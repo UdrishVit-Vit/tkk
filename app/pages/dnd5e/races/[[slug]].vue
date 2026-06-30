@@ -429,7 +429,8 @@ const RACE_KNOT_DEFAULT = {
   '/dnd5e/races/jabari': '/images/races/jabari/knots/jabari-t.png',
   '/dnd5e/races/adzhaidy': '/images/races/adzhaidy/knots/adzhaidy-t.png',
   '/dnd5e/races/oyrdugi': '/images/races/oyrdugi/knots/oyrdugi-t.png',
-  '/dnd5e/races/samaghi': '/images/races/samaghi/knots/samaghi-t.png'
+  '/dnd5e/races/samaghi': '/images/races/samaghi/knots/samaghi-t.png',
+  '/dnd5e/races/ehornur': '/images/races/ehornur/knots/ehornur-t.png'
 }
 const activeKnot = computed(() => {
   const map = RACE_KNOTS[selectedPath.value]
