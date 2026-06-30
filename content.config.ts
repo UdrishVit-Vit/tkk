@@ -64,6 +64,27 @@ export default defineContentConfig({
         speed: z.string().default('30 фт.'),
         primaryTraits: z.array(primaryTraitSchema).default([]),
         ruleSections: z.array(ruleSectionSchema).default([]),
+        bloodTables: z.object({
+          mother: z.array(z.object({ dice: z.string(), name: z.string(), text: z.string() })).default([]),
+          father: z.array(z.object({ dice: z.string(), name: z.string(), text: z.string() })).default([])
+        }).optional(),
+        nameData: z.object({
+          intro: z.string(),
+          examples: z.string().optional(),
+          varieties: z.array(z.string()).default([]),
+          d13: z.object({
+            intro: z.string().optional(),
+            entries: z.array(z.object({ roll: z.number(), desc: z.string(), value: z.string() })).default([])
+          }).optional(),
+          d4x4: z.object({
+            intro: z.string().optional(),
+            entries: z.array(z.object({ roll: z.string(), sign: z.string(), value: z.string(), g: z.string().optional() })).default([])
+          }).optional(),
+          lost: z.object({
+            desc: z.string(),
+            entries: z.array(z.object({ d13: z.number(), roll: z.string(), sign: z.string() })).default([])
+          }).optional()
+        }).optional(),
 
         image: z.string().default(''),
         imageAlt: z.string().default(''),

@@ -9,6 +9,11 @@ const descExpanded = ref(false)
 const varietyDescOpen = ref(false)
 const selectedVarietyId = ref(null)
 const isPortraitOpen = ref(false)
+const activeBloodList = ref(null)
+const rolledBlood = ref(null)
+const rolledD13Idx = ref(null)
+const rolledD4Idx = ref(null)
+const namesPartOpen = ref(null)
 
 const selectedPath = computed(() => {
   const slug = route.params.slug
@@ -178,7 +183,31 @@ onMounted(() => { if (import.meta.client) window.addEventListener('keydown', onE
 onUnmounted(() => { if (import.meta.client) window.removeEventListener('keydown', onEscClose) })
 
 function toggleDesc() { descExpanded.value = !descExpanded.value }
-function selectVariety(id) { selectedVarietyId.value = id; varietyDescOpen.value = false }
+function selectVariety(id) {
+  selectedVarietyId.value = id
+  varietyDescOpen.value = false
+  activeBloodList.value = null
+  rolledBlood.value = null
+  rolledD13Idx.value = null
+  rolledD4Idx.value = null
+  namesPartOpen.value = null
+}
+
+function rollBothName() {
+  const nd = activeNameData.value
+  if (!nd) return
+  rolledD13Idx.value = Math.floor(Math.random() * nd.d13.entries.length)
+  rolledD4Idx.value = Math.floor(Math.random() * nd.d4x4.entries.length)
+}
+
+function rollBlood() {
+  const tables = activeBloodTables.value
+  if (!tables) return
+  const m = Math.floor(Math.random() * tables.mother.length)
+  const f = Math.floor(Math.random() * tables.father.length)
+  rolledBlood.value = { m, f }
+  activeBloodList.value = null
+}
 
 function originalLabel(race) {
   const name = race.originalName?.trim()
@@ -320,9 +349,9 @@ function sectionItemsNameLabel(section) {
 
 const sectionSubheadingsByTitle = {
   'Маракиец (Драгмирец)': ['Хранители троп', 'Договор Крови', 'Алые драгмирцы'],
-  'Люди (Дангун)': ['Там, где Солнце не заходит', 'Удача и индиго'],
-  'Люди (Бралл)': ['Красота в голове'],
-  'Люди (Адаад)': ['Неугасающий дух']
+  'Человек (Дангун)': ['Там, где Солнце не заходит', 'Удача и индиго'],
+  'Человек (Бралл)': ['Красота в голове'],
+  'Человек (Адаад)': ['Неугасающий дух']
 }
 function sectionParagraphs(section) {
   const intro = sectionIntro(section)
@@ -383,12 +412,22 @@ const RACE_KNOTS = {
     'Дангун': '/images/races/lyudi/knots/dangun-t.png',
     'Бралл': '/images/races/lyudi/knots/brall-t.png',
     'Адаад': '/images/races/lyudi/knots/adaad-t.png'
+  },
+  '/dnd5e/races/morhory': {
+    'Дитя Анзу': '/images/races/morhory/knots/anzu-t.png',
+    'Дитя Эдры': '/images/races/morhory/knots/edra-t.png'
   }
+}
+// Default knot for races without varieties
+const RACE_KNOT_DEFAULT = {
+  '/dnd5e/races/borosy': '/images/races/borosy/knots/borosy-t.png',
+  '/dnd5e/races/jabari': '/images/races/jabari/knots/jabari-t.png',
+  '/dnd5e/races/adzhaidy': '/images/races/adzhaidy/knots/adzhaidy-t.png'
 }
 const activeKnot = computed(() => {
   const map = RACE_KNOTS[selectedPath.value]
   if (map && activeVariety.value) return map[varietyShortTitle(activeVariety.value)] || ''
-  return ''
+  return RACE_KNOT_DEFAULT[selectedPath.value] || ''
 })
 
 // Per-race, per-variety portraits — for merged races (e.g. Люди) whose varieties
@@ -431,6 +470,61 @@ const baseFeatures = computed(() => {
   // (base + variety), so we don't show a separate base ability card.
   if (baseAbility.value && !varietyItemSections.value.length) list.unshift(baseAbility.value)
   return list
+})
+
+// Names block — shown only for varieties listed in nameData.varieties (Ча'Нери, Кса'От)
+const activeNameData = computed(() => {
+  const nd = selectedRace.value?.nameData
+  if (!nd) return null
+  const variety = activeVariety.value
+  if (!variety) return null
+  return (nd.varieties || []).includes(varietyShortTitle(variety)) ? nd : null
+})
+const d4x4Left = computed(() => activeNameData.value?.d4x4?.entries?.filter((_, i) => i % 2 === 0) || [])
+const d4x4Right = computed(() => activeNameData.value?.d4x4?.entries?.filter((_, i) => i % 2 === 1) || [])
+const isLostName = computed(() => {
+  const nd = activeNameData.value
+  if (!nd || rolledD13Idx.value === null || rolledD4Idx.value === null) return false
+  const d13e = nd.d13?.entries?.[rolledD13Idx.value]
+  const d4e = nd.d4x4?.entries?.[rolledD4Idx.value]
+  if (!d13e || !d4e || !nd.lost) return false
+  return nd.lost.entries.some(e => e.d13 === d13e.roll && e.roll === d4e.roll)
+})
+function rollD13() {
+  const entries = activeNameData.value?.d13?.entries
+  if (!entries?.length) return
+  rolledD13Idx.value = Math.floor(Math.random() * entries.length)
+}
+function rollD4x4() {
+  const entries = activeNameData.value?.d4x4?.entries
+  if (!entries?.length) return
+  rolledD4Idx.value = Math.floor(Math.random() * entries.length)
+}
+
+function adjForm(adj, gender) {
+  if (!adj || !gender || gender === 'm') return adj
+  const base = adj.replace(/ый$/, '')
+  if (gender === 'f') return base + 'ая'
+  if (gender === 'n') return base + 'ое'
+  if (gender === 'pl') return base + 'ые'
+  return adj
+}
+
+const rolledMeaning = computed(() => {
+  if (rolledD13Idx.value === null || rolledD4Idx.value === null) return ''
+  const nd = activeNameData.value
+  const d13e = nd?.d13?.entries?.[rolledD13Idx.value]
+  const d4e = nd?.d4x4?.entries?.[rolledD4Idx.value]
+  if (!d13e || !d4e) return ''
+  return adjForm(d13e.desc, d4e.g || 'm') + ' ' + d4e.sign
+})
+
+// Blood of Snakes table — only shown for the Тлан'Каа variety when the race has bloodTables
+const activeBloodTables = computed(() => {
+  if (!selectedRace.value?.bloodTables) return null
+  const variety = activeVariety.value
+  if (!variety) return null
+  return varietyShortTitle(variety) === 'Тлан\'Каа' ? selectedRace.value.bloodTables : null
 })
 
 // Rule sections already surfaced elsewhere (summary panel, names, ability score)
@@ -633,7 +727,7 @@ function printRace() {
 
               <div class="rd-hero-card-top">
                 <NuxtLink to="/dnd5e/races" class="rd-emblem" title="Назад к расам">
-                  <img v-if="activeKnot" :src="activeKnot" :alt="`Узел: ${varietyShortTitle(activeVariety)}`" class="rd-emblem-knot">
+                  <img v-if="activeKnot" :src="activeKnot" :alt="activeVariety ? `Узел: ${varietyShortTitle(activeVariety)}` : 'Узел расы'" class="rd-emblem-knot">
                   <img v-else src="/assets/nodes/rasy.png" alt="Узел расы" class="rd-emblem-knot">
                 </NuxtLink>
 
@@ -759,10 +853,83 @@ function printRace() {
                 <div class="rd-block">
                   <h2 class="rd-h2">Особенности</h2>
                   <div class="rd-features">
-                    <div v-for="card in varietyFeatures" :key="'v-' + card.title" class="rd-feat rd-feat--v" :class="{ wide: featWide(card.text) }">
-                      <span class="rd-feat-name">{{ card.title }}<span class="rd-feat-tag">{{ varietyShortTitle(activeVariety) }}</span></span>
-                      <span class="rd-feat-text">{{ card.text }}</span>
-                    </div>
+                    <template v-for="card in varietyFeatures" :key="'v-' + card.title">
+                      <!-- Кровь змей: special interactive card with expandable blood lists -->
+                      <div
+                        v-if="card.title === 'Кровь змей' && activeBloodTables"
+                        class="rd-feat rd-feat--v rd-feat--blood wide"
+                      >
+                        <span class="rd-feat-name">{{ card.title }}<span class="rd-feat-tag">{{ varietyShortTitle(activeVariety) }}</span></span>
+                        <span class="rd-feat-text">{{ card.text }}</span>
+                        <!-- Roll button -->
+                        <button class="rd-blood-roll-btn" type="button" @click="rollBlood">
+                          Бросить кубики
+                        </button>
+
+                        <!-- Roll result -->
+                        <transition name="rd-blood-fade">
+                          <div v-if="rolledBlood" class="rd-blood-result">
+                            <div class="rd-blood-result-col">
+                              <div class="rd-blood-result-label">Кровь Матери</div>
+                              <div class="rd-blood-result-entry">
+                                <span class="rd-blood-entry-dice">{{ activeBloodTables.mother[rolledBlood.m].dice }}</span>
+                                <div class="rd-blood-entry-body">
+                                  <strong class="rd-blood-entry-name">{{ activeBloodTables.mother[rolledBlood.m].name }}</strong>
+                                  <p class="rd-blood-entry-text">{{ activeBloodTables.mother[rolledBlood.m].text }}</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="rd-blood-result-divider" />
+                            <div class="rd-blood-result-col">
+                              <div class="rd-blood-result-label">Кровь Отца</div>
+                              <div class="rd-blood-result-entry">
+                                <span class="rd-blood-entry-dice">{{ activeBloodTables.father[rolledBlood.f].dice }}</span>
+                                <div class="rd-blood-entry-body">
+                                  <strong class="rd-blood-entry-name">{{ activeBloodTables.father[rolledBlood.f].name }}</strong>
+                                  <p class="rd-blood-entry-text">{{ activeBloodTables.father[rolledBlood.f].text }}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </transition>
+
+                        <!-- Full list tabs (browse mode) -->
+                        <div class="rd-blood-tabs">
+                          <button
+                            class="rd-blood-tab"
+                            :class="{ active: activeBloodList === 'mother' }"
+                            type="button"
+                            @click="rolledBlood = null; activeBloodList = activeBloodList === 'mother' ? null : 'mother'"
+                          >Кровь Матери</button>
+                          <button
+                            class="rd-blood-tab"
+                            :class="{ active: activeBloodList === 'father' }"
+                            type="button"
+                            @click="rolledBlood = null; activeBloodList = activeBloodList === 'father' ? null : 'father'"
+                          >Кровь Отца</button>
+                        </div>
+                        <transition name="rd-blood-fade">
+                          <div v-if="activeBloodList" class="rd-blood-list">
+                            <div
+                              v-for="entry in activeBloodTables[activeBloodList]"
+                              :key="entry.dice"
+                              class="rd-blood-entry"
+                            >
+                              <span class="rd-blood-entry-dice">{{ entry.dice }}</span>
+                              <div class="rd-blood-entry-body">
+                                <strong class="rd-blood-entry-name">{{ entry.name }}</strong>
+                                <p class="rd-blood-entry-text">{{ entry.text }}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </transition>
+                      </div>
+                      <!-- Regular feature card -->
+                      <div v-else class="rd-feat rd-feat--v" :class="{ wide: featWide(card.text) }">
+                        <span class="rd-feat-name">{{ card.title }}<span class="rd-feat-tag">{{ varietyShortTitle(activeVariety) }}</span></span>
+                        <span class="rd-feat-text">{{ card.text }}</span>
+                      </div>
+                    </template>
                     <div v-for="trait in baseFeatures" :key="'b-' + trait.title" class="rd-feat" :class="{ wide: featWide(trait.text) }">
                       <span class="rd-feat-name">{{ trait.title }}<span class="rd-feat-tag rd-feat-tag--base">БАЗ</span></span>
                       <span class="rd-feat-text">{{ trait.text }}</span>
@@ -785,6 +952,166 @@ function printRace() {
                       </div>
                       <strong>{{ item.title }}</strong>
                       <p>{{ item.text }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 4. Names block — only for varieties with nameData (Ча'Нери, Кса'От) -->
+                <div v-if="activeNameData" class="rd-block rd-names-block">
+                  <h2 class="rd-h2">
+                    Имена
+                    <span class="rd-variety-badge">{{ varietyShortTitle(activeVariety) }}</span>
+                  </h2>
+
+                  <p class="rd-nb-intro">{{ activeNameData.intro }}</p>
+
+                  <div v-if="activeNameData.examples" class="rd-nb-examples">
+                    <span class="rd-nb-examples-lbl">Примеры:</span> {{ activeNameData.examples }}
+                  </div>
+
+                  <!-- Generated name result -->
+                  <transition name="rd-nb-result-fade">
+                    <div
+                      v-if="rolledD13Idx !== null && rolledD4Idx !== null"
+                      class="rd-nb-result"
+                      :class="{ lost: isLostName }"
+                    >
+                      <template v-if="isLostName">
+                        <span class="rd-nb-result-lbl">Имя</span>
+                        <span class="rd-nb-result-name rd-nb-result-nameless">Безымянный</span>
+                        <span class="rd-nb-result-meaning">Утерянное имя — рождённые в этот день остаются без имени</span>
+                      </template>
+                      <template v-else>
+                        <span class="rd-nb-result-lbl">Имя</span>
+                        <span class="rd-nb-result-name">
+                          {{ activeNameData.d13.entries[rolledD13Idx].value }}{{ activeNameData.d4x4.entries[rolledD4Idx].value }}
+                        </span>
+                        <span class="rd-nb-result-meaning">{{ rolledMeaning }}</span>
+                      </template>
+                    </div>
+                  </transition>
+
+                  <!-- Main roll button -->
+                  <button class="rd-nb-roll-main" type="button" @click="rollBothName">
+                    Бросить кубики
+                  </button>
+
+                  <!-- Accordion parts -->
+                  <div class="rd-nb-accordion">
+
+                    <!-- First part: d13 -->
+                    <div class="rd-nb-acc-item">
+                      <button
+                        class="rd-nb-acc-toggle"
+                        :class="{ open: namesPartOpen === 'd13' }"
+                        type="button"
+                        @click="namesPartOpen = namesPartOpen === 'd13' ? null : 'd13'"
+                      >
+                        <span class="rd-nb-die-tag">1d13</span>
+                        <span class="rd-nb-acc-label">Первая часть имени</span>
+                        <span class="rd-nb-acc-arrow">{{ namesPartOpen === 'd13' ? '▴' : '▾' }}</span>
+                      </button>
+                      <transition name="rd-nb-collapse">
+                        <div v-if="namesPartOpen === 'd13'" class="rd-nb-acc-body">
+                          <p v-if="activeNameData.d13.intro" class="rd-nb-sub-intro">{{ activeNameData.d13.intro }}</p>
+                          <div class="rd-nb-table">
+                            <div class="rd-nb-thead"><span>Бросок</span><span>Описание</span><span>Префикс</span></div>
+                            <div
+                              v-for="(entry, idx) in activeNameData.d13.entries"
+                              :key="entry.roll"
+                              class="rd-nb-row"
+                              :class="{ hl: rolledD13Idx === idx }"
+                            >
+                              <span class="rd-nb-cell-die">{{ entry.roll }}</span>
+                              <span class="rd-nb-cell-desc">{{ entry.desc }}</span>
+                              <span class="rd-nb-cell-val">{{ entry.value }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </transition>
+                    </div>
+
+                    <!-- Second part: 4d4 -->
+                    <div class="rd-nb-acc-item">
+                      <button
+                        class="rd-nb-acc-toggle"
+                        :class="{ open: namesPartOpen === 'd4x4' }"
+                        type="button"
+                        @click="namesPartOpen = namesPartOpen === 'd4x4' ? null : 'd4x4'"
+                      >
+                        <span class="rd-nb-die-tag">4к4</span>
+                        <span class="rd-nb-acc-label">Вторая часть имени</span>
+                        <span class="rd-nb-acc-arrow">{{ namesPartOpen === 'd4x4' ? '▴' : '▾' }}</span>
+                      </button>
+                      <transition name="rd-nb-collapse">
+                        <div v-if="namesPartOpen === 'd4x4'" class="rd-nb-acc-body">
+                          <p v-if="activeNameData.d4x4.intro" class="rd-nb-sub-intro">{{ activeNameData.d4x4.intro }}</p>
+                          <div class="rd-nb-d4-grid">
+                            <div class="rd-nb-table">
+                              <div class="rd-nb-thead"><span>4к4</span><span>Знак</span><span>Часть</span></div>
+                              <div
+                                v-for="(entry, idx) in d4x4Left"
+                                :key="entry.roll"
+                                class="rd-nb-row"
+                                :class="{ hl: rolledD4Idx === idx * 2 }"
+                              >
+                                <span class="rd-nb-cell-die rd-nb-cell-die--sm">{{ entry.roll }}</span>
+                                <span class="rd-nb-cell-desc">{{ entry.sign }}</span>
+                                <span class="rd-nb-cell-val">{{ entry.value }}</span>
+                              </div>
+                            </div>
+                            <div class="rd-nb-table">
+                              <div class="rd-nb-thead"><span>4к4</span><span>Знак</span><span>Часть</span></div>
+                              <div
+                                v-for="(entry, idx) in d4x4Right"
+                                :key="entry.roll"
+                                class="rd-nb-row"
+                                :class="{ hl: rolledD4Idx === idx * 2 + 1 }"
+                              >
+                                <span class="rd-nb-cell-die rd-nb-cell-die--sm">{{ entry.roll }}</span>
+                                <span class="rd-nb-cell-desc">{{ entry.sign }}</span>
+                                <span class="rd-nb-cell-val">{{ entry.value }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </transition>
+                    </div>
+
+                  </div>
+
+                  <!-- Lost names accordion -->
+                  <div v-if="activeNameData.lost" class="rd-nb-accordion rd-nb-accordion--lost">
+                    <div class="rd-nb-acc-item rd-nb-acc-item--lost">
+                      <button
+                        class="rd-nb-acc-toggle rd-nb-acc-toggle--lost"
+                        :class="{ open: namesPartOpen === 'lost' }"
+                        type="button"
+                        @click="namesPartOpen = namesPartOpen === 'lost' ? null : 'lost'"
+                      >
+                        <span class="rd-nb-acc-label">Утерянные имена</span>
+                        <span class="rd-nb-acc-arrow">{{ namesPartOpen === 'lost' ? '▴' : '▾' }}</span>
+                      </button>
+                      <transition name="rd-nb-collapse">
+                        <div v-if="namesPartOpen === 'lost'" class="rd-nb-acc-body">
+                          <p class="rd-nb-sub-intro">{{ activeNameData.lost.desc }}</p>
+                          <div class="rd-nb-table rd-nb-table--lost">
+                            <div class="rd-nb-thead rd-nb-thead--3col">
+                              <span>1d13</span><span>4к4</span><span>Знак</span>
+                            </div>
+                            <div
+                              v-for="(entry, idx) in activeNameData.lost.entries"
+                              :key="idx"
+                              class="rd-nb-row rd-nb-row--3col"
+                              :class="{ hl: isLostName && rolledD13Idx !== null && activeNameData.d13.entries[rolledD13Idx]?.roll === entry.d13 && activeNameData.d4x4.entries[rolledD4Idx]?.roll === entry.roll }"
+                            >
+                              <span class="rd-nb-cell-die">{{ entry.d13 }}</span>
+                              <span class="rd-nb-cell-die rd-nb-cell-die--sm">{{ entry.roll }}</span>
+                              <span class="rd-nb-cell-desc">{{ entry.sign }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </transition>
                     </div>
                   </div>
                 </div>
@@ -1003,7 +1330,7 @@ function printRace() {
 .rd-lightbox-enter-from,.rd-lightbox-leave-to{opacity:0}
 
 .rd-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;line-height:1.5;color:rgba(244,224,170,.85);margin:20px 0 14px}
-.rd-desc{position:relative;max-height:140px;overflow:hidden;transition:max-height .25s ease}
+.rd-desc{position:relative;max-height:360px;overflow:hidden;transition:max-height .25s ease}
 .rd-desc.open{max-height:3000px}
 .rd-desc-inner{font-size:14px;line-height:1.75;color:rgba(226,230,244,.78)}
 .rd-desc-fade{position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(180deg,rgba(11,13,18,0),rgba(11,13,18,.9))}
@@ -1062,6 +1389,32 @@ function printRace() {
 .rd-item-row strong{display:block;margin-bottom:3px;color:rgba(236,240,252,.92);font-size:14px}
 .rd-item-row p{margin:0;font-size:13px;line-height:1.55;color:rgba(226,230,244,.74)}
 
+/* ---- Кровь Змей — inline blood feature card ---- */
+.rd-feat--blood{flex-direction:column;align-items:flex-start;gap:10px}
+.rd-feat--blood .rd-feat-text{white-space:normal}
+.rd-blood-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.rd-blood-tab{padding:7px 18px;border:1px solid rgba(214,170,96,.3);border-radius:999px;background:rgba(214,170,96,.04);color:rgba(226,230,244,.75);font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:.04em;cursor:pointer;transition:all .18s}
+.rd-blood-tab:hover{border-color:rgba(214,170,96,.55);background:rgba(214,170,96,.1);color:rgba(236,240,252,.95)}
+.rd-blood-tab.active{border-color:rgba(214,170,96,.75);background:rgba(214,170,96,.14);color:rgba(244,224,170,1);font-weight:600}
+.rd-blood-list{width:100%;margin-top:4px;display:flex;flex-direction:column;gap:0;border:1px solid rgba(214,170,96,.18);border-radius:12px;overflow:hidden}
+.rd-blood-entry{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:start;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
+.rd-blood-entry:last-child{border-bottom:none}
+.rd-blood-entry:nth-child(even){background:rgba(255,255,255,.015)}
+.rd-blood-entry-dice{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:700;color:rgba(214,170,96,.8);text-align:center;padding-top:2px;letter-spacing:.04em}
+.rd-blood-entry-body{min-width:0}
+.rd-blood-entry-name{display:block;font-size:13.5px;font-weight:600;color:rgba(236,240,252,.92);margin-bottom:3px}
+.rd-blood-entry-text{margin:0;font-size:12.5px;line-height:1.6;color:rgba(226,230,244,.7)}
+.rd-blood-fade-enter-active,.rd-blood-fade-leave-active{transition:opacity .22s,transform .22s}
+.rd-blood-fade-enter-from,.rd-blood-fade-leave-to{opacity:0;transform:translateY(-6px)}
+
+.rd-blood-roll-btn{padding:8px 22px;border:1px solid rgba(214,170,96,.5);border-radius:999px;background:rgba(214,170,96,.12);color:rgba(244,224,170,.95);font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:.04em;cursor:pointer;transition:all .18s}
+.rd-blood-roll-btn:hover{border-color:rgba(214,170,96,.8);background:rgba(214,170,96,.22);color:rgba(255,240,190,1)}
+.rd-blood-result{display:grid;grid-template-columns:1fr auto 1fr;gap:0;width:100%;border:1px solid rgba(214,170,96,.3);border-radius:12px;background:rgba(214,170,96,.07);overflow:hidden}
+.rd-blood-result-col{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.rd-blood-result-label{font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(214,170,96,.7)}
+.rd-blood-result-entry{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start}
+.rd-blood-result-divider{width:1px;background:rgba(214,170,96,.2);margin:12px 0}
+
 /* ---- footer (names + related) ---- */
 .rd-foot{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
 .rd-foot-col{min-width:0}
@@ -1092,6 +1445,82 @@ function printRace() {
   .rd-features{grid-template-columns:1fr}
   .rd-foot{grid-template-columns:1fr}
 }
+
+/* ---- Names block (Имена) ---- */
+.rd-nb-intro{font-family:'Cormorant Garamond',serif;font-size:16.5px;line-height:1.74;color:rgba(226,230,244,.84);margin:0 0 16px}
+.rd-nb-examples{font-family:'Cormorant Garamond',serif;font-size:15px;line-height:1.68;color:rgba(226,230,244,.74);background:rgba(255,255,255,.04);border-left:2px solid rgba(214,170,96,.45);border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:22px}
+.rd-nb-examples-lbl{color:rgba(244,224,170,.9);font-weight:600;font-style:normal}
+
+.rd-nb-result{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:16px 20px;border:1px solid rgba(214,170,96,.4);border-radius:12px;background:rgba(214,170,96,.1);margin:0 0 22px;transition:background .25s,border-color .25s}
+.rd-nb-result.lost{border-color:rgba(200,90,90,.5);background:rgba(200,90,90,.1)}
+.rd-nb-result-nameless{font-style:italic;opacity:.8}
+.rd-nb-result-lbl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(214,170,96,.7);align-self:center}
+.rd-nb-result.lost .rd-nb-result-lbl{color:rgba(200,90,90,.7)}
+.rd-nb-result-name{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:rgba(244,224,170,.98);letter-spacing:.08em;line-height:1}
+.rd-nb-result.lost .rd-nb-result-name{color:rgba(220,160,160,.98)}
+.rd-nb-result-meaning{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:rgba(226,230,244,.6)}
+.rd-nb-result-lost-tag{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(200,90,90,.9);border:1px solid rgba(200,90,90,.5);border-radius:999px;padding:3px 10px;align-self:center}
+.rd-nb-result-fade-enter-active,.rd-nb-result-fade-leave-active{transition:opacity .22s,transform .22s}
+.rd-nb-result-fade-enter-from,.rd-nb-result-fade-leave-to{opacity:0;transform:translateY(-5px)}
+
+.rd-nb-section{margin-top:26px;padding-top:20px;border-top:1px solid rgba(255,255,255,.07)}
+.rd-nb-sub{display:flex;align-items:center;gap:10px;font-family:'Hanken Grotesk';font-size:11px;font-weight:700;letter-spacing:.17em;text-transform:uppercase;color:rgba(214,170,96,.85);margin-bottom:10px}
+.rd-nb-sub--lost{color:rgba(190,100,100,.9)}
+.rd-nb-die-tag{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:3px 10px;border:1px solid rgba(214,170,96,.45);border-radius:6px;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;letter-spacing:.04em;color:rgba(244,224,170,.95);background:rgba(214,170,96,.1);text-transform:none}
+.rd-nb-sub-intro{font-family:'Cormorant Garamond',serif;font-size:15px;line-height:1.62;color:rgba(226,230,244,.7);margin:0 0 12px}
+
+/* Table base */
+.rd-nb-table{border:1px solid rgba(255,255,255,.08);border-radius:11px;overflow:hidden}
+.rd-nb-thead{display:grid;grid-template-columns:48px 1fr 96px;gap:12px;align-items:center;padding:9px 16px;background:rgba(214,170,96,.11);color:rgba(244,224,170,.9);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.rd-nb-row{display:grid;grid-template-columns:48px 1fr 96px;gap:12px;align-items:center;padding:11px 16px;border-top:1px solid rgba(255,255,255,.05);transition:background .15s,border-color .15s}
+.rd-nb-row:nth-child(even){background:rgba(255,255,255,.014)}
+.rd-nb-row.hl{background:rgba(214,170,96,.22)!important;border-color:rgba(214,170,96,.38)}
+
+/* 4d4 table — wider die column for "1 1 1 1" combinations */
+.rd-nb-d4-grid .rd-nb-thead{grid-template-columns:90px 1fr 96px}
+.rd-nb-d4-grid .rd-nb-row{grid-template-columns:90px 1fr 96px}
+
+/* Lost names table columns */
+.rd-nb-thead--3col{grid-template-columns:46px 106px 1fr}
+.rd-nb-row--3col{grid-template-columns:46px 106px 1fr}
+
+/* Table cells */
+.rd-nb-cell-die{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:rgba(214,170,96,.88);letter-spacing:.05em}
+.rd-nb-cell-die--sm{font-size:14px;letter-spacing:.22em;white-space:nowrap}
+.rd-nb-cell-desc{font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(226,230,244,.86);line-height:1.3}
+.rd-nb-cell-val{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:700;color:rgba(244,224,170,.97);letter-spacing:.06em}
+
+/* Two-column 4d4 layout */
+.rd-nb-d4-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Roll button */
+/* Main roll button */
+.rd-nb-roll-main{display:block;width:100%;margin:18px 0 0;padding:13px 22px;border:1px solid rgba(214,170,96,.5);border-radius:12px;background:rgba(214,170,96,.1);color:rgba(244,224,170,.97);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:.06em;text-align:center;cursor:pointer;transition:all .2s}
+.rd-nb-roll-main:hover{background:rgba(214,170,96,.2);border-color:rgba(214,170,96,.75);color:#f0d890}
+
+/* Accordion */
+.rd-nb-accordion{display:flex;flex-direction:column;gap:6px;margin-top:18px}
+.rd-nb-acc-item{border:1px solid rgba(214,170,96,.2);border-radius:10px;overflow:hidden;background:rgba(214,170,96,.03)}
+.rd-nb-acc-toggle{display:flex;align-items:center;gap:10px;width:100%;padding:13px 18px;background:none;border:none;color:rgba(226,230,244,.88);font-family:'Cormorant Garamond',serif;font-size:17px;letter-spacing:.03em;cursor:pointer;text-align:left;transition:background .18s}
+.rd-nb-acc-toggle:hover{background:rgba(214,170,96,.08)}
+.rd-nb-acc-toggle.open{background:rgba(214,170,96,.07);color:rgba(244,224,170,.97)}
+.rd-nb-acc-label{flex:1}
+.rd-nb-acc-arrow{font-size:12px;opacity:.6;margin-left:auto}
+.rd-nb-acc-body{padding:14px 16px 16px}
+
+/* Lost names accordion variant */
+.rd-nb-accordion--lost{margin-top:14px}
+.rd-nb-acc-item--lost{border-color:rgba(180,80,80,.25);background:rgba(180,80,80,.04)}
+.rd-nb-acc-toggle--lost{color:rgba(220,160,160,.85)}
+.rd-nb-acc-toggle--lost:hover{background:rgba(180,80,80,.08)}
+.rd-nb-acc-toggle--lost.open{background:rgba(180,80,80,.07);color:rgba(240,180,180,.95)}
+
+/* Collapse transition */
+.rd-nb-collapse-enter-active,.rd-nb-collapse-leave-active{transition:opacity .2s,max-height .22s ease}
+.rd-nb-collapse-enter-from,.rd-nb-collapse-leave-to{opacity:0;max-height:0}
+.rd-nb-collapse-enter-to,.rd-nb-collapse-leave-from{opacity:1;max-height:2000px}
+
+@media (max-width: 760px){.rd-nb-d4-grid{grid-template-columns:1fr}}
 
 @media print{
   .rd-nav,.rd-actions,.rd-wordmark{display:none}
