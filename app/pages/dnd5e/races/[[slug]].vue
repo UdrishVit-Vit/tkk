@@ -416,6 +416,11 @@ const RACE_KNOTS = {
   '/dnd5e/races/morhory': {
     'Дитя Анзу': '/images/races/morhory/knots/anzu-t.png',
     'Дитя Эдры': '/images/races/morhory/knots/edra-t.png'
+  },
+  '/dnd5e/races/vetu': {
+    "Ча'Нери": '/images/races/vetu/knots/chaneri.png',
+    "Кса'От": '/images/races/vetu/knots/ksaot.png',
+    "Тлан'Каа": '/images/races/vetu/knots/tlaankaa.png'
   }
 }
 // Default knot for races without varieties
