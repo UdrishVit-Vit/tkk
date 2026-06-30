@@ -1,5 +1,5 @@
 ---
-title: Мор’хоры
+title: Мор’хор
 description: Рогатые выходцы из Спиралей, несущие в себе энергию мхур, память древних изобретателей и опасное табу на Анзу.
 status: published
 access: public
@@ -25,7 +25,7 @@ detailImages:
   marak: /images/races/morhory/details/marak.png
   dangun: /images/races/morhory/details/dangun.png
   brall: /images/races/morhory/details/brall.png
-imageAlt: Мор’хоры
+imageAlt: Мор’хор
 creatureType: гуманоид
 abilityScore: Сил +1, Тел +1, Мдр +1
 raceSize: Средний
