@@ -18,9 +18,6 @@ logs
 .fleet
 .idea
 
-# Large media assets (store separately)
-public/images
-
 # Local env files
 .env
 .env.*
