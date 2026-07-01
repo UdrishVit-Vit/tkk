@@ -600,6 +600,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   line-height: 1.6;
   color: rgba(226,230,244,.78);
   margin: 0 0 24px;
+  white-space: pre-line;
 }
 
 .fp-benefits {
