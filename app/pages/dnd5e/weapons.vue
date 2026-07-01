@@ -1,8 +1,42 @@
 <script setup>
-import { WEAPONS_5E, WEAPON_SOURCES } from '~/data/weapons5e.js'
+import { WEAPONS_5E, WEAPON_SOURCES, WEAPON_CATEGORIES, WEAPON_PROPERTIES, propTag } from '~/data/weapons5e.js'
 
 const search = ref('')
 const selectedId = ref(null)
+const filterOpen = ref(false)
+
+const DAMAGE_TYPES = [...new Set(WEAPONS_5E.map(w => w.damageType).filter(Boolean))]
+const ALL_PROPERTY_TAGS = [...new Set(WEAPONS_5E.flatMap(w => w.properties.map(propTag)))].sort()
+
+// ---- filter state ----
+const activeSources = ref(new Set(Object.keys(WEAPON_SOURCES)))
+const activeCategories = ref(new Set(Object.keys(WEAPON_CATEGORIES)))
+const activeDamageTypes = ref(new Set())
+const activeProperties = ref(new Set())
+
+function toggleInSet(set, value) {
+  const next = new Set(set.value)
+  if (next.has(value)) next.delete(value)
+  else next.add(value)
+  set.value = next
+}
+function toggleSource(id) { toggleInSet(activeSources, id) }
+function toggleCategory(id) { toggleInSet(activeCategories, id) }
+function toggleDamageType(t) { toggleInSet(activeDamageTypes, t) }
+function toggleProperty(p) { toggleInSet(activeProperties, p) }
+
+const activeFilterCount = computed(() =>
+  (activeSources.value.size < Object.keys(WEAPON_SOURCES).length ? 1 : 0) +
+  (activeCategories.value.size < Object.keys(WEAPON_CATEGORIES).length ? 1 : 0) +
+  activeDamageTypes.value.size +
+  activeProperties.value.size
+)
+function resetFilters() {
+  activeSources.value = new Set(Object.keys(WEAPON_SOURCES))
+  activeCategories.value = new Set(Object.keys(WEAPON_CATEGORIES))
+  activeDamageTypes.value = new Set()
+  activeProperties.value = new Set()
+}
 
 useSeoMeta({
   title: 'Оружие — TKK.club',
@@ -11,20 +45,26 @@ useSeoMeta({
 
 const filteredWeapons = computed(() => {
   const q = search.value.trim().toLowerCase()
-  if (!q) return WEAPONS_5E
-  return WEAPONS_5E.filter(w =>
-    w.title.toLowerCase().includes(q) ||
-    w.category.toLowerCase().includes(q) ||
-    (w.lore && w.lore.toLowerCase().includes(q))
-  )
+  return WEAPONS_5E.filter(w => {
+    if (!activeSources.value.has(w.source)) return false
+    if (!activeCategories.value.has(w.category)) return false
+    if (activeDamageTypes.value.size && !activeDamageTypes.value.has(w.damageType)) return false
+    if (activeProperties.value.size && !w.properties.some(p => activeProperties.value.has(propTag(p)))) return false
+    if (!q) return true
+    return w.title.toLowerCase().includes(q) ||
+      (w.englishName && w.englishName.toLowerCase().includes(q)) ||
+      (w.lore && w.lore.toLowerCase().includes(q))
+  })
 })
 
 const selectedWeapon = computed(() => WEAPONS_5E.find(w => w.id === selectedId.value) || null)
 
 function select(id) { selectedId.value = selectedId.value === id ? null : id }
 function sourceName(id) { return WEAPON_SOURCES[id] || id }
+function categoryName(id) { return WEAPON_CATEGORIES[id] || id }
+function propertyTooltip(p) { return WEAPON_PROPERTIES[propTag(p)] || '' }
 
-function onKeydown(e) { if (e.key === 'Escape') selectedId.value = null }
+function onKeydown(e) { if (e.key === 'Escape') { filterOpen.value = false; selectedId.value = null } }
 onMounted(() => document.addEventListener('keydown', onKeydown))
 onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 </script>
@@ -53,6 +93,16 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
       <div class="fp-search-wrap">
         <input v-model="search" class="fp-search" type="search" placeholder="Поиск оружия...">
+        <button
+          type="button"
+          class="fp-filter-btn"
+          :class="{ active: activeFilterCount > 0 }"
+          title="Фильтр"
+          @click="filterOpen = true"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          <span v-if="activeFilterCount" class="fp-filter-badge">{{ activeFilterCount }}</span>
+        </button>
       </div>
 
       <div class="fp-list">
@@ -67,7 +117,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
           <span class="fp-item-diamond" />
           <span class="fp-item-body">
             <span class="fp-item-title">{{ w.title }}</span>
-            <span class="fp-item-req">{{ w.category }}</span>
+            <span class="fp-item-req">{{ categoryName(w.category) }}</span>
           </span>
           <span class="fp-item-source" :title="sourceName(w.source)">{{ w.source }}</span>
         </button>
@@ -96,11 +146,12 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
           </div>
 
           <h1 class="fp-title">{{ selectedWeapon.title.toUpperCase() }}</h1>
+          <span v-if="selectedWeapon.englishName" class="fp-subtitle">{{ selectedWeapon.englishName }}</span>
           <div class="fp-divider"><span class="fp-divider-diamond" /></div>
 
           <div class="fp-badge-row">
             <span class="fp-source-badge" :title="sourceName(selectedWeapon.source)">{{ selectedWeapon.source }}</span>
-            <span class="fp-cat-badge">{{ selectedWeapon.category }}</span>
+            <span class="fp-cat-badge">{{ categoryName(selectedWeapon.category) }}</span>
           </div>
 
           <div class="fp-stat-grid">
@@ -114,11 +165,19 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
             </div>
             <div class="fp-stat">
               <span class="fp-stat-label">Урон</span>
-              <span class="fp-stat-value">{{ selectedWeapon.damage }}</span>
+              <span class="fp-stat-value">{{ selectedWeapon.damage || '—' }}<span v-if="selectedWeapon.damageType"> {{ selectedWeapon.damageType }}</span></span>
             </div>
-            <div class="fp-stat">
-              <span class="fp-stat-label">Свойства</span>
-              <span class="fp-stat-value">{{ selectedWeapon.properties.join(', ') }}</span>
+          </div>
+
+          <div v-if="selectedWeapon.properties.length" class="fp-props">
+            <span class="fp-props-label">Свойства</span>
+            <div class="fp-props-list">
+              <span
+                v-for="p in selectedWeapon.properties"
+                :key="p"
+                class="fp-prop-pill"
+                :title="propertyTooltip(p)"
+              >{{ p }}</span>
             </div>
           </div>
 
@@ -138,6 +197,97 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
         </div>
       </transition>
     </main>
+
+    <!-- FILTER PANEL -->
+    <Teleport to="body">
+      <transition name="fp-filter-fade">
+        <div v-if="filterOpen" class="fp-filter-overlay" @click="filterOpen = false">
+          <div class="fp-filter-panel" @click.stop>
+            <div class="fp-filter-head">
+              <h2 class="fp-filter-title">Фильтр</h2>
+              <button class="fp-close" type="button" title="Закрыть" @click="filterOpen = false">✕</button>
+            </div>
+
+            <div class="fp-filter-body">
+              <!-- Categories -->
+              <div class="fp-filter-group">
+                <div class="fp-filter-group-head">
+                  <span>Категория</span>
+                </div>
+                <div class="fp-pill-row">
+                  <button
+                    v-for="(name, id) in WEAPON_CATEGORIES"
+                    :key="id"
+                    type="button"
+                    class="fp-pill"
+                    :class="{ on: activeCategories.has(id) }"
+                    @click="toggleCategory(id)"
+                  >{{ name }}</button>
+                </div>
+              </div>
+
+              <!-- Damage type -->
+              <div v-if="DAMAGE_TYPES.length" class="fp-filter-group">
+                <div class="fp-filter-group-head">
+                  <span>Тип урона</span>
+                </div>
+                <div class="fp-pill-row">
+                  <button
+                    v-for="t in DAMAGE_TYPES"
+                    :key="t"
+                    type="button"
+                    class="fp-pill"
+                    :class="{ on: activeDamageTypes.has(t) }"
+                    @click="toggleDamageType(t)"
+                  >{{ t }}</button>
+                </div>
+              </div>
+
+              <!-- Properties -->
+              <div v-if="ALL_PROPERTY_TAGS.length" class="fp-filter-group">
+                <div class="fp-filter-group-head">
+                  <span>Свойства</span>
+                </div>
+                <div class="fp-pill-row">
+                  <button
+                    v-for="p in ALL_PROPERTY_TAGS"
+                    :key="p"
+                    type="button"
+                    class="fp-pill"
+                    :class="{ on: activeProperties.has(p) }"
+                    :title="WEAPON_PROPERTIES[p] || ''"
+                    @click="toggleProperty(p)"
+                  >{{ p }}</button>
+                </div>
+              </div>
+
+              <!-- Sources -->
+              <div class="fp-filter-group">
+                <div class="fp-filter-group-head">
+                  <span>Источники нитей</span>
+                </div>
+                <div class="fp-pill-row">
+                  <button
+                    v-for="(name, id) in WEAPON_SOURCES"
+                    :key="id"
+                    type="button"
+                    class="fp-pill"
+                    :class="{ on: activeSources.has(id) }"
+                    :title="name"
+                    @click="toggleSource(id)"
+                  >{{ id }}</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="fp-filter-foot">
+              <button type="button" class="fp-filter-reset" @click="resetFilters">Сбросить фильтры</button>
+              <span class="fp-filter-note">Фильтры применяются автоматически!</span>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
@@ -220,9 +370,10 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   color: rgba(244,224,170,.9);
 }
 
-.fp-search-wrap { padding: 0 14px 12px; }
+.fp-search-wrap { padding: 0 14px 12px; display: flex; gap: 8px; }
 .fp-search {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   min-height: 38px;
   padding: 0 14px;
   border: 1px solid rgba(255,255,255,.1);
@@ -235,6 +386,37 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   box-sizing: border-box;
 }
 .fp-search:focus { border-color: rgba(214,170,96,.5); }
+
+.fp-filter-btn {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 999px;
+  background: rgba(7,8,12,.5);
+  color: rgba(226,230,244,.65);
+  cursor: pointer;
+  transition: all .18s;
+}
+.fp-filter-btn:hover { border-color: rgba(214,170,96,.4); color: rgba(244,224,170,.9); }
+.fp-filter-btn.active { border-color: rgba(214,170,96,.55); background: rgba(214,170,96,.12); color: rgba(244,224,170,.95); }
+.fp-filter-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(214,170,96,.95);
+  color: rgba(20,15,6,.95);
+  font-size: 9.5px;
+  font-weight: 700;
+}
 
 .fp-list {
   flex: 1;
@@ -399,6 +581,14 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   margin: 0;
   line-height: 1.05;
 }
+.fp-subtitle {
+  display: block;
+  font-size: 12px;
+  letter-spacing: .1em;
+  font-style: italic;
+  color: rgba(226,230,244,.4);
+  margin-top: 4px;
+}
 
 .fp-divider {
   display: flex;
@@ -449,9 +639,9 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
 .fp-stat-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0,1fr));
+  grid-template-columns: repeat(3, minmax(0,1fr));
   gap: 12px;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 .fp-stat {
   display: flex;
@@ -472,6 +662,27 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   font-family: 'Cormorant Garamond', serif;
   font-size: 16px;
   color: rgba(236,240,252,.92);
+}
+
+.fp-props { margin-bottom: 22px; }
+.fp-props-label {
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(226,230,244,.45);
+  margin-bottom: 8px;
+}
+.fp-props-list { display: flex; flex-wrap: wrap; gap: 7px; }
+.fp-prop-pill {
+  padding: 5px 12px;
+  border: 1px solid rgba(214,170,96,.3);
+  border-radius: 999px;
+  background: rgba(214,170,96,.06);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13.5px;
+  color: rgba(244,224,170,.9);
+  cursor: help;
 }
 
 .fp-special {
@@ -548,4 +759,99 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   .fp-title { font-size: 32px; }
   .fp-stat-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
+
+/* ---- filter panel ---- */
+.fp-filter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 60px 20px;
+  background: rgba(5,6,9,.7);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+.fp-filter-panel {
+  width: 100%;
+  max-width: 460px;
+  border: 1px solid rgba(214,170,96,.25);
+  border-radius: 18px;
+  background: #0c0e14;
+  box-shadow: 0 30px 90px rgba(0,0,0,.6);
+  font-family: 'Hanken Grotesk', sans-serif;
+  color: rgba(226,230,244,.92);
+}
+.fp-filter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.fp-filter-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  letter-spacing: .04em;
+  margin: 0;
+  color: rgba(238,242,252,.97);
+}
+
+.fp-filter-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 20px; max-height: 60vh; overflow-y: auto; }
+.fp-filter-group { display: flex; flex-direction: column; gap: 10px; }
+.fp-filter-group-head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(226,230,244,.55);
+}
+
+.fp-pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.fp-pill {
+  padding: 7px 15px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.03);
+  color: rgba(226,230,244,.65);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: all .16s;
+}
+.fp-pill:hover { border-color: rgba(214,170,96,.4); color: rgba(236,240,252,.92); }
+.fp-pill.on {
+  border-color: rgba(214,170,96,.6);
+  background: rgba(214,170,96,.16);
+  color: rgba(244,224,170,.98);
+  font-weight: 600;
+}
+
+.fp-filter-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px 20px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  flex-wrap: wrap;
+}
+.fp-filter-reset {
+  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.03);
+  color: rgba(226,230,244,.7);
+  font-family: 'Hanken Grotesk';
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .16s;
+}
+.fp-filter-reset:hover { border-color: rgba(214,170,96,.4); color: rgba(244,224,170,.9); }
+.fp-filter-note { font-size: 11px; font-style: italic; color: rgba(226,230,244,.35); }
+
+.fp-filter-fade-enter-active, .fp-filter-fade-leave-active { transition: opacity .18s ease; }
+.fp-filter-fade-enter-from, .fp-filter-fade-leave-to { opacity: 0; }
 </style>
