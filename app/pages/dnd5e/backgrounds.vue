@@ -4,6 +4,44 @@ import { BACKGROUNDS_5E, BACKGROUND_SOURCES } from '~/data/backgrounds5e.js'
 const search = ref('')
 const selectedId = ref(null)
 const rolled = ref({}) // { [tableId]: rowIndex }
+const filterOpen = ref(false)
+const sortDir = ref('asc') // 'asc' | 'desc'
+
+// Fixed skill names granted by each background (skip "choose N of..." entries,
+// those aren't a concrete filterable skill).
+function skillNamesOf(bg) {
+  if (!bg.proficiencies?.skills) return []
+  return bg.proficiencies.skills
+    .map(s => s.name)
+    .filter(name => !/выбор/i.test(name))
+}
+const BACKGROUND_SKILLS = [...new Set(BACKGROUNDS_5E.flatMap(skillNamesOf))].sort()
+
+// ---- filter state ----
+const activeSources = ref(new Set(Object.keys(BACKGROUND_SOURCES)))
+const activeSkills = ref(new Set())
+const activeReqs = ref(new Set()) // subset of 'yes' | 'no'
+
+function toggleInSet(set, value) {
+  const next = new Set(set.value)
+  if (next.has(value)) next.delete(value)
+  else next.add(value)
+  set.value = next
+}
+function toggleSource(id) { toggleInSet(activeSources, id) }
+function toggleSkill(s) { toggleInSet(activeSkills, s) }
+function toggleReq(r) { toggleInSet(activeReqs, r) }
+
+const activeFilterCount = computed(() =>
+  (activeSources.value.size < Object.keys(BACKGROUND_SOURCES).length ? 1 : 0) +
+  activeSkills.value.size +
+  activeReqs.value.size
+)
+function resetFilters() {
+  activeSources.value = new Set(Object.keys(BACKGROUND_SOURCES))
+  activeSkills.value = new Set()
+  activeReqs.value = new Set()
+}
 
 useSeoMeta({
   title: 'Предыстории — TKK.club',
@@ -12,11 +50,19 @@ useSeoMeta({
 
 const filteredBackgrounds = computed(() => {
   const q = search.value.trim().toLowerCase()
-  if (!q) return BACKGROUNDS_5E
-  return BACKGROUNDS_5E.filter(b =>
-    b.title.toLowerCase().includes(q) ||
-    (b.intro && b.intro.toLowerCase().includes(q))
-  )
+  const list = BACKGROUNDS_5E.filter(b => {
+    if (!activeSources.value.has(b.source)) return false
+    if (activeSkills.value.size && !skillNamesOf(b).some(s => activeSkills.value.has(s))) return false
+    if (activeReqs.value.size) {
+      const kind = b.grantsFeat ? 'yes' : 'no'
+      if (!activeReqs.value.has(kind)) return false
+    }
+    if (!q) return true
+    return b.title.toLowerCase().includes(q) ||
+      (b.intro && b.intro.toLowerCase().includes(q))
+  })
+  const sorted = [...list].sort((a, b) => a.title.localeCompare(b.title, 'ru'))
+  return sortDir.value === 'desc' ? sorted.reverse() : sorted
 })
 
 const selectedBackground = computed(() => BACKGROUNDS_5E.find(b => b.id === selectedId.value) || null)
@@ -26,6 +72,7 @@ function select(id) {
   rolled.value = {}
 }
 function sourceName(id) { return BACKGROUND_SOURCES[id] || id }
+function toggleSort() { sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc' }
 
 // Very small **bold** / _italic_ → <strong>/<em> converter for our own trusted static copy.
 function mdBold(text) {
@@ -40,7 +87,7 @@ function rollTable(table) {
   rolled.value = { ...rolled.value, [table.id]: Math.floor(Math.random() * table.entries.length) }
 }
 
-function onKeydown(e) { if (e.key === 'Escape') selectedId.value = null }
+function onKeydown(e) { if (e.key === 'Escape') { filterOpen.value = false; selectedId.value = null } }
 onMounted(() => document.addEventListener('keydown', onKeydown))
 onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 </script>
@@ -69,6 +116,25 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
       <div class="fp-search-wrap">
         <input v-model="search" class="fp-search" type="search" placeholder="Поиск предыстории...">
+        <button
+          type="button"
+          class="fp-filter-btn"
+          :title="sortDir === 'asc' ? 'По алфавиту (А-Я)' : 'По алфавиту (Я-А)'"
+          @click="toggleSort"
+        >
+          <svg v-if="sortDir === 'asc'" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h9M4 12h6M4 18h3M17 4v16M17 4l-4 4M17 4l4 4"/></svg>
+          <svg v-else viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h3M4 12h6M4 18h9M17 20V4M17 20l-4-4M17 20l4-4"/></svg>
+        </button>
+        <button
+          type="button"
+          class="fp-filter-btn"
+          :class="{ active: activeFilterCount > 0 }"
+          title="Фильтр"
+          @click="filterOpen = true"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          <span v-if="activeFilterCount" class="fp-filter-badge">{{ activeFilterCount }}</span>
+        </button>
       </div>
 
       <div class="fp-list">
@@ -210,6 +276,73 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
         </div>
       </transition>
     </main>
+
+    <!-- FILTER PANEL -->
+    <Teleport to="body">
+      <transition name="fp-filter-fade">
+        <div v-if="filterOpen" class="fp-filter-overlay" @click="filterOpen = false">
+          <div class="fp-filter-panel" @click.stop>
+            <div class="fp-filter-head">
+              <h2 class="fp-filter-title">Фильтр</h2>
+              <button class="fp-close" type="button" title="Закрыть" @click="filterOpen = false">✕</button>
+            </div>
+
+            <div class="fp-filter-body">
+              <!-- Sources -->
+              <div class="fp-filter-group">
+                <div class="fp-filter-group-head">
+                  <span>Источники нитей</span>
+                </div>
+                <div class="fp-pill-row">
+                  <button
+                    v-for="(name, id) in BACKGROUND_SOURCES"
+                    :key="id"
+                    type="button"
+                    class="fp-pill"
+                    :class="{ on: activeSources.has(id) }"
+                    :title="name"
+                    @click="toggleSource(id)"
+                  >{{ id }}</button>
+                </div>
+              </div>
+
+              <!-- Skills -->
+              <div v-if="BACKGROUND_SKILLS.length" class="fp-filter-group">
+                <div class="fp-filter-group-head">
+                  <span>Навыки</span>
+                </div>
+                <div class="fp-pill-row">
+                  <button
+                    v-for="s in BACKGROUND_SKILLS"
+                    :key="s"
+                    type="button"
+                    class="fp-pill"
+                    :class="{ on: activeSkills.has(s) }"
+                    @click="toggleSkill(s)"
+                  >{{ s }}</button>
+                </div>
+              </div>
+
+              <!-- Additional requirements -->
+              <div class="fp-filter-group">
+                <div class="fp-filter-group-head">
+                  <span>Черта при старте</span>
+                </div>
+                <div class="fp-pill-row">
+                  <button type="button" class="fp-pill" :class="{ on: activeReqs.has('yes') }" @click="toggleReq('yes')">да</button>
+                  <button type="button" class="fp-pill" :class="{ on: activeReqs.has('no') }" @click="toggleReq('no')">нет</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="fp-filter-foot">
+              <button type="button" class="fp-filter-reset" @click="resetFilters">Сбросить фильтры</button>
+              <span class="fp-filter-note">Фильтры применяются автоматически!</span>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
@@ -292,9 +425,10 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   color: rgba(244,224,170,.9);
 }
 
-.fp-search-wrap { padding: 0 14px 12px; }
+.fp-search-wrap { padding: 0 14px 12px; display: flex; gap: 8px; }
 .fp-search {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   min-height: 38px;
   padding: 0 14px;
   border: 1px solid rgba(255,255,255,.1);
@@ -307,6 +441,37 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   box-sizing: border-box;
 }
 .fp-search:focus { border-color: rgba(214,170,96,.5); }
+
+.fp-filter-btn {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 999px;
+  background: rgba(7,8,12,.5);
+  color: rgba(226,230,244,.65);
+  cursor: pointer;
+  transition: all .18s;
+}
+.fp-filter-btn:hover { border-color: rgba(214,170,96,.4); color: rgba(244,224,170,.9); }
+.fp-filter-btn.active { border-color: rgba(214,170,96,.55); background: rgba(214,170,96,.12); color: rgba(244,224,170,.95); }
+.fp-filter-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(214,170,96,.95);
+  color: rgba(20,15,6,.95);
+  font-size: 9.5px;
+  font-weight: 700;
+}
 
 .fp-list {
   flex: 1;
@@ -742,4 +907,99 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   .fp-card { padding: 24px 22px 32px; }
   .fp-title { font-size: 32px; }
 }
+
+/* ---- filter panel ---- */
+.fp-filter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 60px 20px;
+  background: rgba(5,6,9,.7);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+.fp-filter-panel {
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid rgba(214,170,96,.25);
+  border-radius: 18px;
+  background: #0c0e14;
+  box-shadow: 0 30px 90px rgba(0,0,0,.6);
+  font-family: 'Hanken Grotesk', sans-serif;
+  color: rgba(226,230,244,.92);
+}
+.fp-filter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.fp-filter-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  letter-spacing: .04em;
+  margin: 0;
+  color: rgba(238,242,252,.97);
+}
+
+.fp-filter-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 20px; }
+.fp-filter-group { display: flex; flex-direction: column; gap: 10px; }
+.fp-filter-group-head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(226,230,244,.55);
+}
+
+.fp-pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.fp-pill {
+  padding: 7px 15px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.03);
+  color: rgba(226,230,244,.65);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: all .16s;
+}
+.fp-pill:hover { border-color: rgba(214,170,96,.4); color: rgba(236,240,252,.92); }
+.fp-pill.on {
+  border-color: rgba(214,170,96,.6);
+  background: rgba(214,170,96,.16);
+  color: rgba(244,224,170,.98);
+  font-weight: 600;
+}
+
+.fp-filter-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px 20px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  flex-wrap: wrap;
+}
+.fp-filter-reset {
+  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.03);
+  color: rgba(226,230,244,.7);
+  font-family: 'Hanken Grotesk';
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .16s;
+}
+.fp-filter-reset:hover { border-color: rgba(214,170,96,.4); color: rgba(244,224,170,.9); }
+.fp-filter-note { font-size: 11px; font-style: italic; color: rgba(226,230,244,.35); }
+
+.fp-filter-fade-enter-active, .fp-filter-fade-leave-active { transition: opacity .18s ease; }
+.fp-filter-fade-enter-from, .fp-filter-fade-leave-to { opacity: 0; }
 </style>
