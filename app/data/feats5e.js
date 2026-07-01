@@ -1,6 +1,18 @@
+// Sources feats can come from — currently only the homebrew Enoa thread-book,
+// but the shape mirrors the reference filter (PHB/XGE/etc.) so more can be
+// added later without touching the filter UI.
+export const FEAT_SOURCES = {
+  TJB: 'The Threads of JorasBashu'
+}
+
+export const FEAT_ABILITIES = ['Сила', 'Ловкость', 'Телосложение', 'Интеллект', 'Мудрость', 'Харизма']
+
 export const FEATS_5E = [
   {
     id: 'experienced-nomad',
+    source: 'TJB',
+    abilities: [],
+    minLevel: null,
     title: 'Опытный кочевник',
     requirement: null,
     intro: 'Вы долгое время странствовали с места на место и приобрели в этом тяжком деле мастерство, что даёт вам следующие преимущества:',
@@ -12,6 +24,9 @@ export const FEATS_5E = [
   },
   {
     id: 'fate-bender',
+    source: 'TJB',
+    abilities: [],
+    minLevel: null,
     title: 'Изгибающий судьбу',
     requirement: null,
     intro: 'Ваша воля, амбиции и поступки настолько противоправны законам этого мира, что ваша нить судьбы изгибается в ваших руках, что даёт вам следующие преимущества:',
@@ -23,6 +38,9 @@ export const FEATS_5E = [
   },
   {
     id: 'veil-prophet',
+    source: 'TJB',
+    abilities: [],
+    minLevel: null,
     title: 'Пророк Вуали',
     requirement: null,
     intro: 'Вы узрели нечто настолько тёмное и завораживающее, то что находится за гранью мира, и теперь глаголите истину Эсхи, что даёт вам следующие преимущества:',
@@ -34,6 +52,9 @@ export const FEATS_5E = [
   },
   {
     id: 'strong-blood',
+    source: 'TJB',
+    abilities: [],
+    minLevel: null,
     title: 'Сильная кровь',
     requirement: 'Маракиец (Драгмирец)',
     intro: 'Ваша жгучая драгмирская кровь становится ещё сильнее, разрушая волю тех, кто заключил с вами договор на крови, что даёт вам следующие преимущества:',
@@ -44,6 +65,9 @@ export const FEATS_5E = [
   },
   {
     id: 'obo-guardian',
+    source: 'TJB',
+    abilities: [],
+    minLevel: null,
     title: 'Хранитель Обо',
     requirement: null,
     intro: 'Духи избрали вас хранителем священных мест — обо в этих опасных и суровых землях, что даёт вам следующие преимущества:',
@@ -54,6 +78,9 @@ export const FEATS_5E = [
   },
   {
     id: 'battle-frenzy',
+    source: 'TJB',
+    abilities: ['Сила', 'Телосложение'],
+    minLevel: null,
     title: 'Боевой раж',
     requirement: null,
     intro: 'Закалённое в боях стремление выжить порой выключает в вас человечность, направляя безудержный гнев воина, что даёт вам следующие преимущества:',
@@ -65,6 +92,9 @@ export const FEATS_5E = [
   },
   {
     id: 'sign-of-shamas',
+    source: 'TJB',
+    abilities: ['Харизма'],
+    minLevel: null,
     title: 'Знак Шамаса',
     requirement: 'Солнечный худдулин',
     intro: 'Вы — вероятно, великий потомок самого Эхра, сам Шамас освещает ваш путь к вершине, что даёт вам следующие преимущества:',
@@ -76,6 +106,9 @@ export const FEATS_5E = [
   },
   {
     id: 'sign-of-manu',
+    source: 'TJB',
+    abilities: ['Мудрость'],
+    minLevel: null,
     title: 'Знак Ману',
     requirement: 'Лунный худдулин',
     intro: 'Вы — вероятно, великий потомок Сара, братец Ману приглядывает за вами в ночном небе, что даёт вам следующие преимущества:',
@@ -87,6 +120,9 @@ export const FEATS_5E = [
   },
   {
     id: 'sign-of-nomad-gods',
+    source: 'TJB',
+    abilities: ['Интеллект', 'Ловкость'],
+    minLevel: null,
     title: 'Знак Богов Кочевников',
     requirement: 'Ветреный худдулин',
     intro: 'Вы — вероятно, великий потомок Омора, лучшего игрока в кости. Ваша судьба качается на порывах северного и южного ветров, что даёт вам следующие преимущества:',
@@ -98,6 +134,9 @@ export const FEATS_5E = [
   },
   {
     id: 'omen-reader',
+    source: 'TJB',
+    abilities: [],
+    minLevel: null,
     title: 'Знаток знамений',
     requirement: null,
     intro: 'Вы начинаете понимать, как сплетаются нити судьбы, и учитесь влиять на них своей волей. Вы получаете следующие умения:',
@@ -109,6 +148,9 @@ export const FEATS_5E = [
   },
   {
     id: 'grapple-master',
+    source: 'TJB',
+    abilities: [],
+    minLevel: null,
     title: 'Мастер захвата',
     requirement: null,
     intro: 'Вы научились контролировать своё тело гораздо лучше окружающих — ваш захват подобен стальной ловушке, из которой невозможно сбежать. Выбрав эту черту, вы получаете следующие возможности:',
@@ -120,6 +162,9 @@ export const FEATS_5E = [
   },
   {
     id: 'wasteland-predator',
+    source: 'TJB',
+    abilities: ['Ловкость'],
+    minLevel: null,
     title: 'Хищник пустошей',
     requirement: null,
     intro: 'Вы долго скрывались в густой траве степей, в раскалённых песках — подобно змее, готовой броситься на жертву, вы получаете следующие преимущества:',
@@ -131,6 +176,9 @@ export const FEATS_5E = [
   },
   {
     id: 'beast-tamer',
+    source: 'TJB',
+    abilities: ['Сила', 'Мудрость'],
+    minLevel: null,
     title: 'Укротитель зверей',
     requirement: null,
     intro: 'Суровая жизнь степей научила вас брать ящера за хвост и укрощать даже самых своевольных зверей. Выбирая эту черту, вы получаете следующие преимущества:',

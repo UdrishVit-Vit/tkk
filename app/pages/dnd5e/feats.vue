@@ -1,8 +1,45 @@
 <script setup>
-import { FEATS_5E } from '~/data/feats5e.js'
+import { FEATS_5E, FEAT_SOURCES, FEAT_ABILITIES } from '~/data/feats5e.js'
 
 const search = ref('')
 const selectedId = ref(null)
+const filterOpen = ref(false)
+
+// ---- filter state ----
+// Sources: a pill is "on" when present in the set. Starts with every known
+// source selected (mirrors the reference filter's default-all-on toggle).
+const activeSources = ref(new Set(Object.keys(FEAT_SOURCES)))
+const activeAbilities = ref(new Set())
+const activeReqs = ref(new Set()) // subset of 'yes' | 'no' | 'level'
+
+function toggleInSet(set, value) {
+  const next = new Set(set.value)
+  if (next.has(value)) next.delete(value)
+  else next.add(value)
+  set.value = next
+}
+function toggleSource(id) { toggleInSet(activeSources, id) }
+function toggleAbility(a) { toggleInSet(activeAbilities, a) }
+function toggleReq(r) { toggleInSet(activeReqs, r) }
+
+const activeFilterCount = computed(() =>
+  (activeSources.value.size < Object.keys(FEAT_SOURCES).length ? 1 : 0) +
+  activeAbilities.value.size +
+  activeReqs.value.size
+)
+function resetFilters() {
+  activeSources.value = new Set(Object.keys(FEAT_SOURCES))
+  activeAbilities.value = new Set()
+  activeReqs.value = new Set()
+}
+
+function reqKindsOf(feat) {
+  const kinds = []
+  if (feat.requirement) kinds.push('yes')
+  else kinds.push('no')
+  if (feat.minLevel) kinds.push('level')
+  return kinds
+}
 
 useSeoMeta({
   title: 'Черты — TKK.club',
@@ -11,20 +48,24 @@ useSeoMeta({
 
 const filteredFeats = computed(() => {
   const q = search.value.trim().toLowerCase()
-  if (!q) return FEATS_5E
-  return FEATS_5E.filter(f =>
-    f.title.toLowerCase().includes(q) ||
-    (f.requirement && f.requirement.toLowerCase().includes(q)) ||
-    f.intro.toLowerCase().includes(q) ||
-    f.benefits.some(b => b.toLowerCase().includes(q))
-  )
+  return FEATS_5E.filter(f => {
+    if (!activeSources.value.has(f.source)) return false
+    if (activeAbilities.value.size && !f.abilities.some(a => activeAbilities.value.has(a))) return false
+    if (activeReqs.value.size && !reqKindsOf(f).some(k => activeReqs.value.has(k))) return false
+    if (!q) return true
+    return f.title.toLowerCase().includes(q) ||
+      (f.requirement && f.requirement.toLowerCase().includes(q)) ||
+      f.intro.toLowerCase().includes(q) ||
+      f.benefits.some(b => b.toLowerCase().includes(q))
+  })
 })
 
 const selectedFeat = computed(() => FEATS_5E.find(f => f.id === selectedId.value) || null)
 
 function select(id) { selectedId.value = selectedId.value === id ? null : id }
+function sourceName(id) { return FEAT_SOURCES[id] || id }
 
-function onKeydown(e) { if (e.key === 'Escape') selectedId.value = null }
+function onKeydown(e) { if (e.key === 'Escape') { filterOpen.value = false; selectedId.value = null } }
 onMounted(() => document.addEventListener('keydown', onKeydown))
 onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 </script>
@@ -53,6 +94,16 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
       <div class="fp-search-wrap">
         <input v-model="search" class="fp-search" type="search" placeholder="Поиск черты...">
+        <button
+          type="button"
+          class="fp-filter-btn"
+          :class="{ active: activeFilterCount > 0 }"
+          title="Фильтр"
+          @click="filterOpen = true"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          <span v-if="activeFilterCount" class="fp-filter-badge">{{ activeFilterCount }}</span>
+        </button>
       </div>
 
       <div class="fp-list">
@@ -69,7 +120,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
             <span class="fp-item-title">{{ feat.title }}</span>
             <span v-if="feat.requirement" class="fp-item-req">{{ feat.requirement }}</span>
           </span>
-          <span class="fp-item-count">{{ feat.benefits.length }}</span>
+          <span class="fp-item-source" :title="sourceName(feat.source)">{{ feat.source }}</span>
         </button>
         <div v-if="filteredFeats.length === 0" class="fp-empty">Ничего не найдено</div>
       </div>
@@ -98,9 +149,12 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
           <h1 class="fp-title">{{ selectedFeat.title.toUpperCase() }}</h1>
           <div class="fp-divider"><span class="fp-divider-diamond" /></div>
 
-          <div v-if="selectedFeat.requirement" class="fp-req-badge">
-            <span class="fp-req-label">Требование</span>
-            <span class="fp-req-value">{{ selectedFeat.requirement }}</span>
+          <div class="fp-badge-row">
+            <span class="fp-source-badge" :title="sourceName(selectedFeat.source)">{{ selectedFeat.source }}</span>
+            <div v-if="selectedFeat.requirement" class="fp-req-badge">
+              <span class="fp-req-label">Требование</span>
+              <span class="fp-req-value">{{ selectedFeat.requirement }}</span>
+            </div>
           </div>
 
           <p class="fp-intro">{{ selectedFeat.intro }}</p>
@@ -121,6 +175,74 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
         </div>
       </transition>
     </main>
+
+    <!-- FILTER PANEL -->
+    <Teleport to="body">
+      <transition name="fp-filter-fade">
+        <div v-if="filterOpen" class="fp-filter-overlay" @click="filterOpen = false">
+          <div class="fp-filter-panel" @click.stop>
+            <div class="fp-filter-head">
+              <h2 class="fp-filter-title">Фильтр</h2>
+              <button class="fp-close" type="button" title="Закрыть" @click="filterOpen = false">✕</button>
+            </div>
+
+            <div class="fp-filter-body">
+              <!-- Sources -->
+              <div class="fp-filter-group">
+                <div class="fp-filter-group-head">
+                  <span>Источники нитей</span>
+                </div>
+                <div class="fp-pill-row">
+                  <button
+                    v-for="(name, id) in FEAT_SOURCES"
+                    :key="id"
+                    type="button"
+                    class="fp-pill"
+                    :class="{ on: activeSources.has(id) }"
+                    :title="name"
+                    @click="toggleSource(id)"
+                  >{{ id }}</button>
+                </div>
+              </div>
+
+              <!-- Abilities -->
+              <div class="fp-filter-group">
+                <div class="fp-filter-group-head">
+                  <span>Характеристики</span>
+                </div>
+                <div class="fp-pill-row">
+                  <button
+                    v-for="a in FEAT_ABILITIES"
+                    :key="a"
+                    type="button"
+                    class="fp-pill"
+                    :class="{ on: activeAbilities.has(a) }"
+                    @click="toggleAbility(a)"
+                  >{{ a }}</button>
+                </div>
+              </div>
+
+              <!-- Additional requirements -->
+              <div class="fp-filter-group">
+                <div class="fp-filter-group-head">
+                  <span>Дополнительные требования</span>
+                </div>
+                <div class="fp-pill-row">
+                  <button type="button" class="fp-pill" :class="{ on: activeReqs.has('yes') }" @click="toggleReq('yes')">да</button>
+                  <button type="button" class="fp-pill" :class="{ on: activeReqs.has('no') }" @click="toggleReq('no')">нет</button>
+                  <button type="button" class="fp-pill" :class="{ on: activeReqs.has('level') }" @click="toggleReq('level')">уровень</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="fp-filter-foot">
+              <button type="button" class="fp-filter-reset" @click="resetFilters">Сбросить фильтры</button>
+              <span class="fp-filter-note">Фильтры применяются автоматически!</span>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
@@ -203,9 +325,10 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   color: rgba(244,224,170,.9);
 }
 
-.fp-search-wrap { padding: 0 14px 12px; }
+.fp-search-wrap { padding: 0 14px 12px; display: flex; gap: 8px; }
 .fp-search {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   min-height: 38px;
   padding: 0 14px;
   border: 1px solid rgba(255,255,255,.1);
@@ -218,6 +341,37 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   box-sizing: border-box;
 }
 .fp-search:focus { border-color: rgba(214,170,96,.5); }
+
+.fp-filter-btn {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 999px;
+  background: rgba(7,8,12,.5);
+  color: rgba(226,230,244,.65);
+  cursor: pointer;
+  transition: all .18s;
+}
+.fp-filter-btn:hover { border-color: rgba(214,170,96,.4); color: rgba(244,224,170,.9); }
+.fp-filter-btn.active { border-color: rgba(214,170,96,.55); background: rgba(214,170,96,.12); color: rgba(244,224,170,.95); }
+.fp-filter-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(214,170,96,.95);
+  color: rgba(20,15,6,.95);
+  font-size: 9.5px;
+  font-weight: 700;
+}
 
 .fp-list {
   flex: 1;
@@ -286,18 +440,18 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 }
 .fp-item.active .fp-item-req { color: rgba(244,224,170,.85); }
 
-.fp-item-count {
+.fp-item-source {
   flex: none;
-  width: 20px;
-  height: 20px;
-  display: grid;
-  place-items: center;
+  padding: 3px 8px;
   border: 1px solid rgba(255,255,255,.12);
-  border-radius: 50%;
-  font-size: 10px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
   color: rgba(226,230,244,.45);
+  cursor: help;
 }
-.fp-item.active .fp-item-count {
+.fp-item.active .fp-item-source {
   border-color: rgba(214,170,96,.4);
   color: rgba(244,224,170,.8);
 }
@@ -404,11 +558,24 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   transform: rotate(45deg);
 }
 
+.fp-badge-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.fp-source-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 999px;
+  background: rgba(255,255,255,.03);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: rgba(226,230,244,.65);
+  cursor: help;
+}
 .fp-req-badge {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
   padding: 8px 16px;
   border: 1px solid rgba(214,170,96,.35);
   border-radius: 999px;
@@ -504,4 +671,99 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   .fp-card { padding: 24px 22px 32px; }
   .fp-title { font-size: 32px; }
 }
+
+/* ---- filter panel ---- */
+.fp-filter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 60px 20px;
+  background: rgba(5,6,9,.7);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+.fp-filter-panel {
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid rgba(214,170,96,.25);
+  border-radius: 18px;
+  background: #0c0e14;
+  box-shadow: 0 30px 90px rgba(0,0,0,.6);
+  font-family: 'Hanken Grotesk', sans-serif;
+  color: rgba(226,230,244,.92);
+}
+.fp-filter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.fp-filter-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  letter-spacing: .04em;
+  margin: 0;
+  color: rgba(238,242,252,.97);
+}
+
+.fp-filter-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 20px; }
+.fp-filter-group { display: flex; flex-direction: column; gap: 10px; }
+.fp-filter-group-head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(226,230,244,.55);
+}
+
+.fp-pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.fp-pill {
+  padding: 7px 15px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.03);
+  color: rgba(226,230,244,.65);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: all .16s;
+}
+.fp-pill:hover { border-color: rgba(214,170,96,.4); color: rgba(236,240,252,.92); }
+.fp-pill.on {
+  border-color: rgba(214,170,96,.6);
+  background: rgba(214,170,96,.16);
+  color: rgba(244,224,170,.98);
+  font-weight: 600;
+}
+
+.fp-filter-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px 20px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  flex-wrap: wrap;
+}
+.fp-filter-reset {
+  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.03);
+  color: rgba(226,230,244,.7);
+  font-family: 'Hanken Grotesk';
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .16s;
+}
+.fp-filter-reset:hover { border-color: rgba(214,170,96,.4); color: rgba(244,224,170,.9); }
+.fp-filter-note { font-size: 11px; font-style: italic; color: rgba(226,230,244,.35); }
+
+.fp-filter-fade-enter-active, .fp-filter-fade-leave-active { transition: opacity .18s ease; }
+.fp-filter-fade-enter-from, .fp-filter-fade-leave-to { opacity: 0; }
 </style>
