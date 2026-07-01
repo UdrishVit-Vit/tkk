@@ -68,7 +68,7 @@ function crumbSystem() {
 // "Расы и происхождения" (D&D 5e/2014) and "Виды" (D&D 5.5e/2024) are different
 // rulesets with their own terms — each gets its own page branch instead of
 // sharing one /races list, the same way Pathfinder will get its own branch.
-const RACE_SECTION_ROUTES = { 'Расы и происхождения': '/dnd5e/races', 'Черты': '/dnd5e/feats', 'Предыстории': '/dnd5e/backgrounds' }
+const RACE_SECTION_ROUTES = { 'Расы и происхождения': '/dnd5e/races', 'Черты': '/dnd5e/feats', 'Предыстории': '/dnd5e/backgrounds', 'Оружие': '/dnd5e/weapons' }
 function openSection(name) {
   if (RACE_SECTION_ROUTES[name]) { navigateTo(RACE_SECTION_ROUTES[name]); return }
   state.section = state.section === name ? null : name; state.cls = null
