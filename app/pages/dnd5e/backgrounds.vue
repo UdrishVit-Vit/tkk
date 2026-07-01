@@ -27,11 +27,13 @@ function select(id) {
 }
 function sourceName(id) { return BACKGROUND_SOURCES[id] || id }
 
-// Very small **bold** → <strong> converter for our own trusted static copy.
+// Very small **bold** / _italic_ → <strong>/<em> converter for our own trusted static copy.
 function mdBold(text) {
   if (!text) return ''
   const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  return escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  return escaped
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/_(.+?)_/g, '<em>$1</em>')
 }
 
 function rollTable(table) {
@@ -162,8 +164,13 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
           <!-- Feature -->
           <div v-if="selectedBackground.feature" class="fp-block">
             <h2 class="fp-h2">Умение: {{ selectedBackground.feature.title }}</h2>
-            <p class="fp-feature-text">{{ selectedBackground.feature.text }}</p>
+            <p class="fp-feature-text" v-html="mdBold(selectedBackground.feature.text)" />
+            <p v-if="selectedBackground.feature.alt" class="fp-feature-alt">
+              <span class="fp-feature-alt-lbl">Или:</span> <span v-html="mdBold(selectedBackground.feature.alt)" />
+            </p>
           </div>
+
+          <blockquote v-if="selectedBackground.quote" class="fp-quote">{{ selectedBackground.quote }}</blockquote>
 
           <p v-if="selectedBackground.personalization" class="fp-personalization">{{ selectedBackground.personalization }}</p>
 
@@ -575,6 +582,31 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   line-height: 1.7;
   color: rgba(226,230,244,.78);
   margin: 0;
+}
+.fp-feature-text :deep(strong) { color: rgba(244,224,170,.92); font-weight: 600; }
+.fp-feature-alt {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: rgba(226,230,244,.65);
+  margin: 10px 0 0;
+}
+.fp-feature-alt-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(214,170,96,.7);
+}
+
+.fp-quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(244,224,170,.75);
+  border-left: 2px solid rgba(214,170,96,.35);
+  padding: 4px 0 4px 18px;
+  margin: 0 0 24px;
 }
 
 .fp-personalization {
