@@ -17,7 +17,7 @@ const router = useRouter()
 const state = reactive({
   view: 'home', active: null, group: null, section: null, cls: null, overlay: null,
   theme: 'void', authed: false, bookmarks: [], query: '', cardQuery: '', classToolMessage: '', infOpen: false, invOpen: false,
-  classMode: 'base', activeArchetype: null, archetypeSource: 'all', classHitsOpen: true, classProfOpen: true,
+  classMode: 'base', activeArchetype: null, archetypeSource: 'all', classCardTab: 'skills', classHitsOpen: true, classProfOpen: true,
   classEquipOpen: true, classTableOpen: true, classFilterOpen: false, classFeatureSource: 'all',
   classFeatureLevel: 'all', classFeatureSubclass: 'all', subclassesOpen: false, openSubclass: null
 })
@@ -90,6 +90,7 @@ watch(() => [props.initialSystem, props.initialSection, props.initialClass], ([s
   }
   state.classMode = 'base'
   state.activeArchetype = null
+  state.classCardTab = 'skills'
   state.classHitsOpen = true
   state.classProfOpen = true
   state.classEquipOpen = true
@@ -178,6 +179,7 @@ function openClass(name) {
   state.classMode = 'base'
   state.activeArchetype = null
   state.archetypeSource = 'all'
+  state.classCardTab = 'skills'
   state.classHitsOpen = true
   state.classProfOpen = true
   state.classEquipOpen = true
@@ -596,6 +598,7 @@ const vm = computed(() => {
     className: S.cls || '',
     classEn: cd.en || '',
     classSub: (sysObj ? sysObj.name : '') + ' · Класс',
+    classDescription: cd.description || null,
     classEmblemUrl: classImg(S.cls) || emblem(classIdx<0?0:classIdx),
     classHasRules: has,
     classHd: cd.hd || 8, classHpFirst: cd.hpFirst || '', classHpNext: cd.hpNext || '',

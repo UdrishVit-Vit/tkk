@@ -5,7 +5,8 @@ export const CLASS_FEATURE_SOURCE_NAMES = {
   TCE: "Tasha's Cauldron of Everything",
   TLDC: 'The Threads of Lost Dice Club',
   TS: 'The Threads of Shkad',
-  TJB: 'The Threads of JorasBashu'
+  TJB: 'The Threads of JorasBashu',
+  TU: 'The Threads of Unseen'
 }
 
 export const CLASS_FEATURE_SOURCE_URLS = {
