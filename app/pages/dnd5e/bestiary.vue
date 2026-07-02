@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { BESTIARY_5E, BESTIARY_SOURCES, CREATURE_SIZES, CREATURE_TYPES, CREATURE_TAGS } from '~/data/bestiary5e.js'
 
 const search = ref('')
@@ -72,7 +72,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   <div class="bp">
     <aside class="bp-sidebar">
       <div class="bp-sidebar-head">
-        <NuxtLink to="/?system=5e" class="bp-back" title="К карте D&D 5e">
+        <NuxtLink to="/dnd5e" class="bp-back" title="К карте D&D 5e">
           <img src="/assets/knot-main.png" width="22" height="22" style="display:block;object-fit:contain">
         </NuxtLink>
         <div class="bp-wordmark">
@@ -84,7 +84,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
       <nav class="bp-crumb">
         <NuxtLink to="/" class="bp-crumb-link">Системы</NuxtLink>
         <span class="bp-crumb-sep">/</span>
-        <NuxtLink to="/?system=5e" class="bp-crumb-link">D&D 5e</NuxtLink>
+        <NuxtLink to="/dnd5e" class="bp-crumb-link">D&D 5e</NuxtLink>
         <span class="bp-crumb-sep">/</span>
         <span class="bp-crumb-current">Бестиарий</span>
       </nav>
@@ -122,7 +122,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
           <div class="bp-card-top">
             <div class="bp-card-eyebrow">
-              <NuxtLink to="/?system=5e">D&D 5e</NuxtLink>
+              <NuxtLink to="/dnd5e">D&D 5e</NuxtLink>
               <span class="bp-eyebrow-sep">/</span>
               <span>Бестиарий</span>
             </div>

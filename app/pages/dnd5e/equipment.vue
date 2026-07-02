@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { EQUIPMENT_5E, EQUIPMENT_SOURCES, EQUIPMENT_CATEGORIES, EQUIPMENT_TAGS } from '~/data/equipment5e.js'
 
 const search = ref('')
@@ -76,7 +76,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   <div class="ep">
     <aside class="ep-sidebar">
       <div class="ep-sidebar-head">
-        <NuxtLink to="/?system=5e" class="ep-back" title="К карте D&D 5e">
+        <NuxtLink to="/dnd5e" class="ep-back" title="К карте D&D 5e">
           <img src="/assets/knot-main.png" width="22" height="22" style="display:block;object-fit:contain">
         </NuxtLink>
         <div class="ep-wordmark">
@@ -88,7 +88,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
       <nav class="ep-crumb">
         <NuxtLink to="/" class="ep-crumb-link">Системы</NuxtLink>
         <span class="ep-crumb-sep">/</span>
-        <NuxtLink to="/?system=5e" class="ep-crumb-link">D&D 5e</NuxtLink>
+        <NuxtLink to="/dnd5e" class="ep-crumb-link">D&D 5e</NuxtLink>
         <span class="ep-crumb-sep">/</span>
         <span class="ep-crumb-current">Снаряжение</span>
       </nav>
@@ -139,7 +139,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
           <div class="ep-card-top">
             <div class="ep-card-eyebrow">
-              <NuxtLink to="/?system=5e">D&D 5e</NuxtLink>
+              <NuxtLink to="/dnd5e">D&D 5e</NuxtLink>
               <span class="ep-eyebrow-sep">/</span>
               <span>Снаряжение</span>
             </div>

@@ -1,6 +1,174 @@
 <script setup>
-defineProps(['vm', 'state'])
-defineEmits(['up'])
+const props = defineProps(['vm', 'state'])
+const emit = defineEmits(['up'])
+
+const SOURCE_FULL_NAMES = {
+  PHB: 'Player’s Handbook',
+  TCE: 'Tasha’s Cauldron of Everything',
+  TLDC: 'The Threads of Lost Dice Club',
+  TS: 'The Threads of Shkad',
+  TJB: 'The Threads of JorasBashu'
+}
+
+const SOURCE_URLS = {
+  PHB: 'https://www.dndbeyond.com/sources/dnd/phb-2014',
+  TCE: 'https://www.dndbeyond.com/sources/dnd/tcoe'
+}
+
+function sourceTitle(source) {
+  return SOURCE_FULL_NAMES[source] ? `${source} - ${SOURCE_FULL_NAMES[source]}` : source
+}
+
+function featureParagraphs(text) {
+  return String(text || '').split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
+}
+
+const FEATURE_SECTION_TITLES = [
+  'Заговоры',
+  'Ячейки заклинаний',
+  'Известные заклинания 1-го и более высоких уровней',
+  'Базовая характеристика заклинаний',
+  'Исполнение ритуалов',
+  'Фокусировка заклинания'
+]
+
+function featureBlocks(text) {
+  return featureParagraphs(text).map(paragraph => {
+    const formula = paragraph.match(/^(Сл спасброск(?:а|ов)|Модификатор броска атаки)\s*=\s*(.+)$/i)
+    if (formula) return { type: 'formula', label: formula[1], value: formula[2] }
+    if (/^Например,/i.test(paragraph)) return { type: 'example', text: paragraph }
+    const title = FEATURE_SECTION_TITLES.find(name => paragraph.startsWith(`${name}. `))
+    if (title) return { type: 'section', title, text: paragraph.slice(title.length + 2) }
+    return { type: 'paragraph', text: paragraph }
+  })
+}
+
+function sourceRoute(source) {
+  return SOURCE_URLS[source] || `/dnd5e/class-features?source=${encodeURIComponent(source || '')}`
+}
+
+function isExternalSource(source) {
+  return !!SOURCE_URLS[source]
+}
+
+const featureSources = computed(() => [...new Set([
+  ...props.vm.classFeatures.map(f => f.src),
+  ...props.vm.classArchetypes.map(a => a.source)
+].filter(Boolean))])
+const featureLevels = computed(() => [...new Set(props.vm.classFeatures.map(f => f.rank).filter(v => v !== 999))].sort((a, b) => a - b))
+const classSources = computed(() => {
+  if (props.vm.classHasSelectedArchetype) {
+    return [props.vm.classSelectedArchetype.source].filter(Boolean)
+  }
+  return [...new Set(props.vm.classFeatures.map(f => f.src).filter(Boolean))]
+})
+const CLASS_BASE_SUMMARIES = {
+  'Бард': 'Бард соединяет магию слова, музыку, знание и вдохновение. Он поддерживает союзников, влияет на ход сцены и гибко закрывает пробелы группы за счёт навыков и заклинаний.'
+}
+const activeBuildTitle = computed(() => props.vm.classHasSelectedArchetype
+  ? `${props.vm.className}: ${props.vm.classSelectedArchetype.name}`
+  : props.vm.className
+)
+const activeBuildSummary = computed(() => props.vm.classHasSelectedArchetype
+  ? (props.vm.classSelectedArchetype.summary || 'Подкласс добавляет свои особенности к базовому развитию класса.')
+  : (CLASS_BASE_SUMMARIES[props.vm.className] || 'Основная линия развития класса без дополнительных особенностей подкласса.')
+)
+const activeBuildMeta = computed(() => props.vm.classHasSelectedArchetype
+  ? `${props.vm.classSelectedArchetype.level} · ${sourceTitle(props.vm.classSelectedArchetype.source)}`
+  : `D&D 5e 2014 · ${visibleClassFeatures.value.length} умений`
+)
+const classQuickStats = computed(() => [
+  { label: 'Кость хитов', value: `к${props.vm.classHd}`, part: 'overview' },
+  { label: 'Спасброски', value: props.vm.classSaves, part: 'overview' },
+  { label: 'Владения', value: props.vm.classArmor, part: 'overview' },
+  { label: 'Умения', value: `${visibleClassFeatures.value.length}`, part: 'skills' }
+])
+const visibleClassFeatures = computed(() => props.vm.classFeatures.filter(feature => {
+  if (props.state.classFeatureSource !== 'all' && feature.src !== props.state.classFeatureSource) return false
+  if (props.state.classFeatureLevel !== 'all' && String(feature.rank) !== String(props.state.classFeatureLevel)) return false
+  if (props.state.classFeatureSubclass === 'base' && feature.isArchetype) return false
+  if (props.state.classFeatureSubclass !== 'all' && props.state.classFeatureSubclass !== 'base') {
+    const archetype = props.vm.classArchetypes.find(arch => arch.id === props.state.classFeatureSubclass)
+    if (!archetype || feature.archetypeName !== archetype.name) return false
+  }
+  return true
+}))
+
+function selectBase() {
+  props.state.classMode = 'base'
+  props.state.activeArchetype = null
+}
+
+function selectArchetype(id) {
+  props.state.classMode = 'archetype'
+  props.state.activeArchetype = id
+}
+
+function toggleSubclass(id) {
+  props.state.openSubclass = props.state.openSubclass === id ? null : id
+}
+
+function chooseFeatureSource(source) {
+  props.state.classFeatureSource = source
+}
+
+function chooseFeatureLevel(level) {
+  props.state.classFeatureLevel = String(level)
+}
+
+function chooseFeatureSubclass(id) {
+  props.state.classFeatureSubclass = id
+  if (id === 'base') selectBase()
+  else if (id !== 'all') selectArchetype(id)
+}
+
+function resetFeatureFilters() {
+  props.state.classFeatureSource = 'all'
+  props.state.classFeatureLevel = 'all'
+  props.state.classFeatureSubclass = 'all'
+}
+
+async function copyClassLink() {
+  if (typeof window === 'undefined') return
+  const url = window.location.href
+  if (navigator?.clipboard?.writeText) await navigator.clipboard.writeText(url)
+  props.state.classToolMessage = 'Ссылка скопирована'
+}
+
+function bookmarkClass() {
+  const label = props.vm.className
+  if (!props.state.bookmarks.includes(label)) props.state.bookmarks.push(label)
+  props.state.classToolMessage = 'Добавлено в закладки'
+}
+
+function printClass() {
+  if (typeof window !== 'undefined') window.print()
+}
+
+async function toggleFullscreen() {
+  if (typeof document === 'undefined') return
+  if (document.fullscreenElement) await document.exitFullscreen()
+  else await document.documentElement.requestFullscreen?.()
+}
+
+function closeClass() {
+  emit('up')
+}
+
+function scrollToClassPart(part) {
+  if (typeof document === 'undefined') return
+  const selector = {
+    overview: '#class-overview',
+    equipment: '#class-equipment',
+    table: '#class-table',
+    subclasses: '#class-subclasses',
+    description: '#class-description, #class-overview',
+    skills: '#class-features',
+    spells: '.cls-feature-spells, .cls-spell-table'
+  }[part]
+  const target = selector ? document.querySelector(selector) : null
+  target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 </script>
 
 <template>
@@ -16,74 +184,311 @@ defineEmits(['up'])
           <div class="cls-title">{{ vm.className }}</div>
           <div class="cls-en">{{ vm.classEn }}</div>
         </div>
-        <span class="cls-back" @click="$emit('up')">← к классам</span>
+        <span class="cls-back" @click="closeClass">← к классам</span>
       </div>
 
-      <div class="cls-grid2">
-        <div class="cls-card">
-          <div class="cls-card-title">Хиты</div>
-          <div class="cls-card-body">
-            <div><span class="dim">Кость хитов: </span>1к{{ vm.classHd }} за уровень</div>
-            <div><span class="dim">На 1 уровне: </span>{{ vm.classHpFirst }}</div>
-            <div><span class="dim">Далее: </span>{{ vm.classHpNext }} (мин. 1)</div>
-          </div>
+      <div class="cls-toolbar">
+        <div class="cls-section-tools">
+          <button type="button" class="cls-section-btn" @click="scrollToClassPart('skills')">Навыки</button>
+          <button type="button" class="cls-section-btn" @click="scrollToClassPart('description')">Описание</button>
+          <button type="button" class="cls-section-btn" @click="scrollToClassPart('spells')">Заклинания</button>
+          <button type="button" class="cls-section-btn" :class="{ active: state.classFilterOpen }" @click="state.classFilterOpen = !state.classFilterOpen">Фильтр</button>
         </div>
-        <div class="cls-card">
-          <div class="cls-card-title">Владение</div>
-          <div class="cls-card-body">
-            <div><span class="dim">Доспехи: </span>{{ vm.classArmor }}</div>
-            <div><span class="dim">Оружие: </span>{{ vm.classWeapons }}</div>
-            <div><span class="dim">Инструменты: </span>{{ vm.classTools }}</div>
-            <div><span class="dim">Спасброски: </span>{{ vm.classSaves }}</div>
-            <div><span class="dim">Навыки: </span>{{ vm.classSkills }}</div>
-          </div>
+        <div class="cls-icon-tools" aria-label="Инструменты страницы класса">
+          <button type="button" class="cls-icon-btn" title="Скопировать ссылку" @click="copyClassLink">⧉</button>
+          <button type="button" class="cls-icon-btn" title="Добавить в закладки" @click="bookmarkClass">☆</button>
+          <button type="button" class="cls-icon-btn" title="Открыть окно печати" @click="printClass">⎙</button>
+          <button type="button" class="cls-icon-btn" title="Развернуть окно" @click="toggleFullscreen">⛶</button>
+          <button type="button" class="cls-icon-btn close" title="Закрыть страницу класса" @click="closeClass">×</button>
         </div>
+        <span v-if="state.classToolMessage" class="cls-tool-message">{{ state.classToolMessage }}</span>
       </div>
+
+      <Teleport to="body">
+        <div v-if="state.classFilterOpen" class="cls-filter-modal" @click.self="state.classFilterOpen = false">
+          <div class="cls-filter-window">
+            <div class="cls-filter-top">
+              <div>
+                <div class="cls-filter-label">Фильтр</div>
+                <div class="cls-filter-subtitle">{{ vm.className }} · {{ visibleClassFeatures.length }} умений показано</div>
+              </div>
+              <button type="button" class="cls-filter-close" title="Закрыть фильтр" @click="state.classFilterOpen = false">×</button>
+            </div>
+
+            <section class="cls-filter-section">
+              <div class="cls-filter-section-head">
+                <span>Источник</span>
+                <button type="button" class="cls-filter-reset" @click="chooseFeatureSource('all')">Все</button>
+              </div>
+              <div class="cls-filter-pills">
+                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureSource === 'all' }" @click="chooseFeatureSource('all')">Все источники</button>
+                <button
+                  v-for="source in featureSources"
+                  :key="source"
+                  type="button"
+                  class="cls-filter-pill"
+                  :class="{ active: state.classFeatureSource === source }"
+                  :title="sourceTitle(source)"
+                  @click="chooseFeatureSource(source)"
+                >
+                  {{ source }}
+                </button>
+              </div>
+            </section>
+
+            <section class="cls-filter-section">
+              <div class="cls-filter-section-head">
+                <span>Уровень</span>
+                <button type="button" class="cls-filter-reset" @click="chooseFeatureLevel('all')">Все</button>
+              </div>
+              <div class="cls-filter-pills">
+                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureLevel === 'all' }" @click="chooseFeatureLevel('all')">Все уровни</button>
+                <button
+                  v-for="level in featureLevels"
+                  :key="level"
+                  type="button"
+                  class="cls-filter-pill"
+                  :class="{ active: String(state.classFeatureLevel) === String(level) }"
+                  @click="chooseFeatureLevel(level)"
+                >
+                  {{ level }} уровень
+                </button>
+              </div>
+            </section>
+
+            <section class="cls-filter-section">
+              <div class="cls-filter-section-head">
+                <span>Подкласс</span>
+                <button type="button" class="cls-filter-reset" @click="chooseFeatureSubclass('all')">Все</button>
+              </div>
+              <div class="cls-filter-pills">
+                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureSubclass === 'all' }" @click="chooseFeatureSubclass('all')">Базовый и выбранный</button>
+                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureSubclass === 'base' }" @click="chooseFeatureSubclass('base')">Только базовый класс</button>
+                <button
+                  v-for="arch in vm.classArchetypes"
+                  :key="arch.id"
+                  type="button"
+                  class="cls-filter-pill"
+                  :class="{ active: state.classFeatureSubclass === arch.id }"
+                  @click="chooseFeatureSubclass(arch.id)"
+                >
+                  {{ arch.name }}
+                </button>
+              </div>
+            </section>
+
+            <div class="cls-filter-footer">
+              <button type="button" class="cls-section-btn" @click="resetFeatureFilters">Сбросить</button>
+              <button type="button" class="cls-section-btn" @click="state.classFilterOpen = false; scrollToClassPart('skills')">Показать умения</button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
+
+      <div class="cls-mode-panel">
+        <div class="cls-mode-top">
+          <button
+            type="button"
+            class="cls-mode-btn"
+            :class="{ active: state.classMode !== 'archetype' }"
+            @click="selectBase"
+          >
+            Базовое описание
+          </button>
+          <button
+            v-for="arch in vm.classArchetypes"
+            :key="arch.id"
+            type="button"
+            class="cls-mode-btn"
+            :class="{ active: state.classMode === 'archetype' && state.activeArchetype === arch.id }"
+            @click="selectArchetype(arch.id)"
+          >
+            {{ arch.name }}
+          </button>
+        </div>
+        <div v-if="!vm.classHasArchetypes" class="cls-arch-empty">Подклассы для этого класса пока не добавлены.</div>
+      </div>
+
+      <section class="cls-build-panel">
+        <div class="cls-build-top">
+          <div class="cls-build-main">
+            <div class="cls-eyebrow">Текущая карточка</div>
+            <h2>{{ activeBuildTitle }}</h2>
+            <p>{{ activeBuildSummary }}</p>
+            <div class="cls-build-meta">
+              <span>{{ activeBuildMeta }}</span>
+            </div>
+          </div>
+          <div class="cls-source-row">
+            <span>Источники</span>
+            <div>
+              <template v-for="source in classSources" :key="source">
+                <a v-if="isExternalSource(source)" class="cls-mini-source" :href="sourceRoute(source)" target="_blank" rel="noreferrer" :title="sourceTitle(source)">{{ source }}</a>
+                <NuxtLink v-else class="cls-mini-source" :to="sourceRoute(source)" :title="sourceTitle(source)">{{ source }}</NuxtLink>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <div class="cls-build-summary">
+          <button v-for="stat in classQuickStats" :key="stat.label" type="button" class="cls-summary-pill" @click="scrollToClassPart(stat.part)">
+            <span>{{ stat.label }}</span>
+            <strong>{{ stat.value }}</strong>
+          </button>
+        </div>
+
+        <div id="class-overview" class="cls-rule-panels">
+          <section class="cls-rule-panel wide">
+            <button type="button" class="cls-rule-head" @click="state.classHitsOpen = !state.classHitsOpen">
+              <span class="cls-rule-mark">{{ state.classHitsOpen ? '−' : '+' }}</span>
+              <span>Хиты</span>
+            </button>
+            <div v-if="state.classHitsOpen" class="cls-rule-body">
+              <div class="cls-rule-row"><strong>Кость хитов</strong><span>1к{{ vm.classHd }} за уровень</span></div>
+              <div class="cls-rule-row"><strong>На 1 уровне</strong><span>{{ vm.classHpFirst }}</span></div>
+              <div class="cls-rule-row"><strong>Далее</strong><span>{{ vm.classHpNext }} (мин. 1)</span></div>
+            </div>
+          </section>
+
+          <section v-if="vm.classHasEquip" id="class-equipment" class="cls-rule-panel balanced">
+            <button type="button" class="cls-rule-head" @click="state.classEquipOpen = !state.classEquipOpen">
+              <span class="cls-rule-mark">{{ state.classEquipOpen ? '−' : '+' }}</span>
+              <span>Снаряжение</span>
+            </button>
+            <div v-if="state.classEquipOpen" class="cls-rule-body">
+              <div v-for="(e, i) in vm.classEquip" :key="i" class="cls-rule-row">
+                <strong class="dot-label"><i aria-hidden="true" /></strong><span>{{ e }}</span>
+              </div>
+              <div v-if="vm.classEquipNote" class="cls-rule-row note"><strong>Примечание</strong><span>{{ vm.classEquipNote }}</span></div>
+            </div>
+          </section>
+
+          <section class="cls-rule-panel balanced" :class="{ wide: !vm.classHasEquip }">
+            <button type="button" class="cls-rule-head" @click="state.classProfOpen = !state.classProfOpen">
+              <span class="cls-rule-mark">{{ state.classProfOpen ? '−' : '+' }}</span>
+              <span>Владение</span>
+            </button>
+            <div v-if="state.classProfOpen" class="cls-rule-body">
+              <div class="cls-rule-row"><strong>Доспехи</strong><span>{{ vm.classArmor }}</span></div>
+              <div class="cls-rule-row"><strong>Оружие</strong><span>{{ vm.classWeapons }}</span></div>
+              <div class="cls-rule-row"><strong>Инструменты</strong><span>{{ vm.classTools }}</span></div>
+              <div class="cls-rule-row"><strong>Спасброски</strong><span>{{ vm.classSaves }}</span></div>
+              <div class="cls-rule-row"><strong>Навыки</strong><span>{{ vm.classSkills }}</span></div>
+            </div>
+          </section>
+        </div>
+
+        <template v-if="vm.classHasRules">
+          <div id="class-table" class="cls-class-table-panel">
+            <button type="button" class="cls-rule-head cls-table-headline" @click="state.classTableOpen = !state.classTableOpen">
+              <span class="cls-rule-mark">{{ state.classTableOpen ? '−' : '+' }}</span>
+              <span>Таблица класса</span>
+            </button>
+            <div v-if="state.classTableOpen" class="cls-table-wrap in-card">
+              <div class="cls-table" :style="{ gridTemplateColumns: vm.classTableGrid }">
+                <div v-for="(col, i) in vm.classTableCols" :key="'col'+i" class="cls-table-head">{{ col }}</div>
+                <template v-for="(r, ri) in vm.classTableRows" :key="'row'+ri">
+                  <div v-for="(c, ci) in r.cells" :key="'cell'+ri+'-'+ci" :style="c.style">{{ c.v }}</div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <template v-if="vm.classHasSelectedArchetype">
+            <div id="class-description" class="cls-subclass-description">
+              <div class="cls-subclass-description-head">
+                <div>
+                  <div class="cls-eyebrow">{{ vm.classSelectedArchetypeDescription.type }} · {{ vm.classSelectedArchetypeDescription.source }}</div>
+                  <div class="cls-subclass-description-title">{{ vm.classSelectedArchetypeDescription.name }}</div>
+                </div>
+                <span class="cls-feature-lvl">{{ vm.classSelectedArchetypeDescription.level }}</span>
+              </div>
+              <blockquote v-if="vm.classSelectedArchetypeDescription.hasQuote" class="cls-arch-quote compact">{{ vm.classSelectedArchetypeDescription.quote }}</blockquote>
+              <div class="cls-subclass-description-text">
+                <p v-for="(p, i) in vm.classSelectedArchetypeDescription.intro" :key="i">{{ p }}</p>
+                <p v-if="vm.classSelectedArchetypeDescription.summary">{{ vm.classSelectedArchetypeDescription.summary }}</p>
+              </div>
+            </div>
+          </template>
+
+          <section id="class-features" class="cls-class-features-panel">
+            <div class="cls-features-heading">
+              <div>
+                <div class="cls-eyebrow">Раздел класса</div>
+                <h3>Умения класса</h3>
+              </div>
+              <span class="cls-feature-count">{{ visibleClassFeatures.length }}</span>
+            </div>
+            <div class="cls-features-body">
+              <div v-if="!visibleClassFeatures.length" class="cls-stub">По выбранным фильтрам умения не найдены.</div>
+              <details v-for="(f, i) in visibleClassFeatures" :key="f.id || i" class="cls-card cls-feature-card">
+                <summary class="cls-feature-summary">
+                  <span class="cls-feature-mark" aria-hidden="true"></span>
+                  <span class="cls-feature-summary-main">
+                    <span class="cls-feature-name">{{ f.name }}</span>
+                    <span class="cls-feature-meta-row">
+                      <span class="cls-badge" :title="sourceTitle(f.src)">{{ f.src }}</span>
+                      <span v-if="f.isArchetype" class="cls-badge alt">{{ f.archetypeName }}</span>
+                      <span class="cls-feature-lvl">{{ f.lvl }}</span>
+                    </span>
+                  </span>
+                </summary>
+                <div class="cls-feature-content">
+                  <div class="cls-feature-prose">
+                    <template v-for="(block, bi) in featureBlocks(f.text)" :key="bi">
+                      <section v-if="block.type === 'section'" class="cls-feature-section">
+                        <h4>{{ block.title }}</h4>
+                        <p>{{ block.text }}</p>
+                      </section>
+                      <aside v-else-if="block.type === 'example'" class="cls-feature-example">{{ block.text }}</aside>
+                      <div v-else-if="block.type === 'formula'" class="cls-feature-formula">
+                        <strong>{{ block.label }}</strong> = {{ block.value }}
+                      </div>
+                      <p v-else>{{ block.text }}</p>
+                    </template>
+                  </div>
+                  <blockquote v-if="f.hasQuote" class="cls-arch-quote compact">{{ f.quote }}</blockquote>
+                  <div v-if="f.hasItems" class="cls-arch-items" :class="{ roomy: f.hasLongItems }">
+                    <details v-for="item in f.items" :key="item.name" class="cls-arch-item" open>
+                      <summary>{{ item.name }}</summary>
+                      <span>{{ item.text }}</span>
+                    </details>
+                  </div>
+                  <div v-if="f.hasSpellTable" class="cls-spell-table">
+                    <div class="cls-spell-table-head">
+                      <div style="padding:9px 14px">Уровень</div>
+                      <div style="padding:9px 14px;border-left:1px solid rgba(214,170,96,.18)">Заклинание</div>
+                    </div>
+                    <div v-for="(sr, sri) in f.spellTable" :key="sri" class="cls-spell-table-row">
+                      <div style="padding:8px 14px;color:rgba(244,224,170,.85)">{{ sr.lvl }}</div>
+                      <div style="padding:8px 14px;border-left:1px solid rgba(255,255,255,.05)">{{ sr.spell }}</div>
+                    </div>
+                  </div>
+                  <div v-if="f.hasSpells" class="cls-feature-spells">
+                    <div v-for="spell in f.spells" :key="spell.name" class="cls-spell-card">
+                      <div class="cls-feature-head">
+                        <span class="cls-feature-name">{{ spell.name }}</span>
+                        <span class="cls-badge">{{ spell.level }}</span>
+                        <span class="cls-feature-lvl">{{ spell.school }}</span>
+                      </div>
+                      <div class="cls-spell-meta">
+                        <span>Сотворение: {{ spell.casting }}</span>
+                        <span>Дистанция: {{ spell.range }}</span>
+                        <span>Компоненты: {{ spell.components }}</span>
+                        <span>Длительность: {{ spell.duration }}</span>
+                      </div>
+                      <div class="cls-feature-text">{{ spell.text }}</div>
+                      <div v-if="spell.hasHigher" class="cls-higher"><strong>На больших уровнях.</strong> {{ spell.higher }}</div>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </section>
+        </template>
+      </section>
 
       <template v-if="vm.classHasRules">
-        <div class="cls-h2">Таблица класса</div>
-        <div class="cls-table-wrap">
-          <div class="cls-table" :style="{ gridTemplateColumns: vm.classTableGrid }">
-            <div v-for="(col, i) in vm.classTableCols" :key="'col'+i" class="cls-table-head">{{ col }}</div>
-            <template v-for="(r, ri) in vm.classTableRows" :key="'row'+ri">
-              <div v-for="(c, ci) in r.cells" :key="'cell'+ri+'-'+ci" :style="c.style">{{ c.v }}</div>
-            </template>
-          </div>
-        </div>
-
-        <template v-if="vm.classHasEquip">
-          <div class="cls-h2">Снаряжение</div>
-          <div class="cls-card">
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div v-for="(e, i) in vm.classEquip" :key="i" class="cls-equip-row">
-                <span style="color:rgba(214,170,96,.7);font-size:13px">◇</span><span>{{ e }}</span>
-              </div>
-            </div>
-            <div class="cls-equip-note">{{ vm.classEquipNote }}</div>
-          </div>
-        </template>
-
-        <div class="cls-h2">Умения класса</div>
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div v-for="(f, i) in vm.classFeatures" :key="i" class="cls-card">
-            <div class="cls-feature-head">
-              <span class="cls-feature-name">{{ f.name }}</span>
-              <span class="cls-badge">{{ f.src }}</span>
-              <span class="cls-feature-lvl">{{ f.lvl }}</span>
-            </div>
-            <div class="cls-feature-text">{{ f.text }}</div>
-            <div v-if="f.hasSpellTable" class="cls-spell-table">
-              <div class="cls-spell-table-head">
-                <div style="padding:9px 14px">Уровень</div>
-                <div style="padding:9px 14px;border-left:1px solid rgba(214,170,96,.18)">Заклинание</div>
-              </div>
-              <div v-for="(sr, sri) in f.spellTable" :key="sri" class="cls-spell-table-row">
-                <div style="padding:8px 14px;color:rgba(244,224,170,.85)">{{ sr.lvl }}</div>
-                <div style="padding:8px 14px;border-left:1px solid rgba(255,255,255,.05)">{{ sr.spell }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <template v-if="vm.classHasInfusions">
           <div class="cls-collapsible" @click="state.infOpen = !state.infOpen">
@@ -121,6 +526,84 @@ defineEmits(['up'])
         </template>
       </template>
       <div v-else class="cls-stub">Полная таблица уровней и умения для класса «{{ vm.className }}» в подготовке.</div>
+
+      <template v-if="vm.classHasArchetypes">
+        <div id="class-subclasses" class="cls-collapsible" @click="state.subclassesOpen = !state.subclassesOpen">
+          <span class="cls-chevron">{{ state.subclassesOpen ? '−' : '+' }}</span>
+          <span class="cls-collapsible-title">Подклассы</span>
+          <span class="cls-collapsible-hint">{{ state.subclassesOpen ? 'свернуть' : 'развернуть' }}</span>
+        </div>
+        <div v-if="state.subclassesOpen" class="cls-subclass-list">
+          <div v-for="arch in vm.classArchetypes" :key="arch.id" class="cls-subclass-item">
+            <div class="cls-subclass-toggle">
+              <button type="button" class="cls-subclass-plus" :title="state.openSubclass === arch.id ? 'Свернуть подкласс' : 'Раскрыть подкласс'" @click.stop="toggleSubclass(arch.id)">
+                {{ state.openSubclass === arch.id ? '−' : '+' }}
+              </button>
+              <div class="cls-subclass-heading" @click.stop="toggleSubclass(arch.id)">
+                <span class="cls-subclass-title">{{ arch.name }}</span>
+                <span class="cls-subclass-meta">{{ arch.level }} · {{ arch.type }}</span>
+              </div>
+              <span class="cls-subclass-source" :title="sourceTitle(arch.source)">{{ arch.source }}</span>
+              <button type="button" class="cls-open-arch inline" @click.stop="selectArchetype(arch.id)">Применить подкласс</button>
+            </div>
+            <div v-if="state.openSubclass === arch.id" class="cls-subclass-body">
+              <div v-if="arch.summary" class="cls-feature-text">{{ arch.summary }}</div>
+              <blockquote v-if="arch.quote" class="cls-arch-quote compact">{{ arch.quote }}</blockquote>
+              <div v-if="arch.intro?.length" class="cls-subclass-prose">
+                <p v-for="(p, i) in arch.intro" :key="i">{{ p }}</p>
+              </div>
+              <div class="cls-subclass-rules">
+                <article v-for="feature in arch.features" :key="feature.name" class="cls-subclass-rule">
+                  <div class="cls-feature-head">
+                    <span class="cls-feature-name">{{ feature.name }}</span>
+                    <span class="cls-badge" :title="sourceTitle(arch.source)">{{ arch.source }}</span>
+                    <span class="cls-feature-lvl">{{ feature.level }}</span>
+                  </div>
+                  <div class="cls-feature-prose compact">
+                    <template v-for="(block, bi) in featureBlocks(feature.text)" :key="bi">
+                      <section v-if="block.type === 'section'" class="cls-feature-section">
+                        <h4>{{ block.title }}</h4>
+                        <p>{{ block.text }}</p>
+                      </section>
+                      <aside v-else-if="block.type === 'example'" class="cls-feature-example">{{ block.text }}</aside>
+                      <div v-else-if="block.type === 'formula'" class="cls-feature-formula">
+                        <strong>{{ block.label }}</strong> = {{ block.value }}
+                      </div>
+                      <p v-else>{{ block.text }}</p>
+                    </template>
+                  </div>
+                  <div v-if="feature.hasItems" class="cls-arch-items" :class="{ roomy: feature.items.length > 3 }">
+                    <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" open>
+                      <summary>{{ item.name }}</summary>
+                      <span>{{ item.text }}</span>
+                    </details>
+                  </div>
+                </article>
+              </div>
+              <div v-if="arch.spells?.length" class="cls-subclass-spells">
+                <div class="cls-h3">Дополнительные заклинания</div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div v-for="spell in arch.spells" :key="spell.name" class="cls-spell-card">
+                    <div class="cls-feature-head">
+                      <span class="cls-feature-name">{{ spell.name }}</span>
+                      <span class="cls-badge">{{ spell.level }}</span>
+                      <span class="cls-feature-lvl">{{ spell.school }}</span>
+                    </div>
+                    <div class="cls-spell-meta">
+                      <span>Сотворение: {{ spell.casting }}</span>
+                      <span>Дистанция: {{ spell.range }}</span>
+                      <span>Компоненты: {{ spell.components }}</span>
+                      <span>Длительность: {{ spell.duration }}</span>
+                    </div>
+                    <div class="cls-feature-text">{{ spell.text }}</div>
+                    <div v-if="spell.hasHigher" class="cls-higher"><strong>На больших уровнях.</strong> {{ spell.higher }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -137,29 +620,242 @@ defineEmits(['up'])
 .cls-en{font-family:'Hanken Grotesk',sans-serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:rgba(214,170,96,.85);margin-top:2px}
 .cls-back{flex:none;align-self:flex-start;font-family:'Hanken Grotesk',sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(226,230,244,.55);border:1px solid rgba(255,255,255,.16);border-radius:22px;padding:10px 18px;cursor:pointer}
 .cls-back:hover{background:rgba(255,255,255,.05)}
+.cls-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:26px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.018);padding:12px 14px}
+.cls-icon-tools,.cls-section-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cls-icon-btn{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:rgba(7,8,12,.32);color:rgba(226,230,244,.72);font-family:'Hanken Grotesk',sans-serif;font-size:16px;cursor:pointer;transition:all .18s}
+.cls-icon-btn:hover{border-color:rgba(214,170,96,.5);background:rgba(214,170,96,.12);color:rgba(244,224,170,.96)}
+.cls-icon-btn.close:hover{border-color:rgba(220,120,120,.45);background:rgba(220,120,120,.1);color:rgba(255,210,210,.95)}
+.cls-section-btn{min-height:34px;border:1px solid rgba(214,170,96,.28);border-radius:999px;background:rgba(214,170,96,.06);color:rgba(244,224,170,.88);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:0 13px;cursor:pointer}
+.cls-section-btn:hover,.cls-section-btn.active{background:rgba(214,170,96,.14);border-color:rgba(214,170,96,.5)}
+.cls-tool-message{font-family:'Hanken Grotesk',sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.48)}
+.cls-filter-modal{position:fixed;inset:0;z-index:200;background:rgba(3,4,7,.62);backdrop-filter:blur(8px);display:flex;align-items:flex-start;justify-content:center;padding:48px 18px;overflow:auto}
+.cls-filter-window{width:min(760px,100%);border:1px solid rgba(92,142,236,.85);border-radius:8px;background:rgba(18,28,33,.98);box-shadow:0 20px 80px rgba(0,0,0,.48);color:rgba(226,230,244,.9)}
+.cls-filter-top{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035)}
+.cls-filter-label{font-family:'Hanken Grotesk',sans-serif;font-size:20px;font-weight:700;letter-spacing:.02em;color:rgba(236,240,252,.98)}
+.cls-filter-subtitle{margin-top:3px;font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.48)}
+.cls-filter-close{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:rgba(255,255,255,.1);color:rgba(236,240,252,.9);font-size:24px;line-height:1;cursor:pointer}
+.cls-filter-close:hover{background:rgba(255,255,255,.16)}
+.cls-filter-section{margin:14px;border:1px solid rgba(92,142,236,.55);border-radius:8px;background:rgba(5,10,14,.26);padding:13px}
+.cls-filter-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.cls-filter-section-head span{font-family:'Hanken Grotesk',sans-serif;font-size:14px;font-weight:700;color:rgba(236,240,252,.96)}
+.cls-filter-reset{border:0;background:transparent;color:rgba(226,230,244,.55);font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.cls-filter-reset:hover{color:rgba(244,224,170,.92)}
+.cls-filter-pills{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cls-filter-pill{border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(55,101,190,.72);color:rgba(236,240,252,.95);font-family:'Hanken Grotesk',sans-serif;font-size:12px;font-weight:700;padding:7px 11px;cursor:pointer}
+.cls-filter-pill:hover{background:rgba(72,123,220,.82)}
+.cls-filter-pill.active{border-color:rgba(244,224,170,.75);background:rgba(214,170,96,.2);color:rgba(244,224,170,.98)}
+.cls-filter-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;padding:0 14px 14px}
+.cls-mode-panel{margin-top:34px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.018);padding:16px}
+.cls-mode-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cls-mode-btn{min-height:36px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(7,8,12,.32);color:rgba(226,230,244,.65);font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:0 16px;cursor:pointer;transition:all .18s}
+.cls-mode-btn:hover:not(:disabled){border-color:rgba(214,170,96,.45);color:rgba(244,224,170,.95)}
+.cls-mode-btn.active{border-color:rgba(214,170,96,.6);background:rgba(214,170,96,.13);color:rgba(244,224,170,.98)}
+.cls-mode-btn:disabled{opacity:.42;cursor:default}
+.cls-build-panel{display:flex;flex-direction:column;gap:16px;margin-top:18px;border:1px solid rgba(214,170,96,.18);border-radius:14px;background:linear-gradient(145deg,rgba(214,170,96,.065),rgba(255,255,255,.014) 54%,rgba(7,8,12,.18));box-shadow:0 22px 70px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04);padding:22px}
+.cls-build-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:22px;align-items:start}
+.cls-build-main h2{margin:6px 0 10px;font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1.05;letter-spacing:.03em;text-transform:uppercase;color:rgba(236,240,252,.96)}
+.cls-build-main p{max-width:760px;margin:0;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.56;color:rgba(226,230,244,.72)}
+.cls-build-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.46)}
+.cls-source-row{display:flex;flex-direction:column;align-items:flex-end;gap:9px;min-width:180px;border-left:1px solid rgba(214,170,96,.16);padding-left:20px}
+.cls-source-row>span,.cls-summary-pill span{font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(226,230,244,.42)}
+.cls-source-row div{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.cls-mini-source{display:inline-flex;border-radius:6px;background:rgba(214,170,96,.85);color:rgba(20,15,6,.95);font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;letter-spacing:.08em;text-decoration:none;padding:4px 7px}
+.cls-build-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.045)}
+.cls-summary-pill{display:flex;min-height:64px;flex-direction:column;justify-content:center;gap:6px;border:0;border-left:1px solid rgba(255,255,255,.06);background:rgba(7,8,12,.34);padding:12px 14px;text-align:left;cursor:pointer}
+.cls-summary-pill:first-child{border-left:0}
+.cls-summary-pill:hover{background:rgba(214,170,96,.08)}
+.cls-summary-pill strong{font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.1;color:rgba(244,224,170,.92);font-weight:600}
+.cls-rule-panels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cls-rule-panel{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(7,8,12,.24)}
+.cls-rule-panel.wide{grid-column:1/-1}
+.cls-rule-head{width:100%;display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;border:0;background:rgba(255,255,255,.028);color:inherit;text-align:left;padding:13px 15px;cursor:pointer}
+.cls-rule-head:hover{background:rgba(214,170,96,.08)}
+.cls-rule-mark{display:grid;place-items:center;width:24px;height:24px;border:1px solid rgba(214,170,96,.36);border-radius:50%;font-family:'Hanken Grotesk',sans-serif;font-size:13px;color:rgba(244,224,170,.95)}
+.cls-rule-head span:not(.cls-rule-mark):not(.cls-feature-count){font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:.06em;text-transform:uppercase;color:rgba(236,240,252,.92)}
+.cls-rule-head small{font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(226,230,244,.42)}
+.cls-rule-body{border-top:1px solid rgba(255,255,255,.06)}
+.cls-rule-panel.balanced .cls-rule-body{display:grid;grid-template-rows:repeat(5,minmax(44px,auto));height:100%}
+.cls-rule-row{display:grid;grid-template-columns:minmax(128px,.36fr) minmax(0,1fr);border-top:1px solid rgba(255,255,255,.045)}
+.cls-rule-row:first-child{border-top:0}
+.cls-rule-row strong{padding:8px 14px;background:rgba(214,170,96,.07);font-family:'Hanken Grotesk',sans-serif;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,224,170,.88)}
+.cls-rule-row span{padding:8px 14px;border-left:1px solid rgba(255,255,255,.045);font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.32;color:rgba(226,230,244,.79)}
+.cls-rule-row.note span{font-style:italic;color:rgba(226,230,244,.62)}
+.cls-rule-row .dot-label{display:flex;align-items:center;justify-content:center;padding:0;background:rgba(214,170,96,.07)}
+.cls-rule-row .dot-label i{display:block;width:7px;height:7px;border-radius:50%;background:rgba(244,224,170,.88);box-shadow:0 0 0 4px rgba(214,170,96,.08)}
+.cls-class-table-panel{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(7,8,12,.24)}
+.cls-table-headline{border-bottom:1px solid rgba(255,255,255,.06)}
+.cls-class-features-panel{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(7,8,12,.24)}
+.cls-features-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:1px solid rgba(255,255,255,.06);padding:17px 18px 15px}
+.cls-features-heading h3{margin:4px 0 0;font-family:'Cormorant Garamond',serif;font-size:24px;letter-spacing:.08em;text-transform:uppercase;color:rgba(236,240,252,.94);font-weight:500}
+.cls-features-body{display:flex;flex-direction:column;gap:10px;padding:14px}
+.cls-features-body .cls-stub{margin-top:0}
+.cls-feature-count{justify-self:end;border-radius:999px;background:rgba(214,170,96,.12);border:1px solid rgba(214,170,96,.28);padding:3px 9px;font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:800;letter-spacing:.08em;color:rgba(244,224,170,.92)}
+.cls-source-filter{margin-left:auto;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.cls-source-filter span{font-family:'Hanken Grotesk',sans-serif;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(226,230,244,.42)}
+.cls-source-pill{border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(255,255,255,.025);color:rgba(226,230,244,.62);font-family:'Cormorant Garamond',serif;font-size:14px;padding:5px 12px;cursor:pointer}
+.cls-source-pill.active{border-color:rgba(214,170,96,.55);background:rgba(214,170,96,.12);color:rgba(244,224,170,.95)}
+.cls-arch-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:14px}
+.cls-arch-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-height:126px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.018);padding:15px 16px;text-align:left;cursor:pointer;transition:all .2s}
+.cls-arch-card:hover{border-color:rgba(214,170,96,.36);background:rgba(255,255,255,.04);transform:translateY(-1px)}
+.cls-arch-card.active{border-color:rgba(214,170,96,.65);background:rgba(214,170,96,.09)}
+.cls-arch-source{font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:700;letter-spacing:.12em;color:rgba(20,15,6,.95);background:rgba(214,170,96,.85);border-radius:6px;padding:3px 7px}
+.cls-arch-name{font-family:'Cormorant Garamond',serif;font-size:22px;line-height:1.04;color:rgba(244,224,170,.96)}
+.cls-arch-meta{font-family:'Hanken Grotesk',sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.45)}
+.cls-arch-summary{font-family:'Cormorant Garamond',serif;font-size:15px;line-height:1.36;color:rgba(226,230,244,.68)}
+.cls-arch-empty{margin-top:14px;border:1px dashed rgba(255,255,255,.12);border-radius:12px;padding:16px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(226,230,244,.48)}
 .cls-grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:38px}
 .cls-card{border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.018);padding:22px 24px}
 .cls-card-title{font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,224,170,.92);margin-bottom:14px}
+.cls-card-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;border:0;background:transparent;color:inherit;padding:0;text-align:left;cursor:pointer}
+.cls-card-toggle .cls-card-title{margin-bottom:0}
+.cls-card-toggle:hover .cls-card-title{color:rgba(255,236,190,.98)}
+.cls-card-mark{display:grid;place-items:center;flex:none;width:26px;height:26px;border:1px solid rgba(214,170,96,.36);border-radius:50%;font-family:'Hanken Grotesk',sans-serif;font-size:16px;color:rgba(244,224,170,.92)}
 .cls-card-body{display:flex;flex-direction:column;gap:9px;font-family:'Cormorant Garamond',serif;font-size:17px;color:rgba(226,230,244,.82);line-height:1.4}
+.cls-card-toggle + .cls-card-body{margin-top:14px}
 .dim{color:rgba(226,230,244,.45)}
 .cls-h2{font-family:'Cormorant Garamond',serif;font-size:26px;letter-spacing:.1em;text-transform:uppercase;color:rgba(236,240,252,.92);margin:46px 0 18px}
 .cls-table-wrap{border:1px solid rgba(255,255,255,.09);border-radius:14px;overflow:hidden}
+.cls-table-wrap.in-card{border:0;border-radius:0;overflow:auto;background:rgba(4,5,8,.2)}
 .cls-table{display:grid;align-items:stretch}
 .cls-table-head{padding:11px 6px;background:rgba(214,170,96,.1);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,224,170,.92);text-align:center;border-bottom:1px solid rgba(255,255,255,.1)}
+.cls-info-toggle{margin:14px 0 8px;padding:12px 16px}
+.cls-info-toggle .cls-collapsible-title,.cls-table-toggle .cls-collapsible-title{font-size:20px;letter-spacing:.07em}
+.cls-info-toggle .cls-collapsible-hint,.cls-table-toggle .cls-collapsible-hint{font-size:10px}
+.cls-info-toggle .cls-chevron,.cls-table-toggle .cls-chevron{font-size:13px}
+.cls-info-table{border:1px solid rgba(255,255,255,.09);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.012)}
+.cls-info-row{display:grid;grid-template-columns:minmax(150px,.32fr) minmax(0,1fr);border-top:1px solid rgba(255,255,255,.055)}
+.cls-info-row:first-child{border-top:0}
+.cls-info-row strong{padding:12px 16px;background:rgba(214,170,96,.075);font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,224,170,.88)}
+.cls-info-row span{padding:12px 16px;border-left:1px solid rgba(255,255,255,.055);font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.45;color:rgba(226,230,244,.8)}
+.cls-info-row.note span{font-style:italic;color:rgba(226,230,244,.62)}
 .cls-equip-row{display:flex;gap:12px;align-items:baseline;font-family:'Cormorant Garamond',serif;font-size:18px;color:rgba(226,230,244,.82)}
+.cls-equip-card{margin-top:46px}
+.cls-card-toggle + .cls-equip-row,.cls-card-toggle + div{margin-top:14px}
 .cls-equip-note{margin-top:14px;font-family:'Hanken Grotesk',sans-serif;font-size:12.5px;font-style:italic;color:rgba(226,230,244,.5)}
+.cls-subclass-description{margin-top:0;border:1px solid rgba(214,170,96,.18);border-radius:14px;background:rgba(214,170,96,.045);padding:24px}
+.cls-subclass-description-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.cls-subclass-description-title{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:.03em;text-transform:uppercase;color:rgba(236,240,252,.96);line-height:1.04;margin-top:6px}
+.cls-subclass-description-text{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 22px;margin-top:16px;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.6;color:rgba(226,230,244,.76)}
+.cls-subclass-description-text p{margin:0}
 .cls-feature-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px}
 .cls-feature-name{font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:.02em;color:rgba(244,224,170,.95)}
+.cls-feature-card{padding:0;overflow:hidden;background:rgba(255,255,255,.014)}
+.cls-feature-card[open]{border-color:rgba(214,170,96,.18);background:rgba(214,170,96,.035)}
+.cls-feature-summary{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:center;list-style:none;padding:15px 17px;cursor:pointer}
+.cls-feature-summary::-webkit-details-marker{display:none}
+.cls-feature-summary:hover{background:rgba(255,255,255,.035)}
+.cls-feature-card[open] .cls-feature-summary{border-bottom:1px solid rgba(255,255,255,.06);background:rgba(214,170,96,.045)}
+.cls-feature-mark{display:grid;place-items:center;width:24px;height:24px;border:1px solid rgba(214,170,96,.36);border-radius:50%;font-family:'Hanken Grotesk',sans-serif;font-size:13px;color:rgba(244,224,170,.95)}
+.cls-feature-mark::before{content:'+'}
+.cls-feature-card[open] .cls-feature-mark::before{content:'−'}
+.cls-feature-summary-main{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-width:0}
+.cls-feature-meta-row{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.cls-feature-content{padding:18px 20px 20px}
 .cls-badge{font-family:'Hanken Grotesk',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.1em;color:rgba(20,15,6,.95);background:rgba(214,170,96,.85);border-radius:6px;padding:3px 7px}
+.cls-badge.alt{border:1px solid rgba(214,170,96,.35);background:rgba(214,170,96,.1);color:rgba(244,224,170,.9)}
 .cls-feature-lvl{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.45)}
 .cls-feature-text{font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.5;color:rgba(226,230,244,.78)}
+.cls-feature-text.rich{display:flex;flex-direction:column;gap:10px}
+.cls-feature-text.rich p{margin:0}
+.cls-feature-prose{display:flex;flex-direction:column;gap:14px;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.5;color:rgba(226,230,244,.8)}
+.cls-feature-prose.compact{font-size:16.5px;gap:12px}
+.cls-feature-prose p{margin:0}
+.cls-feature-section{display:flex;flex-direction:column;gap:3px}
+.cls-feature-section h4{margin:0;font-family:'Hanken Grotesk',sans-serif;font-size:13px;line-height:1.25;font-weight:800;letter-spacing:.01em;color:rgba(236,240,252,.95)}
+.cls-feature-section p{margin:0}
+.cls-feature-example{margin:2px 0;border-left:2px solid rgba(92,142,236,.95);background:rgba(226,230,244,.065);padding:13px 16px;font-family:'Hanken Grotesk',sans-serif;font-size:14px;line-height:1.45;color:rgba(226,230,244,.78)}
+.cls-feature-formula{align-self:center;text-align:center;font-family:'Hanken Grotesk',sans-serif;font-size:14px;line-height:1.4;color:rgba(236,240,252,.9)}
+.cls-feature-formula strong{font-weight:800;color:rgba(236,240,252,.98)}
 .cls-spell-table{margin-top:14px;border:1px solid rgba(214,170,96,.22);border-radius:10px;overflow:hidden;max-width:420px}
 .cls-spell-table-head{display:grid;grid-template-columns:130px 1fr;background:rgba(214,170,96,.12);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,224,170,.9)}
 .cls-spell-table-row{display:grid;grid-template-columns:130px 1fr;border-top:1px solid rgba(255,255,255,.05);font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(226,230,244,.82)}
 .cls-collapsible{display:flex;align-items:center;gap:14px;margin:46px 0 0;padding:18px 22px;border:1px solid rgba(214,170,96,.28);border-radius:14px;background:rgba(214,170,96,.06);cursor:pointer}
+.cls-table-toggle{margin:28px 0 10px;padding:12px 16px}
 .cls-collapsible:hover{background:rgba(255,255,255,.06)}
 .cls-chevron{font-family:'Cormorant Garamond',serif;font-size:14px;color:rgba(244,224,170,.9)}
 .cls-collapsible-title{flex:1;font-family:'Cormorant Garamond',serif;font-size:26px;letter-spacing:.06em;text-transform:uppercase;color:rgba(236,240,252,.92)}
 .cls-collapsible-hint{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(226,230,244,.45)}
 .cls-stub{margin-top:40px;border:1px dashed rgba(255,255,255,.14);border-radius:14px;padding:30px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:19px;color:rgba(226,230,244,.55)}
+.cls-arch-detail{margin-top:34px}
+.cls-arch-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;border:1px solid rgba(214,170,96,.18);border-radius:14px;background:rgba(214,170,96,.045);padding:24px}
+.cls-arch-detail-title{font-family:'Cormorant Garamond',serif;font-size:42px;letter-spacing:.03em;text-transform:uppercase;color:rgba(236,240,252,.96);line-height:1.04;margin-top:6px}
+.cls-arch-detail-sub{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(214,170,96,.78);margin-top:6px}
+.cls-arch-quote{margin:22px 0 18px;border-left:2px solid rgba(214,170,96,.45);padding:4px 0 4px 18px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;line-height:1.55;color:rgba(244,224,170,.78)}
+.cls-arch-prose{display:flex;flex-direction:column;gap:12px;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.62;color:rgba(226,230,244,.76)}
+.cls-arch-prose p{margin:0}
+.cls-arch-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:16px}
+.cls-arch-items.roomy{display:flex;flex-direction:column;gap:12px}
+.cls-arch-item{display:block;border:1px solid rgba(214,170,96,.14);border-radius:10px;background:rgba(7,8,12,.2);padding:16px 18px}
+.cls-arch-items.roomy .cls-arch-item{padding:18px 20px}
+.cls-arch-item summary{cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.25;color:rgba(244,224,170,.95)}
+.cls-arch-item span{display:block;margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:16.5px;line-height:1.58;color:rgba(226,230,244,.78)}
+.cls-spell-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0 12px;font-family:'Hanken Grotesk',sans-serif;font-size:11.5px;color:rgba(226,230,244,.55)}
+.cls-feature-spells{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.cls-spell-card{border:1px solid rgba(214,170,96,.16);border-radius:12px;background:rgba(7,8,12,.22);padding:16px}
+.cls-higher{margin-top:12px;border-top:1px solid rgba(255,255,255,.07);padding-top:12px;font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.5;color:rgba(226,230,244,.72)}
+.cls-higher strong{color:rgba(244,224,170,.92)}
+.cls-arch-list{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.cls-subclass-list{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.cls-subclass-item{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.018)}
+.cls-subclass-toggle{width:100%;display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;gap:12px;align-items:center;border:0;background:transparent;color:inherit;padding:16px 18px;text-align:left}
+.cls-subclass-toggle:hover{background:rgba(255,255,255,.035)}
+.cls-subclass-heading{display:flex;flex-direction:column;gap:4px;min-width:0;cursor:pointer}
+.cls-subclass-plus{display:grid;place-items:center;width:26px;height:26px;border:1px solid rgba(214,170,96,.42);border-radius:50%;background:rgba(7,8,12,.25);font-family:'Hanken Grotesk',sans-serif;font-size:16px;color:rgba(244,224,170,.95);cursor:pointer}
+.cls-subclass-plus:hover{background:rgba(214,170,96,.14)}
+.cls-subclass-title{font-family:'Cormorant Garamond',serif;font-size:23px;line-height:1.05;color:rgba(236,240,252,.94)}
+.cls-subclass-source{font-family:'Hanken Grotesk',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.1em;color:rgba(20,15,6,.95);background:rgba(214,170,96,.85);border-radius:6px;padding:4px 8px}
+.cls-subclass-meta{font-family:'Hanken Grotesk',sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.45);white-space:nowrap}
+.cls-subclass-body{padding:0 22px 22px 64px}
+.cls-subclass-prose{display:flex;flex-direction:column;gap:8px;margin-top:12px;font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.55;color:rgba(226,230,244,.72)}
+.cls-subclass-prose p{margin:0}
+.cls-subclass-rules{display:flex;flex-direction:column;gap:14px;margin-top:18px}
+.cls-subclass-rule{border-top:1px solid rgba(255,255,255,.07);padding-top:16px}
+.cls-subclass-spells{margin-top:22px;border-top:1px solid rgba(255,255,255,.07);padding-top:18px}
+.cls-h3{font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,224,170,.92);margin-bottom:14px}
+.cls-open-arch.inline{margin-top:0;white-space:nowrap}
+.cls-arch-rule-mini{display:grid;gap:9px;margin-top:14px}
+.cls-arch-rule-row{display:grid;grid-template-columns:minmax(150px,.42fr) minmax(0,1fr);gap:12px;border-top:1px solid rgba(255,255,255,.06);padding-top:9px}
+.cls-arch-rule-row strong{font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,224,170,.9)}
+.cls-arch-rule-row span{font-family:'Cormorant Garamond',serif;font-size:15.5px;line-height:1.45;color:rgba(226,230,244,.72)}
+.cls-open-arch{margin-top:14px;border:1px solid rgba(214,170,96,.42);border-radius:999px;background:rgba(214,170,96,.1);color:rgba(244,224,170,.95);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:9px 14px;cursor:pointer}
+.cls-open-arch:hover{background:rgba(214,170,96,.18)}
+.cls-open-arch.ghost{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.025);color:rgba(226,230,244,.62)}
+@media (max-width: 820px){
+  .cls-wrap{padding:34px 22px 84px}
+  .cls-head{align-items:flex-start;gap:18px}
+  .cls-emblem-box{width:96px;height:96px}
+  .cls-emblem-frame,.cls-emblem{width:82px;height:82px}
+  .cls-title{font-size:38px}
+  .cls-grid2{grid-template-columns:1fr}
+  .cls-build-top{grid-template-columns:1fr}
+  .cls-source-row{align-items:flex-start;border-left:0;border-top:1px solid rgba(214,170,96,.16);padding:14px 0 0}
+  .cls-source-row div{justify-content:flex-start}
+  .cls-build-summary{grid-template-columns:1fr 1fr}
+  .cls-rule-panels{grid-template-columns:1fr}
+  .cls-rule-panel.wide{grid-column:auto}
+  .cls-toolbar{align-items:flex-start}
+  .cls-section-tools{order:1}
+  .cls-icon-tools{order:2;margin-left:auto}
+  .cls-tool-message{order:3;width:100%}
+  .cls-info-row{grid-template-columns:1fr}
+  .cls-info-row span{border-left:0;border-top:1px solid rgba(255,255,255,.045)}
+  .cls-source-filter{margin-left:0;width:100%}
+  .cls-rule-panel.balanced .cls-rule-body{display:block;height:auto}
+  .cls-rule-row{grid-template-columns:1fr}
+  .cls-rule-row span{border-left:0;border-top:1px solid rgba(255,255,255,.045)}
+  .cls-rule-row .dot-label{justify-content:flex-start;min-height:34px;padding:10px 14px}
+  .cls-features-heading{align-items:flex-start}
+  .cls-feature-summary-main{align-items:flex-start;flex-direction:column;gap:7px}
+  .cls-feature-meta-row{justify-content:flex-start}
+  .cls-arch-detail-title{font-size:30px}
+  .cls-spell-meta{grid-template-columns:1fr}
+  .cls-subclass-toggle{grid-template-columns:30px minmax(0,1fr) auto}
+  .cls-subclass-meta{white-space:normal}
+  .cls-open-arch.inline{grid-column:2 / -1;justify-self:start}
+  .cls-subclass-body{padding:0 16px 18px 16px}
+  .cls-arch-rule-row{grid-template-columns:1fr}
+}
+@media (max-width: 540px){
+  .cls-build-summary{grid-template-columns:1fr}
+}
 </style>

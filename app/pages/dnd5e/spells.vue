@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { SPELLS_5E, SPELL_SOURCES, SPELL_LEVELS, SPELL_SCHOOLS, SPELL_TAGS } from '~/data/spells5e.js'
 
 const search = ref('')
@@ -71,7 +71,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   <div class="sp">
     <aside class="sp-sidebar">
       <div class="sp-sidebar-head">
-        <NuxtLink to="/?system=5e" class="sp-back" title="К карте D&D 5e">
+        <NuxtLink to="/dnd5e" class="sp-back" title="К карте D&D 5e">
           <img src="/assets/knot-main.png" width="22" height="22" style="display:block;object-fit:contain">
         </NuxtLink>
         <div class="sp-wordmark">
@@ -83,7 +83,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
       <nav class="sp-crumb">
         <NuxtLink to="/" class="sp-crumb-link">Системы</NuxtLink>
         <span class="sp-crumb-sep">/</span>
-        <NuxtLink to="/?system=5e" class="sp-crumb-link">D&D 5e</NuxtLink>
+        <NuxtLink to="/dnd5e" class="sp-crumb-link">D&D 5e</NuxtLink>
         <span class="sp-crumb-sep">/</span>
         <span class="sp-crumb-current">Заклинания</span>
       </nav>
@@ -121,7 +121,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
           <div class="sp-card-top">
             <div class="sp-card-eyebrow">
-              <NuxtLink to="/?system=5e">D&D 5e</NuxtLink>
+              <NuxtLink to="/dnd5e">D&D 5e</NuxtLink>
               <span class="sp-eyebrow-sep">/</span>
               <span>Заклинания</span>
             </div>

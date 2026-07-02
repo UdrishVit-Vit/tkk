@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { useKnotCanvas } from '~/composables/useKnotCanvas.js'
 
 const route = useRoute()
@@ -622,7 +622,7 @@ function printRace() {
 
       <div class="rl-nodes" :style="{ transform: `scale(${rlFit})` }">
         <!-- central node: Расы и происхождения → back to the D&D 5e system map -->
-        <NuxtLink to="/?system=5e" class="rl-node rl-node-center" title="К карте D&D 5e">
+        <NuxtLink to="/dnd5e" class="rl-node rl-node-center" title="К карте D&D 5e">
           <div class="rl-disc rl-disc-center" />
           <div class="rl-knot rl-knot-center">
             <img src="/assets/nodes/rasy.png" alt="Расы и происхождения">
