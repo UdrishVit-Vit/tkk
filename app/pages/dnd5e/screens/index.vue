@@ -14,6 +14,8 @@ const copiedRule = ref(null)
 const sectionCache = shallowRef({})
 const activeFilters = ref([])
 const showFilter = ref(false)
+const railEl = ref(null)
+const sparkEl = ref(null)
 
 const groups = computed(() => RULE_SCREEN_GROUPS_5E.map(group => ({
   ...group,
@@ -145,6 +147,90 @@ function ruleSourceName(rule) {
   return rule.sourceName || openData.value?.screen?.sourceName
 }
 
+// ── Искорка по нити, зажигающая золотые ромбы ──────────────────────
+let sparkRaf = null
+let sparkTimer = null
+
+onMounted(() => {
+  const rail = railEl.value
+  const spark = sparkEl.value
+  if (!rail || !spark) return
+
+  const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  const SPEED = 240 // px/сек
+  const PAUSE = 1100 // мс между проходами
+
+  function collectNodes() {
+    const railTop = rail.getBoundingClientRect().top
+    const badge = rail.querySelector('.screens-emblem-badge')
+    const titles = [...rail.querySelectorAll('.thread-group-title')]
+    // Искра стартует от эмблемы (её центр), а зажигает ромбы разделов.
+    const startY = badge ? centerY(badge, railTop) : 0
+    const nodes = titles
+      .map(t => ({ el: t, y: t.getBoundingClientRect().top + 17 - railTop }))
+      .sort((a, b) => a.y - b.y)
+    return { startY, nodes }
+  }
+
+  function centerY(el, railTop) {
+    const r = el.getBoundingClientRect()
+    return r.top + r.height / 2 - railTop
+  }
+
+  function clearLit(nodes) {
+    for (const n of nodes) n.el.classList.remove('lit')
+  }
+
+  if (reduce) {
+    const { nodes } = collectNodes()
+    for (const n of nodes) n.el.classList.add('lit')
+    spark.style.display = 'none'
+    return
+  }
+
+  function runPass() {
+    const { startY, nodes } = collectNodes()
+    if (!nodes.length) {
+      sparkTimer = window.setTimeout(runPass, 400)
+      return
+    }
+    clearLit(nodes)
+    const endY = nodes[nodes.length - 1].y
+    const distance = Math.max(1, endY - startY)
+    const duration = (distance / SPEED) * 1000
+    let start = null
+
+    spark.style.opacity = '1'
+
+    function frame(ts) {
+      if (start === null) start = ts
+      const t = Math.min(1, (ts - start) / duration)
+      const y = startY + (endY - startY) * t
+      spark.style.transform = `translate(-50%, ${y}px)`
+
+      for (const n of nodes) {
+        if (y >= n.y - 2) n.el.classList.add('lit')
+      }
+
+      if (t < 1) {
+        sparkRaf = requestAnimationFrame(frame)
+      } else {
+        spark.style.opacity = '0'
+        sparkTimer = window.setTimeout(runPass, PAUSE)
+      }
+    }
+
+    sparkRaf = requestAnimationFrame(frame)
+  }
+
+  sparkTimer = window.setTimeout(runPass, 500)
+})
+
+onBeforeUnmount(() => {
+  if (sparkRaf) cancelAnimationFrame(sparkRaf)
+  if (sparkTimer) clearTimeout(sparkTimer)
+})
+
 useSeoMeta({
   title: 'Ширма правил D&D 5e 2014 — TKK.club',
   description: 'Внутренняя ширма правил D&D 5e 2014: действия, бой, проверки, состояния, заклинания, снаряжение, путешествия и инструменты Мастера.'
@@ -153,6 +239,15 @@ useSeoMeta({
 
 <template>
   <div class="screens-page">
+    <div ref="railEl" class="screens-shell">
+      <NuxtLink to="/dnd5e" class="screens-emblem" title="Вернуться к D&D 5e">
+        <span class="screens-emblem-badge">
+          <img src="/assets/nodes/shirma.png" alt="Ширма-справочник" width="120" height="120">
+        </span>
+      </NuxtLink>
+      <span class="screens-thread-line" aria-hidden="true" />
+      <span ref="sparkEl" class="thread-spark" aria-hidden="true" />
+
     <header class="screens-header">
       <nav class="screens-crumb" aria-label="Навигация">
         <NuxtLink to="/">Системы</NuxtLink>
@@ -163,10 +258,7 @@ useSeoMeta({
       </nav>
 
       <p class="screens-kicker">D&D 5e 2014</p>
-      <div class="screens-title-row">
-        <img class="screens-title-img" src="/assets/nodes/shirma.png" alt="Ширма-справочник" width="72" height="72">
-        <h1>Ширма правил</h1>
-      </div>
+      <h1>Ширма правил</h1>
       <p class="screens-lead">
         Все правила игры — части одной нити. Потяните за узел — нить сплетётся
         и раскроет вложенные правила, не уводя вас со страницы.
@@ -218,6 +310,7 @@ useSeoMeta({
     </header>
 
     <main class="screens-main">
+      <div class="thread-rail">
 
       <section v-if="bookmarks.length && !query" class="thread-group bookmarks-group">
         <h2 class="thread-group-title">Закладки</h2>
@@ -411,7 +504,9 @@ useSeoMeta({
       <div v-if="!filteredGroups.length" class="screens-empty">
         Ничего не найдено. Попробуйте другой термин.
       </div>
+      </div>
     </main>
+    </div>
   </div>
 </template>
 
@@ -430,14 +525,52 @@ useSeoMeta({
   font-family:'Hanken Grotesk',system-ui,sans-serif;
 }
 
+/* Оболочка-таймлайн: слева нить с эмблемой, справа весь контент */
+.screens-shell{
+  --indent:112px;
+  --axis:38px;
+  position:relative;
+  width:min(872px,calc(100% - 48px));
+  margin:0 auto;
+  padding-left:var(--indent);
+}
+
 .screens-header,
 .screens-main{
-  width:min(760px,calc(100% - 48px));
-  margin:0 auto;
+  width:auto;
 }
 
 .screens-header{
   padding:38px 0 8px;
+}
+
+/* Непрерывная нить сверху (от эмблемы) до самого низа */
+.screens-thread-line{
+  position:absolute;
+  left:var(--axis);
+  transform:translateX(-50%);
+  top:196px;
+  bottom:56px;
+  width:1px;
+  background:linear-gradient(180deg,rgba(214,170,96,.55),var(--t-line) 120px);
+  z-index:0;
+}
+
+/* Искра, бегущая по нити — маленькая, ненавязчивая */
+.thread-spark{
+  position:absolute;
+  left:var(--axis);
+  top:0;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:#ffe4a0;
+  box-shadow:0 0 5px 1.5px rgba(255,220,140,.7),0 0 10px 3px rgba(214,170,96,.28);
+  opacity:0;
+  z-index:1;
+  pointer-events:none;
+  will-change:transform;
+  transition:opacity .4s ease;
 }
 
 .screens-crumb{
@@ -473,14 +606,76 @@ useSeoMeta({
 .screens-title-row{
   display:flex;
   align-items:center;
-  gap:20px;
+  gap:22px;
 }
 
-.screens-title-img{
-  flex:0 0 auto;
+/* Кликабельная эмблема-ширма — исток нити, ведёт на уровень вверх (/dnd5e) */
+.screens-emblem{
+  position:absolute;
+  left:var(--axis);
+  top:78px;
+  transform:translateX(-50%);
+  z-index:3;
+  display:block;
+  text-decoration:none;
+  outline:none;
+}
+
+.screens-emblem-badge{
+  position:relative;
+  display:grid;
+  place-items:center;
+  width:116px;
+  height:116px;
+}
+
+.screens-emblem-badge::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  margin:auto;
   width:72px;
   height:72px;
+  transform:rotate(45deg);
+  border:1px solid rgba(214,170,96,.55);
+  background:var(--t-bg);
+  transition:border-color .25s ease,box-shadow .25s ease;
+}
+
+.screens-emblem-badge::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  margin:auto;
+  width:88px;
+  height:88px;
+  transform:rotate(45deg);
+  border:1px solid rgba(214,170,96,.2);
+  transition:border-color .25s ease;
+}
+
+.screens-emblem-badge img{
+  position:relative;
+  z-index:1;
+  width:92px;
+  height:92px;
   object-fit:contain;
+  transition:transform .25s ease;
+}
+
+.screens-emblem:hover .screens-emblem-badge::before,
+.screens-emblem:focus-visible .screens-emblem-badge::before{
+  border-color:var(--t-gold);
+  box-shadow:0 0 20px 4px rgba(214,170,96,.4);
+}
+
+.screens-emblem:hover .screens-emblem-badge::after,
+.screens-emblem:focus-visible .screens-emblem-badge::after{
+  border-color:rgba(214,170,96,.5);
+}
+
+.screens-emblem:hover .screens-emblem-badge img{
+  transform:scale(1.06);
 }
 
 .screens-header h1{
@@ -658,31 +853,16 @@ useSeoMeta({
   padding:28px 0 90px;
 }
 
-/* ── Нить: вертикальная линия с узлами ─────────────────────────── */
+/* ── Разделы на нити ───────────────────────────────────────────── */
 .thread-group{
   position:relative;
-  margin-top:40px;
-  padding-left:30px;
+  margin-top:38px;
+  padding-left:0;
   scroll-margin-top:24px;
 }
 
 .thread-group:first-of-type{
-  margin-top:14px;
-}
-
-.thread-group::before{
-  content:'';
-  position:absolute;
-  left:5px;
-  top:14px;
-  bottom:-40px;
-  width:1px;
-  background:var(--t-line);
-}
-
-.thread-group:last-of-type::before{
-  bottom:0;
-  background:linear-gradient(180deg,var(--t-line) 60%,transparent);
+  margin-top:6px;
 }
 
 .thread-group-title{
@@ -700,17 +880,24 @@ useSeoMeta({
 .thread-group-title::before{
   content:'';
   position:absolute;
-  left:-30px;
+  left:calc(var(--axis) - var(--indent) - 6px);
   top:11px;
-  width:11px;
-  height:11px;
+  width:12px;
+  height:12px;
   border:1px solid var(--t-gold);
   background:var(--t-bg);
   transform:rotate(45deg);
+  transition:background .4s ease,box-shadow .4s ease;
+  z-index:1;
 }
 
+.thread-group-title.lit::before,
 .bookmarks-group .thread-group-title::before{
   background:var(--t-gold);
+}
+
+.thread-group-title.lit::before{
+  box-shadow:0 0 13px 3px rgba(214,170,96,.6);
 }
 
 .thread-items{
@@ -752,13 +939,14 @@ useSeoMeta({
 .thread-item::before{
   content:'';
   position:absolute;
-  left:-27.5px;
+  left:calc(var(--axis) - var(--indent) - 2.5px);
   top:21px;
   width:5px;
   height:5px;
   border-radius:50%;
   background:rgba(232,236,248,.28);
   transition:background .18s ease,box-shadow .18s ease,transform .18s ease;
+  z-index:1;
 }
 
 .thread-item:hover::before,
@@ -1335,26 +1523,46 @@ useSeoMeta({
 }
 
 @media (max-width:720px){
-  .screens-header,
-  .screens-main{
-    width:min(100% - 32px,760px);
+  .screens-shell{
+    --indent:76px;
+    --axis:26px;
+    width:min(100% - 20px,760px);
   }
 
   .screens-header h1{
-    font-size:40px;
-  }
-
-  .screens-title-img{
-    width:54px;
-    height:54px;
-  }
-
-  .screens-title-row{
-    gap:14px;
+    font-size:34px;
   }
 
   .screens-lead{
     font-size:18px;
+  }
+
+  .screens-emblem{
+    top:64px;
+  }
+
+  .screens-emblem-badge{
+    width:84px;
+    height:84px;
+  }
+
+  .screens-emblem-badge::before{
+    width:46px;
+    height:46px;
+  }
+
+  .screens-emblem-badge::after{
+    width:60px;
+    height:60px;
+  }
+
+  .screens-emblem-badge img{
+    width:62px;
+    height:62px;
+  }
+
+  .screens-thread-line{
+    top:150px;
   }
 
   .branch{
