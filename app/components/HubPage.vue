@@ -18,8 +18,8 @@ const state = reactive({
   view: 'home', active: null, group: null, section: null, cls: null, overlay: null,
   theme: 'void', authed: false, bookmarks: [], query: '', cardQuery: '', classToolMessage: '', infOpen: false, invOpen: false,
   classMode: 'base', activeArchetype: null, archetypeSource: 'all', classCardTab: 'skills', classHitsOpen: true, classProfOpen: true,
-  classEquipOpen: true, classTableOpen: true, classFilterOpen: false, classFeatureSource: 'all',
-  classFeatureLevel: 'all', classFeatureSubclass: 'all', subclassesOpen: false, openSubclass: null
+  classEquipOpen: true, classTableOpen: true, classFilterOpen: false, classFilterTouched: false, classFeatureSource: 'all',
+  classFeatureLevel: 'all', classFeatureSubclass: 'base', subclassesOpen: false, openSubclass: null
 })
 
 const CLASS_QUERY = {
@@ -96,9 +96,10 @@ watch(() => [props.initialSystem, props.initialSection, props.initialClass], ([s
   state.classEquipOpen = true
   state.classTableOpen = true
   state.classFilterOpen = false
+  state.classFilterTouched = false
   state.classFeatureSource = 'all'
   state.classFeatureLevel = 'all'
-  state.classFeatureSubclass = 'all'
+  state.classFeatureSubclass = 'base'
   state.subclassesOpen = false
   state.openSubclass = null
 })
@@ -160,7 +161,7 @@ function crumbSystem() {
 // "Расы и происхождения" (D&D 5e/2014) and "Виды" (D&D 5.5e/2024) are different
 // rulesets with their own terms — each gets its own page branch instead of
 // sharing one /races list, the same way Pathfinder will get its own branch.
-const RACE_SECTION_ROUTES = { 'Расы и происхождения': '/dnd5e/races', 'Черты': '/dnd5e/feats', 'Особенности классов': '/dnd5e/class-features', 'Предыстории': '/dnd5e/backgrounds', 'Заклинания': '/dnd5e/spells', 'Оружие': '/dnd5e/weapons', 'Доспехи': '/dnd5e/armor', 'Снаряжение': '/dnd5e/equipment', 'Бестиарий': '/dnd5e/bestiary' }
+const RACE_SECTION_ROUTES = { 'Расы и происхождения': '/dnd5e/races', 'Черты': '/dnd5e/feats', 'Особенности классов': '/dnd5e/class-features', 'Предыстории': '/dnd5e/backgrounds', 'Заклинания': '/dnd5e/spells', 'Оружие': '/dnd5e/weapons', 'Доспехи': '/dnd5e/armor', 'Снаряжение': '/dnd5e/equipment', 'Бестиарий': '/dnd5e/bestiary', 'Ширма (справочник)': '/dnd5e/screens' }
 function openSection(name) {
   if (RACE_SECTION_ROUTES[name]) { navigateTo(RACE_SECTION_ROUTES[name]); return }
   state.section = state.section === name ? null : name; state.cls = null
@@ -185,9 +186,10 @@ function openClass(name) {
   state.classEquipOpen = true
   state.classTableOpen = true
   state.classFilterOpen = false
+  state.classFilterTouched = false
   state.classFeatureSource = 'all'
   state.classFeatureLevel = 'all'
-  state.classFeatureSubclass = 'all'
+  state.classFeatureSubclass = 'base'
   state.subclassesOpen = false
   state.openSubclass = null
 }
@@ -483,22 +485,11 @@ const vm = computed(() => {
 
   const cd = (S.cls && CLASSDATA[S.cls]) || {}
   const has = !!cd.table
-  const classTableRows = (cd.table||[]).map(r => ({
-    cells: r.map((v, ci) => {
-      const feat = ci===2
-      return { v:String(v), style:{
-        padding: feat ? '9px 10px' : '9px 6px',
-        textAlign: feat ? 'left' : 'center',
-        fontFamily: feat ? "'Hanken Grotesk',sans-serif" : "'Cormorant Garamond',serif",
-        fontSize: feat ? '11.5px' : (ci===0 ? '16px' : '15px'),
-        lineHeight: feat ? 1.3 : 1.2,
-        color: ci===0 ? 'rgba(244,224,170,.9)' : 'rgba(226,230,244,.72)',
-        borderBottom:'1px solid rgba(255,255,255,.05)',
-        background: ci===0 ? 'rgba(255,255,255,.012)' : 'transparent'
-      }}
-    })
-  }))
   const classIdx = POOL.classes.indexOf(S.cls)
+  const featureLevel = value => {
+    const match = String(value || '').match(/\d+/)
+    return match ? Number(match[0]) : 999
+  }
   const classArchetypes = (cd.archetypes || []).map(a => ({
     ...a,
     sourceUrl: `/dnd5e/class-features?source=${encodeURIComponent(a.source || '')}`,
@@ -508,6 +499,7 @@ const vm = computed(() => {
         ...f,
         id,
         featureUrl: classFeatureUrl(id),
+        rank: featureLevel(f.level),
         hasItems: !!(f.items && f.items.length),
         items: (f.items || []).map(([name, text]) => ({ name, text }))
       }
@@ -518,10 +510,6 @@ const vm = computed(() => {
   const activeArchetypeSource = S.archetypeSource || 'all'
   const filteredClassArchetypes = classArchetypes.filter(a => activeArchetypeSource === 'all' || a.source === activeArchetypeSource)
   const selectedClassArchetype = classArchetypes.find(a => a.id === S.activeArchetype) || null
-  const featureLevel = value => {
-    const match = String(value || '').match(/\d+/)
-    return match ? Number(match[0]) : 999
-  }
   const baseClassFeatures = (cd.features||[]).map((f, order) => {
     const id = classFeatureId(S.cls, f[2], f[0])
     return {
@@ -537,38 +525,134 @@ const vm = computed(() => {
       spellTable: (f[4]||[]).map(s=>({ lvl:s[0], spell:s[1] }))
     }
   })
-  const selectedArchetypeFeatures = selectedClassArchetype ? [
-    ...selectedClassArchetype.features.map((f, order) => ({
+  const archetypeFeatureEntries = (arch, archetypeOrder = 0) => [
+    ...arch.features.map((f, order) => ({
       id: f.id,
       featureUrl: f.featureUrl,
       name: f.name,
-      src: selectedClassArchetype.source,
+      src: arch.source,
       lvl: f.level,
       text: f.text,
-      order: 101 + order,
-      rank: featureLevel(f.level),
+      order: 1000 + archetypeOrder * 100 + order,
+      rank: f.rank || featureLevel(f.level),
       isArchetype: true,
-      archetypeName: selectedClassArchetype.name,
+      archetypeId: arch.id,
+      archetypeName: arch.name,
       hasItems: !!(f.items && f.items.length),
       hasLongItems: !!(f.items && f.items.length > 3),
       items: f.items || []
     })),
-    ...((selectedClassArchetype.spells && selectedClassArchetype.spells.length) ? [{
-      id: classFeatureId(S.cls, selectedClassArchetype.id, 'Дополнительные заклинания'),
-      featureUrl: classFeatureUrl(classFeatureId(S.cls, selectedClassArchetype.id, 'Дополнительные заклинания')),
+    ...((arch.spells && arch.spells.length) ? [{
+      id: classFeatureId(S.cls, arch.id, 'Дополнительные заклинания'),
+      featureUrl: classFeatureUrl(classFeatureId(S.cls, arch.id, 'Дополнительные заклинания')),
       name: 'Дополнительные заклинания',
-      src: selectedClassArchetype.source,
-      lvl: selectedClassArchetype.level,
+      src: arch.source,
+      lvl: arch.level,
       text: 'Вы получаете дополнительные заклинания подкласса. Они считаются для вас заклинаниями барда и вплетаются в магическую традицию выбранной коллегии.',
-      order: 198,
-      rank: featureLevel(selectedClassArchetype.level),
+      order: 1000 + archetypeOrder * 100 + 98,
+      rank: featureLevel(arch.level),
       isArchetype: true,
-      archetypeName: selectedClassArchetype.name,
+      archetypeId: arch.id,
+      archetypeName: arch.name,
       hasSpells: true,
-      spells: selectedClassArchetype.spells
+      spells: arch.spells
     }] : [])
+  ]
+  const allArchetypeFeatures = classArchetypes.flatMap((arch, archetypeOrder) => archetypeFeatureEntries(arch, archetypeOrder))
+  const selectedArchetypeFeatures = selectedClassArchetype
+    ? allArchetypeFeatures.filter(feature => feature.archetypeId === selectedClassArchetype.id)
+    : []
+  const cleanTableFeatureName = value => String(value || '')
+    .replace(/\s*\([^)]*\)/g, '')
+    .trim()
+  const tableFeatureKey = value => featureSlug(cleanTableFeatureName(value))
+  const linkableTableFeatures = [...baseClassFeatures, ...selectedArchetypeFeatures]
+  const tableFeatureByName = new Map()
+  const tableFeatureByNameLevel = new Map()
+  linkableTableFeatures.forEach(feature => {
+    const key = tableFeatureKey(feature.name)
+    const rank = featureLevel(feature.lvl)
+    if (!key) return
+    if (!tableFeatureByName.has(key)) tableFeatureByName.set(key, feature)
+    tableFeatureByNameLevel.set(`${key}:${rank}`, feature)
+  })
+  const tableFeatureLink = (name, level) => {
+    const key = tableFeatureKey(name)
+    if (!key) return null
+    return tableFeatureByNameLevel.get(`${key}:${level}`) || tableFeatureByName.get(key) || null
+  }
+  const selectedTableFeaturesByLevel = selectedArchetypeFeatures.reduce((acc, feature) => {
+    const rank = featureLevel(feature.lvl)
+    if (!rank || rank === 999) return acc
+    if (!acc.has(rank)) acc.set(rank, [])
+    acc.get(rank).push(feature.name)
+    return acc
+  }, new Map())
+  const archetypeTypeForms = selectedClassArchetype?.type ? [
+    selectedClassArchetype.type,
+    selectedClassArchetype.type.replace(/ия(\s|$)/i, 'ии$1')
   ] : []
+  const archetypePlaceholderSlugs = new Set(archetypeTypeForms.map(featureSlug).filter(Boolean))
+  const tableFeatureParts = (value, level) => {
+    const text = String(value || '')
+    const archetypeNames = selectedTableFeaturesByLevel.get(level) || []
+    const baseParts = text
+      .split(',')
+      .map(part => part.trim())
+      .filter(Boolean)
+      .filter(part => part !== '—')
+      .filter(part => !archetypeNames.length || !archetypePlaceholderSlugs.has(featureSlug(part)))
+      .map((part, index) => {
+        const feature = tableFeatureLink(part, level)
+        return {
+          key: `base-${level}-${index}-${featureSlug(part)}`,
+          text: part,
+          featureId: feature?.id || '',
+          isArchetype: false
+        }
+      })
+    const archetypeParts = archetypeNames.map((part, index) => ({
+      key: `arch-${level}-${index}-${featureSlug(part)}`,
+      text: part,
+      featureId: tableFeatureLink(part, level)?.id || '',
+      isArchetype: true
+    }))
+    return [...archetypeParts, ...baseParts]
+  }
+  const classTableRows = (cd.table||[]).map(r => {
+    const level = Number(r[0])
+    return {
+      hasArchetypeFeatures: selectedTableFeaturesByLevel.has(level),
+      cells: r.map((v, ci) => {
+        const feat = ci===2
+        const parts = feat ? tableFeatureParts(v, level) : []
+        const hasArchetypeParts = parts.some(part => part.isArchetype)
+        return {
+          v:String(v),
+          parts,
+          className: [
+            feat ? 'feature' : '',
+            hasArchetypeParts ? 'has-archetype-parts' : ''
+          ].filter(Boolean).join(' '),
+          title: hasArchetypeParts ? `Умения подкласса: ${parts.filter(part => part.isArchetype).map(part => part.text).join(', ')}` : '',
+          style:{
+            padding: feat ? '9px 10px' : '9px 6px',
+            textAlign: feat ? 'left' : 'center',
+            fontFamily: feat ? "'Hanken Grotesk',sans-serif" : "'Cormorant Garamond',serif",
+            fontSize: feat ? '11.5px' : (ci===0 ? '16px' : '15px'),
+            lineHeight: feat ? 1.3 : 1.2,
+            color: ci===0 ? 'rgba(244,224,170,.9)' : 'rgba(226,230,244,.72)',
+            borderBottom:'1px solid rgba(255,255,255,.05)',
+            background: hasArchetypeParts ? 'linear-gradient(90deg, rgba(126,196,184,.105), rgba(7,8,12,.02))' : (ci===0 ? 'rgba(255,255,255,.012)' : 'transparent'),
+            boxShadow: hasArchetypeParts ? 'inset 2px 0 0 rgba(126,196,184,.7)' : 'none'
+          }
+        }
+      })
+    }
+  })
   const classFeatures = [...baseClassFeatures, ...selectedArchetypeFeatures]
+    .sort((a, b) => a.rank - b.rank || a.order - b.order)
+  const classAllFeatures = [...baseClassFeatures, ...allArchetypeFeatures]
     .sort((a, b) => a.rank - b.rank || a.order - b.order)
   const selectedClassArchetypeDescription = selectedClassArchetype ? {
     name: selectedClassArchetype.name,
@@ -607,6 +691,7 @@ const vm = computed(() => {
     classEquip: cd.equipment || [], classEquipNote: cd.equipNote || '', classHasEquip: !!(cd.equipment && cd.equipment.length),
     classTableCols: cd.tableCols || [], classTableRows, classTableGrid: cd.tableGrid || '46px 50px 1fr',
     classFeatures,
+    classAllFeatures,
     classArchetypes,
     classFilteredArchetypes: filteredClassArchetypes,
     classArchetypeSources,

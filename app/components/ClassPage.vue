@@ -65,6 +65,10 @@ function featureBlocks(text) {
     if (/^Например,/i.test(paragraph)) return { type: 'example', text: paragraph }
     const title = FEATURE_SECTION_TITLES.find(name => paragraph.startsWith(`${name}. `))
     if (title) return { type: 'section', title, text: paragraph.slice(title.length + 2) }
+    const lines = paragraph.split('\n').map(line => line.trim()).filter(Boolean)
+    if (lines.length > 1 && lines.every(line => /^[-•]\s+/.test(line))) {
+      return { type: 'list', items: lines.map(line => line.replace(/^[-•]\s+/, '')) }
+    }
     return { type: 'paragraph', text: paragraph }
   })
 }
@@ -78,13 +82,39 @@ function isExternalSource(source) {
 }
 
 const featureSources = computed(() => [...new Set([
-  ...props.vm.classFeatures.map(f => f.src),
+  ...(props.vm.classAllFeatures || props.vm.classFeatures).map(f => f.src),
   ...props.vm.classArchetypes.map(a => a.source),
-  ...SPELLS_5E.map(spell => spell.source)
+  ...classSpellList.value.map(spell => spell.source)
 ].filter(Boolean))])
-const featureLevels = computed(() => [...new Set(props.vm.classFeatures.map(f => f.rank).filter(v => v !== 999))].sort((a, b) => a - b))
-const activeClassTab = computed(() => props.state.classCardTab || 'skills')
+const featureLevels = computed(() => [...new Set((props.vm.classAllFeatures || props.vm.classFeatures).map(f => f.rank).filter(v => v !== 999))].sort((a, b) => a - b))
+const activeClassTab = computed(() => ['skills', 'description', 'spells'].includes(props.state.classCardTab)
+  ? props.state.classCardTab
+  : 'skills'
+)
+const classSpellList = computed(() => {
+  const className = props.vm.className
+  const direct = SPELLS_5E.filter(spell => spell.classes?.includes(className))
+  if (direct.length) return direct
+  return SPELLS_5E.filter(spell => !spell.classes?.length || spell.classes.includes(className))
+})
+const sourceFilteredArchetypes = computed(() => props.vm.classArchetypes.filter(arch => {
+  if (!props.state.classFilterTouched) return true
+  return props.state.classFeatureSource === 'all' || arch.source === props.state.classFeatureSource
+}))
+const visibleClassArchetypes = computed(() => sourceFilteredArchetypes.value.filter(arch => {
+  if (!props.state.classFilterTouched) return true
+  if (props.state.classFeatureSubclass !== 'all' && props.state.classFeatureSubclass !== 'base' && arch.id !== props.state.classFeatureSubclass) return false
+  if (props.state.classFeatureLevel !== 'all') {
+    const hasLevelFeature = arch.features?.some(feature => String(feature.rank) === String(props.state.classFeatureLevel))
+    const hasLevelSpells = arch.spells?.length && String(arch.level || '').match(/\d+/)?.[0] === String(props.state.classFeatureLevel)
+    if (!hasLevelFeature && !hasLevelSpells) return false
+  }
+  return true
+}))
 const classSources = computed(() => {
+  if (props.state.classFilterTouched && props.state.classFeatureSource !== 'all') {
+    return [props.state.classFeatureSource]
+  }
   if (props.vm.classHasSelectedArchetype) {
     return [props.vm.classSelectedArchetype.source].filter(Boolean)
   }
@@ -111,46 +141,53 @@ const classQuickStats = computed(() => [
   { label: 'Владения', value: props.vm.classArmor, part: 'overview' },
   { label: 'Умения', value: `${visibleClassFeatures.value.length}`, part: 'skills' }
 ])
-const visibleClassFeatures = computed(() => props.vm.classFeatures.filter(feature => {
-  if (props.state.classFeatureSource !== 'all' && feature.src !== props.state.classFeatureSource) return false
-  if (props.state.classFeatureLevel !== 'all' && String(feature.rank) !== String(props.state.classFeatureLevel)) return false
-  if (props.state.classFeatureSubclass === 'base' && feature.isArchetype) return false
-  if (props.state.classFeatureSubclass !== 'all' && props.state.classFeatureSubclass !== 'base') {
-    const archetype = props.vm.classArchetypes.find(arch => arch.id === props.state.classFeatureSubclass)
-    if (!archetype || feature.archetypeName !== archetype.name) return false
-  }
-  return true
-}))
+const visibleClassFeatures = computed(() => {
+  const classFeatures = props.vm.classFeatures || []
+  const allFeatures = props.vm.classAllFeatures || classFeatures
+  const filterByLevel = feature => props.state.classFeatureLevel === 'all'
+    || String(feature.rank) === String(props.state.classFeatureLevel)
+
+  if (!props.state.classFilterTouched) return classFeatures
+
+  const subclass = props.state.classFeatureSubclass || 'base'
+  return allFeatures.filter(feature => {
+    if (!filterByLevel(feature)) return false
+    if (!feature.isArchetype) return true
+    if (subclass === 'base') return false
+    if (subclass !== 'all' && feature.archetypeId !== subclass) return false
+    if (props.state.classFeatureSource !== 'all' && feature.src !== props.state.classFeatureSource) return false
+    return true
+  })
+})
 const classDescription = computed(() => props.vm.classDescription || {
   title: props.vm.className,
   source: 'Описание класса',
   intro: [activeBuildSummary.value],
   sections: []
 })
-const classSpellList = computed(() => {
-  const className = props.vm.className
-  const direct = SPELLS_5E.filter(spell => spell.classes?.includes(className))
-  if (direct.length) return direct
-  return SPELLS_5E.filter(spell => !spell.classes?.length || spell.classes.includes(className))
-})
 const visibleClassSpells = computed(() => classSpellList.value.filter(spell => {
-  if (props.state.classFeatureSource !== 'all' && spell.source !== props.state.classFeatureSource) return false
+  if (props.state.classFilterTouched && props.state.classFeatureSource !== 'all' && spell.source !== props.state.classFeatureSource) return false
   return true
 }))
 
 function selectClassTab(tab) {
+  if (tab === 'filter') {
+    props.state.classFilterOpen = true
+    return
+  }
   props.state.classCardTab = tab
-  if (tab === 'filter') props.state.classFilterOpen = true
 }
 
 function selectBase() {
   props.state.classMode = 'base'
   props.state.activeArchetype = null
+  if (props.state.classFilterTouched) props.state.classFeatureSubclass = 'base'
 }
 
 function selectArchetype(id) {
   props.state.classMode = 'archetype'
   props.state.activeArchetype = id
+  if (props.state.classFilterTouched) props.state.classFeatureSubclass = id
 }
 
 function toggleSubclass(id) {
@@ -158,14 +195,25 @@ function toggleSubclass(id) {
 }
 
 function chooseFeatureSource(source) {
+  props.state.classFilterTouched = true
   props.state.classFeatureSource = source
+  if (source !== 'all' && props.state.classFeatureSubclass !== 'all' && props.state.classFeatureSubclass !== 'base') {
+    const archetype = props.vm.classArchetypes.find(arch => arch.id === props.state.classFeatureSubclass)
+    if (!archetype || archetype.source !== source) props.state.classFeatureSubclass = 'base'
+  }
+  if (source !== 'all' && props.state.activeArchetype) {
+    const activeArchetype = props.vm.classArchetypes.find(arch => arch.id === props.state.activeArchetype)
+    if (!activeArchetype || activeArchetype.source !== source) selectBase()
+  }
 }
 
 function chooseFeatureLevel(level) {
+  props.state.classFilterTouched = true
   props.state.classFeatureLevel = String(level)
 }
 
 function chooseFeatureSubclass(id) {
+  props.state.classFilterTouched = true
   props.state.classFeatureSubclass = id
   if (id === 'base') selectBase()
   else if (id !== 'all') selectArchetype(id)
@@ -174,7 +222,9 @@ function chooseFeatureSubclass(id) {
 function resetFeatureFilters() {
   props.state.classFeatureSource = 'all'
   props.state.classFeatureLevel = 'all'
-  props.state.classFeatureSubclass = 'all'
+  props.state.classFeatureSubclass = 'base'
+  props.state.classFilterTouched = false
+  selectBase()
 }
 
 async function copyClassLink() {
@@ -218,16 +268,27 @@ function scrollToClassPart(part) {
   const target = selector ? document.querySelector(selector) : null
   target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
+
+function scrollToClassFeature(featureId) {
+  if (!featureId || typeof document === 'undefined') return
+  const target = document.getElementById(`class-feature-${featureId}`)
+  if (!target) return
+  if ('open' in target) target.open = true
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  target.classList.remove('is-scroll-target')
+  window.setTimeout(() => target.classList.add('is-scroll-target'), 20)
+  window.setTimeout(() => target.classList.remove('is-scroll-target'), 1500)
+}
 </script>
 
 <template>
   <div class="cls-page" :style="{ background: vm.th.bg }">
     <div class="cls-wrap">
       <div class="cls-head">
-        <div class="cls-emblem-box">
+        <NuxtLink class="cls-emblem-box" to="/dnd5e/classes" title="Вернуться к списку классов" aria-label="Вернуться к списку классов">
           <div class="cls-emblem-frame" :style="{ borderColor: vm.th.thread+'0.6)', boxShadow: '0 0 22px '+vm.th.glow+'0.25)' }" />
           <div class="cls-emblem" :style="{ backgroundImage: `url(${vm.classEmblemUrl})`, filter: 'drop-shadow(0 0 16px '+vm.th.glow+'0.4))' }" />
-        </div>
+        </NuxtLink>
         <div style="flex:1">
           <div class="cls-eyebrow">{{ vm.classSub }}</div>
           <div class="cls-title">{{ vm.className }}</div>
@@ -243,7 +304,7 @@ function scrollToClassPart(part) {
             :key="tab.id"
             type="button"
             class="cls-section-btn"
-            :class="{ active: activeClassTab === tab.id }"
+            :class="{ active: activeClassTab === tab.id || (tab.id === 'filter' && state.classFilterOpen) }"
             @click="selectClassTab(tab.id)"
           >
             {{ tab.label }}
@@ -265,7 +326,7 @@ function scrollToClassPart(part) {
             <div class="cls-filter-top">
               <div>
                 <div class="cls-filter-label">Фильтр</div>
-                <div class="cls-filter-subtitle">{{ vm.className }} · {{ visibleClassFeatures.length }} умений показано</div>
+                <div class="cls-filter-subtitle">{{ vm.className }} · {{ visibleClassFeatures.length }} умений · {{ visibleClassArchetypes.length }} подклассов</div>
               </div>
               <button type="button" class="cls-filter-close" title="Закрыть фильтр" @click="state.classFilterOpen = false">×</button>
             </div>
@@ -314,17 +375,17 @@ function scrollToClassPart(part) {
             <section class="cls-filter-section">
               <div class="cls-filter-section-head">
                 <span>Подкласс</span>
-                <button type="button" class="cls-filter-reset" @click="chooseFeatureSubclass('all')">Все</button>
+                <button type="button" class="cls-filter-reset" @click="chooseFeatureSubclass('base')">База</button>
               </div>
               <div class="cls-filter-pills">
-                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureSubclass === 'all' }" @click="chooseFeatureSubclass('all')">Базовый и выбранный</button>
-                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureSubclass === 'base' }" @click="chooseFeatureSubclass('base')">Только базовый класс</button>
+                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureSubclass === 'base' }" @click="chooseFeatureSubclass('base')">Базовое описание</button>
                 <button
-                  v-for="arch in vm.classArchetypes"
+                  v-for="arch in sourceFilteredArchetypes"
                   :key="arch.id"
                   type="button"
                   class="cls-filter-pill"
                   :class="{ active: state.classFeatureSubclass === arch.id }"
+                  :title="sourceTitle(arch.source)"
                   @click="chooseFeatureSubclass(arch.id)"
                 >
                   {{ arch.name }}
@@ -334,7 +395,7 @@ function scrollToClassPart(part) {
 
             <div class="cls-filter-footer">
               <button type="button" class="cls-section-btn" @click="resetFeatureFilters">Сбросить</button>
-              <button type="button" class="cls-section-btn" @click="state.classFilterOpen = false; selectClassTab('skills')">Показать умения</button>
+              <button type="button" class="cls-section-btn" @click="state.classFilterOpen = false; state.subclassesOpen = true; selectClassTab('skills')">Показать умения</button>
             </div>
           </div>
         </div>
@@ -351,7 +412,7 @@ function scrollToClassPart(part) {
             Базовое описание
           </button>
           <button
-            v-for="arch in vm.classArchetypes"
+            v-for="arch in sourceFilteredArchetypes"
             :key="arch.id"
             type="button"
             class="cls-mode-btn"
@@ -362,6 +423,7 @@ function scrollToClassPart(part) {
           </button>
         </div>
         <div v-if="!vm.classHasArchetypes" class="cls-arch-empty">Подклассы для этого класса пока не добавлены.</div>
+        <div v-else-if="state.classFeatureSource !== 'all' && !sourceFilteredArchetypes.length" class="cls-arch-empty">Для источника {{ state.classFeatureSource }} подклассы не найдены.</div>
       </div>
 
       <section class="cls-build-panel">
@@ -444,7 +506,30 @@ function scrollToClassPart(part) {
               <div class="cls-table" :style="{ gridTemplateColumns: vm.classTableGrid }">
                 <div v-for="(col, i) in vm.classTableCols" :key="'col'+i" class="cls-table-head">{{ col }}</div>
                 <template v-for="(r, ri) in vm.classTableRows" :key="'row'+ri">
-                  <div v-for="(c, ci) in r.cells" :key="'cell'+ri+'-'+ci" :style="c.style">{{ c.v }}</div>
+                  <div v-for="(c, ci) in r.cells" :key="'cell'+ri+'-'+ci" class="cls-table-cell" :class="c.className" :style="c.style" :title="c.title">
+                    <template v-if="c.parts?.length">
+                      <template v-for="part in c.parts" :key="part.key">
+                        <button
+                          v-if="part.featureId"
+                          type="button"
+                          class="cls-table-feature-part cls-table-feature-link"
+                          :class="{ archetype: part.isArchetype }"
+                          :title="`Перейти к умению: ${part.text}`"
+                          @click="scrollToClassFeature(part.featureId)"
+                        >
+                          {{ part.text }}
+                        </button>
+                        <span
+                          v-else
+                          class="cls-table-feature-part"
+                          :class="{ archetype: part.isArchetype }"
+                        >
+                          {{ part.text }}
+                        </span>
+                      </template>
+                    </template>
+                    <template v-else>{{ c.v }}</template>
+                  </div>
                 </template>
               </div>
             </div>
@@ -477,16 +562,15 @@ function scrollToClassPart(part) {
             </div>
             <div class="cls-features-body">
               <div v-if="!visibleClassFeatures.length" class="cls-stub">По выбранным фильтрам умения не найдены.</div>
-              <details v-for="(f, i) in visibleClassFeatures" :key="f.id || i" class="cls-card cls-feature-card">
+              <details v-for="(f, i) in visibleClassFeatures" :id="`class-feature-${f.id}`" :key="f.id || i" class="cls-card cls-feature-card" :class="{ 'is-archetype-feature': f.isArchetype }" open>
                 <summary class="cls-feature-summary">
-                  <span class="cls-feature-mark" aria-hidden="true"></span>
                   <span class="cls-feature-summary-main">
                     <span class="cls-feature-name">{{ f.name }}</span>
-                    <span class="cls-feature-meta-row">
-                      <span class="cls-badge" :title="sourceTitle(f.src)">{{ f.src }}</span>
-                      <span v-if="f.isArchetype" class="cls-badge alt">{{ f.archetypeName }}</span>
-                      <span class="cls-feature-lvl">{{ f.lvl }}</span>
-                    </span>
+                    <span class="cls-feature-lvl">{{ f.lvl }}<template v-if="f.isArchetype"> · {{ f.archetypeName }}</template></span>
+                  </span>
+                  <span class="cls-feature-meta-row">
+                    <span class="cls-badge" :title="sourceTitle(f.src)">{{ f.src }}</span>
+                    <span class="cls-feature-mark" aria-hidden="true"></span>
                   </span>
                 </summary>
                 <div class="cls-feature-content">
@@ -496,10 +580,15 @@ function scrollToClassPart(part) {
                         <h4>{{ block.title }}</h4>
                         <p>{{ block.text }}</p>
                       </section>
-                      <aside v-else-if="block.type === 'example'" class="cls-feature-example">{{ block.text }}</aside>
+                      <aside v-else-if="block.type === 'example'" class="cls-feature-example">
+                        {{ block.text }}
+                      </aside>
                       <div v-else-if="block.type === 'formula'" class="cls-feature-formula">
                         <strong>{{ block.label }}</strong> = {{ block.value }}
                       </div>
+                      <ul v-else-if="block.type === 'list'" class="cls-feature-list">
+                        <li v-for="(item, li) in block.items" :key="li">{{ item }}</li>
+                      </ul>
                       <p v-else>{{ block.text }}</p>
                     </template>
                   </div>
@@ -618,82 +707,6 @@ function scrollToClassPart(part) {
           </div>
         </div>
 
-        <div v-else class="cls-tab-content cls-filter-tab">
-          <div class="cls-filter-card-head">
-            <div>
-              <div class="cls-eyebrow">Настройки показа</div>
-              <h3>Фильтр карточки</h3>
-            </div>
-            <button type="button" class="cls-open-arch" @click="state.classFilterOpen = true">Открыть окно фильтра</button>
-          </div>
-          <div class="cls-filter-inline-grid">
-            <section class="cls-filter-inline-section">
-              <div class="cls-filter-section-head">
-                <span>Источник</span>
-                <button type="button" class="cls-filter-reset" @click="chooseFeatureSource('all')">Все</button>
-              </div>
-              <div class="cls-filter-pills">
-                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureSource === 'all' }" @click="chooseFeatureSource('all')">Все источники</button>
-                <button
-                  v-for="source in featureSources"
-                  :key="'inline-source-'+source"
-                  type="button"
-                  class="cls-filter-pill"
-                  :class="{ active: state.classFeatureSource === source }"
-                  :title="sourceTitle(source)"
-                  @click="chooseFeatureSource(source)"
-                >
-                  {{ source }}
-                </button>
-              </div>
-            </section>
-            <section class="cls-filter-inline-section">
-              <div class="cls-filter-section-head">
-                <span>Уровень</span>
-                <button type="button" class="cls-filter-reset" @click="chooseFeatureLevel('all')">Все</button>
-              </div>
-              <div class="cls-filter-pills">
-                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureLevel === 'all' }" @click="chooseFeatureLevel('all')">Все уровни</button>
-                <button
-                  v-for="level in featureLevels"
-                  :key="'inline-level-'+level"
-                  type="button"
-                  class="cls-filter-pill"
-                  :class="{ active: String(state.classFeatureLevel) === String(level) }"
-                  @click="chooseFeatureLevel(level)"
-                >
-                  {{ level }} уровень
-                </button>
-              </div>
-            </section>
-            <section class="cls-filter-inline-section wide">
-              <div class="cls-filter-section-head">
-                <span>Подкласс</span>
-                <button type="button" class="cls-filter-reset" @click="chooseFeatureSubclass('all')">Все</button>
-              </div>
-              <div class="cls-filter-pills">
-                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureSubclass === 'all' }" @click="chooseFeatureSubclass('all')">Базовый и выбранный</button>
-                <button type="button" class="cls-filter-pill" :class="{ active: state.classFeatureSubclass === 'base' }" @click="chooseFeatureSubclass('base')">Только базовый класс</button>
-                <button
-                  v-for="arch in vm.classArchetypes"
-                  :key="'inline-subclass-'+arch.id"
-                  type="button"
-                  class="cls-filter-pill"
-                  :class="{ active: state.classFeatureSubclass === arch.id }"
-                  :title="sourceTitle(arch.source)"
-                  @click="chooseFeatureSubclass(arch.id)"
-                >
-                  {{ arch.name }}
-                </button>
-              </div>
-            </section>
-          </div>
-          <div class="cls-filter-card-footer">
-            <span>{{ visibleClassFeatures.length }} умений показано</span>
-            <span>{{ visibleClassSpells.length }} заклинаний доступно во вкладке заклинаний</span>
-            <button type="button" class="cls-section-btn" @click="resetFeatureFilters">Сбросить фильтр</button>
-          </div>
-        </div>
       </section>
 
       <template v-if="vm.classHasRules">
@@ -742,7 +755,8 @@ function scrollToClassPart(part) {
           <span class="cls-collapsible-hint">{{ state.subclassesOpen ? 'свернуть' : 'развернуть' }}</span>
         </div>
         <div v-if="state.subclassesOpen" class="cls-subclass-list">
-          <div v-for="arch in vm.classArchetypes" :key="arch.id" class="cls-subclass-item">
+          <div v-if="!visibleClassArchetypes.length" class="cls-subclass-empty">По выбранным фильтрам подклассы не найдены.</div>
+          <div v-for="arch in visibleClassArchetypes" :key="arch.id" class="cls-subclass-item">
             <div class="cls-subclass-toggle">
               <button type="button" class="cls-subclass-plus" :title="state.openSubclass === arch.id ? 'Свернуть подкласс' : 'Раскрыть подкласс'" @click.stop="toggleSubclass(arch.id)">
                 {{ state.openSubclass === arch.id ? '−' : '+' }}
@@ -820,7 +834,9 @@ function scrollToClassPart(part) {
 .cls-page{position:absolute;top:0;right:0;bottom:0;left:68px;z-index:58;overflow-y:auto}
 .cls-wrap{max-width:1080px;margin:0 auto;padding:56px 56px 100px}
 .cls-head{display:flex;align-items:center;gap:30px}
-.cls-emblem-box{position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px}
+.cls-emblem-box{position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px;border-radius:18px;text-decoration:none;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
+.cls-emblem-box:hover{background:rgba(255,255,255,.025);box-shadow:0 0 0 1px rgba(214,170,96,.14),0 18px 44px rgba(0,0,0,.18);transform:translateY(-1px)}
+.cls-emblem-box:focus-visible{outline:2px solid rgba(244,224,170,.72);outline-offset:4px}
 .cls-emblem-frame{position:absolute;width:120px;height:120px;transform:rotate(45deg);border:1px solid;border-radius:9px}
 .cls-emblem{width:120px;height:120px;background-size:contain;background-repeat:no-repeat;background-position:center}
 .cls-eyebrow{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:rgba(226,230,244,.42)}
@@ -859,7 +875,7 @@ function scrollToClassPart(part) {
 .cls-mode-btn:hover:not(:disabled){border-color:rgba(214,170,96,.45);color:rgba(244,224,170,.95)}
 .cls-mode-btn.active{border-color:rgba(214,170,96,.6);background:rgba(214,170,96,.13);color:rgba(244,224,170,.98)}
 .cls-mode-btn:disabled{opacity:.42;cursor:default}
-.cls-build-panel{display:flex;flex-direction:column;gap:16px;margin-top:18px;border:1px solid rgba(214,170,96,.18);border-radius:14px;background:linear-gradient(145deg,rgba(214,170,96,.065),rgba(255,255,255,.014) 54%,rgba(7,8,12,.18));box-shadow:0 22px 70px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04);padding:22px}
+.cls-build-panel{--subclass-accent:126,196,184;--subclass-strong:151,220,207;display:flex;flex-direction:column;gap:16px;margin-top:18px;border:1px solid rgba(214,170,96,.18);border-radius:14px;background:linear-gradient(145deg,rgba(214,170,96,.065),rgba(255,255,255,.014) 54%,rgba(7,8,12,.18));box-shadow:0 22px 70px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04);padding:22px}
 .cls-build-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:22px;align-items:start}
 .cls-build-main h2{margin:6px 0 10px;font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1.05;letter-spacing:.03em;text-transform:uppercase;color:rgba(236,240,252,.96)}
 .cls-build-main p{max-width:760px;margin:0;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.56;color:rgba(226,230,244,.72)}
@@ -898,11 +914,6 @@ function scrollToClassPart(part) {
 .cls-class-spell-list{display:flex;flex-direction:column;gap:10px}
 .cls-spell-tags{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 12px}
 .cls-spell-tags span{border:1px solid rgba(214,170,96,.18);border-radius:999px;background:rgba(214,170,96,.08);padding:4px 9px;font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(244,224,170,.82)}
-.cls-filter-inline-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.cls-filter-inline-section{border:1px solid rgba(92,142,236,.34);border-radius:12px;background:rgba(5,10,14,.22);padding:14px}
-.cls-filter-inline-section.wide{grid-column:1/-1}
-.cls-filter-card-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.018);padding:13px 14px}
-.cls-filter-card-footer span{font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.48)}
 .cls-tab-content .cls-stub{margin-top:0}
 .cls-build-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.045)}
 .cls-summary-pill{display:flex;min-height:64px;flex-direction:column;justify-content:center;gap:6px;border:0;border-left:1px solid rgba(255,255,255,.06);background:rgba(7,8,12,.34);padding:12px 14px;text-align:left;cursor:pointer}
@@ -929,10 +940,10 @@ function scrollToClassPart(part) {
 .cls-rule-row .equip-label{font-size:9px;line-height:1.22;letter-spacing:.055em}
 .cls-class-table-panel{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(7,8,12,.24)}
 .cls-table-headline{border-bottom:1px solid rgba(255,255,255,.06)}
-.cls-class-features-panel{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(7,8,12,.24)}
+.cls-class-features-panel{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.018),rgba(7,8,12,.24))}
 .cls-features-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:1px solid rgba(255,255,255,.06);padding:17px 18px 15px}
 .cls-features-heading h3{margin:4px 0 0;font-family:'Cormorant Garamond',serif;font-size:24px;letter-spacing:.08em;text-transform:uppercase;color:rgba(236,240,252,.94);font-weight:500}
-.cls-features-body{display:flex;flex-direction:column;gap:10px;padding:14px}
+.cls-features-body{display:flex;flex-direction:column;gap:0;padding:20px 24px 26px}
 .cls-features-body .cls-stub{margin-top:0}
 .cls-feature-count{justify-self:end;border-radius:999px;background:rgba(214,170,96,.12);border:1px solid rgba(214,170,96,.28);padding:3px 9px;font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:800;letter-spacing:.08em;color:rgba(244,224,170,.92)}
 .cls-source-filter{margin-left:auto;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
@@ -963,6 +974,13 @@ function scrollToClassPart(part) {
 .cls-table-wrap.in-card{border:0;border-radius:0;overflow:auto;background:rgba(4,5,8,.2)}
 .cls-table{display:grid;align-items:stretch}
 .cls-table-head{padding:11px 6px;background:rgba(214,170,96,.1);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,224,170,.92);text-align:center;border-bottom:1px solid rgba(255,255,255,.1)}
+.cls-table-cell.feature.has-archetype-parts{position:relative}
+.cls-table-feature-part{display:inline;color:rgba(226,230,244,.72)}
+.cls-table-feature-part:not(:last-child)::after{content:', ';color:rgba(226,230,244,.42)}
+.cls-table-feature-part.archetype{color:rgba(var(--subclass-strong),.96);font-weight:800;text-shadow:0 0 12px rgba(var(--subclass-accent),.2)}
+.cls-table-feature-link{border:0;background:transparent;padding:0;font:inherit;line-height:inherit;text-align:left;color:rgba(138,176,255,.92);cursor:pointer;text-decoration:underline;text-decoration-color:rgba(138,176,255,.28);text-underline-offset:3px}
+.cls-table-feature-link:hover{color:rgba(244,224,170,.98);text-decoration-color:rgba(244,224,170,.75)}
+.cls-table-feature-link.archetype:hover{color:rgba(var(--subclass-strong),1);text-decoration-color:rgba(var(--subclass-accent),.8)}
 .cls-info-toggle{margin:14px 0 8px;padding:12px 16px}
 .cls-info-toggle .cls-collapsible-title,.cls-table-toggle .cls-collapsible-title{font-size:20px;letter-spacing:.07em}
 .cls-info-toggle .cls-collapsible-hint,.cls-table-toggle .cls-collapsible-hint{font-size:10px}
@@ -977,39 +995,60 @@ function scrollToClassPart(part) {
 .cls-equip-card{margin-top:46px}
 .cls-card-toggle + .cls-equip-row,.cls-card-toggle + div{margin-top:14px}
 .cls-equip-note{margin-top:14px;font-family:'Hanken Grotesk',sans-serif;font-size:12.5px;font-style:italic;color:rgba(226,230,244,.5)}
-.cls-subclass-description{margin-top:0;border:1px solid rgba(214,170,96,.18);border-radius:14px;background:rgba(214,170,96,.045);padding:24px}
+.cls-subclass-description{margin-top:0;border:1px solid rgba(var(--subclass-accent),.28);border-radius:14px;background:linear-gradient(145deg,rgba(var(--subclass-accent),.065),rgba(214,170,96,.032));padding:24px}
 .cls-subclass-description-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
-.cls-subclass-description-title{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:.03em;text-transform:uppercase;color:rgba(236,240,252,.96);line-height:1.04;margin-top:6px}
+.cls-subclass-description-title{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:.03em;text-transform:uppercase;color:rgba(var(--subclass-strong),.96);line-height:1.04;margin-top:6px;text-shadow:0 0 18px rgba(var(--subclass-accent),.16)}
 .cls-subclass-description-text{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 22px;margin-top:16px;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.6;color:rgba(226,230,244,.76)}
 .cls-subclass-description-text p{margin:0}
 .cls-feature-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px}
-.cls-feature-name{font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:.02em;color:rgba(244,224,170,.95)}
-.cls-feature-card{padding:0;overflow:hidden;background:rgba(255,255,255,.014)}
-.cls-feature-card[open]{border-color:rgba(214,170,96,.18);background:rgba(214,170,96,.035)}
-.cls-feature-summary{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:center;list-style:none;padding:15px 17px;cursor:pointer}
+.cls-feature-name{font-family:'Cormorant Garamond',serif;font-size:27px;line-height:1.08;font-weight:500;letter-spacing:.035em;color:rgba(236,240,252,.96)}
+.cls-feature-card{position:relative;scroll-margin-top:24px;padding:0;overflow:hidden;border:1px solid rgba(214,170,96,.13);border-radius:12px;background:linear-gradient(145deg,rgba(214,170,96,.045),rgba(255,255,255,.012) 42%,rgba(6,8,12,.36));box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.cls-feature-card::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,rgba(214,170,96,.2),rgba(214,170,96,.72),rgba(214,170,96,.12));opacity:.9}
+.cls-feature-card + .cls-feature-card{margin-top:14px}
+.cls-feature-card[open]{border-color:rgba(214,170,96,.24);background:linear-gradient(145deg,rgba(214,170,96,.06),rgba(255,255,255,.014) 48%,rgba(6,8,12,.32))}
+.cls-feature-card.is-archetype-feature{border-color:rgba(var(--subclass-accent),.24);background:linear-gradient(145deg,rgba(var(--subclass-accent),.06),rgba(255,255,255,.012) 44%,rgba(6,8,12,.34))}
+.cls-feature-card.is-archetype-feature::before{background:linear-gradient(180deg,rgba(var(--subclass-accent),.18),rgba(var(--subclass-accent),.78),rgba(var(--subclass-accent),.14))}
+.cls-feature-card.is-archetype-feature[open]{border-color:rgba(var(--subclass-accent),.36);background:linear-gradient(145deg,rgba(var(--subclass-accent),.075),rgba(255,255,255,.014) 48%,rgba(6,8,12,.32))}
+.cls-feature-card.is-archetype-feature .cls-feature-name{color:rgba(var(--subclass-strong),.96);text-shadow:0 0 14px rgba(var(--subclass-accent),.12)}
+.cls-feature-card.is-scroll-target{animation:cls-feature-pulse 1.45s ease-out}
+@keyframes cls-feature-pulse{
+  0%{box-shadow:0 0 0 0 rgba(214,170,96,.42), inset 0 1px 0 rgba(255,255,255,.035)}
+  42%{box-shadow:0 0 0 5px rgba(214,170,96,.11), 0 0 34px rgba(214,170,96,.16), inset 0 1px 0 rgba(255,255,255,.05)}
+  100%{box-shadow:0 0 0 0 rgba(214,170,96,0), inset 0 1px 0 rgba(255,255,255,.035)}
+}
+.cls-feature-summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start;list-style:none;border-bottom:1px solid rgba(214,170,96,.12);padding:17px 18px 14px 22px;cursor:pointer}
 .cls-feature-summary::-webkit-details-marker{display:none}
-.cls-feature-summary:hover{background:rgba(255,255,255,.035)}
-.cls-feature-card[open] .cls-feature-summary{border-bottom:1px solid rgba(255,255,255,.06);background:rgba(214,170,96,.045)}
-.cls-feature-mark{display:grid;place-items:center;width:24px;height:24px;border:1px solid rgba(214,170,96,.36);border-radius:50%;font-family:'Hanken Grotesk',sans-serif;font-size:13px;color:rgba(244,224,170,.95)}
+.cls-feature-summary:hover .cls-feature-name{color:rgba(255,236,190,.98)}
+.cls-feature-card[open] .cls-feature-summary{background:transparent}
+.cls-feature-card.is-archetype-feature .cls-feature-summary{border-bottom-color:rgba(var(--subclass-accent),.18);box-shadow:none}
+.cls-feature-card.is-archetype-feature[open] .cls-feature-summary{background:transparent}
+.cls-feature-mark{display:inline-grid;place-items:center;width:24px;height:24px;border:1px solid rgba(214,170,96,.28);border-radius:50%;background:rgba(7,8,12,.28);font-family:'Hanken Grotesk',sans-serif;font-size:15px;font-weight:600;line-height:1;color:rgba(244,224,170,.86)}
+.cls-feature-card.is-archetype-feature .cls-feature-mark{border-color:rgba(var(--subclass-accent),.36);color:rgba(var(--subclass-strong),.86);background:rgba(var(--subclass-accent),.08)}
 .cls-feature-mark::before{content:'+'}
 .cls-feature-card[open] .cls-feature-mark::before{content:'−'}
-.cls-feature-summary-main{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-width:0}
-.cls-feature-meta-row{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-.cls-feature-content{padding:18px 20px 20px}
+.cls-feature-summary-main{display:flex;min-width:0;flex-direction:column;gap:3px}
+.cls-feature-meta-row{display:flex;align-items:center;justify-content:flex-end;gap:14px;white-space:nowrap;padding-top:2px}
+.cls-feature-summary .cls-badge{border:1px solid rgba(214,170,96,.22);border-radius:7px;background:rgba(214,170,96,.12);padding:4px 8px;font-size:10px;font-weight:800;letter-spacing:.1em;color:rgba(244,224,170,.92)}
+.cls-feature-card.is-archetype-feature .cls-feature-summary .cls-badge{border-color:rgba(var(--subclass-accent),.28);background:rgba(var(--subclass-accent),.1);color:rgba(var(--subclass-strong),.9)}
+.cls-feature-content{padding:16px 22px 22px}
 .cls-badge{font-family:'Hanken Grotesk',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.1em;color:rgba(20,15,6,.95);background:rgba(214,170,96,.85);border-radius:6px;padding:3px 7px}
 .cls-badge.alt{border:1px solid rgba(214,170,96,.35);background:rgba(214,170,96,.1);color:rgba(244,224,170,.9)}
-.cls-feature-lvl{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.45)}
+.cls-feature-lvl{font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;line-height:1.25;letter-spacing:.13em;text-transform:uppercase;color:rgba(226,230,244,.44)}
 .cls-feature-text{font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.5;color:rgba(226,230,244,.78)}
 .cls-feature-text.rich{display:flex;flex-direction:column;gap:10px}
 .cls-feature-text.rich p{margin:0}
-.cls-feature-prose{display:flex;flex-direction:column;gap:14px;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.5;color:rgba(226,230,244,.8)}
-.cls-feature-prose.compact{font-size:16.5px;gap:12px}
+.cls-feature-prose{display:flex;max-width:900px;flex-direction:column;gap:13px;font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.55;color:rgba(226,230,244,.8)}
+.cls-feature-prose.compact{font-size:17px;gap:12px}
 .cls-feature-prose p{margin:0}
 .cls-feature-section{display:flex;flex-direction:column;gap:3px}
-.cls-feature-section h4{margin:0;font-family:'Hanken Grotesk',sans-serif;font-size:13px;line-height:1.25;font-weight:800;letter-spacing:.01em;color:rgba(236,240,252,.95)}
+.cls-feature-section h4{margin:0;font-family:'Hanken Grotesk',sans-serif;font-size:11.5px;line-height:1.25;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:rgba(244,224,170,.9)}
+.cls-feature-card.is-archetype-feature .cls-feature-section h4{color:rgba(var(--subclass-strong),.92)}
 .cls-feature-section p{margin:0}
-.cls-feature-example{margin:2px 0;border-left:2px solid rgba(92,142,236,.95);background:rgba(226,230,244,.065);padding:13px 16px;font-family:'Hanken Grotesk',sans-serif;font-size:14px;line-height:1.45;color:rgba(226,230,244,.78)}
-.cls-feature-formula{align-self:center;text-align:center;font-family:'Hanken Grotesk',sans-serif;font-size:14px;line-height:1.4;color:rgba(236,240,252,.9)}
+.cls-feature-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0 0 0 22px}
+.cls-feature-list li{padding-left:2px}
+.cls-feature-list li::marker{color:rgba(244,224,170,.78)}
+.cls-feature-example{margin:2px 0;border-left:2px solid rgba(214,170,96,.65);border-radius:0 10px 10px 0;background:linear-gradient(90deg,rgba(214,170,96,.085),rgba(255,255,255,.025));padding:13px 16px;font-family:'Hanken Grotesk',sans-serif;font-size:13.5px;line-height:1.5;color:rgba(226,230,244,.8)}
+.cls-feature-formula{align-self:flex-start;border:1px solid rgba(214,170,96,.16);border-radius:10px;background:rgba(214,170,96,.055);padding:10px 14px;text-align:left;font-family:'Hanken Grotesk',sans-serif;font-size:13.5px;line-height:1.4;color:rgba(236,240,252,.9)}
 .cls-feature-formula strong{font-weight:800;color:rgba(236,240,252,.98)}
 .cls-spell-table{margin-top:14px;border:1px solid rgba(214,170,96,.22);border-radius:10px;overflow:hidden;max-width:420px}
 .cls-spell-table-head{display:grid;grid-template-columns:130px 1fr;background:rgba(214,170,96,.12);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,224,170,.9)}
@@ -1041,6 +1080,7 @@ function scrollToClassPart(part) {
 .cls-higher strong{color:rgba(244,224,170,.92)}
 .cls-arch-list{display:flex;flex-direction:column;gap:14px;margin-top:16px}
 .cls-subclass-list{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.cls-subclass-empty{border:1px dashed rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.012);padding:20px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:17px;color:rgba(226,230,244,.52)}
 .cls-subclass-item{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.018)}
 .cls-subclass-toggle{width:100%;display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;gap:12px;align-items:center;border:0;background:transparent;color:inherit;padding:16px 18px;text-align:left}
 .cls-subclass-toggle:hover{background:rgba(255,255,255,.035)}
@@ -1076,7 +1116,6 @@ function scrollToClassPart(part) {
   .cls-source-row{align-items:flex-start;border-left:0;border-top:1px solid rgba(214,170,96,.16);padding:14px 0 0}
   .cls-source-row div{justify-content:flex-start}
   .cls-build-summary{grid-template-columns:1fr 1fr}
-  .cls-filter-inline-grid{grid-template-columns:1fr}
   .cls-description-head,.cls-spell-tab-head,.cls-filter-card-head{flex-direction:column}
   .cls-rule-panels{grid-template-columns:1fr}
   .cls-rule-panel.wide{grid-column:auto}
