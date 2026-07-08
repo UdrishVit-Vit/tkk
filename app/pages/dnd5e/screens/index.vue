@@ -13,9 +13,20 @@ const loadingSection = ref(null)
 const copiedRule = ref(null)
 const sectionCache = shallowRef({})
 const activeFilters = ref([])
+const activeSources = ref([])
 const showFilter = ref(false)
+const sourcesLoading = ref(false)
 const railEl = ref(null)
 const sparkEl = ref(null)
+
+// Источники, полезные игроку для отбора правил.
+const SOURCE_OPTIONS = [
+  { code: 'PHB', label: 'Книга игрока' },
+  { code: 'DMG', label: 'Руководство Мастера' },
+  { code: 'XGE', label: 'Руководство Занатара' },
+  { code: 'TCE', label: 'Котёл Таши' },
+  { code: 'MM', label: 'Бестиарий' }
+]
 
 const groups = computed(() => RULE_SCREEN_GROUPS_5E.map(group => ({
   ...group,
@@ -33,11 +44,32 @@ const groups = computed(() => RULE_SCREEN_GROUPS_5E.map(group => ({
 const totalScreens = computed(() => RULE_SCREENS_5E.length)
 const query = computed(() => search.value.trim().toLowerCase())
 
+// Множество источников раздела по загруженным данным (или null, если ещё не загружен).
+function screenSourceSet(slug) {
+  const data = sectionCache.value[slug]
+  if (!data) return null
+  const set = new Set()
+  for (const group of data.groups) {
+    for (const rule of group.rules) {
+      if (rule.source) set.add(rule.source)
+    }
+  }
+  return set
+}
+
+function screenMatchesSources(screen) {
+  if (!activeSources.value.length) return true
+  const set = screenSourceSet(screen.slug)
+  if (!set) return true // данные ещё грузятся — не прячем заранее
+  return activeSources.value.some(code => set.has(code))
+}
+
 const filteredGroups = computed(() => groups.value
   .filter(group => !activeFilters.value.length || activeFilters.value.includes(group.id))
   .map(group => ({
     ...group,
     screens: group.screens.filter(screen => {
+      if (!screenMatchesSources(screen)) return false
       if (!query.value) return true
 
       return [
@@ -57,13 +89,42 @@ function toggleFilter(id) {
     : [...activeFilters.value, id]
 }
 
+async function toggleSource(code) {
+  activeSources.value = activeSources.value.includes(code)
+    ? activeSources.value.filter(item => item !== code)
+    : [...activeSources.value, code]
+  if (activeSources.value.length) await ensureAllSections()
+}
+
 function resetFilters() {
   activeFilters.value = []
+  activeSources.value = []
+}
+
+// Для отбора по источнику нужны данные всех разделов — грузим один раз.
+async function ensureAllSections() {
+  const slugs = Object.keys(RULE_SCREEN_LOADERS_5E).filter(slug => !sectionCache.value[slug])
+  if (!slugs.length) return
+  sourcesLoading.value = true
+  try {
+    await Promise.all(slugs.map(slug => ensureSection(slug)))
+  } finally {
+    sourcesLoading.value = false
+  }
 }
 
 const totalVisible = computed(() => filteredGroups.value.reduce((sum, group) => sum + group.screens.length, 0))
 
 const openData = computed(() => sectionCache.value[openSection.value] || null)
+
+// Правила раскрытого раздела с учётом отбора по источнику.
+const openGroups = computed(() => {
+  if (!openData.value) return []
+  if (!activeSources.value.length) return openData.value.groups
+  return openData.value.groups
+    .map(group => ({ ...group, rules: group.rules.filter(rule => activeSources.value.includes(rule.source)) }))
+    .filter(group => group.rules.length)
+})
 
 async function ensureSection(slug) {
   if (sectionCache.value[slug]) return
@@ -157,24 +218,19 @@ onMounted(() => {
   if (!rail || !spark) return
 
   const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  const SPEED = 240 // px/сек
-  const PAUSE = 1100 // мс между проходами
+  const SPEED = 85 // px/сек — искра идёт медленно и мягко
+  const PAUSE = 1600 // мс между проходами
 
   function collectNodes() {
     const railTop = rail.getBoundingClientRect().top
-    const badge = rail.querySelector('.screens-emblem-badge')
+    const line = rail.querySelector('.screens-thread-line')
     const titles = [...rail.querySelectorAll('.thread-group-title')]
-    // Искра стартует от эмблемы (её центр), а зажигает ромбы разделов.
-    const startY = badge ? centerY(badge, railTop) : 0
+    // Искра стартует у самого верха нити (над эмблемой) и проходит сквозь неё.
+    const startY = line ? line.getBoundingClientRect().top - railTop : 0
     const nodes = titles
       .map(t => ({ el: t, y: t.getBoundingClientRect().top + 17 - railTop }))
       .sort((a, b) => a.y - b.y)
     return { startY, nodes }
-  }
-
-  function centerY(el, railTop) {
-    const r = el.getBoundingClientRect()
-    return r.top + r.height / 2 - railTop
   }
 
   function clearLit(nodes) {
@@ -209,7 +265,7 @@ onMounted(() => {
       spark.style.transform = `translate(-50%, ${y}px)`
 
       for (const n of nodes) {
-        if (y >= n.y - 2) n.el.classList.add('lit')
+        if (y >= n.y - 10) n.el.classList.add('lit')
       }
 
       if (t < 1) {
@@ -275,31 +331,62 @@ useSeoMeta({
         <button
           type="button"
           class="screens-filter-btn"
-          :class="{ active: activeFilters.length || showFilter }"
+          :class="{ active: activeFilters.length || activeSources.length || showFilter }"
           :aria-expanded="showFilter"
-          title="Фильтр разделов"
+          title="Фильтр и источники"
           @click="showFilter = !showFilter"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-          <span v-if="activeFilters.length" class="screens-filter-count">{{ activeFilters.length }}</span>
+          <span v-if="activeFilters.length + activeSources.length" class="screens-filter-count">{{ activeFilters.length + activeSources.length }}</span>
         </button>
         <span class="screens-count">{{ totalVisible }} / {{ totalScreens }}</span>
       </div>
 
       <Transition name="weave">
         <div v-if="showFilter" class="screens-filter-panel">
+          <div class="screens-filter-group">
+            <span class="screens-filter-label">Разделы</span>
+            <div class="screens-filter-chips">
+              <button
+                v-for="group in groups"
+                :key="group.id"
+                type="button"
+                class="screens-filter-chip"
+                :class="{ active: activeFilters.includes(group.id) }"
+                @click="toggleFilter(group.id)"
+              >
+                {{ group.title }}
+              </button>
+            </div>
+          </div>
+
+          <div class="screens-filter-group">
+            <span class="screens-filter-label">
+              Источник
+              <span v-if="sourcesLoading" class="screens-filter-loading">загрузка…</span>
+            </span>
+            <div class="screens-filter-chips">
+              <button
+                v-for="src in SOURCE_OPTIONS"
+                :key="src.code"
+                type="button"
+                class="screens-filter-chip"
+                :class="{ active: activeSources.includes(src.code) }"
+                :title="src.label"
+                @click="toggleSource(src.code)"
+              >
+                {{ src.code }}
+              </button>
+            </div>
+          </div>
+
           <button
-            v-for="group in groups"
-            :key="group.id"
+            v-if="activeFilters.length || activeSources.length"
             type="button"
-            class="screens-filter-chip"
-            :class="{ active: activeFilters.includes(group.id) }"
-            @click="toggleFilter(group.id)"
+            class="screens-filter-clear"
+            @click="resetFilters"
           >
-            {{ group.title }}
-          </button>
-          <button v-if="activeFilters.length" type="button" class="screens-filter-clear" @click="resetFilters">
-            Сбросить
+            Сбросить всё
           </button>
         </div>
       </Transition>
@@ -393,7 +480,7 @@ useSeoMeta({
                     </span>
                   </div>
 
-                  <template v-for="ruleGroup in openData.groups" :key="ruleGroup.id">
+                  <template v-for="ruleGroup in openGroups" :key="ruleGroup.id">
                     <div v-if="ruleGroup.title" class="branch-group-title">{{ ruleGroup.title }}</div>
 
                     <div
@@ -430,6 +517,8 @@ useSeoMeta({
                       <Transition name="weave">
                         <div v-if="openRule === rule.slug" class="rule-body-wrap">
                           <div class="rule-body">
+                            <span class="rt-corner rt-corner-tl" aria-hidden="true" /><span class="rt-corner rt-corner-tr" aria-hidden="true" />
+                            <span class="rt-corner rt-corner-bl" aria-hidden="true" /><span class="rt-corner rt-corner-br" aria-hidden="true" />
                             <p class="rule-summary">
                               <RuleRichText :text="rule.summary" :current-path="rulePagePath(screen, rule)" />
                             </p>
@@ -549,10 +638,10 @@ useSeoMeta({
   position:absolute;
   left:var(--axis);
   transform:translateX(-50%);
-  top:196px;
+  top:26px;
   bottom:56px;
   width:1px;
-  background:linear-gradient(180deg,rgba(214,170,96,.55),var(--t-line) 120px);
+  background:linear-gradient(180deg,rgba(214,170,96,.5),rgba(214,170,96,.5) 210px,var(--t-line) 320px);
   z-index:0;
 }
 
@@ -780,10 +869,41 @@ useSeoMeta({
 
 .screens-filter-panel{
   display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-top:18px;
+  overflow:hidden;
+}
+
+.screens-filter-group{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.screens-filter-label{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--t-faint);
+}
+
+.screens-filter-loading{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:none;
+  color:rgba(214,170,96,.7);
+}
+
+.screens-filter-chips{
+  display:flex;
   flex-wrap:wrap;
   gap:8px;
-  margin-top:16px;
-  overflow:hidden;
 }
 
 .screens-filter-chip{
@@ -812,9 +932,10 @@ useSeoMeta({
 }
 
 .screens-filter-clear{
+  align-self:flex-start;
   border:0;
   background:none;
-  padding:7px 6px;
+  padding:2px 0;
   color:var(--t-faint);
   font-size:11px;
   font-weight:750;
@@ -1329,23 +1450,54 @@ useSeoMeta({
   stroke:none;
 }
 
-/* ── Текст правила ─────────────────────────────────────────────── */
+/* ── Текст правила — оформленный блок с золотыми уголками ───────── */
 .rule-body{
   position:relative;
-  margin-left:10px;
-  padding:4px 0 16px 22px;
+  margin:8px 0 6px 10px;
+  padding:20px 22px 18px;
+  border:1px solid rgba(214,170,96,.16);
+  border-radius:10px;
+  background:linear-gradient(180deg,rgba(214,170,96,.045),rgba(255,255,255,.008));
 }
 
-.rule-body::before{
-  content:'';
+/* Уголки-скобки, мотив со страницы рас */
+.rt-corner{
   position:absolute;
-  left:0;
-  top:0;
-  bottom:12px;
-  width:1px;
-  background:linear-gradient(180deg,rgba(214,170,96,.4),transparent);
-  transform-origin:top;
-  animation:weaveLine .5s cubic-bezier(.4,0,.2,1) both;
+  width:14px;
+  height:14px;
+  pointer-events:none;
+}
+
+.rt-corner-tl{
+  top:6px;
+  left:6px;
+  border-top:1.5px solid rgba(214,170,96,.5);
+  border-left:1.5px solid rgba(214,170,96,.5);
+  border-radius:5px 0 0 0;
+}
+
+.rt-corner-tr{
+  top:6px;
+  right:6px;
+  border-top:1.5px solid rgba(214,170,96,.5);
+  border-right:1.5px solid rgba(214,170,96,.5);
+  border-radius:0 5px 0 0;
+}
+
+.rt-corner-bl{
+  bottom:6px;
+  left:6px;
+  border-bottom:1.5px solid rgba(214,170,96,.5);
+  border-left:1.5px solid rgba(214,170,96,.5);
+  border-radius:0 0 0 5px;
+}
+
+.rt-corner-br{
+  bottom:6px;
+  right:6px;
+  border-bottom:1.5px solid rgba(214,170,96,.5);
+  border-right:1.5px solid rgba(214,170,96,.5);
+  border-radius:0 0 5px 0;
 }
 
 .rule-summary{

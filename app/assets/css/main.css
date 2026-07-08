@@ -4,6 +4,36 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: #050608; }
+
+/* ── Общие стили тела карточек справочников в дизайне «нить» ──────── */
+.tref-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
+.tref-source { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: rgba(232,236,248,.38); cursor: help; border-bottom: 1px dotted rgba(232,236,248,.28); }
+.tref-pill { display: inline-flex; align-items: baseline; gap: 8px; border: 1px solid rgba(214,170,96,.32); border-radius: 999px; background: rgba(214,170,96,.08); padding: 5px 13px; }
+.tref-pill b { font-size: 13px; font-weight: 700; color: rgba(244,224,170,.9); }
+.tref-pill span { font-size: 9px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: rgba(214,170,96,.7); }
+.tref-tag { border: 1px solid rgba(232,236,248,.12); border-radius: 999px; padding: 4px 10px; font-size: 10px; font-weight: 700; letter-spacing: .04em; color: rgba(232,236,248,.55); }
+
+.tref-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; margin: 0 0 16px; border: 1px solid rgba(232,236,248,.08); border-radius: 9px; overflow: hidden; background: rgba(232,236,248,.08); }
+.tref-stat { display: flex; flex-direction: column; gap: 4px; padding: 11px 14px; background: #0a0b11; }
+.tref-stat dt, .tref-stat-label { margin: 0; font-size: 9px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: rgba(232,236,248,.4); }
+.tref-stat dd, .tref-stat-value { margin: 0; font-size: 15px; font-weight: 700; color: rgba(244,224,170,.9); }
+
+.tref-desc { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 19px; line-height: 1.6; color: rgba(224,232,242,.84); }
+.tref-desc + .tref-desc { margin-top: 10px; }
+
+.tref-block { margin-top: 16px; }
+.tref-block-title { margin: 0 0 8px; font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: rgba(246,248,255,.9); }
+.tref-list { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.tref-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: rgba(224,232,242,.82); }
+.tref-list li::before { content: ''; position: absolute; left: 2px; top: 9px; width: 7px; height: 7px; border: 1px solid #d6aa60; background: #07080d; transform: rotate(45deg); }
+.tref-list li b { color: rgba(244,224,170,.92); font-weight: 700; }
+
+.tref-abilities { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; margin: 0 0 16px; border: 1px solid rgba(232,236,248,.08); border-radius: 9px; overflow: hidden; background: rgba(232,236,248,.08); }
+.tref-ability { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 6px; background: #0a0b11; text-align: center; }
+.tref-ability span { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: rgba(232,236,248,.4); }
+.tref-ability b { font-size: 14px; font-weight: 700; color: rgba(244,224,170,.9); }
+@media (max-width: 560px) { .tref-abilities { grid-template-columns: repeat(3, 1fr); } }
+
 ::selection { background: rgba(200,210,240,.18); }
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 8px; }
