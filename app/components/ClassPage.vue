@@ -10,7 +10,8 @@ const SOURCE_FULL_NAMES = {
   TLDC: 'The Threads of Lost Dice Club',
   TS: 'The Threads of Shkad',
   TJB: 'The Threads of JorasBashu',
-  TU: 'The Threads of Unseen'
+  TU: 'The Threads of Unseen',
+  TKK: 'TKK.club'
 }
 
 const SOURCE_URLS = {
@@ -25,8 +26,13 @@ const CLASS_CARD_TABS = [
   { id: 'filter', label: 'Фильтр' }
 ]
 
-function sourceTitle(source) {
-  return SOURCE_FULL_NAMES[source] ? `${source} - ${SOURCE_FULL_NAMES[source]}` : source
+function sourceTitle(source, fullName = '') {
+  const name = fullName || SOURCE_FULL_NAMES[source]
+  return name ? `${source} - ${name}` : source
+}
+
+function classSourceTitle(source) {
+  return sourceTitle(source, props.vm.classSourceFullNames?.[source])
 }
 
 function spellLevelName(level) {
@@ -55,17 +61,87 @@ const FEATURE_SECTION_TITLES = [
   'Известные заклинания 1-го и более высоких уровней',
   'Базовая характеристика заклинаний',
   'Исполнение ритуалов',
-  'Фокусировка заклинания'
+  'Фокусировка заклинания',
+  'Получение импланта',
+  'Вживление импланта',
+  'Количество имплантов',
+  'Снижение риска отторжения',
+  'Увеличение лимита имплантов',
+  'Улучшенный лимит имплантов',
+  'Малый патчфамильяр',
+  'Средний патчфамильяр',
+  'Большой патчфамильяр',
+  'Развитие патчфамильяра',
+  'Иджра',
+  'Эффекты Слияния',
+  'Цена Слияния'
 ]
+
+function tableCells(line) {
+  return String(line || '')
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    .map(cell => cell.trim())
+}
+
+function isMarkdownTable(paragraph) {
+  const lines = String(paragraph || '').split('\n').map(line => line.trim()).filter(Boolean)
+  return lines.length >= 2
+    && lines[0].startsWith('|')
+    && /^\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)+\|?$/.test(lines[1])
+}
+
+function markdownTableBlock(paragraph) {
+  const lines = String(paragraph || '').split('\n').map(line => line.trim()).filter(Boolean)
+  return {
+    type: 'table',
+    headers: tableCells(lines[0]),
+    rows: lines.slice(2).filter(line => line.includes('|')).map(tableCells)
+  }
+}
+
+function isDiceLabel(text) {
+  return /^[кd](?:4|6|8|10|12|20|100)$/i.test(String(text || '').trim())
+}
+
+function inlineParts(text) {
+  const value = String(text || '')
+  const parts = []
+  const pattern = /((?:\d+)?[кd](?:4|6|8|10|12|20|100))/giu
+  let lastIndex = 0
+  for (const match of value.matchAll(pattern)) {
+    const start = match.index || 0
+    if (start > lastIndex) parts.push({ type: 'text', value: value.slice(lastIndex, start) })
+    parts.push({ type: 'dice', value: match[0] })
+    lastIndex = start + match[0].length
+  }
+  if (lastIndex < value.length) parts.push({ type: 'text', value: value.slice(lastIndex) })
+  return parts
+}
+
+function splitFeatureLead(text) {
+  const match = String(text || '').match(/^([^.!?]{2,80}\.)\s*(.*)$/u)
+  if (!match) return { lead: '', rest: String(text || '') }
+  return { lead: match[1], rest: match[2] }
+}
 
 function featureBlocks(text) {
   return featureParagraphs(text).map(paragraph => {
-    const formula = paragraph.match(/^(Сл спасброск(?:а|ов)|Модификатор броска атаки)\s*=\s*(.+)$/i)
+    if (isMarkdownTable(paragraph)) return markdownTableBlock(paragraph)
+    const formula = paragraph.match(/^(Сл(?: проверки| спасброск(?:а|ов)(?: [^=]+)?)?|Модификатор броска атаки)\s*=\s*(.+)$/i)
     if (formula) return { type: 'formula', label: formula[1], value: formula[2] }
     if (/^Например,/i.test(paragraph)) return { type: 'example', text: paragraph }
+    const exactTitle = FEATURE_SECTION_TITLES.find(name => paragraph === name)
+    if (exactTitle) return { type: 'section', title: exactTitle, text: '' }
     const title = FEATURE_SECTION_TITLES.find(name => paragraph.startsWith(`${name}. `))
     if (title) return { type: 'section', title, text: paragraph.slice(title.length + 2) }
     const lines = paragraph.split('\n').map(line => line.trim()).filter(Boolean)
+    if (lines.length > 1 && isDiceLabel(lines[0]) && lines.slice(1).every(line => /^[-•]\s+/.test(line))) {
+      return { type: 'diceGroup', die: lines[0].toLowerCase(), items: lines.slice(1).map(line => line.replace(/^[-•]\s+/, '')) }
+    }
+    if (isDiceLabel(paragraph)) return { type: 'diceHeading', die: paragraph.toLowerCase() }
     if (lines.length > 1 && lines.every(line => /^[-•]\s+/.test(line))) {
       return { type: 'list', items: lines.map(line => line.replace(/^[-•]\s+/, '')) }
     }
@@ -132,7 +208,7 @@ const activeBuildSummary = computed(() => props.vm.classHasSelectedArchetype
   : (CLASS_BASE_SUMMARIES[props.vm.className] || 'Основная линия развития класса без дополнительных особенностей подкласса.')
 )
 const activeBuildMeta = computed(() => props.vm.classHasSelectedArchetype
-  ? `${props.vm.classSelectedArchetype.level} · ${sourceTitle(props.vm.classSelectedArchetype.source)}`
+  ? `${props.vm.classSelectedArchetype.level} · ${sourceTitle(props.vm.classSelectedArchetype.source, props.vm.classSelectedArchetype.sourceFullName)}`
   : `D&D 5e 2014 · ${visibleClassFeatures.value.length} умений`
 )
 const classQuickStats = computed(() => [
@@ -344,7 +420,7 @@ function scrollToClassFeature(featureId) {
                   type="button"
                   class="cls-filter-pill"
                   :class="{ active: state.classFeatureSource === source }"
-                  :title="sourceTitle(source)"
+                  :title="classSourceTitle(source)"
                   @click="chooseFeatureSource(source)"
                 >
                   {{ source }}
@@ -385,7 +461,7 @@ function scrollToClassFeature(featureId) {
                   type="button"
                   class="cls-filter-pill"
                   :class="{ active: state.classFeatureSubclass === arch.id }"
-                  :title="sourceTitle(arch.source)"
+                  :title="sourceTitle(arch.source, arch.sourceFullName)"
                   @click="chooseFeatureSubclass(arch.id)"
                 >
                   {{ arch.name }}
@@ -440,8 +516,8 @@ function scrollToClassFeature(featureId) {
             <span>Источники</span>
             <div>
               <template v-for="source in classSources" :key="source">
-                <a v-if="isExternalSource(source)" class="cls-mini-source" :href="sourceRoute(source)" target="_blank" rel="noreferrer" :title="sourceTitle(source)">{{ source }}</a>
-                <NuxtLink v-else class="cls-mini-source" :to="sourceRoute(source)" :title="sourceTitle(source)">{{ source }}</NuxtLink>
+                <a v-if="isExternalSource(source)" class="cls-mini-source" :href="sourceRoute(source)" target="_blank" rel="noreferrer" :title="classSourceTitle(source)">{{ source }}</a>
+                <NuxtLink v-else class="cls-mini-source" :to="sourceRoute(source)" :title="classSourceTitle(source)">{{ source }}</NuxtLink>
               </template>
             </div>
           </div>
@@ -569,7 +645,7 @@ function scrollToClassFeature(featureId) {
                     <span class="cls-feature-lvl">{{ f.lvl }}<template v-if="f.isArchetype"> · {{ f.archetypeName }}</template></span>
                   </span>
                   <span class="cls-feature-meta-row">
-                    <span class="cls-badge" :title="sourceTitle(f.src)">{{ f.src }}</span>
+                    <span class="cls-badge" :title="sourceTitle(f.src, f.sourceFullName)">{{ f.src }}</span>
                     <span class="cls-feature-mark" aria-hidden="true"></span>
                   </span>
                 </summary>
@@ -578,7 +654,11 @@ function scrollToClassFeature(featureId) {
                     <template v-for="(block, bi) in featureBlocks(f.text)" :key="bi">
                       <section v-if="block.type === 'section'" class="cls-feature-section">
                         <h4>{{ block.title }}</h4>
-                        <p>{{ block.text }}</p>
+                        <p v-if="block.text">
+                          <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
+                            <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                          </template>
+                        </p>
                       </section>
                       <aside v-else-if="block.type === 'example'" class="cls-feature-example">
                         {{ block.text }}
@@ -587,13 +667,59 @@ function scrollToClassFeature(featureId) {
                         <strong>{{ block.label }}</strong> = {{ block.value }}
                       </div>
                       <ul v-else-if="block.type === 'list'" class="cls-feature-list">
-                        <li v-for="(item, li) in block.items" :key="li">{{ item }}</li>
+                        <li v-for="(item, li) in block.items" :key="li">
+                          <template v-for="(part, pi) in inlineParts(item)" :key="pi">
+                            <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                          </template>
+                        </li>
                       </ul>
-                      <p v-else>{{ block.text }}</p>
+                      <div v-else-if="block.type === 'diceGroup'" class="cls-dice-group">
+                        <div class="cls-dice-heading">{{ block.die }}</div>
+                        <ul class="cls-feature-list">
+                          <li v-for="(item, li) in block.items" :key="li">
+                            <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
+                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi">
+                              <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                            </template>
+                          </li>
+                        </ul>
+                      </div>
+                      <div v-else-if="block.type === 'diceHeading'" class="cls-dice-heading">{{ block.die }}</div>
+                      <div v-else-if="block.type === 'table'" class="cls-feature-table-wrap">
+                        <table class="cls-feature-table">
+                          <thead>
+                            <tr>
+                              <th v-for="(header, hi) in block.headers" :key="hi">{{ header }}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(row, ri) in block.rows" :key="ri">
+                              <td v-for="(cell, ci) in row" :key="ci">{{ cell }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <p v-else>
+                        <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
+                          <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                        </template>
+                      </p>
                     </template>
                   </div>
                   <blockquote v-if="f.hasQuote" class="cls-arch-quote compact">{{ f.quote }}</blockquote>
-                  <div v-if="f.hasItems" class="cls-arch-items" :class="{ roomy: f.hasLongItems }">
+                  <details v-if="f.hasItems && f.itemsTitle" class="cls-arch-items-group" :open="!f.itemsCollapsed">
+                    <summary>
+                      <span>{{ f.itemsTitle }}</span>
+                      <small>{{ f.items.length }} в списке</small>
+                    </summary>
+                    <div class="cls-arch-items roomy">
+                      <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="!f.itemsCollapsed">
+                        <summary>{{ item.name }}</summary>
+                        <span>{{ item.text }}</span>
+                      </details>
+                    </div>
+                  </details>
+                  <div v-else-if="f.hasItems" class="cls-arch-items" :class="{ roomy: f.hasLongItems }">
                     <details v-for="item in f.items" :key="item.name" class="cls-arch-item" open>
                       <summary>{{ item.name }}</summary>
                       <span>{{ item.text }}</span>
@@ -765,7 +891,7 @@ function scrollToClassFeature(featureId) {
                 <span class="cls-subclass-title">{{ arch.name }}</span>
                 <span class="cls-subclass-meta">{{ arch.level }} · {{ arch.type }}</span>
               </div>
-              <span class="cls-subclass-source" :title="sourceTitle(arch.source)">{{ arch.source }}</span>
+              <span class="cls-subclass-source" :title="sourceTitle(arch.source, arch.sourceFullName)">{{ arch.source }}</span>
               <button type="button" class="cls-open-arch inline" @click.stop="selectArchetype(arch.id)">Применить подкласс</button>
             </div>
             <div v-if="state.openSubclass === arch.id" class="cls-subclass-body">
@@ -778,23 +904,76 @@ function scrollToClassFeature(featureId) {
                 <article v-for="feature in arch.features" :key="feature.name" class="cls-subclass-rule">
                   <div class="cls-feature-head">
                     <span class="cls-feature-name">{{ feature.name }}</span>
-                    <span class="cls-badge" :title="sourceTitle(arch.source)">{{ arch.source }}</span>
+                    <span class="cls-badge" :title="sourceTitle(arch.source, arch.sourceFullName)">{{ arch.source }}</span>
                     <span class="cls-feature-lvl">{{ feature.level }}</span>
                   </div>
                   <div class="cls-feature-prose compact">
                     <template v-for="(block, bi) in featureBlocks(feature.text)" :key="bi">
                       <section v-if="block.type === 'section'" class="cls-feature-section">
                         <h4>{{ block.title }}</h4>
-                        <p>{{ block.text }}</p>
+                        <p v-if="block.text">
+                          <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
+                            <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                          </template>
+                        </p>
                       </section>
                       <aside v-else-if="block.type === 'example'" class="cls-feature-example">{{ block.text }}</aside>
                       <div v-else-if="block.type === 'formula'" class="cls-feature-formula">
                         <strong>{{ block.label }}</strong> = {{ block.value }}
                       </div>
-                      <p v-else>{{ block.text }}</p>
+                      <ul v-else-if="block.type === 'list'" class="cls-feature-list">
+                        <li v-for="(item, li) in block.items" :key="li">
+                          <template v-for="(part, pi) in inlineParts(item)" :key="pi">
+                            <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                          </template>
+                        </li>
+                      </ul>
+                      <div v-else-if="block.type === 'diceGroup'" class="cls-dice-group">
+                        <div class="cls-dice-heading">{{ block.die }}</div>
+                        <ul class="cls-feature-list">
+                          <li v-for="(item, li) in block.items" :key="li">
+                            <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
+                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi">
+                              <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                            </template>
+                          </li>
+                        </ul>
+                      </div>
+                      <div v-else-if="block.type === 'diceHeading'" class="cls-dice-heading">{{ block.die }}</div>
+                      <div v-else-if="block.type === 'table'" class="cls-feature-table-wrap">
+                        <table class="cls-feature-table">
+                          <thead>
+                            <tr>
+                              <th v-for="(header, hi) in block.headers" :key="hi">{{ header }}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(row, ri) in block.rows" :key="ri">
+                              <td v-for="(cell, ci) in row" :key="ci">{{ cell }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <p v-else>
+                        <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
+                          <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                        </template>
+                      </p>
                     </template>
                   </div>
-                  <div v-if="feature.hasItems" class="cls-arch-items" :class="{ roomy: feature.items.length > 3 }">
+                  <details v-if="feature.hasItems && feature.itemsTitle" class="cls-arch-items-group" :open="!feature.itemsCollapsed">
+                    <summary>
+                      <span>{{ feature.itemsTitle }}</span>
+                      <small>{{ feature.items.length }} в списке</small>
+                    </summary>
+                    <div class="cls-arch-items roomy">
+                      <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="!feature.itemsCollapsed">
+                        <summary>{{ item.name }}</summary>
+                        <span>{{ item.text }}</span>
+                      </details>
+                    </div>
+                  </details>
+                  <div v-else-if="feature.hasItems" class="cls-arch-items" :class="{ roomy: feature.items.length > 3 }">
                     <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" open>
                       <summary>{{ item.name }}</summary>
                       <span>{{ item.text }}</span>
@@ -1047,6 +1226,18 @@ function scrollToClassFeature(featureId) {
 .cls-feature-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0 0 0 22px}
 .cls-feature-list li{padding-left:2px}
 .cls-feature-list li::marker{color:rgba(244,224,170,.78)}
+.cls-dice-token{display:inline-flex;align-items:center;justify-content:center;min-width:2.2em;margin:0 .1em;border:1px solid rgba(var(--subclass-accent,214,170,96),.24);border-radius:7px;background:rgba(var(--subclass-accent,214,170,96),.09);padding:0 .38em;font-family:'Hanken Grotesk',sans-serif;font-size:.78em;font-weight:800;line-height:1.45;letter-spacing:.04em;color:rgba(var(--subclass-strong,244,224,170),.94);vertical-align:.08em}
+.cls-dice-group{display:flex;flex-direction:column;gap:10px;margin:4px 0 2px;border:1px solid rgba(var(--subclass-accent,214,170,96),.16);border-radius:12px;background:linear-gradient(145deg,rgba(var(--subclass-accent,214,170,96),.055),rgba(255,255,255,.012));padding:12px 14px 14px}
+.cls-dice-group .cls-feature-list{padding-left:20px}
+.cls-dice-group .cls-feature-list li{line-height:1.58}
+.cls-dance-option{display:inline;font-family:'Hanken Grotesk',sans-serif;font-size:.82em;font-weight:900;letter-spacing:.035em;color:rgba(var(--subclass-strong,244,224,170),.96);text-shadow:0 0 14px rgba(var(--subclass-accent,214,170,96),.12)}
+.cls-dance-option::after{content:' ';white-space:pre}
+.cls-dice-heading{align-self:flex-start;border:1px solid rgba(var(--subclass-accent,214,170,96),.36);border-radius:999px;background:rgba(var(--subclass-accent,214,170,96),.12);padding:5px 11px;font-family:'Hanken Grotesk',sans-serif;font-size:12px;font-weight:900;line-height:1;letter-spacing:.12em;text-transform:uppercase;color:rgba(var(--subclass-strong,244,224,170),.96);box-shadow:0 0 18px rgba(var(--subclass-accent,214,170,96),.08)}
+.cls-feature-table-wrap{max-width:100%;overflow:auto;border:1px solid rgba(214,170,96,.18);border-radius:10px;background:rgba(7,8,12,.24)}
+.cls-feature-table{width:100%;border-collapse:collapse;font-family:'Hanken Grotesk',sans-serif;font-size:12.5px;line-height:1.45;color:rgba(226,230,244,.78)}
+.cls-feature-table th{padding:9px 10px;background:rgba(214,170,96,.12);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,224,170,.92);text-align:left;white-space:nowrap}
+.cls-feature-table td{padding:9px 10px;border-top:1px solid rgba(255,255,255,.06);vertical-align:top}
+.cls-feature-table tr:nth-child(even) td{background:rgba(255,255,255,.018)}
 .cls-feature-example{margin:2px 0;border-left:2px solid rgba(214,170,96,.65);border-radius:0 10px 10px 0;background:linear-gradient(90deg,rgba(214,170,96,.085),rgba(255,255,255,.025));padding:13px 16px;font-family:'Hanken Grotesk',sans-serif;font-size:13.5px;line-height:1.5;color:rgba(226,230,244,.8)}
 .cls-feature-formula{align-self:flex-start;border:1px solid rgba(214,170,96,.16);border-radius:10px;background:rgba(214,170,96,.055);padding:10px 14px;text-align:left;font-family:'Hanken Grotesk',sans-serif;font-size:13.5px;line-height:1.4;color:rgba(236,240,252,.9)}
 .cls-feature-formula strong{font-weight:800;color:rgba(236,240,252,.98)}
@@ -1067,12 +1258,16 @@ function scrollToClassFeature(featureId) {
 .cls-arch-quote{margin:22px 0 18px;border-left:2px solid rgba(214,170,96,.45);padding:4px 0 4px 18px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;line-height:1.55;color:rgba(244,224,170,.78)}
 .cls-arch-prose{display:flex;flex-direction:column;gap:12px;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.62;color:rgba(226,230,244,.76)}
 .cls-arch-prose p{margin:0}
+.cls-arch-items-group{margin-top:16px;border:1px solid rgba(214,170,96,.18);border-radius:12px;background:rgba(7,8,12,.24);overflow:hidden}
+.cls-arch-items-group>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:14px 16px;font-family:'Cormorant Garamond',serif;font-size:22px;line-height:1.1;color:rgba(244,224,170,.96)}
+.cls-arch-items-group>summary small{font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.5);white-space:nowrap}
+.cls-arch-items-group .cls-arch-items{margin-top:0;padding:14px;border-top:1px solid rgba(214,170,96,.12)}
 .cls-arch-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:16px}
 .cls-arch-items.roomy{display:flex;flex-direction:column;gap:12px}
 .cls-arch-item{display:block;border:1px solid rgba(214,170,96,.14);border-radius:10px;background:rgba(7,8,12,.2);padding:16px 18px}
 .cls-arch-items.roomy .cls-arch-item{padding:18px 20px}
 .cls-arch-item summary{cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.25;color:rgba(244,224,170,.95)}
-.cls-arch-item span{display:block;margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:16.5px;line-height:1.58;color:rgba(226,230,244,.78)}
+.cls-arch-item span{display:block;margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:16.5px;line-height:1.58;color:rgba(226,230,244,.78);white-space:pre-line}
 .cls-spell-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0 12px;font-family:'Hanken Grotesk',sans-serif;font-size:11.5px;color:rgba(226,230,244,.55)}
 .cls-feature-spells{display:flex;flex-direction:column;gap:12px;margin-top:14px}
 .cls-spell-card{border:1px solid rgba(214,170,96,.16);border-radius:12px;background:rgba(7,8,12,.22);padding:16px}

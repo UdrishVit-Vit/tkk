@@ -1,281 +1,303 @@
 # Схема сайта TKK.club
 
-Документ составлен по текущей структуре проекта `C:\Projects\ENOA\tkk`.
+Последнее обновление: 2026-07-08.
 
-## 1. Технологическая основа
+Документ фиксирует текущую структуру проекта `C:\Projects\ENOA\tkk`: где лежат страницы, данные, ассеты и как связаны разделы D&D 5e 2014. Это рабочая карта сайта, чтобы после новых правок быстро понимать, куда добавлять контент и какие маршруты проверять.
 
-- Проект: Nuxt 4 / Vue 3.
-- Пакетный менеджер: pnpm.
-- Точка конфигурации Nuxt: `nuxt.config.ts`.
-- Общая точка приложения: `app/app.vue`.
+## 1. Техническая основа
+
+- Фреймворк: Nuxt 4.4.8 / Vue 3.
+- Менеджер пакетов: pnpm.
+- Главная конфигурация: `nuxt.config.ts`.
+- Точка приложения: `app/app.vue`.
 - Глобальные стили: `app/assets/css/main.css`.
-- Подключенные модули:
-  - `@nuxt/content` - контент из Markdown-коллекций.
-  - `@nuxt/ui` - UI-обвязка через `UApp`.
-  - `@nuxt/image` - работа с изображениями.
-  - `@pinia/nuxt` - состояние, пока отдельные store-файлы не заведены.
-
-## 2. Главная карта сайта
-
-Основной пользовательский вход: `/`.
-
-Файл:
-
-- `app/pages/index.vue`
-
-Назначение:
-
-- Интерактивная карта "узлов" TKK.club.
-- Отображает центральный узел и системы:
-  - D&D 5e / 2014.
-  - D&D 5.5e / 2024.
-  - Pathfinder 2e.
-  - Lore.
-- Управляет состоянием карты локально через `reactive`.
-- Поддерживает deep-link вида `/?system=5e`.
-- Рисует фоновые нити и узлы через canvas/SVG.
-- Показывает сайдбар с действиями: главная, поиск, закладки, сообщество, тема, выбор системы, авторизация.
-- Открывает часть разделов прямо на карте, а часть переводит на отдельные страницы.
+- Контент Markdown: `@nuxt/content`, конфигурация в `content.config.ts`.
+- Основные данные справочников: JS-модули в `app/data`.
+- Публичные изображения и иконки: `public`.
 
 Ключевые зависимости:
 
-- `app/data/hub.js` - структура систем, разделов, тем и изображений узлов.
-- `app/data/classdata.js` - данные классов для карточки класса.
-- `app/composables/useKnotCanvas.js` - анимированный canvas-фон.
-- `app/components/ClassPage.vue` - подробная страница выбранного класса внутри карты.
-- `app/components/SectionCards.vue` - плиточная страница раздела внутри карты.
-- `app/components/HubOverlays.vue` - всплывающие панели поиска, закладок, соцсетей, темы и систем.
+- `@nuxt/content` - Markdown-коллекции, сейчас используется для рас.
+- `@nuxt/image` - работа с изображениями.
+- `@nuxt/ui` - UI-обвязка приложения.
+- `@pinia/nuxt` и `pinia` - подключены для состояния.
+- `better-sqlite3` - зависимость Nuxt Content.
 
-## 3. Маршруты
+## 2. Главные зоны сайта
 
-Текущие страницы лежат в `app/pages`.
+| Зона | Маршрут | Основной файл | Назначение |
+| --- | --- | --- | --- |
+| Главный хаб | `/` | `app/pages/index.vue` | Интерактивная карта систем TKK.club. Поддерживает deep-link `/?system=5e`. |
+| Хаб D&D 5e | `/dnd5e` | `app/pages/dnd5e/index.vue` | Та же карта, сразу открытая на системе D&D 5e 2014. |
+| Классы | `/dnd5e/classes` | `app/pages/dnd5e/classes/[[slug]].vue` | Карта классов. |
+| Страница класса | `/dnd5e/classes/:slug` | `app/pages/dnd5e/classes/[[slug]].vue` | Подробная карточка класса, подклассы, таблица класса, умения. |
+| Расы | `/dnd5e/races` | `app/pages/dnd5e/races/[[slug]].vue` | Карта рас и народов. |
+| Страница расы | `/dnd5e/races/:slug` | `app/pages/dnd5e/races/[[slug]].vue` | Досье конкретной расы из Markdown. |
+| Ширма правил | `/dnd5e/screens` | `app/pages/dnd5e/screens/index.vue` | Большой справочник правил D&D 5e 2014. |
+| Раздел ширмы | `/dnd5e/screens/:section` | `app/pages/dnd5e/screens/<section>/index.vue` | Список правил внутри выбранного раздела. |
+| Правило ширмы | `/dnd5e/screens/:section/:rule` | `app/pages/dnd5e/screens/<section>/[rule].vue` | Отдельная страница правила. |
 
-| Маршрут | Файл | Назначение |
-| --- | --- | --- |
-| `/` | `app/pages/index.vue` | Главная интерактивная карта систем и разделов. |
-| `/dnd5e/races` | `app/pages/dnd5e/races/[[slug]].vue` | Список рас D&D 5e в виде карты-созвездия. |
-| `/dnd5e/races/:slug` | `app/pages/dnd5e/races/[[slug]].vue` | Детальная страница выбранной расы. |
-| `/dnd5e/feats` | `app/pages/dnd5e/feats.vue` | Справочник черт с поиском и фильтрами. |
-| `/dnd5e/backgrounds` | `app/pages/dnd5e/backgrounds.vue` | Справочник предысторий с поиском, сортировкой, фильтрами и бросками таблиц. |
-| `/dnd5e/spells` | `app/pages/dnd5e/spells.vue` | Справочник заклинаний D&D 5e с поиском и фильтрами. |
-| `/dnd5e/weapons` | `app/pages/dnd5e/weapons.vue` | Справочник оружия с поиском и фильтрами. |
-| `/dnd5e/armor` | `app/pages/dnd5e/armor.vue` | Справочник доспехов и щитов D&D 5e 2014 с поиском и фильтрами. |
-| `/dnd5e/equipment` | `app/pages/dnd5e/equipment.vue` | Справочник снаряжения D&D 5e 2014 с поиском и фильтрами. |
-| `/dnd5e/bestiary` | `app/pages/dnd5e/bestiary.vue` | Бестиарий D&D 5e с монстрами мира Эноа, поиском и фильтрами. |
+## 3. Хаб D&D 5e
 
-Переходы из главной карты:
+Структура хаба берётся из `app/data/hub.js`, а маршруты разделов задаются в `app/components/HubPage.vue`.
 
-- Раздел `Расы и происхождения` ведет на `/dnd5e/races`.
-- Раздел `Черты` ведет на `/dnd5e/feats`.
-- Раздел `Предыстории` ведет на `/dnd5e/backgrounds`.
-- Раздел `Заклинания` ведет на `/dnd5e/spells`.
-- Раздел `Оружие` ведет на `/dnd5e/weapons`.
-- Раздел `Доспехи` ведет на `/dnd5e/armor`.
-- Раздел `Снаряжение` ведет на `/dnd5e/equipment`.
-- Раздел `Бестиарий` ведет на `/dnd5e/bestiary`.
-- Остальные разделы пока раскрываются внутри карты через `SectionCards.vue` или схематичные узлы.
+### Разделы хаба
 
-## 4. Контент
-
-Контент расположен в папке `content`.
-
-Главный Markdown:
-
-- `content/index.md` - базовая страница контента с названием `Threads of the Knot`.
-
-Коллекция рас D&D 5e:
-
-- Папка: `content/dnd5e/races`.
-- Конфигурация коллекции: `content.config.ts`.
-- Коллекция называется `dnd5eRaces`.
-- Источник: `dnd5e/races/**/*.md`.
-- Используется на маршруте `/dnd5e/races` и `/dnd5e/races/:slug`.
-
-Сейчас в коллекции рас есть опубликованные файлы:
-
-- `adzhaidy.md` - Аджаид.
-- `borosy.md` - Борос.
-- `ehornur.md` - Эхор'нур.
-- `hudduliny.md` - Худдулин.
-- `jabari.md` - Джабари.
-- `lyudi.md` - Человек.
-- `marakiytsy.md` - Маракиец.
-- `morhory.md` - Мор'хор.
-- `oyrdugi.md` - Ойрдуг.
-- `samaghi.md` - Самагхи.
-- `udrishi.md` - Удриш.
-- `vetu.md` - Вету.
-
-Важные поля схемы расы:
-
-- `title`, `description`, `status`, `access`, `tags`, `related`.
-- `region`, `playable`, `hasDndRules`.
-- `source`, `originalName`, `creatureType`, `abilityScore`, `raceSize`, `speed`.
-- `primaryTraits` - основные особенности.
-- `ruleSections` - большие текстовые разделы правил и лора.
-- `bloodTables` - специальные таблицы крови, если есть.
-- `nameData` - генераторы/таблицы имен, если есть.
-- `image`, `imageAlt`, `cardImages`, `detailImages` - изображения.
-
-## 5. Данные JavaScript
-
-Папка данных: `app/data`.
-
-| Файл | Что хранит |
+| Группа | Разделы |
 | --- | --- |
-| `hub.js` | Системы, разделы хаба, списки-заглушки, темы, изображения узлов, маршрутизация разделов. |
-| `classdata.js` | Подробные данные классов для карты D&D 5e. |
-| `feats5e.js` | Черты D&D 5e, источники и характеристики для фильтров. |
-| `backgrounds5e.js` | Предыстории D&D 5e, источники, владения, таблицы и особенности. |
-| `spells5e.js` | Заклинания D&D 5e для мира Эноа, уровни, школы, компоненты, классы, метки и описания. |
-| `weapons5e.js` | Оружие D&D 5e, категории, свойства, источники и описания. |
-| `armor5e.js` | Доспехи и щиты D&D 5e 2014, категории, КД, требования, свойства и описания. |
-| `equipment5e.js` | Снаряжение D&D 5e 2014, категории, стоимость, вес, метки, описания и расширенные правила. |
-| `bestiary5e.js` | Монстры D&D 5e для мира Эноа: статы, защиты, особенности, действия и легендарные действия. |
+| Персонаж | Классы, Расы и происхождения, Черты, Особенности классов, Предыстории, Заклинания |
+| Предметы | Оружие, Доспехи, Снаряжение, Драгоценности, Магические предметы |
+| Инструменты | Знамения, Гнев Ильбеша, Чай |
+| Мастерская | Бестиарий, Ширма (справочник) |
 
-Важно: часть разделов в `hub.js` пока питается массивами-заглушками из `POOL`. Полноценные страницы сейчас реализованы для рас, черт, предысторий, заклинаний, оружия, доспехов, снаряжения и бестиария D&D 5e.
+### Связанные маршруты
 
-## 6. Компоненты
+| Раздел | Маршрут |
+| --- | --- |
+| Классы | `/dnd5e/classes` |
+| Расы и происхождения | `/dnd5e/races` |
+| Черты | `/dnd5e/feats` |
+| Особенности классов | `/dnd5e/class-features` |
+| Предыстории | `/dnd5e/backgrounds` |
+| Заклинания | `/dnd5e/spells` |
+| Оружие | `/dnd5e/weapons` |
+| Доспехи | `/dnd5e/armor` |
+| Снаряжение | `/dnd5e/equipment` |
+| Драгоценности | `/dnd5e/jewelry` |
+| Магические предметы | `/dnd5e/magic-items` |
+| Бестиарий | `/dnd5e/bestiary` |
+| Знамения | `/dnd5e/omens` |
+| Ширма (справочник) | `/dnd5e/screens` |
 
-Папка компонентов: `app/components`.
+## 4. Справочники D&D 5e
 
-- `ClassPage.vue` - детальный экран класса внутри главной карты.
-- `SectionCards.vue` - универсальная плиточная выдача для выбранного раздела карты.
-- `HubOverlays.vue` - оверлеи главной карты: поиск, закладки, соцсети, темы, выбор системы, авторизация.
+Все эти страницы находятся в `app/pages/dnd5e`, а данные в `app/data`.
 
-Общий подход:
+| Справочник | Маршрут | Данные | Сейчас записей |
+| --- | --- | --- | --- |
+| Классы | `/dnd5e/classes` | `classdata.js` | 15 классов |
+| Умения классов | `/dnd5e/class-features` | `classFeatures5e.js` | 194 умения |
+| Расы | `/dnd5e/races` | `content/dnd5e/races/*.md` | 12 файлов |
+| Черты | `/dnd5e/feats` | `feats5e.js` | 14 черт |
+| Предыстории | `/dnd5e/backgrounds` | `backgrounds5e.js` | 4 предыстории |
+| Заклинания | `/dnd5e/spells` | `spells5e.js` | 10 заклинаний |
+| Оружие | `/dnd5e/weapons` | `weapons5e.js` | 38 предметов |
+| Доспехи | `/dnd5e/armor` | `armor5e.js` | 13 предметов |
+| Снаряжение | `/dnd5e/equipment` | `equipment5e.js` | 81 предмет |
+| Бестиарий | `/dnd5e/bestiary` | `bestiary5e.js` | 6 существ |
+| Драгоценности | `/dnd5e/jewelry` | `gems5e.js` | 53 камня |
+| Магические предметы | `/dnd5e/magic-items` | `magicItems5e.js` | 32 предмета |
+| Знамения | `/dnd5e/omens` | `omens5e.js` | 35 знамений |
 
-- Главная карта собирает view-model в `index.vue` и передает ее компонентам.
-- Справочники `feats`, `backgrounds`, `spells`, `weapons`, `armor`, `equipment` пока сделаны как самостоятельные страницы с похожим двухколоночным интерфейсом: слева список/поиск/фильтры, справа детальная карточка.
-- Страница рас отличается: список рас - отдельная карта-созвездие, детальная страница - большой dossier layout с портретом, правилами, разновидностями, таблицами и именами.
+## 5. Страница класса
 
-## 7. Изображения и публичные ассеты
+Главный компонент: `app/components/ClassPage.vue`.
 
-Публичные файлы лежат в `public`.
+Маршруты:
 
-Основные группы:
+- `/dnd5e/classes` - список классов.
+- `/dnd5e/classes/bard` - пример отдельной страницы класса.
+- `/dnd5e/classes/:slug` - универсальный маршрут для остальных классов.
 
-- `public/assets` - изображения узлов главной карты и классов.
-- `public/assets/nodes` - иконки разделов карты.
-- `public/assets/classes` - изображения классов.
-- `public/images/races` - изображения рас.
-- `public/images/races/portraits` - портреты для карты рас.
-- `public/robots.txt` и `public/favicon.ico`.
+Данные:
 
-Структура изображений рас:
+- `app/data/classdata.js` - базовые карточки классов, таблицы уровней, подклассы.
+- `app/data/classFeatures5e.js` - вынесенные умения классов.
+- `app/data/spells5e.js` - используется для вкладки заклинаний класса.
+- `app/data/ruleLinkIndex5e.js` - словарь правил и терминов для ссылок в тексте.
 
-- У каждой расы может быть папка вида `public/images/races/<slug>`.
-- Частые подпапки:
-  - `cards` - изображения для карточек.
-  - `details` - изображения для детальной страницы.
-  - `knots` - узлы/символы разновидностей.
-  - специальные папки вроде `tattoos` или `parasites` для уникальных блоков конкретной расы.
+Что важно помнить:
 
-В проекте также есть изображения для рас/народов, которых пока нет как Markdown-страницы: например `adaady`, `bralltsy`, `danguntsy`.
+- Карточка класса должна оставаться универсальной для всех 15 классов.
+- Выбор подкласса не должен сам включать фильтр. Фильтр применяется только вручную пользователем.
+- Базовые умения PHB должны оставаться видимыми вместе с выбранным подклассом.
+- Таблица класса содержит ссылки на блоки умений ниже и должна вести к ним плавным скроллом.
+- Эмблема класса ведёт назад на `/dnd5e/classes`.
 
-## 8. Логика страницы рас
+## 6. Ширма правил D&D 5e
 
-Файл:
+Ширма - новая крупная структура сайта.
 
-- `app/pages/dnd5e/races/[[slug]].vue`
+Главные файлы:
 
-Работа страницы:
+- `app/pages/dnd5e/screens/index.vue` - центральный экран ширмы.
+- `app/components/RuleScreenListPage.vue` - список правил внутри раздела.
+- `app/components/RuleScreenDetailPage.vue` - отдельная страница правила.
+- `app/components/RuleRichText.vue` - форматирование текста правила.
+- `app/composables/useRuleBookmarks5e.js` - закладки правил.
+- `app/data/ruleScreens5e.js` - группы и 31 раздел ширмы.
+- `app/data/ruleScreenRegistry5e.js` - lazy-load модулей правил.
+- `app/data/ruleLinkIndex5e.js` - 805 ссылочных терминов.
 
-- Без `slug` показывает карту всех опубликованных рас.
-- С `slug` ищет выбранную расу по `path` из коллекции `dnd5eRaces`.
-- Получает данные через `queryCollection('dnd5eRaces').order('title', 'ASC').all()`.
-- Фильтрует `status !== 'archived'`.
-- Использует `content.config.ts` как строгую схему данных.
-- Портрет для узла карты ожидается по пути `/images/races/portraits/<slug>.png`.
+Текущая статистика:
 
-Специальная логика:
+- 5 групп ширмы.
+- 31 раздел правил.
+- 31 локальный загрузчик раздела.
+- 774 правила внутри разделов.
 
-- Парсинг именованных блоков внутри текста правил: татуировки, паразиты, стигматы, договоры, ярость Анзу.
-- Подстановка специальных изображений для паразитов Удришей и татуировок Аджаидов.
-- Переключение разновидностей рас.
-- Броски таблиц имен и крови.
-- Lightbox для портрета.
+### Группы ширмы
 
-## 9. Логика справочников D&D 5e
+| Группа | Разделы |
+| --- | --- |
+| Ход и сцена | Движение, Действие, Бонусное действие, Реакция, Прочая деятельность |
+| Бой и опасности | Сражение, Урон и атака, Хиты, Смерть и Отдых, Состояния и болезни, Окружающая среда, Ловушки, Погоня |
+| Персонаж | Характеристики и Навыки, Происхождение, Активные умения класса, Мультиклассирование, Опыт, Языки |
+| Магия и предметы | Заклинания, Снаряжение, Магические предметы, Артефакты, Сверхъестественные дары, Демонические дары, Эпические дары, Магические проявления |
+| Мастерская | Деятельность в простое, Создание приключений, Путешествие, Путешествия по планам, Монстры |
 
-Общие черты страниц:
+### Разделы ширмы
 
-- Левая колонка: хлебные крошки, поиск, список сущностей, фильтры.
-- Правая колонка: детальная карточка выбранного элемента.
-- Клавиша `Escape` закрывает фильтр/выбор.
-- Все данные импортируются из `app/data/*.js`, а не из Markdown.
+| Раздел | Маршрут | Данные | Правил |
+| --- | --- | --- | ---: |
+| Движение | `/dnd5e/screens/move` | `movementRules5e.js` | 14 |
+| Действие | `/dnd5e/screens/action` | `actionRules5e.js` | 24 |
+| Бонусное действие | `/dnd5e/screens/bonus_action` | `bonusActionRules5e.js` | 3 |
+| Реакция | `/dnd5e/screens/reaction` | `reactionRules5e.js` | 3 |
+| Сражение | `/dnd5e/screens/combat` | `combatRules5e.js` | 9 |
+| Прочая деятельность | `/dnd5e/screens/other_action` | `otherActionRules5e.js` | 3 |
+| Окружающая среда | `/dnd5e/screens/environment` | `environmentRules5e.js` | 45 |
+| Урон и атака | `/dnd5e/screens/damage_and_attack` | `damageAttackRules5e.js` | 25 |
+| Хиты, Смерть и Отдых | `/dnd5e/screens/hits_death_rest` | `hitsDeathRestRules5e.js` | 17 |
+| Характеристики и Навыки | `/dnd5e/screens/stats_and_skills` | `statsSkillsRules5e.js` | 51 |
+| Происхождение | `/dnd5e/screens/origins` | `originRules5e.js` | 21 |
+| Состояния и болезни | `/dnd5e/screens/conditions_and_disease` | `conditionsDiseaseRules5e.js` | 47 |
+| Активные умения класса | `/dnd5e/screens/active_class_features` | `activeClassFeatureRules5e.js` | 32 |
+| Заклинания | `/dnd5e/screens/spells` | `spellRules5e.js` | 15 |
+| Мультиклассирование | `/dnd5e/screens/multiclassing` | `multiclassingRules5e.js` | 10 |
+| Снаряжение | `/dnd5e/screens/equipment` | `equipmentRules5e.js` | 87 |
+| Деятельность в простое | `/dnd5e/screens/downtime_activities` | `downtimeActivityRules5e.js` | 29 |
+| Создание приключений | `/dnd5e/screens/creating_adventures` | `creatingAdventureRules5e.js` | 13 |
+| Ловушки | `/dnd5e/screens/traps` | `trapRules5e.js` | 23 |
+| Сверхъестественные дары | `/dnd5e/screens/supernatural_gifts` | `supernaturalGiftRules5e.js` | 89 |
+| Демонические дары | `/dnd5e/screens/demonic_boons` | `demonicBoonRules5e.js` | 12 |
+| Эпические дары | `/dnd5e/screens/epic_boons` | `epicBoonRules5e.js` | 26 |
+| Артефакты | `/dnd5e/screens/artifacts` | `artifactRules5e.js` | 5 |
+| Магические предметы | `/dnd5e/screens/magic_items` | `magicItemRules5e.js` | 34 |
+| Путешествие | `/dnd5e/screens/journey` | `journeyRules5e.js` | 17 |
+| Путешествия по планам | `/dnd5e/screens/planar_travel` | `planarTravelRules5e.js` | 62 |
+| Погоня | `/dnd5e/screens/chases` | `chaseRules5e.js` | 5 |
+| Магические проявления | `/dnd5e/screens/magical_phenomena` | `magicalPhenomenaRules5e.js` | 13 |
+| Монстры | `/dnd5e/screens/monster` | `monsterRules5e.js` | 20 |
+| Языки | `/dnd5e/screens/language` | `languageRules5e.js` | 18 |
+| Опыт | `/dnd5e/screens/experience` | `experienceRules5e.js` | 2 |
 
-Страницы:
+## 7. Расы и Markdown-контент
 
-- `feats.vue` использует `FEATS_5E`, `FEAT_SOURCES`, `FEAT_ABILITIES`.
-- `backgrounds.vue` использует `BACKGROUNDS_5E`, `BACKGROUND_SOURCES`.
-- `weapons.vue` использует `WEAPONS_5E`, `WEAPON_SOURCES`, `WEAPON_CATEGORIES`, `WEAPON_PROPERTIES`.
+Папка: `content/dnd5e/races`.
 
-## 10. Карта папок
+Конфигурация: `content.config.ts`, коллекция `dnd5eRaces`.
 
-```text
-C:\Projects\ENOA\tkk
-├─ app
-│  ├─ app.vue
-│  ├─ assets/css/main.css
-│  ├─ components
-│  │  ├─ ClassPage.vue
-│  │  ├─ HubOverlays.vue
-│  │  └─ SectionCards.vue
-│  ├─ composables
-│  │  └─ useKnotCanvas.js
-│  ├─ data
-│  │  ├─ backgrounds5e.js
-│  │  ├─ classdata.js
-│  │  ├─ feats5e.js
-│  │  ├─ hub.js
-│  │  └─ weapons5e.js
-│  └─ pages
-│     ├─ index.vue
-│     └─ dnd5e
-│        ├─ backgrounds.vue
-│        ├─ feats.vue
-│        ├─ weapons.vue
-│        └─ races/[[slug]].vue
-├─ content
-│  ├─ index.md
-│  └─ dnd5e/races/*.md
-├─ public
-│  ├─ assets
-│  ├─ images/races
-│  ├─ favicon.ico
-│  └─ robots.txt
-├─ content.config.ts
-├─ nuxt.config.ts
-├─ package.json
-├─ pnpm-lock.yaml
-└─ README.md
+Текущие файлы:
+
+- `adzhaidy.md`
+- `borosy.md`
+- `ehornur.md`
+- `hudduliny.md`
+- `jabari.md`
+- `lyudi.md`
+- `marakiytsy.md`
+- `morhory.md`
+- `oyrdugi.md`
+- `samaghi.md`
+- `udrishi.md`
+- `vetu.md`
+
+Связанные изображения:
+
+- Портреты: `public/images/races/portraits`.
+- Карточки: `public/images/races/<slug>/cards`.
+- Детальные изображения: `public/images/races/<slug>/details`.
+- Узлы разновидностей: `public/images/races/<slug>/knots`.
+- Специальные подпапки: например `tattoos`, `parasites`.
+
+## 8. Компоненты
+
+| Компонент | Назначение |
+| --- | --- |
+| `HubPage.vue` | Интерактивная карта систем и маршрутизация разделов хаба. |
+| `HubOverlays.vue` | Поиск, закладки, социальные ссылки, тема, выбор системы. |
+| `ClassPage.vue` | Универсальная страница класса. |
+| `SectionCards.vue` | Плиточная выдача разделов хаба. |
+| `ThreadRefPage.vue` | Общий каркас справочника в стиле нити. |
+| `RuleScreenListPage.vue` | Список правил внутри раздела ширмы. |
+| `RuleScreenDetailPage.vue` | Детальная страница одного правила. |
+| `RuleRichText.vue` | Рендер структурированного текста правил. |
+| `OmenCard.vue` | Карточка знамений. |
+
+## 9. Ассеты
+
+| Папка | Что хранит |
+| --- | --- |
+| `public/assets` | Главные узлы, favicon и базовые декоративные элементы. |
+| `public/assets/classes` | Иконки 15 классов. |
+| `public/assets/nodes` | Иконки узлов хаба D&D 5e. |
+| `public/images/races` | Изображения рас, портреты, карточки, детали, узлы. |
+
+Файлы узлов хаба уже есть для основных разделов: классы, расы, черты, особенности, предыстории, заклинания, оружие, доспехи, снаряжение, драгоценности, магические предметы, бестиарий, знамения, ширма.
+
+## 10. Как добавлять новый раздел ширмы
+
+1. Создать модуль данных в `app/data/<slug>Rules5e.js`.
+2. В модуле хранить экран, группы, правила, иконки и `RULE_BY_SLUG`.
+3. Добавить загрузчик в `app/data/ruleScreenRegistry5e.js`.
+4. Добавить экран в `app/data/ruleScreens5e.js`.
+5. Создать папку маршрута `app/pages/dnd5e/screens/<slug>`.
+6. Внутри папки добавить `index.vue` для списка и `[rule].vue` для деталей.
+7. При необходимости добавить термины в `app/data/ruleLinkIndex5e.js`.
+8. Проверить `/dnd5e/screens`, `/dnd5e/screens/<slug>` и несколько правил внутри.
+
+## 11. Как добавлять новый справочник D&D 5e
+
+1. Создать файл данных в `app/data`.
+2. Создать страницу в `app/pages/dnd5e`.
+3. Добавить маршрут в `RACE_SECTION_ROUTES` внутри `app/components/HubPage.vue`.
+4. Добавить раздел в `SYSTEMS` и иконку в `NODE_IMG` внутри `app/data/hub.js`, если раздел должен отображаться на карте.
+5. Положить PNG-иконку узла в `public/assets/nodes`.
+6. Проверить переход из `/dnd5e` и прямой маршрут.
+
+## 12. Что проверять после крупных правок
+
+Минимальный набор маршрутов:
+
+- `/`
+- `/dnd5e`
+- `/dnd5e/classes`
+- `/dnd5e/classes/bard`
+- `/dnd5e/races`
+- `/dnd5e/spells`
+- `/dnd5e/weapons`
+- `/dnd5e/armor`
+- `/dnd5e/equipment`
+- `/dnd5e/bestiary`
+- `/dnd5e/jewelry`
+- `/dnd5e/magic-items`
+- `/dnd5e/omens`
+- `/dnd5e/screens`
+- `/dnd5e/screens/move`
+- `/dnd5e/screens/move/moving`
+- `/dnd5e/screens/equipment`
+- `/dnd5e/screens/equipment/weapons`
+
+Команды:
+
+```bash
+pnpm exec nuxt prepare
+pnpm dev
 ```
 
-## 11. Что считать готовым сейчас
+Для продакшена:
 
-Готовые пользовательские зоны:
+```bash
+pnpm build
+node .output/server/index.mjs
+```
 
-- Главная интерактивная карта `/`.
-- Карта и детальные страницы рас D&D 5e.
-- Справочник черт D&D 5e.
-- Справочник предысторий D&D 5e.
-- Справочник заклинаний D&D 5e.
-- Справочник оружия D&D 5e.
-- Справочник доспехов D&D 5e.
-- Справочник снаряжения D&D 5e.
-- Бестиарий D&D 5e.
+## 13. Текущий вывод по структуре
 
-Зоны, которые выглядят как задел:
+Сайт теперь состоит из двух больших слоёв:
 
-- D&D 5.5e, Pathfinder и Lore в главном хабе.
-- Многие разделы D&D 5e в `hub.js`, которые пока раскрываются как карточки-заглушки из массивов.
-- Изображения для некоторых народов без соответствующей Markdown-страницы.
+- визуальный хаб TKK.club с узлами систем и разделов;
+- справочная база D&D 5e 2014, где есть отдельные справочники и новая ширма правил.
 
-## 12. Быстрый ориентир для будущих правок
-
-- Добавить новую расу: создать Markdown в `content/dnd5e/races`, заполнить поля по `content.config.ts`, добавить портрет в `public/images/races/portraits`.
-- Добавить изображения расы: класть в `public/images/races/<slug>/cards`, `details`, `knots` и прописывать пути в Markdown.
-- Добавить новый справочник: создать страницу в `app/pages`, данные в `app/data`, затем связать раздел из `app/pages/index.vue`.
-- Добавить раздел на главную карту: менять `SYSTEMS`, `NODE_IMG`, `entriesFor` в `app/data/hub.js`.
-- Добавить новый визуальный узел раздела: положить PNG в `public/assets/nodes` и связать его через `NODE_IMG`.
+Самое крупное изменение после прошлой схемы - появление `/dnd5e/screens`: это отдельная библиотека правил с 31 разделом, вложенными страницами правил, закладками, фильтрами, поиском и ссылочным индексом терминов. Эту часть нужно считать одной из центральных структур сайта наравне с классами, расами и предметными справочниками.

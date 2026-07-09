@@ -490,6 +490,10 @@ const vm = computed(() => {
     const match = String(value || '').match(/\d+/)
     return match ? Number(match[0]) : 999
   }
+  const classFeatureItems = items => (items || []).map(item => {
+    if (Array.isArray(item)) return { name: item[0], text: item[1] }
+    return { name: item.name, text: item.text }
+  }).filter(item => item.name)
   const classArchetypes = (cd.archetypes || []).map(a => ({
     ...a,
     sourceUrl: `/dnd5e/class-features?source=${encodeURIComponent(a.source || '')}`,
@@ -501,12 +505,18 @@ const vm = computed(() => {
         featureUrl: classFeatureUrl(id),
         rank: featureLevel(f.level),
         hasItems: !!(f.items && f.items.length),
-        items: (f.items || []).map(([name, text]) => ({ name, text }))
+        itemsTitle: f.itemsTitle || '',
+        itemsCollapsed: !!f.itemsCollapsed,
+        items: classFeatureItems(f.items)
       }
     }),
     spells: (a.spells || []).map(sp => ({ ...sp, hasHigher: !!sp.higher }))
   }))
   const classArchetypeSources = [...new Set(classArchetypes.map(a => a.source).filter(Boolean))]
+  const classSourceFullNames = classArchetypes.reduce((acc, archetype) => {
+    if (archetype.source && archetype.sourceFullName) acc[archetype.source] = archetype.sourceFullName
+    return acc
+  }, {})
   const activeArchetypeSource = S.archetypeSource || 'all'
   const filteredClassArchetypes = classArchetypes.filter(a => activeArchetypeSource === 'all' || a.source === activeArchetypeSource)
   const selectedClassArchetype = classArchetypes.find(a => a.id === S.activeArchetype) || null
@@ -531,6 +541,7 @@ const vm = computed(() => {
       featureUrl: f.featureUrl,
       name: f.name,
       src: arch.source,
+      sourceFullName: arch.sourceFullName || '',
       lvl: f.level,
       text: f.text,
       order: 1000 + archetypeOrder * 100 + order,
@@ -540,6 +551,8 @@ const vm = computed(() => {
       archetypeName: arch.name,
       hasItems: !!(f.items && f.items.length),
       hasLongItems: !!(f.items && f.items.length > 3),
+      itemsTitle: f.itemsTitle || '',
+      itemsCollapsed: !!f.itemsCollapsed,
       items: f.items || []
     })),
     ...((arch.spells && arch.spells.length) ? [{
@@ -547,6 +560,7 @@ const vm = computed(() => {
       featureUrl: classFeatureUrl(classFeatureId(S.cls, arch.id, 'Дополнительные заклинания')),
       name: 'Дополнительные заклинания',
       src: arch.source,
+      sourceFullName: arch.sourceFullName || '',
       lvl: arch.level,
       text: 'Вы получаете дополнительные заклинания подкласса. Они считаются для вас заклинаниями барда и вплетаются в магическую традицию выбранной коллегии.',
       order: 1000 + archetypeOrder * 100 + 98,
@@ -657,6 +671,7 @@ const vm = computed(() => {
   const selectedClassArchetypeDescription = selectedClassArchetype ? {
     name: selectedClassArchetype.name,
     source: selectedClassArchetype.source,
+    sourceFullName: selectedClassArchetype.sourceFullName || '',
     type: selectedClassArchetype.type,
     level: selectedClassArchetype.level,
     summary: selectedClassArchetype.summary || '',
@@ -695,6 +710,7 @@ const vm = computed(() => {
     classArchetypes,
     classFilteredArchetypes: filteredClassArchetypes,
     classArchetypeSources,
+    classSourceFullNames,
     classHasArchetypes: classArchetypes.length > 0,
     classSelectedArchetype: selectedClassArchetype,
     classHasSelectedArchetype: !!selectedClassArchetype,

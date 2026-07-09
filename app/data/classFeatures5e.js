@@ -6,7 +6,8 @@ export const CLASS_FEATURE_SOURCE_NAMES = {
   TLDC: 'The Threads of Lost Dice Club',
   TS: 'The Threads of Shkad',
   TJB: 'The Threads of JorasBashu',
-  TU: 'The Threads of Unseen'
+  TU: 'The Threads of Unseen',
+  TKK: 'TKK.club'
 }
 
 export const CLASS_FEATURE_SOURCE_URLS = {
@@ -84,7 +85,7 @@ for (const [className, data] of Object.entries(CLASSDATA)) {
         typeLabel: archetype.type || 'Подкласс',
         name: feature.name,
         source: archetype.source,
-        sourceName: sourceName(archetype.source),
+        sourceName: archetype.sourceFullName || sourceName(archetype.source),
         sourceUrl: CLASS_FEATURE_SOURCE_URLS[archetype.source] || '',
         levelText: feature.level,
         level: featureLevel(feature.level),
@@ -107,7 +108,7 @@ for (const [className, data] of Object.entries(CLASSDATA)) {
         typeLabel: 'Заклинания подкласса',
         name: 'Дополнительные заклинания',
         source: archetype.source,
-        sourceName: sourceName(archetype.source),
+        sourceName: archetype.sourceFullName || sourceName(archetype.source),
         sourceUrl: CLASS_FEATURE_SOURCE_URLS[archetype.source] || '',
         levelText: archetype.level || '',
         level: featureLevel(archetype.level),
