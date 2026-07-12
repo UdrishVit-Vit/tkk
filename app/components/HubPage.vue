@@ -283,7 +283,7 @@ function mkLink(d, kind, open, th) {
   const noFlow = kind==='cross' || kind==='stub'
   const flowA = open ? 0.5 : 0.26
   return { d, base, hasGlow:false, hasSpark:false,
-    flow: noFlow ? { stroke:'none' } : { stroke:'rgba('+th.hi+','+flowA+')', strokeWidth:Math.max(1, bw*0.55), fill:'none',
+    flow: noFlow ? { stroke:'none', fill:'none' } : { stroke:'rgba('+th.hi+','+flowA+')', strokeWidth:Math.max(1, bw*0.55), fill:'none',
       strokeLinejoin:'round', strokeLinecap:'round', strokeDasharray:'2 560',
       animation:'threadBead 15s linear infinite', animationDelay:(idx*0.6)+'s' } }
 }
@@ -314,37 +314,6 @@ function mkMarker(x, y, s, open, th) {
       ? { stroke:'rgba(246,208,126,0.95)', strokeWidth:'1.5', fill:'rgba(238,190,98,0.95)', filter:'drop-shadow(0 0 7px rgba(236,196,120,0.9))' }
       : { stroke: th.thread+'0.66)', strokeWidth:'1', fill:'rgba(7,8,12,0.95)' }
   }
-}
-
-// Angular "circuit-board" routing from a group hub (hx,hy) to a section (sx,sy).
-// Instead of a soft Bézier, threads run in right angles onto a shared rail per
-// group, with a short perpendicular stub tick — so the whole map reads as
-// drafted, woven, brutalist geometry (the knot-of-knots), echoing the races map.
-function groupElbow(o, hx, hy, sx, sy, si) {
-  const T = 14, dir = si % 2 ? 1 : -1, stag = (si % 2) * 18
-  let d, beads, stub
-  if (o === 'up') {
-    const rail = -230 - stag
-    d = 'M '+hx+' '+hy+' L '+hx+' '+rail+' L '+sx+' '+rail+' L '+sx+' '+sy
-    beads = [[hx, rail], [sx, rail]]
-    stub = 'M '+sx+' '+rail+' L '+(sx + dir * T)+' '+rail
-  } else if (o === 'down') {
-    const rail = 334 + stag
-    d = 'M '+hx+' '+hy+' L '+hx+' '+rail+' L '+sx+' '+rail+' L '+sx+' '+sy
-    beads = [[hx, rail], [sx, rail]]
-    stub = 'M '+sx+' '+rail+' L '+(sx + dir * T)+' '+rail
-  } else if (o === 'right') {
-    const rail = 388 + stag
-    d = 'M '+hx+' '+hy+' L '+rail+' '+hy+' L '+rail+' '+sy+' L '+sx+' '+sy
-    beads = [[rail, hy], [rail, sy]]
-    stub = 'M '+rail+' '+sy+' L '+rail+' '+(sy + dir * T)
-  } else {
-    const rail = -384 - stag
-    d = 'M '+hx+' '+hy+' L '+rail+' '+hy+' L '+rail+' '+sy+' L '+sx+' '+sy
-    beads = [[rail, hy], [rail, sy]]
-    stub = 'M '+rail+' '+sy+' L '+rail+' '+(sy + dir * T)
-  }
-  return { d, beads, stub }
 }
 
 const CX = 'calc(50% + 34px)'
@@ -433,64 +402,63 @@ const vm = computed(() => {
     }
   } else if (sysObj) {
     if (sysObj.groups) {
+      // ---- radial knot mandala: sections woven into one outer ring, group
+      // hubs on an inner ring at their sections' mean angle. Threads run from
+      // the centre out through angular junctions, and an interlacing border
+      // braids the whole ring — a Tibetan woven knot rather than a plus/tree.
       const G = sysObj.groups
-      const ORI = ['up','right','down','left']
-      const secPos = {}
+      const squash = 0.9
+      const Rsec = 404, Rhub = 190, Rj = 300
+      const P = (r, ang, sq) => [Math.round(Math.cos(ang)*r), Math.round(Math.sin(ang)*r*(sq==null?squash:sq))]
+
+      const flat = []
+      G.forEach((g, gi) => g.sections.forEach(sec => flat.push({ sec, gi })))
+      const N = flat.length
+      flat.forEach((o, i) => { o.ang = (-90 + i*(360/N)) * Math.PI/180 ;[o.x, o.y] = P(Rsec, o.ang) })
+
       G.forEach((g, gi) => {
-        const o = ORI[gi % 4]
-        let hx = 0, hy = 0
-        if (o==='up') { hx=0; hy=-158 }
-        else if (o==='down') { hx=0; hy=250 }
-        else if (o==='right') { hx=250; hy=0 }
-        else { hx=-270; hy=0 }
-        // Spine from the centre to the group hub, with a small perpendicular
-        // cross-tick at its middle — reads as a thread crossing (a knot node).
+        const mine = flat.filter(o => o.gi === gi)
+        // mean angle via vector sum (wrap-safe)
+        let vx = 0, vy = 0
+        mine.forEach(o => { vx += Math.cos(o.ang); vy += Math.sin(o.ang) })
+        const hAng = Math.atan2(vy, vx)
+        const [hx, hy] = P(Rhub, hAng)
+        // centre → hub spoke with a mid bead and a perpendicular thread-crossing tick
         connectors.push(mkLink('M0 0 L '+hx+' '+hy, 'group', false, th))
-        const mxh = Math.round(hx*0.46), myh = Math.round(hy*0.46)
+        const [mxh, myh] = P(Rhub*0.5, hAng)
         markers.push(mkMarker(mxh, myh, 5, false, th))
-        const perp = (o==='up'||o==='down')
-          ? 'M '+(mxh-11)+' '+myh+' L '+(mxh+11)+' '+myh
-          : 'M '+mxh+' '+(myh-11)+' L '+mxh+' '+(myh+11)
-        connectors.push(mkLink(perp, 'stub', false, th))
-        nodes.push(mkNode({ cx:CX, x:hx, y:hy, scale:1, opacity:1, color:inkHi, knot:48,
-          label:g.name, sub:'', lsize:18, labelAbove:(o==='down'), mask:nodeImg(g.name), onClick:null }, th))
-        const m = g.sections.length
-        g.sections.forEach((sec, si) => {
-          const isOpen = S.section === sec
-          let sx, sy, mx, my
-          if (o==='up') { const GX=166; sx=Math.round((si-(m-1)/2)*GX); sy=-300; mx=sx; my=sy+48 }
-          else if (o==='down') { const GX=190; sx=Math.round((si-(m-1)/2)*GX); sy=406; mx=sx; my=sy-48 }
-          else if (o==='right') { const GY=132; sy=Math.round((si-(m-1)/2)*GY); sx=515; mx=sx-48; my=sy }
-          else { const GY=150; sy=Math.round((si-(m-1)/2)*GY); sx=-470; mx=sx+48; my=sy }
-          const { d, beads, stub } = groupElbow(o, hx, hy, sx, sy, si)
-          connectors.push(mkLink(d, 'section', isOpen, th))
-          connectors.push(mkLink(stub, 'stub', false, th))
-          beads.forEach(([bx, by]) => markers.push(mkMarker(bx, by, 3.4, false, th)))
-          markers.push(mkMarker(mx, my, isOpen?6:5, isOpen, th))
-          secPos[sec] = { x:sx, y:sy, o }
-          nodes.push(mkNode({ cx:CX, x:sx, y:sy, scale:isOpen?1.22:1, opacity:1, color: isOpen?inkHi:ink, knot:74,
-            label:sec, sub:'', lsize:12.5, dense:true, wrap:true, labelAbove:(o==='up'), active:isOpen, mask:nodeImg(sec), onClick:() => openSection(sec) }, th))
+        const px = -Math.sin(hAng)*10, py = Math.cos(hAng)*10
+        connectors.push(mkLink('M '+Math.round(mxh-px)+' '+Math.round(myh-py)+' L '+Math.round(mxh+px)+' '+Math.round(myh+py), 'stub', false, th))
+        nodes.push(mkNode({ cx:CX, x:hx, y:hy, scale:1, opacity:1, color:inkHi, knot:50,
+          label:g.name, sub:'', lsize:17, labelAbove:(hy<0), mask:nodeImg(g.name), onClick:null }, th))
+
+        // hub → each section: two angular segments through a ring junction, plus
+        // a short perpendicular stub — drafted, woven geometry.
+        mine.forEach((o, si) => {
+          const isOpen = S.section === o.sec
+          const [jx, jy] = P(Rj, o.ang)
+          connectors.push(mkLink('M '+hx+' '+hy+' L '+jx+' '+jy+' L '+o.x+' '+o.y, 'section', isOpen, th))
+          markers.push(mkMarker(jx, jy, 3.4, false, th))
+          const dir = si % 2 ? 1 : -1
+          const spx = -Math.sin(o.ang)*12*dir, spy = Math.cos(o.ang)*12*dir
+          connectors.push(mkLink('M '+jx+' '+jy+' L '+Math.round(jx+spx)+' '+Math.round(jy+spy), 'stub', false, th))
+          const [bx, by] = P(Rsec-46, o.ang)
+          markers.push(mkMarker(bx, by, isOpen?6:4, isOpen, th))
+          nodes.push(mkNode({ cx:CX, x:o.x, y:o.y, scale:isOpen?1.2:1, opacity:1, color: isOpen?inkHi:ink, knot:60,
+            label:o.sec, sub:'', lsize:12, dense:true, wrap:true, labelAbove:(o.y<0), active:isOpen, mask:nodeImg(o.sec), onClick:() => openSection(o.sec) }, th))
         })
       })
-      // Cross-ties between related sections in different groups — angular
-      // brackets that step OUTWARD past each node (leaving perpendicular to the
-      // node's own rail) and run along the outside, weaving the four arms
-      // together without cutting through the node columns.
-      const PAD = 66
-      ;[['Заклинания','Магические предметы'],['Бестиарий','Гнев Ильбеша']].forEach(pair => {
-        const a=secPos[pair[0]], b=secPos[pair[1]]
-        if (a && b) {
-          const aH = a.o==='left' || a.o==='right'   // node approached horizontally
-          const bH = b.o==='left' || b.o==='right'
-          const aOut = aH ? [a.x + (a.x>=0?PAD:-PAD), a.y] : [a.x, a.y + (a.y>=0?PAD:-PAD)]
-          const bOut = bH ? [b.x + (b.x>=0?PAD:-PAD), b.y] : [b.x, b.y + (b.y>=0?PAD:-PAD)]
-          const c1=[bOut[0], aOut[1]], c2=[aOut[0], bOut[1]]
-          const corner = (Math.hypot(c1[0],c1[1]) >= Math.hypot(c2[0],c2[1])) ? c1 : c2
-          const d = 'M '+a.x+' '+a.y+' L '+aOut[0]+' '+aOut[1]+' L '+corner[0]+' '+corner[1]+' L '+bOut[0]+' '+bOut[1]+' L '+b.x+' '+b.y
-          connectors.unshift(mkLink(d, 'cross', false, th))
-          markers.push(mkMarker(corner[0], corner[1], 3.4, false, th))
-        }
-      })
+
+      // Woven border: braid adjacent ring sections with chevrons that alternately
+      // bow out and dip in, so the strands read as passing over and under —
+      // the endless-knot band that ties the whole ring into one figure.
+      for (let i = 0; i < N; i++) {
+        const a = flat[i], b = flat[(i+1)%N]
+        const mAng = (-90 + (i+0.5)*(360/N)) * Math.PI/180
+        const [mx, my] = P(Rsec + (i%2 ? 34 : -16), mAng)
+        connectors.unshift(mkLink('M '+a.x+' '+a.y+' L '+mx+' '+my+' L '+b.x+' '+b.y, 'cross', false, th))
+        markers.push(mkMarker(mx, my, 3, false, th))
+      }
     } else {
       const secs = sysObj.sections, pts = layoutPoints(secs.length), Rx = 360, Ry = 312
       secs.forEach((sec, i) => {
