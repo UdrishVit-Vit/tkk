@@ -274,14 +274,16 @@ function mkNode(o, th) {
 let _ci = 0
 function mkLink(d, kind, open, th) {
   const idx = _ci++
-  const a  = kind==='group' ? 0.5 : (kind==='cross' ? 0.16 : (open ? 0.74 : 0.42))
-  const bw = kind==='group' ? 1.7 : (kind==='cross' ? 1.1 : (open ? 2.1 : 1.5))
-  const base = { stroke: th.thread + a + ')', strokeWidth:bw, fill:'none', strokeLinejoin:'round', strokeLinecap:'round',
+  const a  = kind==='group' ? 0.5 : (kind==='cross' ? 0.16 : (kind==='stub' ? 0.34 : (open ? 0.74 : 0.42)))
+  const bw = kind==='group' ? 1.7 : (kind==='cross' ? 1.1 : (kind==='stub' ? 1 : (open ? 2.1 : 1.5)))
+  const base = { stroke: th.thread + a + ')', strokeWidth:bw, fill:'none', strokeLinejoin:'miter', strokeLinecap:'butt',
     transition:'stroke .45s, stroke-width .45s' }
   if (kind==='cross') base.strokeDasharray = '4 10'
-  const flowA = kind==='cross' ? 0 : (open ? 0.5 : 0.26)
+  // Stubs and cross-ties are static structural ticks — no travelling bead.
+  const noFlow = kind==='cross' || kind==='stub'
+  const flowA = open ? 0.5 : 0.26
   return { d, base, hasGlow:false, hasSpark:false,
-    flow:{ stroke:'rgba('+th.hi+','+flowA+')', strokeWidth:Math.max(1, bw*0.55), fill:'none',
+    flow: noFlow ? { stroke:'none' } : { stroke:'rgba('+th.hi+','+flowA+')', strokeWidth:Math.max(1, bw*0.55), fill:'none',
       strokeLinejoin:'round', strokeLinecap:'round', strokeDasharray:'2 560',
       animation:'threadBead 15s linear infinite', animationDelay:(idx*0.6)+'s' } }
 }
@@ -312,6 +314,37 @@ function mkMarker(x, y, s, open, th) {
       ? { stroke:'rgba(246,208,126,0.95)', strokeWidth:'1.5', fill:'rgba(238,190,98,0.95)', filter:'drop-shadow(0 0 7px rgba(236,196,120,0.9))' }
       : { stroke: th.thread+'0.66)', strokeWidth:'1', fill:'rgba(7,8,12,0.95)' }
   }
+}
+
+// Angular "circuit-board" routing from a group hub (hx,hy) to a section (sx,sy).
+// Instead of a soft Bézier, threads run in right angles onto a shared rail per
+// group, with a short perpendicular stub tick — so the whole map reads as
+// drafted, woven, brutalist geometry (the knot-of-knots), echoing the races map.
+function groupElbow(o, hx, hy, sx, sy, si) {
+  const T = 14, dir = si % 2 ? 1 : -1, stag = (si % 2) * 18
+  let d, beads, stub
+  if (o === 'up') {
+    const rail = -230 - stag
+    d = 'M '+hx+' '+hy+' L '+hx+' '+rail+' L '+sx+' '+rail+' L '+sx+' '+sy
+    beads = [[hx, rail], [sx, rail]]
+    stub = 'M '+sx+' '+rail+' L '+(sx + dir * T)+' '+rail
+  } else if (o === 'down') {
+    const rail = 334 + stag
+    d = 'M '+hx+' '+hy+' L '+hx+' '+rail+' L '+sx+' '+rail+' L '+sx+' '+sy
+    beads = [[hx, rail], [sx, rail]]
+    stub = 'M '+sx+' '+rail+' L '+(sx + dir * T)+' '+rail
+  } else if (o === 'right') {
+    const rail = 388 + stag
+    d = 'M '+hx+' '+hy+' L '+rail+' '+hy+' L '+rail+' '+sy+' L '+sx+' '+sy
+    beads = [[rail, hy], [rail, sy]]
+    stub = 'M '+rail+' '+sy+' L '+rail+' '+(sy + dir * T)
+  } else {
+    const rail = -384 - stag
+    d = 'M '+hx+' '+hy+' L '+rail+' '+hy+' L '+rail+' '+sy+' L '+sx+' '+sy
+    beads = [[rail, hy], [rail, sy]]
+    stub = 'M '+rail+' '+sy+' L '+rail+' '+(sy + dir * T)
+  }
+  return { d, beads, stub }
 }
 
 const CX = 'calc(50% + 34px)'
@@ -410,44 +443,52 @@ const vm = computed(() => {
         else if (o==='down') { hx=0; hy=250 }
         else if (o==='right') { hx=250; hy=0 }
         else { hx=-270; hy=0 }
+        // Spine from the centre to the group hub, with a small perpendicular
+        // cross-tick at its middle — reads as a thread crossing (a knot node).
         connectors.push(mkLink('M0 0 L '+hx+' '+hy, 'group', false, th))
-        markers.push(mkMarker(Math.round(hx*0.46), Math.round(hy*0.46), 5, false, th))
+        const mxh = Math.round(hx*0.46), myh = Math.round(hy*0.46)
+        markers.push(mkMarker(mxh, myh, 5, false, th))
+        const perp = (o==='up'||o==='down')
+          ? 'M '+(mxh-11)+' '+myh+' L '+(mxh+11)+' '+myh
+          : 'M '+mxh+' '+(myh-11)+' L '+mxh+' '+(myh+11)
+        connectors.push(mkLink(perp, 'stub', false, th))
         nodes.push(mkNode({ cx:CX, x:hx, y:hy, scale:1, opacity:1, color:inkHi, knot:48,
           label:g.name, sub:'', lsize:18, labelAbove:(o==='down'), mask:nodeImg(g.name), onClick:null }, th))
         const m = g.sections.length
         g.sections.forEach((sec, si) => {
           const isOpen = S.section === sec
-          let sx, sy, d, mx, my
-          if (o==='up') {
-            const GX=166; sx=Math.round((si-(m-1)/2)*GX); sy=-300
-            const q=Math.round((hy+sy)/2); d='M '+hx+' '+hy+' C '+hx+' '+q+' '+sx+' '+q+' '+sx+' '+sy
-            mx=sx; my=sy+48
-          } else if (o==='down') {
-            const GX=190; sx=Math.round((si-(m-1)/2)*GX); sy=406
-            const q=Math.round((hy+sy)/2); d='M '+hx+' '+hy+' C '+hx+' '+q+' '+sx+' '+q+' '+sx+' '+sy
-            mx=sx; my=sy-48
-          } else if (o==='right') {
-            const GY=132; sy=Math.round((si-(m-1)/2)*GY); sx=515
-            const q=Math.round((hx+sx)/2); d='M '+hx+' '+hy+' C '+q+' '+hy+' '+q+' '+sy+' '+sx+' '+sy
-            mx=sx-48; my=sy
-          } else {
-            const GY=150; sy=Math.round((si-(m-1)/2)*GY); sx=-470
-            const q=Math.round((hx+sx)/2); d='M '+hx+' '+hy+' C '+q+' '+hy+' '+q+' '+sy+' '+sx+' '+sy
-            mx=sx+48; my=sy
-          }
+          let sx, sy, mx, my
+          if (o==='up') { const GX=166; sx=Math.round((si-(m-1)/2)*GX); sy=-300; mx=sx; my=sy+48 }
+          else if (o==='down') { const GX=190; sx=Math.round((si-(m-1)/2)*GX); sy=406; mx=sx; my=sy-48 }
+          else if (o==='right') { const GY=132; sy=Math.round((si-(m-1)/2)*GY); sx=515; mx=sx-48; my=sy }
+          else { const GY=150; sy=Math.round((si-(m-1)/2)*GY); sx=-470; mx=sx+48; my=sy }
+          const { d, beads, stub } = groupElbow(o, hx, hy, sx, sy, si)
           connectors.push(mkLink(d, 'section', isOpen, th))
+          connectors.push(mkLink(stub, 'stub', false, th))
+          beads.forEach(([bx, by]) => markers.push(mkMarker(bx, by, 3.4, false, th)))
           markers.push(mkMarker(mx, my, isOpen?6:5, isOpen, th))
-          secPos[sec] = { x:sx, y:sy }
+          secPos[sec] = { x:sx, y:sy, o }
           nodes.push(mkNode({ cx:CX, x:sx, y:sy, scale:isOpen?1.22:1, opacity:1, color: isOpen?inkHi:ink, knot:74,
             label:sec, sub:'', lsize:12.5, dense:true, wrap:true, labelAbove:(o==='up'), active:isOpen, mask:nodeImg(sec), onClick:() => openSection(sec) }, th))
         })
       })
+      // Cross-ties between related sections in different groups — angular
+      // brackets that step OUTWARD past each node (leaving perpendicular to the
+      // node's own rail) and run along the outside, weaving the four arms
+      // together without cutting through the node columns.
+      const PAD = 66
       ;[['Заклинания','Магические предметы'],['Бестиарий','Гнев Ильбеша']].forEach(pair => {
         const a=secPos[pair[0]], b=secPos[pair[1]]
         if (a && b) {
-          const midx=(a.x+b.x)/2, midy=(a.y+b.y)/2, len=Math.hypot(midx,midy)||1
-          const cx=Math.round(midx+midx/len*150), cy=Math.round(midy+midy/len*150)
-          connectors.unshift(mkLink('M '+a.x+' '+a.y+' Q '+cx+' '+cy+' '+b.x+' '+b.y, 'cross', false, th))
+          const aH = a.o==='left' || a.o==='right'   // node approached horizontally
+          const bH = b.o==='left' || b.o==='right'
+          const aOut = aH ? [a.x + (a.x>=0?PAD:-PAD), a.y] : [a.x, a.y + (a.y>=0?PAD:-PAD)]
+          const bOut = bH ? [b.x + (b.x>=0?PAD:-PAD), b.y] : [b.x, b.y + (b.y>=0?PAD:-PAD)]
+          const c1=[bOut[0], aOut[1]], c2=[aOut[0], bOut[1]]
+          const corner = (Math.hypot(c1[0],c1[1]) >= Math.hypot(c2[0],c2[1])) ? c1 : c2
+          const d = 'M '+a.x+' '+a.y+' L '+aOut[0]+' '+aOut[1]+' L '+corner[0]+' '+corner[1]+' L '+bOut[0]+' '+bOut[1]+' L '+b.x+' '+b.y
+          connectors.unshift(mkLink(d, 'cross', false, th))
+          markers.push(mkMarker(corner[0], corner[1], 3.4, false, th))
         }
       })
     } else {
@@ -761,6 +802,10 @@ function addBookmark() {
 
     <svg class="tkk-conn">
       <g :transform="`translate(${center.x},${center.y}) scale(${fit})`">
+        <g class="tkk-halo" aria-hidden="true">
+          <rect x="-300" y="-300" width="600" height="600" transform="rotate(45)" />
+          <rect x="-436" y="-436" width="872" height="872" transform="rotate(45)" />
+        </g>
         <g v-for="(c, i) in vm.connectors" :key="'c'+i">
           <path v-if="c.hasGlow" :d="c.d" :style="c.glow" />
           <path :d="c.d" :style="c.base" />
@@ -870,7 +915,9 @@ function addBookmark() {
 .tkk{position:fixed;inset:0;overflow:hidden;font-family:'Hanken Grotesk',sans-serif;color:rgba(226,230,244,.92);transition:background .8s ease}
 .tkk-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
 .tkk-rings{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
-.tkk-conn{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.tkk-conn{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
+.tkk-halo rect{fill:none;stroke:rgba(214,170,96,.14);stroke-width:1}
+.tkk-halo rect:first-child{stroke:rgba(214,170,96,.22)}
 .tkk-nodes{position:absolute;inset:0;z-index:4;pointer-events:none;transform-origin:calc(50% + 34px) 50%}
 .tkk-node{cursor:default}
 .tkk-knot:hover{transform:translate(-50%,-50%) scale(1.2) !important}
