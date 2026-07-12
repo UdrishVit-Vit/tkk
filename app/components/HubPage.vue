@@ -161,7 +161,7 @@ function crumbSystem() {
 // "Расы и происхождения" (D&D 5e/2014) and "Виды" (D&D 5.5e/2024) are different
 // rulesets with their own terms — each gets its own page branch instead of
 // sharing one /races list, the same way Pathfinder will get its own branch.
-const RACE_SECTION_ROUTES = { 'Расы и происхождения': '/dnd5e/races', 'Черты': '/dnd5e/feats', 'Особенности классов': '/dnd5e/class-features', 'Предыстории': '/dnd5e/backgrounds', 'Заклинания': '/dnd5e/spells', 'Оружие': '/dnd5e/weapons', 'Доспехи': '/dnd5e/armor', 'Снаряжение': '/dnd5e/equipment', 'Драгоценности': '/dnd5e/jewelry', 'Магические предметы': '/dnd5e/magic-items', 'Бестиарий': '/dnd5e/bestiary', 'Знамения': '/dnd5e/omens', 'Ширма (справочник)': '/dnd5e/screens' }
+const RACE_SECTION_ROUTES = { 'Расы и происхождения': '/dnd5e/races', 'Черты': '/dnd5e/feats', 'Особенности классов': '/dnd5e/class-features', 'Предыстории': '/dnd5e/backgrounds', 'Заклинания': '/dnd5e/spells', 'Оружие': '/dnd5e/weapons', 'Доспехи': '/dnd5e/armor', 'Снаряжение': '/dnd5e/equipment', 'Драгоценности': '/dnd5e/jewelry', 'Магические предметы': '/dnd5e/magic-items', 'Бестиарий': '/dnd5e/bestiary', 'Знамения': '/dnd5e/omens', 'Гнев Ильбеша': '/dnd5e/wrath', 'Ширма (справочник)': '/dnd5e/screens' }
 function openSection(name) {
   if (RACE_SECTION_ROUTES[name]) { navigateTo(RACE_SECTION_ROUTES[name]); return }
   state.section = state.section === name ? null : name; state.cls = null
