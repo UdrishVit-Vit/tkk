@@ -1735,10 +1735,14 @@ let CLASSDATA;
       ? importedArchetypes.filter(archetype => archetypeKey(archetype.name).includes('мастодонт'))
       : importedArchetypes
     const seen = new Set(existing.map(archetype => archetypeKey(archetype.name)))
+    const seenIdentities = new Set(existing.map(archetype => `${archetypeKey(archetype.name)}|${archetype.source || ''}`))
     const additions = importList.filter(archetype => {
       const key = archetypeKey(archetype.name)
-      if (seen.has(key)) return false
+      const identity = `${key}|${archetype.source || ''}`
+      const allowSourceVariant = className === 'Изобретатель' && key === archetypeKey('Дитя Сальбары')
+      if (seenIdentities.has(identity) || (seen.has(key) && !allowSourceVariant)) return false
       seen.add(key)
+      seenIdentities.add(identity)
       return true
     })
     DATA[className].archetypes = [...existing, ...additions]

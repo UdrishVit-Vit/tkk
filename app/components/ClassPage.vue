@@ -4,6 +4,12 @@ import { SPELLS_5E, SPELL_LEVELS, SPELL_SCHOOLS, SPELL_TAGS, SPELL_SOURCES } fro
 const props = defineProps(['vm', 'state'])
 const emit = defineEmits(['up'])
 
+const duplicateArchetypeNames = computed(() => {
+  const counts = new Map()
+  for (const archetype of props.vm.classArchetypes || []) counts.set(archetype.name, (counts.get(archetype.name) || 0) + 1)
+  return new Set([...counts].filter(([, count]) => count > 1).map(([name]) => name))
+})
+
 const SOURCE_FULL_NAMES = {
   PHB: 'Player’s Handbook',
   TCE: 'Tasha’s Cauldron of Everything',
@@ -63,7 +69,17 @@ const FEATURE_SECTION_TITLES = [
   'Исполнение ритуалов',
   'Фокусировка заклинания',
   'Получение импланта',
+  'Происхождение',
+  'Создание импланта',
   'Вживление импланта',
+  'Отторжение импланта',
+  'Поддержание имплантов',
+  'Использование имплантов в игре',
+  'Каталог имплантов',
+  'Проведение ритуала',
+  'Успех',
+  'Провал',
+  'Использование',
   'Количество имплантов',
   'Снижение риска отторжения',
   'Увеличение лимита имплантов',
@@ -74,7 +90,8 @@ const FEATURE_SECTION_TITLES = [
   'Развитие патчфамильяра',
   'Иджра',
   'Эффекты Слияния',
-  'Цена Слияния'
+  'Цена Слияния',
+  'Бросок имплантов'
 ]
 
 function tableCells(line) {
@@ -245,6 +262,101 @@ const visibleClassSpells = computed(() => classSpellList.value.filter(spell => {
   if (props.state.classFilterTouched && props.state.classFeatureSource !== 'all' && spell.source !== props.state.classFeatureSource) return false
   return true
 }))
+const itemRolls = reactive({})
+const IMPLANT_BONES = [
+  { key: 'bunti', value: 1, label: 'Бунти' },
+  { key: 'ayur', value: 2, label: 'Аюр' },
+  { key: 'dodor', value: 3, label: 'Додор' },
+  { key: 'tahar', value: 4, label: 'Тахар' }
+]
+
+function itemRollKey(feature) {
+  return feature.id || `${feature.name}-${feature.itemsTitle || ''}`
+}
+
+function itemRollResult(feature) {
+  return itemRolls[itemRollKey(feature)] || null
+}
+
+function rollFeatureItem(feature) {
+  const items = feature.items || []
+  if (!items.length) return
+  if (feature.itemsRollMode === 'implants-4d4') {
+    const rolls = Array.from({ length: 4 }, () => Math.floor(Math.random() * 4) + 1)
+    const counts = IMPLANT_BONES.reduce((acc, bone) => {
+      acc[bone.key] = rolls.filter(value => value === bone.value).length
+      return acc
+    }, {})
+    const index = items.findIndex(item => implantRollMatches(item, counts))
+    const item = items[index] || items[0]
+    itemRolls[itemRollKey(feature)] = {
+      number: index >= 0 ? index + 1 : 1,
+      item,
+      dice: '4D4',
+      rolls,
+      counts
+    }
+    return
+  }
+  const index = Math.floor(Math.random() * items.length)
+  itemRolls[itemRollKey(feature)] = {
+    number: index + 1,
+    item: items[index]
+  }
+}
+
+function implantRollMatches(item, counts) {
+  const itemCounts = item.roll?.counts || {}
+  return IMPLANT_BONES.every(bone => Number(itemCounts[bone.key] || 0) === Number(counts[bone.key] || 0))
+}
+
+function implantBoneCount(item, bone) {
+  return Number(item.roll?.counts?.[bone.key] || 0)
+}
+
+function implantActiveBones(item) {
+  return IMPLANT_BONES.filter(bone => implantBoneCount(item, bone) > 0)
+}
+
+function implantRollCounts(result) {
+  return IMPLANT_BONES.map(bone => ({
+    ...bone,
+    count: Number(result?.counts?.[bone.key] || 0)
+  }))
+}
+
+function implantRollCombo(result) {
+  return implantRollCounts(result)
+    .filter(bone => bone.count)
+    .map(bone => `${bone.count}x ${bone.label}`)
+    .join(' · ')
+}
+
+function implantRollName(value) {
+  return IMPLANT_BONES.find(bone => bone.value === value)?.label || value
+}
+
+function implantParts(text) {
+  const lines = String(text || '').split('\n').map(line => line.trim()).filter(Boolean)
+  const meta = []
+  const levels = []
+  const notes = []
+  for (const line of lines) {
+    if (/^(Кости|Характеристики|Тип|Бонус|Провал)\s*:?\s*$/i.test(line)) continue
+    const level = line.match(/^Уровень\s+(\d+\+?)\s*:?\s*(.+)$/i)
+    if (level) {
+      levels.push({ level: `Уровень ${level[1]}`, text: level[2].trim() })
+      continue
+    }
+    const metaLine = line.match(/^(Создание импланта|Получение импланта|Вживление импланта)\s*:?\s*(.*)$/i)
+    if (metaLine) {
+      meta.push({ label: metaLine[1], value: metaLine[2] || 'не указано' })
+      continue
+    }
+    notes.push(line)
+  }
+  return { meta, levels, notes }
+}
 
 function selectClassTab(tab) {
   if (tab === 'filter') {
@@ -495,7 +607,7 @@ function scrollToClassFeature(featureId) {
             :class="{ active: state.classMode === 'archetype' && state.activeArchetype === arch.id }"
             @click="selectArchetype(arch.id)"
           >
-            {{ arch.name }}
+            {{ arch.name }}<template v-if="duplicateArchetypeNames.has(arch.name)"> · {{ arch.source }}</template>
           </button>
         </div>
         <div v-if="!vm.classHasArchetypes" class="cls-arch-empty">Подклассы для этого класса пока не добавлены.</div>
@@ -638,7 +750,7 @@ function scrollToClassFeature(featureId) {
             </div>
             <div class="cls-features-body">
               <div v-if="!visibleClassFeatures.length" class="cls-stub">По выбранным фильтрам умения не найдены.</div>
-              <details v-for="(f, i) in visibleClassFeatures" :id="`class-feature-${f.id}`" :key="f.id || i" class="cls-card cls-feature-card" :class="{ 'is-archetype-feature': f.isArchetype }" open>
+              <details v-for="(f, i) in visibleClassFeatures" :id="`class-feature-${f.id}`" :key="f.id || i" class="cls-card cls-feature-card" :class="{ 'is-archetype-feature': f.isArchetype }" :open="!f.itemsCollapsed">
                 <summary class="cls-feature-summary">
                   <span class="cls-feature-summary-main">
                     <span class="cls-feature-name">{{ f.name }}</span>
@@ -650,7 +762,7 @@ function scrollToClassFeature(featureId) {
                   </span>
                 </summary>
                 <div class="cls-feature-content">
-                  <div class="cls-feature-prose">
+                  <div class="cls-feature-prose" :class="{ 'is-option-list': f.name === 'Изменения плоти', 'is-weapon-link': f.name === 'Связь с оружием' }">
                     <template v-for="(block, bi) in featureBlocks(f.text)" :key="bi">
                       <section v-if="block.type === 'section'" class="cls-feature-section">
                         <h4>{{ block.title }}</h4>
@@ -668,7 +780,11 @@ function scrollToClassFeature(featureId) {
                       </div>
                       <ul v-else-if="block.type === 'list'" class="cls-feature-list">
                         <li v-for="(item, li) in block.items" :key="li">
-                          <template v-for="(part, pi) in inlineParts(item)" :key="pi">
+                          <template v-if="f.name === 'Изменения плоти'">
+                            <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
+                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span></template>
+                          </template>
+                          <template v-else v-for="(part, pi) in inlineParts(item)" :key="pi">
                             <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
                           </template>
                         </li>
@@ -700,22 +816,126 @@ function scrollToClassFeature(featureId) {
                         </table>
                       </div>
                       <p v-else>
-                        <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
+                        <template v-if="f.name === 'Связь с оружием'">
+                          <strong v-if="splitFeatureLead(block.text).lead" class="cls-dance-option">{{ splitFeatureLead(block.text).lead }}</strong>
+                          <template v-for="(part, pi) in inlineParts(splitFeatureLead(block.text).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span></template>
+                        </template>
+                        <template v-else v-for="(part, pi) in inlineParts(block.text)" :key="pi">
                           <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
                         </template>
                       </p>
                     </template>
                   </div>
                   <blockquote v-if="f.hasQuote" class="cls-arch-quote compact">{{ f.quote }}</blockquote>
-                  <details v-if="f.hasItems && f.itemsTitle" class="cls-arch-items-group" :open="!f.itemsCollapsed">
+                  <NuxtLink v-if="f.archetypeName === 'Школа Клыков' && (f.name === 'Импланты' || f.name === 'Список Имплантов')" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/implants">Открыть справочник 35 имплантов →</NuxtLink>
+                  <NuxtLink v-if="f.archetypeName === 'Школа Клыков' && f.name === 'Создание фамильяра: Сошид-е-Мута'" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/familiars">Создать патчфамильяра · 105 вариантов →</NuxtLink>
+                  <template v-if="f.hasItems && f.itemsTitle && f.name === f.itemsTitle">
+                    <div v-if="f.itemsRollTitle" class="cls-arch-roll" :class="{ implants: f.itemsRollMode === 'implants-4d4' }">
+                      <button type="button" class="cls-arch-roll-btn" :class="{ 'implant-roll-btn': f.itemsRollMode === 'implants-4d4' }" @click="rollFeatureItem(f)">
+                        <svg v-if="f.itemsRollMode === 'implants-4d4'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></svg>
+                        <span>{{ f.itemsRollMode === 'implants-4d4' ? 'Создать имплант · 4D4' : f.itemsRollTitle }}</span>
+                      </button>
+                      <div v-if="itemRollResult(f) && f.itemsRollMode === 'implants-4d4'" class="cls-arch-roll-result implant-result">
+                        <div class="cls-implant-dice-row">
+                          <span v-for="(roll, ri) in itemRollResult(f).rolls" :key="ri" class="cls-implant-die" :class="`bone-${IMPLANT_BONES[roll - 1]?.key}`"><b>{{ roll }}</b>{{ implantRollName(roll) }}</span>
+                          <span class="cls-implant-arrow">→</span>
+                          <span class="cls-implant-result-name">{{ itemRollResult(f).number }}. {{ itemRollResult(f).item.name }}</span>
+                        </div>
+                        <div class="cls-implant-result-card">
+                          <span class="rt-corner rt-corner-tl" aria-hidden="true" /><span class="rt-corner rt-corner-tr" aria-hidden="true" />
+                          <span class="rt-corner rt-corner-bl" aria-hidden="true" /><span class="rt-corner rt-corner-br" aria-hidden="true" />
+                          <div class="cls-implant-result-badges">
+                            <span class="cls-implant-pill"><span>Бросок</span><b>{{ itemRollResult(f).dice }}</b></span>
+                            <span class="cls-implant-tag">{{ implantRollCombo(itemRollResult(f)) }}</span>
+                          </div>
+                          <div class="cls-implant-result-title">{{ itemRollResult(f).item.name }}</div>
+                        </div>
+                      </div>
+                      <div v-else-if="itemRollResult(f)" class="cls-arch-roll-result">
+                        <strong>{{ itemRollResult(f).number }}</strong>
+                        <span>{{ itemRollResult(f).item.name }}</span>
+                      </div>
+                    </div>
+                    <div class="cls-arch-items roomy">
+                      <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="!f.itemsCollapsed">
+                        <summary>{{ item.name }}</summary>
+                        <div v-if="f.itemsRollMode === 'implants-4d4'" class="cls-implant-body">
+                          <div class="cls-implant-bones">
+                            <span v-for="bone in implantActiveBones(item)" :key="bone.key" :class="`bone-${bone.key}`">{{ bone.label }} × {{ implantBoneCount(item, bone) }}</span>
+                          </div>
+                          <div v-if="implantParts(item.text).meta.length" class="cls-implant-meta">
+                            <span v-for="meta in implantParts(item.text).meta" :key="meta.label"><strong>{{ meta.label }}</strong> {{ meta.value }}</span>
+                          </div>
+                          <div v-if="implantParts(item.text).levels.length" class="cls-implant-levels">
+                            <article v-for="level in implantParts(item.text).levels" :key="level.level">
+                              <strong>{{ level.level }}</strong>
+                              <p>
+                                <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                </template>
+                              </p>
+                            </article>
+                          </div>
+                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
+                        </div>
+                        <span v-else>{{ item.text }}</span>
+                      </details>
+                    </div>
+                  </template>
+                  <details v-else-if="f.hasItems && f.itemsTitle" class="cls-arch-items-group" :open="!f.itemsCollapsed">
                     <summary>
                       <span>{{ f.itemsTitle }}</span>
                       <small>{{ f.items.length }} в списке</small>
                     </summary>
+                    <div v-if="f.itemsRollTitle" class="cls-arch-roll" :class="{ implants: f.itemsRollMode === 'implants-4d4' }">
+                      <button type="button" class="cls-arch-roll-btn" :class="{ 'implant-roll-btn': f.itemsRollMode === 'implants-4d4' }" @click="rollFeatureItem(f)">
+                        <svg v-if="f.itemsRollMode === 'implants-4d4'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></svg>
+                        <span>{{ f.itemsRollMode === 'implants-4d4' ? 'Создать имплант · 4D4' : f.itemsRollTitle }}</span>
+                      </button>
+                      <div v-if="itemRollResult(f) && f.itemsRollMode === 'implants-4d4'" class="cls-arch-roll-result implant-result">
+                        <div class="cls-implant-dice-row">
+                          <span v-for="(roll, ri) in itemRollResult(f).rolls" :key="ri" class="cls-implant-die" :class="`bone-${IMPLANT_BONES[roll - 1]?.key}`"><b>{{ roll }}</b>{{ implantRollName(roll) }}</span>
+                          <span class="cls-implant-arrow">→</span>
+                          <span class="cls-implant-result-name">{{ itemRollResult(f).number }}. {{ itemRollResult(f).item.name }}</span>
+                        </div>
+                        <div class="cls-implant-result-card">
+                          <span class="rt-corner rt-corner-tl" aria-hidden="true" /><span class="rt-corner rt-corner-tr" aria-hidden="true" />
+                          <span class="rt-corner rt-corner-bl" aria-hidden="true" /><span class="rt-corner rt-corner-br" aria-hidden="true" />
+                          <div class="cls-implant-result-badges">
+                            <span class="cls-implant-pill"><span>Бросок</span><b>{{ itemRollResult(f).dice }}</b></span>
+                            <span class="cls-implant-tag">{{ implantRollCombo(itemRollResult(f)) }}</span>
+                          </div>
+                          <div class="cls-implant-result-title">{{ itemRollResult(f).item.name }}</div>
+                        </div>
+                      </div>
+                      <div v-else-if="itemRollResult(f)" class="cls-arch-roll-result">
+                        <strong>{{ itemRollResult(f).number }}</strong>
+                        <span>{{ itemRollResult(f).item.name }}</span>
+                      </div>
+                    </div>
                     <div class="cls-arch-items roomy">
                       <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="!f.itemsCollapsed">
                         <summary>{{ item.name }}</summary>
-                        <span>{{ item.text }}</span>
+                        <div v-if="f.itemsRollMode === 'implants-4d4'" class="cls-implant-body">
+                          <div class="cls-implant-bones">
+                            <span v-for="bone in implantActiveBones(item)" :key="bone.key" :class="`bone-${bone.key}`">{{ bone.label }} × {{ implantBoneCount(item, bone) }}</span>
+                          </div>
+                          <div v-if="implantParts(item.text).meta.length" class="cls-implant-meta">
+                            <span v-for="meta in implantParts(item.text).meta" :key="meta.label"><strong>{{ meta.label }}</strong> {{ meta.value }}</span>
+                          </div>
+                          <div v-if="implantParts(item.text).levels.length" class="cls-implant-levels">
+                            <article v-for="level in implantParts(item.text).levels" :key="level.level">
+                              <strong>{{ level.level }}</strong>
+                              <p>
+                                <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                </template>
+                              </p>
+                            </article>
+                          </div>
+                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
+                        </div>
+                        <span v-else>{{ item.text }}</span>
                       </details>
                     </div>
                   </details>
@@ -907,7 +1127,7 @@ function scrollToClassFeature(featureId) {
                     <span class="cls-badge" :title="sourceTitle(arch.source, arch.sourceFullName)">{{ arch.source }}</span>
                     <span class="cls-feature-lvl">{{ feature.level }}</span>
                   </div>
-                  <div class="cls-feature-prose compact">
+                  <div class="cls-feature-prose compact" :class="{ 'is-option-list': feature.name === 'Изменения плоти', 'is-weapon-link': feature.name === 'Связь с оружием' }">
                     <template v-for="(block, bi) in featureBlocks(feature.text)" :key="bi">
                       <section v-if="block.type === 'section'" class="cls-feature-section">
                         <h4>{{ block.title }}</h4>
@@ -923,7 +1143,11 @@ function scrollToClassFeature(featureId) {
                       </div>
                       <ul v-else-if="block.type === 'list'" class="cls-feature-list">
                         <li v-for="(item, li) in block.items" :key="li">
-                          <template v-for="(part, pi) in inlineParts(item)" :key="pi">
+                          <template v-if="feature.name === 'Изменения плоти'">
+                            <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
+                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span></template>
+                          </template>
+                          <template v-else v-for="(part, pi) in inlineParts(item)" :key="pi">
                             <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
                           </template>
                         </li>
@@ -955,21 +1179,125 @@ function scrollToClassFeature(featureId) {
                         </table>
                       </div>
                       <p v-else>
-                        <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
+                        <template v-if="feature.name === 'Связь с оружием'">
+                          <strong v-if="splitFeatureLead(block.text).lead" class="cls-dance-option">{{ splitFeatureLead(block.text).lead }}</strong>
+                          <template v-for="(part, pi) in inlineParts(splitFeatureLead(block.text).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span></template>
+                        </template>
+                        <template v-else v-for="(part, pi) in inlineParts(block.text)" :key="pi">
                           <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
                         </template>
                       </p>
                     </template>
                   </div>
-                  <details v-if="feature.hasItems && feature.itemsTitle" class="cls-arch-items-group" :open="!feature.itemsCollapsed">
+                  <NuxtLink v-if="feature.archetypeName === 'Школа Клыков' && (feature.name === 'Импланты' || feature.name === 'Список Имплантов')" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/implants">Все правила и 35 имплантов в едином справочнике →</NuxtLink>
+                  <NuxtLink v-if="feature.archetypeName === 'Школа Клыков' && feature.name === 'Создание фамильяра: Сошид-е-Мута'" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/familiars">Создать патчфамильяра · малый, средний или большой →</NuxtLink>
+                  <template v-if="feature.hasItems && feature.itemsTitle && feature.name === feature.itemsTitle">
+                    <div v-if="feature.itemsRollTitle" class="cls-arch-roll" :class="{ implants: feature.itemsRollMode === 'implants-4d4' }">
+                      <button type="button" class="cls-arch-roll-btn" :class="{ 'implant-roll-btn': feature.itemsRollMode === 'implants-4d4' }" @click="rollFeatureItem(feature)">
+                        <svg v-if="feature.itemsRollMode === 'implants-4d4'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></svg>
+                        <span>{{ feature.itemsRollMode === 'implants-4d4' ? 'Создать имплант · 4D4' : feature.itemsRollTitle }}</span>
+                      </button>
+                      <div v-if="itemRollResult(feature) && feature.itemsRollMode === 'implants-4d4'" class="cls-arch-roll-result implant-result">
+                        <div class="cls-implant-dice-row">
+                          <span v-for="(roll, ri) in itemRollResult(feature).rolls" :key="ri" class="cls-implant-die" :class="`bone-${IMPLANT_BONES[roll - 1]?.key}`"><b>{{ roll }}</b>{{ implantRollName(roll) }}</span>
+                          <span class="cls-implant-arrow">→</span>
+                          <span class="cls-implant-result-name">{{ itemRollResult(feature).number }}. {{ itemRollResult(feature).item.name }}</span>
+                        </div>
+                        <div class="cls-implant-result-card">
+                          <span class="rt-corner rt-corner-tl" aria-hidden="true" /><span class="rt-corner rt-corner-tr" aria-hidden="true" />
+                          <span class="rt-corner rt-corner-bl" aria-hidden="true" /><span class="rt-corner rt-corner-br" aria-hidden="true" />
+                          <div class="cls-implant-result-badges">
+                            <span class="cls-implant-pill"><span>Бросок</span><b>{{ itemRollResult(feature).dice }}</b></span>
+                            <span class="cls-implant-tag">{{ implantRollCombo(itemRollResult(feature)) }}</span>
+                          </div>
+                          <div class="cls-implant-result-title">{{ itemRollResult(feature).item.name }}</div>
+                        </div>
+                      </div>
+                      <div v-else-if="itemRollResult(feature)" class="cls-arch-roll-result">
+                        <strong>{{ itemRollResult(feature).number }}</strong>
+                        <span>{{ itemRollResult(feature).item.name }}</span>
+                      </div>
+                    </div>
+                    <div class="cls-arch-items roomy">
+                      <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="!feature.itemsCollapsed">
+                        <summary>{{ item.name }}</summary>
+                        <div v-if="feature.itemsRollMode === 'implants-4d4'" class="cls-implant-body">
+                          <div class="cls-implant-bones">
+                            <span v-for="bone in implantActiveBones(item)" :key="bone.key" :class="`bone-${bone.key}`">{{ bone.label }} × {{ implantBoneCount(item, bone) }}</span>
+                          </div>
+                          <div v-if="implantParts(item.text).meta.length" class="cls-implant-meta">
+                            <span v-for="meta in implantParts(item.text).meta" :key="meta.label"><strong>{{ meta.label }}</strong> {{ meta.value }}</span>
+                          </div>
+                          <div v-if="implantParts(item.text).levels.length" class="cls-implant-levels">
+                            <article v-for="level in implantParts(item.text).levels" :key="level.level">
+                              <strong>{{ level.level }}</strong>
+                              <p>
+                                <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                </template>
+                              </p>
+                            </article>
+                          </div>
+                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
+                        </div>
+                        <span v-else>{{ item.text }}</span>
+                      </details>
+                    </div>
+                  </template>
+                  <details v-else-if="feature.hasItems && feature.itemsTitle" class="cls-arch-items-group" :open="!feature.itemsCollapsed">
                     <summary>
                       <span>{{ feature.itemsTitle }}</span>
                       <small>{{ feature.items.length }} в списке</small>
                     </summary>
+                    <div v-if="feature.itemsRollTitle" class="cls-arch-roll" :class="{ implants: feature.itemsRollMode === 'implants-4d4' }">
+                      <button type="button" class="cls-arch-roll-btn" :class="{ 'implant-roll-btn': feature.itemsRollMode === 'implants-4d4' }" @click="rollFeatureItem(feature)">
+                        <svg v-if="feature.itemsRollMode === 'implants-4d4'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></svg>
+                        <span>{{ feature.itemsRollMode === 'implants-4d4' ? 'Создать имплант · 4D4' : feature.itemsRollTitle }}</span>
+                      </button>
+                      <div v-if="itemRollResult(feature) && feature.itemsRollMode === 'implants-4d4'" class="cls-arch-roll-result implant-result">
+                        <div class="cls-implant-dice-row">
+                          <span v-for="(roll, ri) in itemRollResult(feature).rolls" :key="ri" class="cls-implant-die" :class="`bone-${IMPLANT_BONES[roll - 1]?.key}`"><b>{{ roll }}</b>{{ implantRollName(roll) }}</span>
+                          <span class="cls-implant-arrow">→</span>
+                          <span class="cls-implant-result-name">{{ itemRollResult(feature).number }}. {{ itemRollResult(feature).item.name }}</span>
+                        </div>
+                        <div class="cls-implant-result-card">
+                          <span class="rt-corner rt-corner-tl" aria-hidden="true" /><span class="rt-corner rt-corner-tr" aria-hidden="true" />
+                          <span class="rt-corner rt-corner-bl" aria-hidden="true" /><span class="rt-corner rt-corner-br" aria-hidden="true" />
+                          <div class="cls-implant-result-badges">
+                            <span class="cls-implant-pill"><span>Бросок</span><b>{{ itemRollResult(feature).dice }}</b></span>
+                            <span class="cls-implant-tag">{{ implantRollCombo(itemRollResult(feature)) }}</span>
+                          </div>
+                          <div class="cls-implant-result-title">{{ itemRollResult(feature).item.name }}</div>
+                        </div>
+                      </div>
+                      <div v-else-if="itemRollResult(feature)" class="cls-arch-roll-result">
+                        <strong>{{ itemRollResult(feature).number }}</strong>
+                        <span>{{ itemRollResult(feature).item.name }}</span>
+                      </div>
+                    </div>
                     <div class="cls-arch-items roomy">
                       <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="!feature.itemsCollapsed">
                         <summary>{{ item.name }}</summary>
-                        <span>{{ item.text }}</span>
+                        <div v-if="feature.itemsRollMode === 'implants-4d4'" class="cls-implant-body">
+                          <div class="cls-implant-bones">
+                            <span v-for="bone in implantActiveBones(item)" :key="bone.key" :class="`bone-${bone.key}`">{{ bone.label }} × {{ implantBoneCount(item, bone) }}</span>
+                          </div>
+                          <div v-if="implantParts(item.text).meta.length" class="cls-implant-meta">
+                            <span v-for="meta in implantParts(item.text).meta" :key="meta.label"><strong>{{ meta.label }}</strong> {{ meta.value }}</span>
+                          </div>
+                          <div v-if="implantParts(item.text).levels.length" class="cls-implant-levels">
+                            <article v-for="level in implantParts(item.text).levels" :key="level.level">
+                              <strong>{{ level.level }}</strong>
+                              <p>
+                                <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                </template>
+                              </p>
+                            </article>
+                          </div>
+                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
+                        </div>
+                        <span v-else>{{ item.text }}</span>
                       </details>
                     </div>
                   </details>
@@ -1232,6 +1560,12 @@ function scrollToClassFeature(featureId) {
 .cls-dice-group .cls-feature-list li{line-height:1.58}
 .cls-dance-option{display:inline;font-family:'Hanken Grotesk',sans-serif;font-size:.82em;font-weight:900;letter-spacing:.035em;color:rgba(var(--subclass-strong,244,224,170),.96);text-shadow:0 0 14px rgba(var(--subclass-accent,214,170,96),.12)}
 .cls-dance-option::after{content:' ';white-space:pre}
+.cls-feature-prose.is-option-list .cls-feature-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;padding:0;list-style:none}
+.cls-feature-prose.is-option-list .cls-feature-list li{position:relative;padding:13px 15px 13px 18px;border:1px solid rgba(var(--subclass-accent,214,170,96),.14);border-radius:9px;background:rgba(var(--subclass-accent,214,170,96),.035);line-height:1.5}
+.cls-feature-prose.is-option-list .cls-feature-list li::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:2px;background:rgba(var(--subclass-accent,214,170,96),.55)}
+.cls-feature-prose.is-option-list .cls-dance-option{display:block;margin-bottom:4px;font-size:.88em}
+.cls-feature-prose.is-weapon-link>p:has(.cls-dance-option){padding:13px 15px;border:1px solid rgba(var(--subclass-accent,214,170,96),.13);border-radius:9px;background:rgba(var(--subclass-accent,214,170,96),.03)}
+.cls-feature-prose.is-weapon-link>p:has(.cls-dance-option) .cls-dance-option{display:block;margin-bottom:5px;font-size:.88em}
 .cls-dice-heading{align-self:flex-start;border:1px solid rgba(var(--subclass-accent,214,170,96),.36);border-radius:999px;background:rgba(var(--subclass-accent,214,170,96),.12);padding:5px 11px;font-family:'Hanken Grotesk',sans-serif;font-size:12px;font-weight:900;line-height:1;letter-spacing:.12em;text-transform:uppercase;color:rgba(var(--subclass-strong,244,224,170),.96);box-shadow:0 0 18px rgba(var(--subclass-accent,214,170,96),.08)}
 .cls-feature-table-wrap{max-width:100%;overflow:auto;border:1px solid rgba(214,170,96,.18);border-radius:10px;background:rgba(7,8,12,.24)}
 .cls-feature-table{width:100%;border-collapse:collapse;font-family:'Hanken Grotesk',sans-serif;font-size:12.5px;line-height:1.45;color:rgba(226,230,244,.78)}
@@ -1262,6 +1596,48 @@ function scrollToClassFeature(featureId) {
 .cls-arch-items-group>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:14px 16px;font-family:'Cormorant Garamond',serif;font-size:22px;line-height:1.1;color:rgba(244,224,170,.96)}
 .cls-arch-items-group>summary small{font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.5);white-space:nowrap}
 .cls-arch-items-group .cls-arch-items{margin-top:0;padding:14px;border-top:1px solid rgba(214,170,96,.12)}
+.cls-arch-roll{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid rgba(214,170,96,.1);background:rgba(214,170,96,.035)}
+.cls-arch-roll-btn{border:1px solid rgba(214,170,96,.42);border-radius:999px;background:rgba(214,170,96,.1);padding:8px 13px;font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,224,170,.95);cursor:pointer}
+.cls-arch-roll-btn:hover{background:rgba(214,170,96,.18);border-color:rgba(244,224,170,.65)}
+.cls-arch-roll-result{display:flex;align-items:center;gap:9px;min-width:0;font-family:'Hanken Grotesk',sans-serif;font-size:12px;color:rgba(226,230,244,.78)}
+.cls-arch-roll-result strong{display:grid;place-items:center;min-width:24px;height:24px;border-radius:50%;background:rgba(214,170,96,.18);color:rgba(244,224,170,.96)}
+.cls-arch-roll-result span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cls-arch-roll.implants{display:flex;align-items:flex-start;gap:18px;padding:18px 18px 20px;background:linear-gradient(180deg,rgba(214,170,96,.055),rgba(255,255,255,.012));}
+.cls-arch-roll-btn.implant-roll-btn{display:inline-flex;align-items:center;gap:10px;border-radius:10px;padding:12px 22px;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;letter-spacing:.06em}
+.cls-arch-roll-btn.implant-roll-btn svg{width:20px;height:20px;flex:0 0 auto}
+.cls-arch-roll-result.implant-result{display:flex;flex-direction:column;gap:14px;flex:1;min-width:280px;font-family:'Hanken Grotesk',sans-serif;color:rgba(226,230,244,.78)}
+.cls-arch-roll-result.implant-result span{overflow:visible;text-overflow:clip;white-space:normal}
+.cls-implant-dice-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.cls-implant-die{display:inline-flex;align-items:baseline;gap:6px;border:1px solid rgba(214,170,96,.32);border-radius:8px;background:rgba(214,170,96,.08);padding:6px 12px;font-size:13px;font-weight:700;letter-spacing:.04em;color:rgba(20,15,10,.9)}
+.cls-implant-die b{font-size:16px;font-variant-numeric:tabular-nums;color:rgba(20,15,10,.95)}
+.cls-implant-arrow{color:rgba(214,170,96,.62);font-size:18px}
+.cls-implant-result-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;letter-spacing:.04em;color:rgba(246,248,255,.95)}
+.cls-implant-result-card{position:relative;padding:18px 20px 17px;border:1px solid rgba(214,170,96,.22);border-radius:10px;background:linear-gradient(180deg,rgba(214,170,96,.05),rgba(255,255,255,.008));}
+.rt-corner{position:absolute;width:14px;height:14px;pointer-events:none}
+.rt-corner-tl{top:6px;left:6px;border-top:1.5px solid rgba(214,170,96,.5);border-left:1.5px solid rgba(214,170,96,.5);border-radius:5px 0 0 0}
+.rt-corner-tr{top:6px;right:6px;border-top:1.5px solid rgba(214,170,96,.5);border-right:1.5px solid rgba(214,170,96,.5);border-radius:0 5px 0 0}
+.rt-corner-bl{bottom:6px;left:6px;border-bottom:1.5px solid rgba(214,170,96,.5);border-left:1.5px solid rgba(214,170,96,.5);border-radius:0 0 0 5px}
+.rt-corner-br{right:6px;bottom:6px;border-right:1.5px solid rgba(214,170,96,.5);border-bottom:1.5px solid rgba(214,170,96,.5);border-radius:0 0 5px 0}
+.cls-implant-result-badges{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px}
+.cls-implant-pill{display:inline-flex;align-items:baseline;gap:8px;border:1px solid rgba(214,170,96,.32);border-radius:999px;background:rgba(214,170,96,.08);padding:5px 13px}
+.cls-implant-pill span{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(214,170,96,.7)}
+.cls-implant-pill b{font-size:13px;font-weight:800;color:rgba(244,224,170,.9)}
+.cls-implant-tag{border:1px solid rgba(232,236,248,.12);border-radius:999px;padding:4px 10px;font-size:10px;font-weight:800;color:rgba(214,170,96,.82)}
+.cls-implant-result-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;line-height:1.2;letter-spacing:.035em;color:rgba(246,248,255,.95)}
+.cls-implant-bones{display:flex;flex-wrap:wrap;gap:6px}
+.cls-implant-bones span{display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:4px 7px;font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:rgba(20,15,10,.92)}
+.bone-bunti{background:rgba(216,104,82,.86);border-color:rgba(246,154,128,.7)!important}
+.bone-ayur{background:rgba(244,210,132,.9);border-color:rgba(255,229,163,.7)!important}
+.bone-dodor{background:rgba(166,149,205,.9);border-color:rgba(197,181,235,.72)!important}
+.bone-tahar{background:rgba(168,198,220,.9);border-color:rgba(201,225,242,.7)!important}
+.cls-implant-body{display:flex;flex-direction:column;gap:12px;margin-top:13px}
+.cls-implant-meta{display:flex;flex-wrap:wrap;gap:8px}
+.cls-implant-meta span{display:inline-flex;gap:7px;align-items:center;border:1px solid rgba(214,170,96,.15);border-radius:8px;background:rgba(214,170,96,.055);padding:7px 10px;font-family:'Hanken Grotesk',sans-serif;font-size:11px;line-height:1.25;color:rgba(226,230,244,.72)}
+.cls-implant-meta strong{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,224,170,.88)}
+.cls-implant-levels{display:flex;flex-direction:column;gap:8px}
+.cls-implant-levels article{display:grid;grid-template-columns:104px minmax(0,1fr);gap:12px;border-top:1px solid rgba(255,255,255,.07);padding-top:9px}
+.cls-implant-levels strong{font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,224,170,.9)}
+.cls-implant-levels p,.cls-implant-note{margin:0;font-family:'Cormorant Garamond',serif;font-size:16.5px;line-height:1.5;color:rgba(226,230,244,.78)}
 .cls-arch-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:16px}
 .cls-arch-items.roomy{display:flex;flex-direction:column;gap:12px}
 .cls-arch-item{display:block;border:1px solid rgba(214,170,96,.14);border-radius:10px;background:rgba(7,8,12,.2);padding:16px 18px}
@@ -1335,6 +1711,10 @@ function scrollToClassFeature(featureId) {
   .cls-open-arch.inline{grid-column:2 / -1;justify-self:start}
   .cls-subclass-body{padding:0 16px 18px 16px}
   .cls-arch-rule-row{grid-template-columns:1fr}
+  .cls-arch-roll.implants{flex-direction:column}
+  .cls-arch-roll-result.implant-result{min-width:0;width:100%}
+  .cls-implant-result-card{width:100%}
+  .cls-implant-levels article{grid-template-columns:1fr;gap:6px}
 }
 @media (max-width: 540px){
   .cls-build-summary{grid-template-columns:1fr}

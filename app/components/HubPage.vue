@@ -501,7 +501,7 @@ const vm = computed(() => {
   }
   const classFeatureItems = items => (items || []).map(item => {
     if (Array.isArray(item)) return { name: item[0], text: item[1] }
-    return { name: item.name, text: item.text }
+    return { name: item.name, text: item.text, roll: item.roll || null }
   }).filter(item => item.name)
   const classArchetypes = (cd.archetypes || []).map(a => ({
     ...a,
@@ -510,11 +510,14 @@ const vm = computed(() => {
       const id = classFeatureId(S.cls, a.id, f.name)
       return {
         ...f,
+        archetypeName: a.name,
         id,
         featureUrl: classFeatureUrl(id),
         rank: featureLevel(f.level),
-        hasItems: !!(f.items && f.items.length),
+        hasItems: a.name === 'Школа Клыков' && f.name === 'Импланты' ? false : !!(f.items && f.items.length),
         itemsTitle: f.itemsTitle || '',
+        itemsRollTitle: f.itemsRollTitle || '',
+        itemsRollMode: f.itemsRollMode || '',
         itemsCollapsed: !!f.itemsCollapsed,
         items: classFeatureItems(f.items)
       }
@@ -558,9 +561,11 @@ const vm = computed(() => {
       isArchetype: true,
       archetypeId: arch.id,
       archetypeName: arch.name,
-      hasItems: !!(f.items && f.items.length),
-      hasLongItems: !!(f.items && f.items.length > 3),
+      hasItems: arch.name === 'Школа Клыков' && f.name === 'Импланты' ? false : !!(f.items && f.items.length),
+      hasLongItems: arch.name === 'Школа Клыков' && f.name === 'Импланты' ? false : !!(f.items && f.items.length > 3),
       itemsTitle: f.itemsTitle || '',
+      itemsRollTitle: f.itemsRollTitle || '',
+      itemsRollMode: f.itemsRollMode || '',
       itemsCollapsed: !!f.itemsCollapsed,
       items: f.items || []
     })),

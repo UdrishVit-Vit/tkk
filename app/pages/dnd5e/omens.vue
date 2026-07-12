@@ -1,14 +1,13 @@
 <script setup>
-import { OMENS_5E, OMEN_TIERS, OMEN_TIER_LABEL, rollOmen } from '~/data/omens5e.js'
+import { OMENS_5E, OMEN_TIERS, OMEN_TIER_LABEL, OMEN_BY_SIG } from '~/data/omens5e.js'
 
 const search = ref('')
 const open = ref(null)
 const showFilter = ref(false)
 const active = reactive({ tier: [] })
-const result = ref(null)
 
-function doRoll() {
-  result.value = rollOmen()
+function resolveOmen(roll) {
+  return OMEN_BY_SIG[roll.sig.join(',')] || null
 }
 
 const query = computed(() => search.value.trim().toLowerCase())
@@ -90,21 +89,12 @@ useSeoMeta({
           </div>
         </details>
 
-        <button type="button" class="omens-roll-btn" @click="doRoll">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></svg>
-          Бросить знамение · 4к4
-        </button>
-
-        <div v-if="result" class="omens-result">
-          <div class="omens-dice">
-            <span v-for="(face, i) in result.faces" :key="i" class="omens-die">
-              <b>{{ result.dice[i] }}</b>{{ face }}
-            </span>
-            <span class="omens-arrow">→</span>
-            <span class="omens-result-name">{{ result.omen.num }}. {{ result.omen.title }}</span>
-          </div>
-          <OmenCard :omen="result.omen" framed />
-        </div>
+        <ShagaiRoll :resolve="resolveOmen" label="Бросить знамение · 4к4" hint="кости Шагай: 1 Бунти · 2 Аюр · 3 Додор · 4 Тахар">
+          <template #result="{ entry }">
+            <div class="omens-result-name">{{ entry.num }}. {{ entry.title }}</div>
+            <OmenCard :omen="entry" framed />
+          </template>
+        </ShagaiRoll>
       </div>
     </template>
 
