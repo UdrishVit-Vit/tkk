@@ -316,6 +316,27 @@ function mkMarker(x, y, s, open, th) {
   }
 }
 
+// An ember diamond that sits dim and flares as a spark passes over it, then
+// fades — delay/period phase-aligned to the travelling spark so the light
+// "runs" along the thread and kindles each knot in turn.
+function mkEmber(x, y, s, delay, period) {
+  return {
+    d: 'M '+x+' '+(y-s)+' L '+(x+s)+' '+y+' L '+x+' '+(y+s)+' L '+(x-s)+' '+y+' Z',
+    style: { stroke:'rgba(246,208,126,0.5)', strokeWidth:'1', fill:'rgba(238,190,98,0.9)', opacity:'0.08',
+      animation:'emberFlare '+period+'s ease-in-out '+delay+'s infinite both' }
+  }
+}
+
+// A slow travelling spark that crawls a closed thread path. Driven by the CSS
+// motion-path timeline (same clock as the embers, so ignition stays in sync).
+function mkSpark(d, dur, delay) {
+  return { r:2.6,
+    style:{ fill:'rgba(255,240,196,0.98)',
+      filter:'drop-shadow(0 0 6px rgba(246,208,126,0.95)) drop-shadow(0 0 12px rgba(236,196,120,0.7))',
+      offsetPath:"path('"+d+"')", offsetRotate:'0deg', offsetDistance:'0%',
+      animation:'sparkRun '+dur+'s linear '+delay+' infinite' } }
+}
+
 const CX = 'calc(50% + 34px)'
 
 // ---- view model: mirrors the prototype's renderVals() ----
@@ -325,7 +346,7 @@ const vm = computed(() => {
   const th = THEMES[S.theme] || THEMES.void
   const ink = th.ink + '0.92)'
   const inkHi = th.ink + '1)'
-  const nodes = [], connectors = [], markers = []
+  const nodes = [], connectors = [], markers = [], embers = [], sparks = []
   const sysObj = S.active ? SYSTEMS.find(s => s.id === S.active) : null
 
   if (S.view === 'home') {
@@ -404,11 +425,12 @@ const vm = computed(() => {
     if (sysObj.groups) {
       // ---- radial knot mandala: sections woven into one outer ring, group
       // hubs on an inner ring at their sections' mean angle. Threads run from
-      // the centre out through angular junctions, and an interlacing border
-      // braids the whole ring — a Tibetan woven knot rather than a plus/tree.
+      // the centre out through angular junctions, and one braided border ring
+      // ties the whole figure into a Tibetan woven knot. Two slow sparks crawl
+      // the ring and kindle an ember at each weave, which then fades.
       const G = sysObj.groups
       const squash = 0.9
-      const Rsec = 404, Rhub = 190, Rj = 300
+      const Rsec = 424, Rhub = 198, Rj = 312
       const P = (r, ang, sq) => [Math.round(Math.cos(ang)*r), Math.round(Math.sin(ang)*r*(sq==null?squash:sq))]
 
       const flat = []
@@ -423,42 +445,55 @@ const vm = computed(() => {
         mine.forEach(o => { vx += Math.cos(o.ang); vy += Math.sin(o.ang) })
         const hAng = Math.atan2(vy, vx)
         const [hx, hy] = P(Rhub, hAng)
-        // centre → hub spoke with a mid bead and a perpendicular thread-crossing tick
+        // centre → hub spoke, with a small perpendicular thread-crossing tick
         connectors.push(mkLink('M0 0 L '+hx+' '+hy, 'group', false, th))
-        const [mxh, myh] = P(Rhub*0.5, hAng)
-        markers.push(mkMarker(mxh, myh, 5, false, th))
-        const px = -Math.sin(hAng)*10, py = Math.cos(hAng)*10
-        connectors.push(mkLink('M '+Math.round(mxh-px)+' '+Math.round(myh-py)+' L '+Math.round(mxh+px)+' '+Math.round(myh+py), 'stub', false, th))
-        nodes.push(mkNode({ cx:CX, x:hx, y:hy, scale:1, opacity:1, color:inkHi, knot:50,
+        const [tx, ty] = P(Rhub*0.52, hAng)
+        const px = -Math.sin(hAng)*11, py = Math.cos(hAng)*11
+        connectors.push(mkLink('M '+Math.round(tx-px)+' '+Math.round(ty-py)+' L '+Math.round(tx+px)+' '+Math.round(ty+py), 'stub', false, th))
+        nodes.push(mkNode({ cx:CX, x:hx, y:hy, scale:1, opacity:1, color:inkHi, knot:64,
           label:g.name, sub:'', lsize:17, labelAbove:(hy<0), mask:nodeImg(g.name), onClick:null }, th))
 
-        // hub → each section: two angular segments through a ring junction, plus
-        // a short perpendicular stub — drafted, woven geometry.
-        mine.forEach((o, si) => {
+        // hub → each section: two angular segments through a ring junction.
+        mine.forEach((o) => {
           const isOpen = S.section === o.sec
           const [jx, jy] = P(Rj, o.ang)
           connectors.push(mkLink('M '+hx+' '+hy+' L '+jx+' '+jy+' L '+o.x+' '+o.y, 'section', isOpen, th))
-          markers.push(mkMarker(jx, jy, 3.4, false, th))
-          const dir = si % 2 ? 1 : -1
-          const spx = -Math.sin(o.ang)*12*dir, spy = Math.cos(o.ang)*12*dir
-          connectors.push(mkLink('M '+jx+' '+jy+' L '+Math.round(jx+spx)+' '+Math.round(jy+spy), 'stub', false, th))
-          const [bx, by] = P(Rsec-46, o.ang)
-          markers.push(mkMarker(bx, by, isOpen?6:4, isOpen, th))
-          nodes.push(mkNode({ cx:CX, x:o.x, y:o.y, scale:isOpen?1.2:1, opacity:1, color: isOpen?inkHi:ink, knot:60,
-            label:o.sec, sub:'', lsize:12, dense:true, wrap:true, labelAbove:(o.y<0), active:isOpen, mask:nodeImg(o.sec), onClick:() => openSection(o.sec) }, th))
+          nodes.push(mkNode({ cx:CX, x:o.x, y:o.y, scale:isOpen?1.16:1, opacity:1, color: isOpen?inkHi:ink, knot:78,
+            label:o.sec, sub:'', lsize:12.5, dense:true, wrap:true, labelAbove:(o.y<0), active:isOpen, mask:nodeImg(o.sec), onClick:() => openSection(o.sec) }, th))
         })
       })
 
-      // Woven border: braid adjacent ring sections with chevrons that alternately
-      // bow out and dip in, so the strands read as passing over and under —
-      // the endless-knot band that ties the whole ring into one figure.
+      // One closed braided border: through each ring node and an alternately
+      // out/in bowed midpoint — reads as strands passing over and under, and
+      // doubles as the motion path for the sparks.
+      const ringPts = []
       for (let i = 0; i < N; i++) {
-        const a = flat[i], b = flat[(i+1)%N]
+        ringPts.push({ x: flat[i].x, y: flat[i].y })
         const mAng = (-90 + (i+0.5)*(360/N)) * Math.PI/180
-        const [mx, my] = P(Rsec + (i%2 ? 34 : -16), mAng)
-        connectors.unshift(mkLink('M '+a.x+' '+a.y+' L '+mx+' '+my+' L '+b.x+' '+b.y, 'cross', false, th))
-        markers.push(mkMarker(mx, my, 3, false, th))
+        const [mx, my] = P(Rsec + (i%2 ? 40 : -18), mAng)
+        ringPts.push({ x: mx, y: my, ember: true })
       }
+      let ringD = 'M '+ringPts[0].x+' '+ringPts[0].y
+      const cum = [0]
+      for (let k = 1; k < ringPts.length; k++) {
+        const a = ringPts[k-1], b = ringPts[k]
+        cum.push(cum[k-1] + Math.hypot(b.x-a.x, b.y-a.y))
+        ringD += ' L '+b.x+' '+b.y
+      }
+      const first = ringPts[0], last = ringPts[ringPts.length-1]
+      const total = cum[cum.length-1] + Math.hypot(first.x-last.x, first.y-last.y)
+      ringD += ' Z'
+      connectors.unshift(mkLink(ringD, 'cross', false, th))
+
+      // Two sparks half a lap apart; each ember flares as either passes it.
+      const LAP = 46, HALF = LAP/2
+      ringPts.forEach((p, k) => {
+        if (!p.ember) return
+        const f = cum[k] / total
+        embers.push(mkEmber(p.x, p.y, 4, +((f*LAP) % HALF).toFixed(2), HALF))
+      })
+      sparks.push(mkSpark(ringD, LAP, '0s'))
+      sparks.push(mkSpark(ringD, LAP, (-HALF)+'s'))
     } else {
       const secs = sysObj.sections, pts = layoutPoints(secs.length), Rx = 360, Ry = 312
       secs.forEach((sec, i) => {
@@ -468,7 +503,7 @@ const vm = computed(() => {
           label:sec, sub:'', lsize:13, dense:secs.length>6, wrap:true, active:isOpen, mask:nodeImg(sec), onClick:() => openSection(sec) }, th))
       })
     }
-    nodes.unshift(mkNode({ cx:CX, x:0, y:0, scale:1.1, opacity:1, color:inkHi, knot:134,
+    nodes.unshift(mkNode({ cx:CX, x:0, y:0, scale:1.1, opacity:1, color:inkHi, knot:150,
       img:IMG[sysObj.id], label:sysObj.name, sub:sysObj.tag, lsize:25, active:true, onClick:() => recenter() }, th))
   }
 
@@ -697,7 +732,7 @@ const vm = computed(() => {
 
   return {
     th, ink, inkHi,
-    nodes, connectors, markers,
+    nodes, connectors, markers, embers, sparks,
     sysObj,
     isSystem: S.view !== 'home',
     activeName: sysObj ? sysObj.name : '',
@@ -788,6 +823,8 @@ function addBookmark() {
           </circle>
         </g>
         <path v-for="(m, i) in vm.markers" :key="'m'+i" :d="m.d" :style="m.style" />
+        <path v-for="(e, i) in vm.embers" :key="'e'+i" :d="e.d" :style="e.style" />
+        <circle v-for="(s, i) in vm.sparks" :key="'s'+i" cx="0" cy="0" :r="s.r" :style="s.style" />
       </g>
     </svg>
 
@@ -882,6 +919,8 @@ function addBookmark() {
 @keyframes ringTurn{to{transform:rotate(360deg)}}
 @keyframes knotTwinkle{0%,100%{opacity:.72;filter:brightness(.92)}50%{opacity:1;filter:brightness(1.34)}}
 @keyframes linePulse{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes emberFlare{0%{opacity:.08;filter:none}5%{opacity:1;filter:drop-shadow(0 0 6px rgba(246,208,126,.95))}26%{opacity:.08;filter:none}100%{opacity:.08;filter:none}}
+@keyframes sparkRun{from{offset-distance:0%}to{offset-distance:100%}}
 @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes popIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 
