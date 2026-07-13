@@ -4,6 +4,64 @@ import { SPELLS_5E, SPELL_LEVELS, SPELL_SCHOOLS, SPELL_TAGS, SPELL_SOURCES } fro
 const props = defineProps(['vm', 'state'])
 const emit = defineEmits(['up'])
 
+const CLASS_THREAD_CYCLE_MS = 45000
+const classWrapRef = ref(null)
+let classThreadResizeObserver
+let classThreadMutationObserver
+let classThreadSyncFrame
+
+function syncClassThreadAnimation() {
+  if (typeof window === 'undefined') return
+  window.cancelAnimationFrame(classThreadSyncFrame)
+  classThreadSyncFrame = window.requestAnimationFrame(() => {
+    const wrap = classWrapRef.value
+    if (!wrap) return
+
+    wrap.classList.remove('is-thread-ready')
+    const wrapRect = wrap.getBoundingClientRect()
+    const height = Math.max(wrapRect.height, 1)
+    const setDelay = (element, centerY) => {
+      const ratio = Math.min(1, Math.max(0, (centerY - wrapRect.top) / height))
+      element.style.setProperty('--cls-node-delay', `${ratio * CLASS_THREAD_CYCLE_MS}ms`)
+    }
+
+    const emblem = wrap.querySelector('.cls-emblem-box')
+    if (emblem) {
+      const rect = emblem.getBoundingClientRect()
+      setDelay(emblem, rect.top + rect.height / 2)
+    }
+    wrap.querySelectorAll('.cls-thread-node').forEach((node) => {
+      const rect = node.getBoundingClientRect()
+      setDelay(node, rect.top + 23)
+    })
+
+    // Force a shared animation origin after every layout change, so the spark
+    // and every knot remain phase-aligned even when collapsible blocks open.
+    void wrap.offsetWidth
+    wrap.classList.add('is-thread-ready')
+  })
+}
+
+onMounted(() => {
+  syncClassThreadAnimation()
+  if (typeof ResizeObserver !== 'undefined') {
+    classThreadResizeObserver = new ResizeObserver(syncClassThreadAnimation)
+    classThreadResizeObserver.observe(classWrapRef.value)
+  }
+  if (typeof MutationObserver !== 'undefined') {
+    classThreadMutationObserver = new MutationObserver(syncClassThreadAnimation)
+    classThreadMutationObserver.observe(classWrapRef.value, { childList: true, subtree: true })
+  }
+  window.addEventListener('resize', syncClassThreadAnimation)
+})
+
+onBeforeUnmount(() => {
+  classThreadResizeObserver?.disconnect()
+  classThreadMutationObserver?.disconnect()
+  window.removeEventListener('resize', syncClassThreadAnimation)
+  window.cancelAnimationFrame(classThreadSyncFrame)
+})
+
 const duplicateArchetypeNames = computed(() => {
   const counts = new Map()
   for (const archetype of props.vm.classArchetypes || []) counts.set(archetype.name, (counts.get(archetype.name) || 0) + 1)
@@ -471,13 +529,14 @@ function scrollToClassFeature(featureId) {
 
 <template>
   <div class="cls-page">
-    <div class="cls-wrap">
+    <div ref="classWrapRef" class="cls-wrap">
+      <span class="cls-thread-spark" aria-hidden="true" />
       <div class="cls-head">
         <NuxtLink class="cls-emblem-box" to="/dnd5e/classes" title="Вернуться к списку классов" aria-label="Вернуться к списку классов">
           <div class="cls-emblem-frame" />
           <div class="cls-emblem" :style="{ backgroundImage: `url(${vm.classEmblemUrl})` }" />
         </NuxtLink>
-        <div style="flex:1">
+        <div class="cls-heading">
           <nav class="cls-crumb" aria-label="Навигация">
             <NuxtLink to="/dnd5e">D&D 5e</NuxtLink>
             <span>/</span>
@@ -1366,27 +1425,54 @@ function scrollToClassFeature(featureId) {
   position:absolute;top:0;right:0;bottom:0;left:68px;z-index:58;overflow-y:auto;
   background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 300px),var(--t-bg);
 }
-.cls-wrap{max-width:1080px;margin:0 auto;padding:44px 56px 100px}
+.cls-wrap{
+  --cls-rail-left:61px;
+  --cls-thread-cycle:45s;
+  --cls-emblem-margin-left:-70px;
+  --cls-emblem-margin-right:35px;
+  max-width:1080px;
+  margin:0 auto;
+  padding:44px 56px 100px;
+}
 .cls-head{display:flex;align-items:center;gap:30px}
+.cls-heading{flex:1;min-width:0}
 .cls-crumb{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;font-size:11px;font-weight:750;letter-spacing:.16em;text-transform:uppercase;color:var(--t-faint)}
 .cls-crumb a{color:var(--t-gold-soft);text-decoration:none}
 .cls-crumb a:hover{color:#f4e0aa}
 
 /* Нить: одна прямая вертикаль по левому краю, от верха страницы до низа.
-   Эмблема класса нанизана на неё боком — левой вершиной ромба, перпендикулярно
-   линии; ниже нить идёт через ромбы-узлы с перемычками к каждому блоку */
+   Центр большой эмблемы класса лежит точно на нити; ниже она проходит через
+   центры малых ромбов-узлов с перемычками к каждому блоку. */
 .cls-wrap{position:relative}
-.cls-wrap::before{content:'';position:absolute;left:61px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--t-line) 60px,var(--t-line) 92%,transparent)}
+.cls-wrap::before{content:'';position:absolute;left:var(--cls-rail-left);top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--t-line) 60px,var(--t-line) 92%,transparent)}
+.cls-thread-spark{
+  position:absolute;
+  z-index:0;
+  left:var(--cls-rail-left);
+  top:0;
+  width:6px;
+  height:6px;
+  border-radius:1.5px;
+  background:#fff3c8;
+  box-shadow:0 0 5px #fff3c8,0 0 12px rgba(244,198,104,.92),0 0 22px rgba(214,170,96,.55);
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+.cls-wrap.is-thread-ready .cls-thread-spark{animation:cls-thread-spark-run var(--cls-thread-cycle) linear infinite}
 .cls-thread{position:relative;padding-left:30px}
 .cls-thread-node{position:relative}
 .cls-thread-node::before{content:'';position:absolute;left:-30px;top:18px;width:11px;height:11px;border:1px solid var(--t-gold);background:var(--t-bg);transform:rotate(45deg);z-index:1}
+.cls-wrap.is-thread-ready .cls-thread-node::before{animation:cls-thread-node-flare var(--cls-thread-cycle) linear var(--cls-node-delay,0s) infinite}
 /* перемычка нить → блок */
 .cls-thread-node::after{content:'';position:absolute;left:-19px;top:23px;width:19px;height:1px;background:var(--t-line)}
-.cls-emblem-box{position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px;margin-left:15px;border-radius:18px;text-decoration:none;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
+.cls-emblem-box{position:relative;z-index:1;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px;margin-left:var(--cls-emblem-margin-left);margin-right:var(--cls-emblem-margin-right);border-radius:18px;text-decoration:none;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
+.cls-emblem-box::before{content:'';position:absolute;z-index:0;width:120px;height:120px;border-radius:9px;background:var(--t-bg);transform:rotate(45deg)}
 .cls-emblem-box:hover{background:rgba(255,255,255,.025);box-shadow:0 0 0 1px rgba(214,170,96,.14),0 18px 44px rgba(0,0,0,.18);transform:translateY(-1px)}
 .cls-emblem-box:focus-visible{outline:2px solid rgba(244,224,170,.72);outline-offset:4px}
-.cls-emblem-frame{position:absolute;width:120px;height:120px;transform:rotate(45deg);border:1px solid rgba(214,170,96,.5);border-radius:9px;box-shadow:0 0 22px rgba(214,170,96,.18)}
-.cls-emblem{width:120px;height:120px;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 0 16px rgba(214,170,96,.3))}
+.cls-emblem-frame{position:absolute;z-index:1;width:120px;height:120px;transform:rotate(45deg);border:1px solid rgba(214,170,96,.5);border-radius:9px;box-shadow:0 0 22px rgba(214,170,96,.18)}
+.cls-wrap.is-thread-ready .cls-emblem-frame{animation:cls-emblem-flare var(--cls-thread-cycle) linear var(--cls-node-delay,0s) infinite}
+.cls-emblem{position:relative;z-index:2;width:120px;height:120px;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 0 16px rgba(214,170,96,.3))}
 .cls-eyebrow{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:rgba(226,230,244,.42)}
 .cls-title{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:rgba(246,248,255,.96);line-height:1}
 .cls-en{font-family:'Hanken Grotesk',sans-serif;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t-faint);margin-top:6px}
@@ -1719,11 +1805,33 @@ function scrollToClassFeature(featureId) {
 .cls-open-arch{margin-top:14px;border:1px solid rgba(214,170,96,.42);border-radius:999px;background:rgba(214,170,96,.1);color:rgba(244,224,170,.95);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:9px 14px;cursor:pointer}
 .cls-open-arch:hover{background:rgba(214,170,96,.18)}
 .cls-open-arch.ghost{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.025);color:rgba(226,230,244,.62)}
+@keyframes cls-thread-spark-run{
+  0%{top:0;opacity:0}
+  1.5%,97%{opacity:1}
+  100%{top:100%;opacity:0}
+}
+@keyframes cls-thread-node-flare{
+  0%{border-color:#fff0bd;background:#d6aa60;box-shadow:0 0 5px #fff0bd,0 0 14px rgba(214,170,96,.9)}
+  7%{border-color:rgba(244,224,170,.95);background:rgba(214,170,96,.7);box-shadow:0 0 10px rgba(214,170,96,.65)}
+  24%{border-color:var(--t-gold);background:var(--t-bg);box-shadow:none}
+  100%{border-color:var(--t-gold);background:var(--t-bg);box-shadow:none}
+}
+@keyframes cls-emblem-flare{
+  0%{border-color:#fff0bd;box-shadow:0 0 8px rgba(255,240,189,.9),0 0 30px rgba(214,170,96,.65)}
+  10%{border-color:rgba(244,224,170,.75);box-shadow:0 0 25px rgba(214,170,96,.35)}
+  28%{border-color:rgba(214,170,96,.5);box-shadow:0 0 22px rgba(214,170,96,.18)}
+  100%{border-color:rgba(214,170,96,.5);box-shadow:0 0 22px rgba(214,170,96,.18)}
+}
 @media (max-width: 820px){
-  .cls-wrap{padding:34px 22px 84px}
+  .cls-wrap{
+    --cls-rail-left:27px;
+    --cls-emblem-margin-left:-43px;
+    --cls-emblem-margin-right:20px;
+    padding:34px 22px 84px;
+  }
   .cls-head{align-items:flex-start;gap:18px}
   .cls-emblem-box{width:96px;height:96px}
-  .cls-emblem-frame,.cls-emblem{width:82px;height:82px}
+  .cls-emblem-box::before,.cls-emblem-frame,.cls-emblem{width:82px;height:82px}
   .cls-title{font-size:38px}
   .cls-grid2{grid-template-columns:1fr}
   .cls-build-top{grid-template-columns:1fr}
@@ -1761,5 +1869,10 @@ function scrollToClassFeature(featureId) {
 }
 @media (max-width: 540px){
   .cls-build-summary{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){
+  .cls-thread-spark{display:none}
+  .cls-wrap.is-thread-ready .cls-thread-node::before,
+  .cls-wrap.is-thread-ready .cls-emblem-frame{animation:none}
 }
 </style>
