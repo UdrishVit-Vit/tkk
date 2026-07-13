@@ -1372,18 +1372,17 @@ function scrollToClassFeature(featureId) {
 .cls-crumb a{color:var(--t-gold-soft);text-decoration:none}
 .cls-crumb a:hover{color:#f4e0aa}
 
-/* Нить: спускается сверху сквозь эмблему, чертёжным изломом уходит к левому
-   краю и идёт вниз через ромбы-узлы; от неё — перемычки к каждому блоку */
-.cls-emblem-box::after{content:'';position:absolute;left:50%;top:-44px;bottom:-45px;width:1px;margin-left:-.5px;background:linear-gradient(180deg,transparent,var(--t-line) 26%,var(--t-line));z-index:-1}
+/* Нить: одна прямая вертикаль по левому краю, от верха страницы до низа.
+   Эмблема класса нанизана на неё боком — левой вершиной ромба, перпендикулярно
+   линии; ниже нить идёт через ромбы-узлы с перемычками к каждому блоку */
+.cls-wrap{position:relative}
+.cls-wrap::before{content:'';position:absolute;left:61px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--t-line) 60px,var(--t-line) 92%,transparent)}
 .cls-thread{position:relative;padding-left:30px}
-.cls-thread::before{content:'';position:absolute;left:5px;top:15px;bottom:0;width:1px;background:linear-gradient(180deg,var(--t-line) 92%,transparent)}
-/* горизонтальное колено: от точки под эмблемой (x=75) к основной линии (x=5) */
-.cls-thread::after{content:'';position:absolute;left:5px;top:15px;width:71px;height:1px;background:var(--t-line)}
 .cls-thread-node{position:relative}
 .cls-thread-node::before{content:'';position:absolute;left:-30px;top:18px;width:11px;height:11px;border:1px solid var(--t-gold);background:var(--t-bg);transform:rotate(45deg);z-index:1}
 /* перемычка нить → блок */
 .cls-thread-node::after{content:'';position:absolute;left:-19px;top:23px;width:19px;height:1px;background:var(--t-line)}
-.cls-emblem-box{position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px;border-radius:18px;text-decoration:none;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
+.cls-emblem-box{position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px;margin-left:15px;border-radius:18px;text-decoration:none;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
 .cls-emblem-box:hover{background:rgba(255,255,255,.025);box-shadow:0 0 0 1px rgba(214,170,96,.14),0 18px 44px rgba(0,0,0,.18);transform:translateY(-1px)}
 .cls-emblem-box:focus-visible{outline:2px solid rgba(244,224,170,.72);outline-offset:4px}
 .cls-emblem-frame{position:absolute;width:120px;height:120px;transform:rotate(45deg);border:1px solid rgba(214,170,96,.5);border-radius:9px;box-shadow:0 0 22px rgba(214,170,96,.18)}
