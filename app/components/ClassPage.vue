@@ -470,22 +470,46 @@ function scrollToClassFeature(featureId) {
 </script>
 
 <template>
-  <div class="cls-page" :style="{ background: vm.th.bg }">
+  <div class="cls-page">
     <div class="cls-wrap">
       <div class="cls-head">
         <NuxtLink class="cls-emblem-box" to="/dnd5e/classes" title="Вернуться к списку классов" aria-label="Вернуться к списку классов">
-          <div class="cls-emblem-frame" :style="{ borderColor: vm.th.thread+'0.6)', boxShadow: '0 0 22px '+vm.th.glow+'0.25)' }" />
-          <div class="cls-emblem" :style="{ backgroundImage: `url(${vm.classEmblemUrl})`, filter: 'drop-shadow(0 0 16px '+vm.th.glow+'0.4))' }" />
+          <div class="cls-emblem-frame" />
+          <div class="cls-emblem" :style="{ backgroundImage: `url(${vm.classEmblemUrl})` }" />
         </NuxtLink>
         <div style="flex:1">
-          <div class="cls-eyebrow">{{ vm.classSub }}</div>
+          <nav class="cls-crumb" aria-label="Навигация">
+            <NuxtLink to="/dnd5e">D&D 5e</NuxtLink>
+            <span>/</span>
+            <NuxtLink to="/dnd5e/classes">Классы</NuxtLink>
+            <span>/</span>
+            <span>{{ vm.className }}</span>
+          </nav>
           <div class="cls-title">{{ vm.className }}</div>
           <div class="cls-en">{{ vm.classEn }}</div>
         </div>
-        <span class="cls-back" @click="closeClass">← к классам</span>
+        <div class="cls-icon-tools" aria-label="Инструменты страницы класса">
+          <button type="button" class="cls-icon-btn" title="Скопировать ссылку" @click="copyClassLink">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1"/></svg>
+          </button>
+          <button type="button" class="cls-icon-btn" title="Добавить в закладки" @click="bookmarkClass">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8z"/></svg>
+          </button>
+          <button type="button" class="cls-icon-btn" title="Открыть окно печати" @click="printClass">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V4h10v4"/><rect x="5" y="8" width="14" height="8" rx="1.5"/><path d="M8 14h8v6H8z"/></svg>
+          </button>
+          <button type="button" class="cls-icon-btn" title="Развернуть окно" @click="toggleFullscreen">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></svg>
+          </button>
+          <button type="button" class="cls-icon-btn close" title="Закрыть страницу класса" @click="closeClass">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
       </div>
 
-      <div class="cls-toolbar">
+      <div class="cls-thread">
+
+      <div class="cls-toolbar cls-thread-node">
         <div class="cls-section-tools">
           <button
             v-for="tab in CLASS_CARD_TABS"
@@ -497,13 +521,6 @@ function scrollToClassFeature(featureId) {
           >
             {{ tab.label }}
           </button>
-        </div>
-        <div class="cls-icon-tools" aria-label="Инструменты страницы класса">
-          <button type="button" class="cls-icon-btn" title="Скопировать ссылку" @click="copyClassLink">⧉</button>
-          <button type="button" class="cls-icon-btn" title="Добавить в закладки" @click="bookmarkClass">☆</button>
-          <button type="button" class="cls-icon-btn" title="Открыть окно печати" @click="printClass">⎙</button>
-          <button type="button" class="cls-icon-btn" title="Развернуть окно" @click="toggleFullscreen">⛶</button>
-          <button type="button" class="cls-icon-btn close" title="Закрыть страницу класса" @click="closeClass">×</button>
         </div>
         <span v-if="state.classToolMessage" class="cls-tool-message">{{ state.classToolMessage }}</span>
       </div>
@@ -589,7 +606,7 @@ function scrollToClassFeature(featureId) {
         </div>
       </Teleport>
 
-      <div class="cls-mode-panel">
+      <div class="cls-mode-panel cls-thread-node">
         <div class="cls-mode-top">
           <button
             type="button"
@@ -614,7 +631,7 @@ function scrollToClassFeature(featureId) {
         <div v-else-if="state.classFeatureSource !== 'all' && !sourceFilteredArchetypes.length" class="cls-arch-empty">Для источника {{ state.classFeatureSource }} подклассы не найдены.</div>
       </div>
 
-      <section class="cls-build-panel">
+      <section class="cls-build-panel cls-thread-node">
         <div class="cls-build-top">
           <div class="cls-build-main">
             <div class="cls-eyebrow">Текущая карточка</div>
@@ -1058,7 +1075,7 @@ function scrollToClassFeature(featureId) {
       <template v-if="vm.classHasRules">
 
         <template v-if="vm.classHasInfusions">
-          <div class="cls-collapsible" @click="state.infOpen = !state.infOpen">
+          <div class="cls-collapsible cls-thread-node" @click="state.infOpen = !state.infOpen">
             <span class="cls-chevron">{{ state.infOpen ? '▾' : '▸' }}</span>
             <span class="cls-collapsible-title">Список инфузий</span>
             <span class="cls-collapsible-hint">{{ state.infOpen ? '▾' : '▸' }} развернуть</span>
@@ -1076,7 +1093,7 @@ function scrollToClassFeature(featureId) {
         </template>
 
         <template v-if="vm.classHasInvocations">
-          <div class="cls-collapsible" @click="state.invOpen = !state.invOpen">
+          <div class="cls-collapsible cls-thread-node" @click="state.invOpen = !state.invOpen">
             <span class="cls-chevron">{{ state.invOpen ? '▾' : '▸' }}</span>
             <span class="cls-collapsible-title">Список таинственных воззваний</span>
             <span class="cls-collapsible-hint">{{ state.invOpen ? '▾' : '▸' }} развернуть</span>
@@ -1095,7 +1112,7 @@ function scrollToClassFeature(featureId) {
       <div v-else class="cls-stub">Полная таблица уровней и умения для класса «{{ vm.className }}» в подготовке.</div>
 
       <template v-if="vm.classHasArchetypes">
-        <div id="class-subclasses" class="cls-collapsible" @click="state.subclassesOpen = !state.subclassesOpen">
+        <div id="class-subclasses" class="cls-collapsible cls-thread-node" @click="state.subclassesOpen = !state.subclassesOpen">
           <span class="cls-chevron">{{ state.subclassesOpen ? '−' : '+' }}</span>
           <span class="cls-collapsible-title">Подклассы</span>
           <span class="cls-collapsible-hint">{{ state.subclassesOpen ? 'свернуть' : 'развернуть' }}</span>
@@ -1333,29 +1350,49 @@ function scrollToClassFeature(featureId) {
           </div>
         </div>
       </template>
+
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.cls-page{position:absolute;top:0;right:0;bottom:0;left:68px;z-index:58;overflow-y:auto}
-.cls-wrap{max-width:1080px;margin:0 auto;padding:56px 56px 100px}
+.cls-page{
+  --t-bg:#07080d;
+  --t-line:rgba(232,236,248,.12);
+  --t-muted:rgba(232,236,248,.58);
+  --t-faint:rgba(232,236,248,.38);
+  --t-gold:#d6aa60;
+  --t-gold-soft:rgba(244,224,170,.9);
+  position:absolute;top:0;right:0;bottom:0;left:68px;z-index:58;overflow-y:auto;
+  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 300px),var(--t-bg);
+}
+.cls-wrap{max-width:1080px;margin:0 auto;padding:44px 56px 100px}
 .cls-head{display:flex;align-items:center;gap:30px}
+.cls-crumb{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;font-size:11px;font-weight:750;letter-spacing:.16em;text-transform:uppercase;color:var(--t-faint)}
+.cls-crumb a{color:var(--t-gold-soft);text-decoration:none}
+.cls-crumb a:hover{color:#f4e0aa}
+
+/* Нить: вертикальная линия слева, каждый крупный блок — узел с ромбом */
+.cls-thread{position:relative;padding-left:30px}
+.cls-thread::before{content:'';position:absolute;left:5px;top:6px;bottom:0;width:1px;background:linear-gradient(180deg,var(--t-line) 92%,transparent)}
+.cls-thread-node{position:relative}
+.cls-thread-node::before{content:'';position:absolute;left:-30px;top:18px;width:11px;height:11px;border:1px solid var(--t-gold);background:var(--t-bg);transform:rotate(45deg);z-index:1}
 .cls-emblem-box{position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px;border-radius:18px;text-decoration:none;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
 .cls-emblem-box:hover{background:rgba(255,255,255,.025);box-shadow:0 0 0 1px rgba(214,170,96,.14),0 18px 44px rgba(0,0,0,.18);transform:translateY(-1px)}
 .cls-emblem-box:focus-visible{outline:2px solid rgba(244,224,170,.72);outline-offset:4px}
-.cls-emblem-frame{position:absolute;width:120px;height:120px;transform:rotate(45deg);border:1px solid;border-radius:9px}
-.cls-emblem{width:120px;height:120px;background-size:contain;background-repeat:no-repeat;background-position:center}
+.cls-emblem-frame{position:absolute;width:120px;height:120px;transform:rotate(45deg);border:1px solid rgba(214,170,96,.5);border-radius:9px;box-shadow:0 0 22px rgba(214,170,96,.18)}
+.cls-emblem{width:120px;height:120px;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 0 16px rgba(214,170,96,.3))}
 .cls-eyebrow{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:rgba(226,230,244,.42)}
-.cls-title{font-family:'Cormorant Garamond',serif;font-size:58px;letter-spacing:.04em;text-transform:uppercase;color:rgba(236,240,252,.97);line-height:1.02}
-.cls-en{font-family:'Hanken Grotesk',sans-serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:rgba(214,170,96,.85);margin-top:2px}
-.cls-back{flex:none;align-self:flex-start;font-family:'Hanken Grotesk',sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(226,230,244,.55);border:1px solid rgba(255,255,255,.16);border-radius:22px;padding:10px 18px;cursor:pointer}
-.cls-back:hover{background:rgba(255,255,255,.05)}
-.cls-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:26px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.018);padding:12px 14px}
+.cls-title{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:rgba(246,248,255,.96);line-height:1}
+.cls-en{font-family:'Hanken Grotesk',sans-serif;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t-faint);margin-top:6px}
+.cls-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:30px;padding:4px 0}
 .cls-icon-tools,.cls-section-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.cls-icon-btn{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:rgba(7,8,12,.32);color:rgba(226,230,244,.72);font-family:'Hanken Grotesk',sans-serif;font-size:16px;cursor:pointer;transition:all .18s}
-.cls-icon-btn:hover{border-color:rgba(214,170,96,.5);background:rgba(214,170,96,.12);color:rgba(244,224,170,.96)}
-.cls-icon-btn.close:hover{border-color:rgba(220,120,120,.45);background:rgba(220,120,120,.1);color:rgba(255,210,210,.95)}
+.cls-icon-tools{align-self:flex-start;padding-top:4px}
+.cls-icon-btn{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--t-line);border-radius:8px;background:transparent;color:var(--t-muted);cursor:pointer;transition:.16s ease}
+.cls-icon-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.cls-icon-btn:hover{border-color:rgba(214,170,96,.5);color:var(--t-gold-soft)}
+.cls-icon-btn.close:hover{border-color:rgba(220,120,120,.45);color:rgba(255,210,210,.95)}
 .cls-section-btn{min-height:34px;border:1px solid rgba(214,170,96,.28);border-radius:999px;background:rgba(214,170,96,.06);color:rgba(244,224,170,.88);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:0 13px;cursor:pointer}
 .cls-section-btn:hover,.cls-section-btn.active{background:rgba(214,170,96,.14);border-color:rgba(214,170,96,.5)}
 .cls-tool-message{font-family:'Hanken Grotesk',sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.48)}
@@ -1376,13 +1413,13 @@ function scrollToClassFeature(featureId) {
 .cls-filter-pill:hover{background:rgba(72,123,220,.82)}
 .cls-filter-pill.active{border-color:rgba(244,224,170,.75);background:rgba(214,170,96,.2);color:rgba(244,224,170,.98)}
 .cls-filter-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;padding:0 14px 14px}
-.cls-mode-panel{margin-top:34px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.018);padding:16px}
+.cls-mode-panel{margin-top:26px;padding:14px 0 4px;border-top:1px solid rgba(232,236,248,.06)}
 .cls-mode-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .cls-mode-btn{min-height:36px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(7,8,12,.32);color:rgba(226,230,244,.65);font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:0 16px;cursor:pointer;transition:all .18s}
 .cls-mode-btn:hover:not(:disabled){border-color:rgba(214,170,96,.45);color:rgba(244,224,170,.95)}
 .cls-mode-btn.active{border-color:rgba(214,170,96,.6);background:rgba(214,170,96,.13);color:rgba(244,224,170,.98)}
 .cls-mode-btn:disabled{opacity:.42;cursor:default}
-.cls-build-panel{--subclass-accent:126,196,184;--subclass-strong:151,220,207;display:flex;flex-direction:column;gap:16px;margin-top:18px;border:1px solid rgba(214,170,96,.18);border-radius:14px;background:linear-gradient(145deg,rgba(214,170,96,.065),rgba(255,255,255,.014) 54%,rgba(7,8,12,.18));box-shadow:0 22px 70px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04);padding:22px}
+.cls-build-panel{--subclass-accent:126,196,184;--subclass-strong:151,220,207;display:flex;flex-direction:column;gap:16px;margin-top:26px;border:1px solid rgba(232,236,248,.1);border-radius:12px;background:rgba(255,255,255,.012);padding:22px}
 .cls-build-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:22px;align-items:start}
 .cls-build-main h2{margin:6px 0 10px;font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1.05;letter-spacing:.03em;text-transform:uppercase;color:rgba(236,240,252,.96)}
 .cls-build-main p{max-width:760px;margin:0;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.56;color:rgba(226,230,244,.72)}
@@ -1578,7 +1615,8 @@ function scrollToClassFeature(featureId) {
 .cls-spell-table{margin-top:14px;border:1px solid rgba(214,170,96,.22);border-radius:10px;overflow:hidden;max-width:420px}
 .cls-spell-table-head{display:grid;grid-template-columns:130px 1fr;background:rgba(214,170,96,.12);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,224,170,.9)}
 .cls-spell-table-row{display:grid;grid-template-columns:130px 1fr;border-top:1px solid rgba(255,255,255,.05);font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(226,230,244,.82)}
-.cls-collapsible{display:flex;align-items:center;gap:14px;margin:46px 0 0;padding:18px 22px;border:1px solid rgba(214,170,96,.28);border-radius:14px;background:rgba(214,170,96,.06);cursor:pointer}
+.cls-collapsible{display:flex;align-items:center;gap:14px;margin:40px 0 0;padding:12px 2px;border-bottom:1px solid rgba(232,236,248,.08);cursor:pointer}
+.cls-collapsible.cls-thread-node::before{top:16px}
 .cls-table-toggle{margin:28px 0 10px;padding:12px 16px}
 .cls-collapsible:hover{background:rgba(255,255,255,.06)}
 .cls-chevron{font-family:'Cormorant Garamond',serif;font-size:14px;color:rgba(244,224,170,.9)}
