@@ -43,13 +43,13 @@ function listFor(slot) {
 
     <div class="wrath-block wrath-effect">
       <h3>Эффект</h3>
-      <p><RuleRichText :text="wrath.effect" /></p>
+      <p><RuleRichText :text="wrath.effect" :exclude-paths="wrath.linkExcludePaths" /></p>
     </div>
 
     <div v-if="listFor('effect')" class="wrath-list">
       <div v-for="item in listFor('effect').items" :key="item.name" class="wrath-list-item">
         <b>{{ item.name }}.</b>
-        <span><RuleRichText :text="item.text" /></span>
+        <span><RuleRichText :text="item.text" :exclude-paths="wrath.linkExcludePaths" /></span>
       </div>
     </div>
 
@@ -65,14 +65,14 @@ function listFor(slot) {
             :key="'c' + ri + '-' + ci"
             class="wrath-td"
             :class="{ first: ci === 0 }"
-          ><RuleRichText :text="cell" /></span>
+          ><RuleRichText :text="cell" :exclude-paths="wrath.linkExcludePaths" /></span>
         </template>
       </div>
     </div>
 
     <div class="wrath-block wrath-success">
       <h3>Успех</h3>
-      <p><RuleRichText :text="wrath.success" /></p>
+      <p><RuleRichText :text="wrath.success" :exclude-paths="wrath.linkExcludePaths" /></p>
     </div>
 
     <div v-if="tableFor('success')" class="wrath-table">
@@ -87,24 +87,24 @@ function listFor(slot) {
             :key="'c' + ri + '-' + ci"
             class="wrath-td"
             :class="{ first: ci === 0 }"
-          ><RuleRichText :text="cell" /></span>
+          ><RuleRichText :text="cell" :exclude-paths="wrath.linkExcludePaths" /></span>
         </template>
       </div>
     </div>
 
     <div v-for="block in blocksFor('success')" :key="block.title" class="wrath-extra wrath-extra-success">
       <div class="wrath-extra-title">{{ block.title }}</div>
-      <p><RuleRichText :text="block.text" /></p>
+      <p><RuleRichText :text="block.text" :exclude-paths="wrath.linkExcludePaths" /></p>
     </div>
 
     <div class="wrath-block wrath-fail">
       <h3>Провал</h3>
-      <p><RuleRichText :text="wrath.fail" /></p>
+      <p><RuleRichText :text="wrath.fail" :exclude-paths="wrath.linkExcludePaths" /></p>
     </div>
 
     <div v-for="block in blocksFor('fail')" :key="block.title" class="wrath-extra wrath-extra-fail">
       <div class="wrath-extra-title">{{ block.title }}</div>
-      <p><RuleRichText :text="block.text" /></p>
+      <p><RuleRichText :text="block.text" :exclude-paths="wrath.linkExcludePaths" /></p>
     </div>
   </div>
 </template>

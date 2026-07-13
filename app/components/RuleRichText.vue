@@ -3,10 +3,11 @@ import { tokenizeRuleText, getRuleTooltip } from '~/utils/ruleText5e.js'
 
 const props = defineProps({
   text: { type: String, required: true },
-  currentPath: { type: String, default: '' }
+  currentPath: { type: String, default: '' },
+  excludePaths: { type: Array, default: () => [] }
 })
 
-const tokens = computed(() => tokenizeRuleText(props.text, props.currentPath))
+const tokens = computed(() => tokenizeRuleText(props.text, props.currentPath, props.excludePaths))
 
 const tip = ref(null)
 let showTimer = null

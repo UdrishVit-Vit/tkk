@@ -123,18 +123,20 @@ export async function getRuleTooltip(path) {
 
 /**
  * Разбивает текст на токены: { type: 'text'|'link'|'adv'|'dis', text, path? }.
- * currentPath исключает ссылку правила на самого себя; на каждую цель — не более одной ссылки.
+ * currentPath исключает ссылку правила на самого себя, excludePaths — контекстно неверные
+ * совпадения; на каждую цель ставится не более одной ссылки.
  */
-export function tokenizeRuleText(text, currentPath = '') {
+export function tokenizeRuleText(text, currentPath = '', excludePaths = []) {
   if (!text) return []
   const index = compiled || compileIndex()
   const ranges = []
+  const contextualExcludes = new Set(excludePaths)
 
   // Раздел, внутри которого находится текущее правило: ссылка на него — шум.
   const ownSectionPath = currentPath.split('/').slice(0, 4).join('/')
 
   for (const entry of index) {
-    if (entry.path === currentPath || entry.path === ownSectionPath) continue
+    if (entry.path === currentPath || entry.path === ownSectionPath || contextualExcludes.has(entry.path)) continue
     const match = entry.rx.exec(text)
     if (!match) continue
     if (entry.capitalOnly && !/^[А-ЯЁ]/.test(match[0])) continue
