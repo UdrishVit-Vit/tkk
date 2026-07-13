@@ -634,7 +634,6 @@ function scrollToClassFeature(featureId) {
       <section class="cls-build-panel cls-thread-node">
         <div class="cls-build-top">
           <div class="cls-build-main">
-            <div class="cls-eyebrow">Текущая карточка</div>
             <h2>{{ activeBuildTitle }}</h2>
             <p>{{ activeBuildSummary }}</p>
             <div class="cls-build-meta">
@@ -1373,11 +1372,17 @@ function scrollToClassFeature(featureId) {
 .cls-crumb a{color:var(--t-gold-soft);text-decoration:none}
 .cls-crumb a:hover{color:#f4e0aa}
 
-/* Нить: вертикальная линия слева, каждый крупный блок — узел с ромбом */
+/* Нить: спускается сверху сквозь эмблему, чертёжным изломом уходит к левому
+   краю и идёт вниз через ромбы-узлы; от неё — перемычки к каждому блоку */
+.cls-emblem-box::after{content:'';position:absolute;left:50%;top:-44px;bottom:-45px;width:1px;margin-left:-.5px;background:linear-gradient(180deg,transparent,var(--t-line) 26%,var(--t-line));z-index:-1}
 .cls-thread{position:relative;padding-left:30px}
-.cls-thread::before{content:'';position:absolute;left:5px;top:6px;bottom:0;width:1px;background:linear-gradient(180deg,var(--t-line) 92%,transparent)}
+.cls-thread::before{content:'';position:absolute;left:5px;top:15px;bottom:0;width:1px;background:linear-gradient(180deg,var(--t-line) 92%,transparent)}
+/* горизонтальное колено: от точки под эмблемой (x=75) к основной линии (x=5) */
+.cls-thread::after{content:'';position:absolute;left:5px;top:15px;width:71px;height:1px;background:var(--t-line)}
 .cls-thread-node{position:relative}
 .cls-thread-node::before{content:'';position:absolute;left:-30px;top:18px;width:11px;height:11px;border:1px solid var(--t-gold);background:var(--t-bg);transform:rotate(45deg);z-index:1}
+/* перемычка нить → блок */
+.cls-thread-node::after{content:'';position:absolute;left:-19px;top:23px;width:19px;height:1px;background:var(--t-line)}
 .cls-emblem-box{position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px;border-radius:18px;text-decoration:none;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
 .cls-emblem-box:hover{background:rgba(255,255,255,.025);box-shadow:0 0 0 1px rgba(214,170,96,.14),0 18px 44px rgba(0,0,0,.18);transform:translateY(-1px)}
 .cls-emblem-box:focus-visible{outline:2px solid rgba(244,224,170,.72);outline-offset:4px}
@@ -1617,6 +1622,7 @@ function scrollToClassFeature(featureId) {
 .cls-spell-table-row{display:grid;grid-template-columns:130px 1fr;border-top:1px solid rgba(255,255,255,.05);font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(226,230,244,.82)}
 .cls-collapsible{display:flex;align-items:center;gap:14px;margin:40px 0 0;padding:12px 2px;border-bottom:1px solid rgba(232,236,248,.08);cursor:pointer}
 .cls-collapsible.cls-thread-node::before{top:16px}
+.cls-collapsible.cls-thread-node::after{top:21px}
 .cls-table-toggle{margin:28px 0 10px;padding:12px 16px}
 .cls-collapsible:hover{background:rgba(255,255,255,.06)}
 .cls-chevron{font-family:'Cormorant Garamond',serif;font-size:14px;color:rgba(244,224,170,.9)}
