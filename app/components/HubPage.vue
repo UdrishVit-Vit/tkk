@@ -316,6 +316,26 @@ function mkMarker(x, y, s, open, th) {
   }
 }
 
+// A drafted, "circuit-board" branch from A to B (the /dnd5e/races look):
+// two right-angle bends with an axis-aligned middle run, a short perpendicular
+// stub off the first bend, and a small knot bead at each bend. `i` varies the
+// bend fractions so sibling branches fan out instead of overlapping.
+function knotElbow(ax, ay, bx, by, i) {
+  const dx = bx-ax, dy = by-ay
+  const horizontal = Math.abs(dx) >= Math.abs(dy)
+  const f = 0.5 + (i % 3) * 0.06
+  const b1x = Math.round(ax + dx*(horizontal ? 0.42 : f))
+  const b1y = Math.round(ay + dy*(horizontal ? f : 0.42))
+  const b2x = Math.round(ax + dx*(horizontal ? 0.78 : f))
+  const b2y = Math.round(ay + dy*(horizontal ? f : 0.78))
+  const d = 'M '+ax+' '+ay+' L '+b1x+' '+b1y+' L '+b2x+' '+b2y+' L '+bx+' '+by
+  const T = 13
+  const stub = horizontal
+    ? 'M '+b1x+' '+b1y+' L '+b1x+' '+(b1y + (dy>=0?T:-T))
+    : 'M '+b1x+' '+b1y+' L '+(b1x + (dx>=0?T:-T))+' '+b1y
+  return { d, beads: [[b1x, b1y, 3.4], [b2x, b2y, 3]], stub }
+}
+
 // An ember diamond that sits dim and flares as a spark passes over it, then
 // fades — delay/period phase-aligned to the travelling spark so the light
 // "runs" along the thread and kindles each knot in turn.
@@ -330,9 +350,9 @@ function mkEmber(x, y, s, delay, period) {
 // A slow travelling spark that crawls a closed thread path. Driven by the CSS
 // motion-path timeline (same clock as the embers, so ignition stays in sync).
 function mkSpark(d, dur, delay) {
-  return { r:2.6,
-    style:{ fill:'rgba(255,240,196,0.98)',
-      filter:'drop-shadow(0 0 6px rgba(246,208,126,0.95)) drop-shadow(0 0 12px rgba(236,196,120,0.7))',
+  return { r:1.8,
+    style:{ fill:'rgba(255,240,200,0.9)',
+      filter:'drop-shadow(0 0 4px rgba(246,208,126,0.8)) drop-shadow(0 0 8px rgba(236,196,120,0.45))',
       offsetPath:"path('"+d+"')", offsetRotate:'0deg', offsetDistance:'0%',
       animation:'sparkRun '+dur+'s linear '+delay+' infinite' } }
 }
@@ -423,16 +443,14 @@ const vm = computed(() => {
     }
   } else if (sysObj) {
     if (sysObj.groups) {
-      // ---- geometric "knot of knots" lattice. The section knots sit on a ring;
-      // overlapping star polygons drawn through them cross one another, and every
-      // one of those threads terminates at a knot — so the lines themselves knit
-      // new lines that reach the nodes. Diameters run through the centre, which
-      // thus ties every opposite pair together. A brighter centre→hub→section
-      // hierarchy is laid over the faint web, and two sparks weave the {16/7}
-      // star, kindling each knot's gateway ember as they pass.
+      // ---- knot library. Section knots sit on a ring; every connection is a
+      // drafted "circuit-board" branch (the /dnd5e/races look) — right-angle
+      // bends, stub ticks and small knot beads — so the design lives in the
+      // threads between the nodes. One small, slow spark drifts a faint ring
+      // that laces the outer knots together.
       const G = sysObj.groups
       const squash = 0.94
-      const Rsec = 432, Rhub = 206
+      const Rsec = 432, Rhub = 210
       const P = (r, ang) => [Math.round(Math.cos(ang)*r), Math.round(Math.sin(ang)*r*squash)]
 
       const flat = []
@@ -440,55 +458,41 @@ const vm = computed(() => {
       const N = flat.length
       flat.forEach((o, i) => { o.ang = (-90 + i*(360/N)) * Math.PI/180 ;[o.x, o.y] = P(Rsec, o.ang) })
 
-      // Faint geometric web: overlapping star polygons through the ring knots.
-      const chord = (a, b) => 'M '+a.x+' '+a.y+' L '+b.x+' '+b.y
-      const addStar = (step) => {
-        const lim = (N % step === 0 && step === N/2) ? N/2 : N
-        for (let i = 0; i < lim; i++) connectors.push(mkLink(chord(flat[i], flat[(i+step)%N]), 'web', false, th))
-      }
-      addStar(4)   // four overlapping squares — the rosette lattice
-      addStar(6)   // two octagrams, filling the interstices
-      addStar(8)   // diameters through the centre: it binds every opposite pair
-
-      // {16/7} star as one continuous woven thread — the spark path, kindling a
-      // gateway ember set just inside each knot in the order the thread visits.
-      const order = []
-      for (let i = 0, v = 0; i < N; i++, v = (v + 7) % N) order.push(flat[v])
-      let weaveD = 'M '+order[0].x+' '+order[0].y
-      const cum = [0]
-      for (let k = 1; k < N; k++) { const a = order[k-1], b = order[k]; cum.push(cum[k-1] + Math.hypot(b.x-a.x, b.y-a.y)); weaveD += ' L '+b.x+' '+b.y }
-      const total = cum[N-1] + Math.hypot(order[0].x-order[N-1].x, order[0].y-order[N-1].y)
-      weaveD += ' Z'
-      connectors.unshift(mkLink(weaveD, 'web', false, th))
-
-      // Bright hierarchy over the web: centre → hub → section.
+      // centre → hub → section, each as a drafted circuit branch.
       G.forEach((g, gi) => {
         const mine = flat.filter(o => o.gi === gi)
         let vx = 0, vy = 0
         mine.forEach(o => { vx += Math.cos(o.ang); vy += Math.sin(o.ang) })
         const hAng = Math.atan2(vy, vx)
         const [hx, hy] = P(Rhub, hAng)
-        connectors.push(mkLink('M0 0 L '+hx+' '+hy, 'group', false, th))
+        const hub = knotElbow(0, 0, hx, hy, gi)
+        connectors.push(mkLink(hub.d, 'group', false, th))
+        connectors.push(mkLink(hub.stub, 'stub', false, th))
+        hub.beads.forEach(([bx, by, s]) => markers.push(mkMarker(bx, by, s, false, th)))
         nodes.push(mkNode({ cx:CX, x:hx, y:hy, scale:1, opacity:1, color:inkHi, knot:62,
           label:g.name, sub:'', lsize:17, labelAbove:(hy<0), mask:nodeImg(g.name), onClick:null }, th))
-        mine.forEach((o) => {
+        mine.forEach((o, si) => {
           const isOpen = S.section === o.sec
-          connectors.push(mkLink('M '+hx+' '+hy+' L '+o.x+' '+o.y, 'section', isOpen, th))
+          const br = knotElbow(hx, hy, o.x, o.y, si)
+          connectors.push(mkLink(br.d, 'section', isOpen, th))
+          connectors.push(mkLink(br.stub, 'stub', false, th))
+          br.beads.forEach(([bx, by, s]) => markers.push(mkMarker(bx, by, s, false, th)))
           nodes.push(mkNode({ cx:CX, x:o.x, y:o.y, scale:isOpen?1.16:1, opacity:1, color: isOpen?inkHi:ink, knot:78,
             label:o.sec, sub:'', lsize:12.5, dense:true, wrap:true, labelAbove:(o.y<0), active:isOpen, mask:nodeImg(o.sec), onClick:() => openSection(o.sec) }, th))
         })
       })
 
-      // Two sparks half a lap apart on the {16/7} weave; each knot's gateway
-      // ember flares as either spark threads through it, then fades.
-      const LAP = 54, HALF = LAP/2
-      order.forEach((o, k) => {
-        const f = cum[k] / total
-        const [gx, gy] = P(Rsec-46, o.ang)
-        embers.push(mkEmber(gx, gy, 4, +((f*LAP) % HALF).toFixed(2), HALF))
-      })
-      sparks.push(mkSpark(weaveD, LAP, '0s'))
-      sparks.push(mkSpark(weaveD, LAP, (-HALF)+'s'))
+      // Faint scalloped ring lacing the outer knots — the single spark's track.
+      let ringD = 'M '+flat[0].x+' '+flat[0].y
+      for (let i = 1; i <= N; i++) {
+        const a = flat[(i-1)%N], b = flat[i%N]
+        const mAng = (-90 + (i-0.5)*(360/N)) * Math.PI/180
+        const [mx, my] = P(Rsec + 16, mAng)
+        ringD += ' Q '+mx+' '+my+' '+b.x+' '+b.y
+      }
+      ringD += ' Z'
+      connectors.unshift(mkLink(ringD, 'web', false, th))
+      sparks.push(mkSpark(ringD, 78, '0s'))
     } else {
       const secs = sysObj.sections, pts = layoutPoints(secs.length), Rx = 360, Ry = 312
       secs.forEach((sec, i) => {
