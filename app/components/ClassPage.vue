@@ -34,7 +34,7 @@ function threadNodeYs(wrap, wrapTop) {
   const ys = []
   const emblem = wrap.querySelector('.cls-emblem-box')
   if (emblem) { const r = emblem.getBoundingClientRect(); ys.push({ el: emblem, y: r.top - wrapTop + r.height / 2 }) }
-  wrap.querySelectorAll('.cls-thread-node').forEach((n) => { const r = n.getBoundingClientRect(); ys.push({ el: n, y: r.top - wrapTop + 23 }) })
+  wrap.querySelectorAll('.cls-thread-node:not(.cls-feature-card)').forEach((n) => { const r = n.getBoundingClientRect(); ys.push({ el: n, y: r.top - wrapTop + 23 }) })
   return ys
 }
 
@@ -850,18 +850,16 @@ function scrollToClassFeature(featureId) {
             </div>
           </template>
 
-          <div class="cls-thread-node cls-node-wrap">
-          <section id="class-features" class="cls-class-features-panel">
-            <div class="cls-features-heading">
-              <div>
-                <div class="cls-eyebrow">Раздел класса</div>
-                <h3>Умения класса</h3>
-              </div>
-              <span class="cls-feature-count">{{ visibleClassFeatures.length }}</span>
+          <div id="class-features" class="cls-features-heading cls-thread-node">
+            <div>
+              <div class="cls-eyebrow">Раздел класса</div>
+              <h3>Умения класса</h3>
             </div>
-            <div class="cls-features-body">
+            <span class="cls-feature-count">{{ visibleClassFeatures.length }}</span>
+          </div>
+          <div class="cls-features-list">
               <div v-if="!visibleClassFeatures.length" class="cls-stub">По выбранным фильтрам умения не найдены.</div>
-              <details v-for="(f, i) in visibleClassFeatures" :id="`class-feature-${f.id}`" :key="f.id || i" class="cls-card cls-feature-card" :class="{ 'is-archetype-feature': f.isArchetype }" :open="!f.itemsCollapsed">
+              <details v-for="(f, i) in visibleClassFeatures" :id="`class-feature-${f.id}`" :key="f.id || i" class="cls-card cls-feature-card cls-thread-node" :class="{ 'is-archetype-feature': f.isArchetype }" :open="!f.itemsCollapsed">
                 <summary class="cls-feature-summary">
                   <span class="cls-feature-summary-main">
                     <span class="cls-feature-name">{{ f.name }}</span>
@@ -1085,8 +1083,6 @@ function scrollToClassFeature(featureId) {
                   </div>
                 </div>
               </details>
-            </div>
-          </section>
           </div>
         </template>
         </template>
@@ -1624,7 +1620,9 @@ function scrollToClassFeature(featureId) {
 .cls-class-table-panel{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(7,8,12,.24)}
 .cls-table-headline{border-bottom:1px solid rgba(255,255,255,.06)}
 .cls-class-features-panel{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.018),rgba(7,8,12,.24))}
-.cls-features-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:1px solid rgba(255,255,255,.06);padding:17px 18px 15px}
+.cls-features-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:1px solid rgba(232,236,248,.08);padding:8px 2px 12px}
+/* Умения: плоский список, каждое умение — узел на нити (ромб вместо коробки) */
+.cls-features-list{display:flex;flex-direction:column;gap:12px;margin-top:2px}
 .cls-features-heading h3{margin:4px 0 0;font-family:'Cormorant Garamond',serif;font-size:24px;letter-spacing:.08em;text-transform:uppercase;color:rgba(236,240,252,.94);font-weight:500}
 .cls-features-body{display:flex;flex-direction:column;gap:0;padding:20px 24px 26px}
 .cls-features-body .cls-stub{margin-top:0}
@@ -1687,6 +1685,10 @@ function scrollToClassFeature(featureId) {
 .cls-feature-name{font-family:'Cormorant Garamond',serif;font-size:27px;line-height:1.08;font-weight:500;letter-spacing:.035em;color:rgba(236,240,252,.96)}
 .cls-feature-card{position:relative;scroll-margin-top:24px;padding:0;overflow:hidden;border:1px solid rgba(214,170,96,.13);border-radius:12px;background:linear-gradient(145deg,rgba(214,170,96,.045),rgba(255,255,255,.012) 42%,rgba(6,8,12,.36));box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
 .cls-feature-card::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,rgba(214,170,96,.2),rgba(214,170,96,.72),rgba(214,170,96,.12));opacity:.9}
+/* карточка умения как узел нити: ромб на рельсе (перекрывает левую акцент-полосу) + перемычка */
+.cls-feature-card.cls-thread-node{overflow:visible}
+.cls-feature-card.cls-thread-node::before{inset:auto;left:-30px;top:19px;width:11px;height:11px;background:var(--t-bg);border:1px solid var(--t-gold);border-radius:0;transform:rotate(45deg);opacity:1;z-index:2}
+.cls-feature-card.cls-thread-node.is-archetype-feature::before{border-color:rgba(var(--subclass-accent),.85)}
 .cls-feature-card + .cls-feature-card{margin-top:14px}
 .cls-feature-card[open]{border-color:rgba(214,170,96,.24);background:linear-gradient(145deg,rgba(214,170,96,.06),rgba(255,255,255,.014) 48%,rgba(6,8,12,.32))}
 .cls-feature-card.is-archetype-feature{border-color:rgba(var(--subclass-accent),.24);background:linear-gradient(145deg,rgba(var(--subclass-accent),.06),rgba(255,255,255,.012) 44%,rgba(6,8,12,.34))}
