@@ -4,24 +4,20 @@ import { SPELLS_5E, SPELL_LEVELS, SPELL_SCHOOLS, SPELL_TAGS, SPELL_SOURCES } fro
 const props = defineProps(['vm', 'state'])
 const emit = defineEmits(['up'])
 
-// ---- Autonomous thread sparks -------------------------------------------
-// Sparks are NOT tied to layout changes: selecting a tab / archetype / opening
-// a block never spawns or restarts one. They appear on their own random
-// schedule, in varying counts, in a small palette of design-fitting colours,
-// and travel the rail either downward or upward — an independent life of their
-// own. As a spark passes a knot it briefly kindles it.
+// ---- Thread spark that slowly trails the cursor along the rail ----------
+// A single soft spark rides the left thread. It eases toward the cursor's
+// vertical position (never snaps — always a slow, lazy follow), and as it
+// drifts past a knot it briefly kindles it. Selecting tabs never touches it.
 const classWrapRef = ref(null)
+const classSparkRef = ref(null)
 const FLARE_MS = 700
-const SPARK_PALETTE = [
-  { core: '#fff3c8', glow: 'rgba(244,198,104,.9)',  ring: 'rgba(214,170,96,.5)'  }, // золото
-  { core: '#ffe6b0', glow: 'rgba(236,196,120,.85)', ring: 'rgba(214,170,96,.4)'  }, // янтарь
-  { core: '#fff8ea', glow: 'rgba(255,236,196,.85)', ring: 'rgba(214,170,96,.32)' }, // бледный
-  { core: '#cfe8d6', glow: 'rgba(143,190,154,.8)',  ring: 'rgba(143,190,154,.32)' }, // нефрит (успех)
-  { core: '#d9e0f6', glow: 'rgba(176,188,232,.8)',  ring: 'rgba(176,188,232,.32)' }  // барвинок
-]
 const sparkTimers = new Set()
-let spawnTimeout = null
-let sparksStopped = false
+let sparkRaf = null
+let sparkRunning = false
+let sparkTargetY = null
+let sparkCurrentY = null
+let sparkPrevY = null
+let sparkStopped = false
 
 function reducedMotion() {
   return typeof window !== 'undefined' && window.matchMedia
@@ -34,72 +30,69 @@ function kindle(el) {
   sparkTimers.add(id)
 }
 
-function spawnSpark() {
-  const wrap = classWrapRef.value
-  if (!wrap || sparksStopped) return
-  const wrapRect = wrap.getBoundingClientRect()
-  const height = Math.max(wrapRect.height, 1)
-  const up = Math.random() < 0.45
-  const dur = 8000 + Math.random() * 12000            // 8–20с, медленно
-  const pal = SPARK_PALETTE[Math.floor(Math.random() * SPARK_PALETTE.length)]
-  const size = (3.4 + Math.random() * 2.6).toFixed(1)
-  const from = up ? height + 14 : -14
-  const to = up ? -14 : height + 14
-
-  const spark = document.createElement('span')
-  spark.className = 'cls-spark'
-  spark.style.setProperty('--spark-core', pal.core)
-  spark.style.setProperty('--spark-glow', pal.glow)
-  spark.style.setProperty('--spark-ring', pal.ring)
-  spark.style.setProperty('--spark-size', size + 'px')
-  spark.style.setProperty('--spark-from', from + 'px')
-  spark.style.setProperty('--spark-to', to + 'px')
-  spark.style.animationDuration = dur + 'ms'
-  wrap.insertBefore(spark, wrap.firstChild)
-
-  // kindle each knot as the spark reaches its Y
-  const span = Math.abs(to - from)
-  const nodes = []
+function threadNodeYs(wrap, wrapTop) {
+  const ys = []
   const emblem = wrap.querySelector('.cls-emblem-box')
-  if (emblem) { const r = emblem.getBoundingClientRect(); nodes.push({ el: emblem, y: r.top - wrapRect.top + r.height / 2 }) }
-  wrap.querySelectorAll('.cls-thread-node').forEach((n) => { const r = n.getBoundingClientRect(); nodes.push({ el: n, y: r.top - wrapRect.top + 23 }) })
-  for (const node of nodes) {
-    const frac = Math.abs(node.y - from) / span
-    if (frac < 0 || frac > 1) continue
-    const id = window.setTimeout(() => { kindle(node.el); sparkTimers.delete(id) }, frac * dur)
-    sparkTimers.add(id)
-  }
-
-  const cleanup = window.setTimeout(() => { spark.remove(); sparkTimers.delete(cleanup) }, dur + 400)
-  sparkTimers.add(cleanup)
+  if (emblem) { const r = emblem.getBoundingClientRect(); ys.push({ el: emblem, y: r.top - wrapTop + r.height / 2 }) }
+  wrap.querySelectorAll('.cls-thread-node').forEach((n) => { const r = n.getBoundingClientRect(); ys.push({ el: n, y: r.top - wrapTop + 23 }) })
+  return ys
 }
 
-function scheduleSpawn(initial) {
-  if (sparksStopped) return
-  const gap = initial ? (2500 + Math.random() * 4500) : (3500 + Math.random() * 13000)
-  spawnTimeout = window.setTimeout(() => {
-    if (sparksStopped) return
-    const r = Math.random()
-    const count = r < 0.12 ? 3 : (r < 0.4 ? 2 : 1)   // иногда густо, чаще по одной
-    for (let i = 0; i < count; i++) {
-      const id = window.setTimeout(spawnSpark, i * (500 + Math.random() * 2200))
-      sparkTimers.add(id)
+function ensureSparkLoop() {
+  if (sparkRunning || sparkStopped) return
+  sparkRunning = true
+  sparkRaf = requestAnimationFrame(sparkTick)
+}
+
+function sparkTick() {
+  const wrap = classWrapRef.value
+  const spark = classSparkRef.value
+  if (!wrap || !spark) { sparkRunning = false; return }
+  const wrapRect = wrap.getBoundingClientRect()
+  const height = Math.max(wrapRect.height, 1)
+  if (sparkTargetY == null) sparkTargetY = height * 0.14
+  if (sparkCurrentY == null) { sparkCurrentY = sparkTargetY; sparkPrevY = sparkTargetY; spark.classList.add('is-live') }
+
+  const diff = sparkTargetY - sparkCurrentY
+  sparkCurrentY += diff * 0.05                         // медленный ленивый догон
+  const y = Math.max(0, Math.min(height, sparkCurrentY))
+  spark.style.transform = `translateY(${y}px) rotate(45deg)`
+
+  // kindle knots the spark drifts past
+  const lo = Math.min(sparkPrevY, y), hi = Math.max(sparkPrevY, y)
+  if (hi - lo > 0.5) {
+    for (const node of threadNodeYs(wrap, wrapRect.top)) {
+      if (node.y >= lo && node.y <= hi) kindle(node.el)
     }
-    scheduleSpawn(false)
-  }, gap)
+  }
+  sparkPrevY = y
+
+  if (Math.abs(diff) < 0.4) { sparkRunning = false; return }   // осел — стоп до движения курсора
+  sparkRaf = requestAnimationFrame(sparkTick)
+}
+
+function onSparkPointerMove(e) {
+  const wrap = classWrapRef.value
+  if (!wrap) return
+  const r = wrap.getBoundingClientRect()
+  sparkTargetY = Math.max(0, Math.min(r.height, e.clientY - r.top))
+  ensureSparkLoop()
 }
 
 onMounted(() => {
   if (typeof window === 'undefined' || reducedMotion()) return
-  scheduleSpawn(true)
+  window.addEventListener('pointermove', onSparkPointerMove, { passive: true })
+  ensureSparkLoop()
 })
 
 onBeforeUnmount(() => {
-  sparksStopped = true
-  if (spawnTimeout) window.clearTimeout(spawnTimeout)
+  sparkStopped = true
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('pointermove', onSparkPointerMove)
+    if (sparkRaf) cancelAnimationFrame(sparkRaf)
+  }
   for (const id of sparkTimers) window.clearTimeout(id)
   sparkTimers.clear()
-  classWrapRef.value?.querySelectorAll('.cls-spark').forEach((s) => s.remove())
 })
 
 const duplicateArchetypeNames = computed(() => {
@@ -570,6 +563,7 @@ function scrollToClassFeature(featureId) {
 <template>
   <div class="cls-page">
     <div ref="classWrapRef" class="cls-wrap">
+      <span ref="classSparkRef" class="cls-spark" aria-hidden="true" />
       <div class="cls-head">
         <NuxtLink class="cls-emblem-box" to="/dnd5e/classes" title="Вернуться к списку классов" aria-label="Вернуться к списку классов">
           <div class="cls-emblem-frame" />
@@ -1483,32 +1477,26 @@ function scrollToClassFeature(featureId) {
    центры малых ромбов-узлов с перемычками к каждому блоку. */
 .cls-wrap{position:relative}
 .cls-wrap::before{content:'';position:absolute;left:var(--cls-rail-left);top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--t-line) 60px,var(--t-line) 92%,transparent)}
-/* Автономная искра: создаётся из JS, едет по рельсу вниз или вверх */
+/* Искра на нити: единственная, transform (позицию Y) задаёт JS — она лениво
+   тянется за курсором по рельсу */
 .cls-spark{
   position:absolute;
   z-index:0;
   left:var(--cls-rail-left);
   top:0;
-  width:var(--spark-size,4px);
-  height:var(--spark-size,4px);
-  margin-left:calc(var(--spark-size,4px) / -2);
+  width:5px;
+  height:5px;
+  margin-left:-2.5px;
   border-radius:1.5px;
-  background:var(--spark-core,#fff3c8);
-  box-shadow:0 0 4px var(--spark-core,#fff3c8),0 0 11px var(--spark-glow,rgba(244,198,104,.9)),0 0 20px var(--spark-ring,rgba(214,170,96,.5));
+  background:#fff3c8;
+  box-shadow:0 0 4px #fff3c8,0 0 11px rgba(244,198,104,.9),0 0 20px rgba(214,170,96,.5);
   opacity:0;
   pointer-events:none;
-  transform:translateY(var(--spark-from,-14px)) rotate(45deg);
-  animation-name:cls-spark-travel;
-  animation-timing-function:linear;
-  animation-fill-mode:forwards;
-  will-change:transform,opacity;
+  transform:translateY(-20px) rotate(45deg);
+  transition:opacity .8s ease;
+  will-change:transform;
 }
-@keyframes cls-spark-travel{
-  0%{transform:translateY(var(--spark-from,-14px)) rotate(45deg);opacity:0}
-  6%{opacity:1}
-  94%{opacity:1}
-  100%{transform:translateY(var(--spark-to,100%)) rotate(45deg);opacity:0}
-}
+.cls-spark.is-live{opacity:.9}
 .cls-thread{position:relative;padding-left:30px}
 .cls-thread-node{position:relative}
 .cls-thread-node::before{content:'';position:absolute;left:-30px;top:18px;width:11px;height:11px;border:1px solid var(--t-gold);background:var(--t-bg);transform:rotate(45deg);z-index:1}
