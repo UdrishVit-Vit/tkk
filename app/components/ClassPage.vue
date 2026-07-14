@@ -95,6 +95,54 @@ onBeforeUnmount(() => {
   sparkTimers.clear()
 })
 
+// ---- Right-edge scrubber -------------------------------------------------
+// A diamond thumb on its own thread at the right edge. Drag it up/down to
+// scroll the page. While it is held, the left-thread spark goes out and the
+// flame burns on the thumb instead; on release the spark returns.
+const classPageRef = ref(null)
+const scrubTrackRef = ref(null)
+const scrubDragging = ref(false)
+const scrubRatio = ref(0)
+
+function updateScrubFromScroll() {
+  const el = classPageRef.value
+  if (!el) return
+  const max = el.scrollHeight - el.clientHeight
+  scrubRatio.value = max > 0 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0
+}
+
+function scrubApplyClientY(clientY) {
+  const el = classPageRef.value
+  const track = scrubTrackRef.value
+  if (!el || !track) return
+  const r = track.getBoundingClientRect()
+  const ratio = Math.min(1, Math.max(0, (clientY - r.top) / Math.max(1, r.height)))
+  scrubRatio.value = ratio
+  el.scrollTop = ratio * (el.scrollHeight - el.clientHeight)
+}
+
+function onScrubDown(e) {
+  scrubDragging.value = true
+  scrubApplyClientY(e.clientY)
+  e.currentTarget?.setPointerCapture?.(e.pointerId)
+}
+function onScrubMove(e) {
+  if (!scrubDragging.value) return
+  scrubApplyClientY(e.clientY)
+}
+function onScrubUp() { scrubDragging.value = false }
+
+onMounted(() => {
+  const el = classPageRef.value
+  if (!el) return
+  el.addEventListener('scroll', updateScrubFromScroll, { passive: true })
+  updateScrubFromScroll()
+})
+
+onBeforeUnmount(() => {
+  classPageRef.value?.removeEventListener('scroll', updateScrubFromScroll)
+})
+
 const duplicateArchetypeNames = computed(() => {
   const counts = new Map()
   for (const archetype of props.vm.classArchetypes || []) counts.set(archetype.name, (counts.get(archetype.name) || 0) + 1)
@@ -561,9 +609,21 @@ function scrollToClassFeature(featureId) {
 </script>
 
 <template>
-  <div class="cls-page">
+  <div ref="classPageRef" class="cls-page">
+    <div
+      ref="scrubTrackRef"
+      class="cls-scrub"
+      :class="{ dragging: scrubDragging }"
+      title="Перетащите, чтобы прокрутить страницу"
+      @pointerdown="onScrubDown"
+      @pointermove="onScrubMove"
+      @pointerup="onScrubUp"
+      @pointercancel="onScrubUp"
+    >
+      <span class="cls-scrub-thumb" :style="{ top: (scrubRatio * 100) + '%' }" aria-hidden="true" />
+    </div>
     <div ref="classWrapRef" class="cls-wrap">
-      <span ref="classSparkRef" class="cls-spark" aria-hidden="true" />
+      <span ref="classSparkRef" class="cls-spark" :class="{ 'is-suppressed': scrubDragging }" aria-hidden="true" />
       <div class="cls-head">
         <NuxtLink class="cls-emblem-box" to="/dnd5e/classes" title="Вернуться к списку классов" aria-label="Вернуться к списку классов">
           <div class="cls-emblem-frame" />
@@ -1497,6 +1557,54 @@ function scrollToClassFeature(featureId) {
   will-change:transform;
 }
 .cls-spark.is-live{opacity:.9}
+.cls-spark.is-suppressed{opacity:0}
+
+/* Ползунок справа: своя нить + ромб-узел; тянешь — страница едет.
+   Пока схвачен — искра слева гаснет, огонь горит на ромбе. */
+.cls-page{scrollbar-width:none}
+.cls-page::-webkit-scrollbar{display:none}
+.cls-scrub{
+  position:fixed;
+  z-index:70;
+  right:14px;
+  top:110px;
+  bottom:110px;
+  width:22px;
+  cursor:grab;
+  touch-action:none;
+}
+.cls-scrub::before{
+  content:'';
+  position:absolute;
+  left:50%;
+  top:0;
+  bottom:0;
+  width:1px;
+  margin-left:-.5px;
+  background:linear-gradient(180deg,transparent,var(--t-line) 26px,var(--t-line) calc(100% - 26px),transparent);
+}
+.cls-scrub.dragging{cursor:grabbing}
+.cls-scrub-thumb{
+  position:absolute;
+  left:50%;
+  width:13px;
+  height:13px;
+  margin:-6.5px 0 0 -6.5px;
+  border:1px solid var(--t-gold);
+  background:var(--t-bg);
+  transform:rotate(45deg);
+  transition:box-shadow .25s ease,background .25s ease,border-color .25s ease;
+}
+.cls-scrub:hover .cls-scrub-thumb{border-color:rgba(244,224,170,.85);box-shadow:0 0 8px rgba(214,170,96,.35)}
+.cls-scrub.dragging .cls-scrub-thumb{
+  border-color:#fff0bd;
+  background:#d6aa60;
+  box-shadow:0 0 5px #fff3c8,0 0 13px rgba(244,198,104,.9),0 0 24px rgba(214,170,96,.55);
+}
+@media (max-width:820px){
+  .cls-scrub{display:none}
+  .cls-page{scrollbar-width:auto}
+}
 .cls-thread{position:relative;padding-left:30px}
 .cls-thread-node{position:relative}
 .cls-thread-node::before{content:'';position:absolute;left:-30px;top:18px;width:11px;height:11px;border:1px solid var(--t-gold);background:var(--t-bg);transform:rotate(45deg);z-index:1}
