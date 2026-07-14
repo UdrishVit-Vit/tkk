@@ -723,8 +723,8 @@ function scrollToClassFeature(featureId) {
         <div v-else-if="state.classFeatureSource !== 'all' && !sourceFilteredArchetypes.length" class="cls-arch-empty">Для источника {{ state.classFeatureSource }} подклассы не найдены.</div>
       </div>
 
-      <section class="cls-build-panel cls-thread-node">
-        <div class="cls-build-top">
+      <section class="cls-build-panel">
+        <div class="cls-build-top cls-thread-node">
           <div class="cls-build-main">
             <h2>{{ activeBuildTitle }}</h2>
             <p>{{ activeBuildSummary }}</p>
@@ -751,7 +751,7 @@ function scrollToClassFeature(featureId) {
           </button>
         </div>
 
-        <div id="class-overview" class="cls-rule-panels">
+        <div id="class-overview" class="cls-rule-panels cls-thread-node">
           <section class="cls-rule-panel wide">
             <button type="button" class="cls-rule-head" @click="state.classHitsOpen = !state.classHitsOpen">
               <span class="cls-rule-mark">{{ state.classHitsOpen ? '−' : '+' }}</span>
@@ -793,6 +793,7 @@ function scrollToClassFeature(featureId) {
         </div>
 
         <template v-if="vm.classHasRules">
+          <div class="cls-thread-node cls-node-wrap">
           <div id="class-table" class="cls-class-table-panel">
             <button type="button" class="cls-rule-head cls-table-headline" @click="state.classTableOpen = !state.classTableOpen">
               <span class="cls-rule-mark">{{ state.classTableOpen ? '−' : '+' }}</span>
@@ -830,9 +831,10 @@ function scrollToClassFeature(featureId) {
               </div>
             </div>
           </div>
+          </div>
 
           <template v-if="vm.classHasSelectedArchetype">
-            <div id="class-description" class="cls-subclass-description">
+            <div id="class-description" class="cls-subclass-description cls-thread-node">
               <div class="cls-subclass-description-head">
                 <div>
                   <div class="cls-eyebrow">{{ vm.classSelectedArchetypeDescription.type }} · {{ vm.classSelectedArchetypeDescription.source }}</div>
@@ -848,6 +850,7 @@ function scrollToClassFeature(featureId) {
             </div>
           </template>
 
+          <div class="cls-thread-node cls-node-wrap">
           <section id="class-features" class="cls-class-features-panel">
             <div class="cls-features-heading">
               <div>
@@ -1084,6 +1087,7 @@ function scrollToClassFeature(featureId) {
               </details>
             </div>
           </section>
+          </div>
         </template>
         </template>
 
@@ -1551,12 +1555,15 @@ function scrollToClassFeature(featureId) {
 .cls-mode-btn:hover:not(:disabled){border-color:rgba(214,170,96,.45);color:rgba(244,224,170,.95)}
 .cls-mode-btn.active{border-color:rgba(214,170,96,.6);background:rgba(214,170,96,.13);color:rgba(244,224,170,.98)}
 .cls-mode-btn:disabled{opacity:.42;cursor:default}
-.cls-build-panel{--subclass-accent:126,196,184;--subclass-strong:151,220,207;display:flex;flex-direction:column;gap:16px;margin-top:26px;border:1px solid rgba(232,236,248,.1);border-radius:12px;background:rgba(255,255,255,.012);padding:22px}
+/* Раскрытая карточка больше не бокс-в-боксе: это плоский поток секций, каждая
+   из которых висит узлом на левой нити (заголовок, обзор, таблица, умения). */
+.cls-build-panel{--subclass-accent:126,196,184;--subclass-strong:151,220,207;display:flex;flex-direction:column;gap:22px;margin-top:26px}
+.cls-node-wrap{position:relative}
 .cls-build-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:22px;align-items:start}
 .cls-build-main h2{margin:6px 0 10px;font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1.05;letter-spacing:.03em;text-transform:uppercase;color:rgba(236,240,252,.96)}
 .cls-build-main p{max-width:760px;margin:0;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.56;color:rgba(226,230,244,.72)}
 .cls-build-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,230,244,.46)}
-.cls-source-row{display:flex;flex-direction:column;align-items:flex-end;gap:9px;min-width:180px;border-left:1px solid rgba(214,170,96,.16);padding-left:20px}
+.cls-source-row{display:flex;flex-direction:column;align-items:flex-end;gap:9px;min-width:180px;padding-left:20px}
 .cls-source-row>span,.cls-summary-pill span{font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(226,230,244,.42)}
 .cls-source-row div{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
 .cls-mini-source{display:inline-flex;border-radius:6px;background:rgba(214,170,96,.85);color:rgba(20,15,6,.95);font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;letter-spacing:.08em;text-decoration:none;padding:4px 7px}
@@ -1591,9 +1598,9 @@ function scrollToClassFeature(featureId) {
 .cls-spell-tags{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 12px}
 .cls-spell-tags span{border:1px solid rgba(214,170,96,.18);border-radius:999px;background:rgba(214,170,96,.08);padding:4px 9px;font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(244,224,170,.82)}
 .cls-tab-content .cls-stub{margin-top:0}
-.cls-build-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.045)}
-.cls-summary-pill{display:flex;min-height:64px;flex-direction:column;justify-content:center;gap:6px;border:0;border-left:1px solid rgba(255,255,255,.06);background:rgba(7,8,12,.34);padding:12px 14px;text-align:left;cursor:pointer}
-.cls-summary-pill:first-child{border-left:0}
+.cls-build-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.cls-summary-pill{display:flex;min-height:64px;flex-direction:column;justify-content:center;gap:6px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(7,8,12,.34);padding:12px 14px;text-align:left;cursor:pointer}
+.cls-summary-pill:hover{border-color:rgba(214,170,96,.32)}
 .cls-summary-pill:hover{background:rgba(214,170,96,.08)}
 .cls-summary-pill strong{font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.1;color:rgba(244,224,170,.92);font-weight:600}
 .cls-rule-panels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
