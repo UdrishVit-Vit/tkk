@@ -1515,6 +1515,8 @@ function scrollToClassFeature(featureId) {
   --t-faint:rgba(232,236,248,.38);
   --t-gold:#d6aa60;
   --t-gold-soft:rgba(244,224,170,.9);
+  --cls-page-left:68px;
+  --cls-workspace-max:1080px;
   position:absolute;top:0;right:0;bottom:0;left:68px;z-index:58;overflow-y:auto;
   background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 300px),var(--t-bg);
 }
@@ -1522,7 +1524,7 @@ function scrollToClassFeature(featureId) {
   --cls-rail-left:61px;
   --cls-emblem-margin-left:-70px;
   --cls-emblem-margin-right:35px;
-  max-width:1080px;
+  max-width:var(--cls-workspace-max);
   margin:0 auto;
   padding:44px 56px 100px;
 }
@@ -1566,7 +1568,7 @@ function scrollToClassFeature(featureId) {
 .cls-scrub{
   position:fixed;
   z-index:70;
-  right:14px;
+  right:max(14px,calc((100vw - var(--cls-page-left) - var(--cls-workspace-max))/2 - 11px));
   top:110px;
   bottom:110px;
   width:22px;
