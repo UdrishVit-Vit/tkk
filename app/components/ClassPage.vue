@@ -4,62 +4,102 @@ import { SPELLS_5E, SPELL_LEVELS, SPELL_SCHOOLS, SPELL_TAGS, SPELL_SOURCES } fro
 const props = defineProps(['vm', 'state'])
 const emit = defineEmits(['up'])
 
-const CLASS_THREAD_CYCLE_MS = 45000
+// ---- Autonomous thread sparks -------------------------------------------
+// Sparks are NOT tied to layout changes: selecting a tab / archetype / opening
+// a block never spawns or restarts one. They appear on their own random
+// schedule, in varying counts, in a small palette of design-fitting colours,
+// and travel the rail either downward or upward — an independent life of their
+// own. As a spark passes a knot it briefly kindles it.
 const classWrapRef = ref(null)
-let classThreadResizeObserver
-let classThreadMutationObserver
-let classThreadSyncFrame
+const FLARE_MS = 700
+const SPARK_PALETTE = [
+  { core: '#fff3c8', glow: 'rgba(244,198,104,.9)',  ring: 'rgba(214,170,96,.5)'  }, // золото
+  { core: '#ffe6b0', glow: 'rgba(236,196,120,.85)', ring: 'rgba(214,170,96,.4)'  }, // янтарь
+  { core: '#fff8ea', glow: 'rgba(255,236,196,.85)', ring: 'rgba(214,170,96,.32)' }, // бледный
+  { core: '#cfe8d6', glow: 'rgba(143,190,154,.8)',  ring: 'rgba(143,190,154,.32)' }, // нефрит (успех)
+  { core: '#d9e0f6', glow: 'rgba(176,188,232,.8)',  ring: 'rgba(176,188,232,.32)' }  // барвинок
+]
+const sparkTimers = new Set()
+let spawnTimeout = null
+let sparksStopped = false
 
-function syncClassThreadAnimation() {
-  if (typeof window === 'undefined') return
-  window.cancelAnimationFrame(classThreadSyncFrame)
-  classThreadSyncFrame = window.requestAnimationFrame(() => {
-    const wrap = classWrapRef.value
-    if (!wrap) return
+function reducedMotion() {
+  return typeof window !== 'undefined' && window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
 
-    wrap.classList.remove('is-thread-ready')
-    const wrapRect = wrap.getBoundingClientRect()
-    const height = Math.max(wrapRect.height, 1)
-    const setDelay = (element, centerY) => {
-      const ratio = Math.min(1, Math.max(0, (centerY - wrapRect.top) / height))
-      element.style.setProperty('--cls-node-delay', `${ratio * CLASS_THREAD_CYCLE_MS}ms`)
+function kindle(el) {
+  el.classList.add('is-lit')
+  const id = window.setTimeout(() => { el.classList.remove('is-lit'); sparkTimers.delete(id) }, FLARE_MS)
+  sparkTimers.add(id)
+}
+
+function spawnSpark() {
+  const wrap = classWrapRef.value
+  if (!wrap || sparksStopped) return
+  const wrapRect = wrap.getBoundingClientRect()
+  const height = Math.max(wrapRect.height, 1)
+  const up = Math.random() < 0.45
+  const dur = 8000 + Math.random() * 12000            // 8–20с, медленно
+  const pal = SPARK_PALETTE[Math.floor(Math.random() * SPARK_PALETTE.length)]
+  const size = (3.4 + Math.random() * 2.6).toFixed(1)
+  const from = up ? height + 14 : -14
+  const to = up ? -14 : height + 14
+
+  const spark = document.createElement('span')
+  spark.className = 'cls-spark'
+  spark.style.setProperty('--spark-core', pal.core)
+  spark.style.setProperty('--spark-glow', pal.glow)
+  spark.style.setProperty('--spark-ring', pal.ring)
+  spark.style.setProperty('--spark-size', size + 'px')
+  spark.style.setProperty('--spark-from', from + 'px')
+  spark.style.setProperty('--spark-to', to + 'px')
+  spark.style.animationDuration = dur + 'ms'
+  wrap.insertBefore(spark, wrap.firstChild)
+
+  // kindle each knot as the spark reaches its Y
+  const span = Math.abs(to - from)
+  const nodes = []
+  const emblem = wrap.querySelector('.cls-emblem-box')
+  if (emblem) { const r = emblem.getBoundingClientRect(); nodes.push({ el: emblem, y: r.top - wrapRect.top + r.height / 2 }) }
+  wrap.querySelectorAll('.cls-thread-node').forEach((n) => { const r = n.getBoundingClientRect(); nodes.push({ el: n, y: r.top - wrapRect.top + 23 }) })
+  for (const node of nodes) {
+    const frac = Math.abs(node.y - from) / span
+    if (frac < 0 || frac > 1) continue
+    const id = window.setTimeout(() => { kindle(node.el); sparkTimers.delete(id) }, frac * dur)
+    sparkTimers.add(id)
+  }
+
+  const cleanup = window.setTimeout(() => { spark.remove(); sparkTimers.delete(cleanup) }, dur + 400)
+  sparkTimers.add(cleanup)
+}
+
+function scheduleSpawn(initial) {
+  if (sparksStopped) return
+  const gap = initial ? (2500 + Math.random() * 4500) : (3500 + Math.random() * 13000)
+  spawnTimeout = window.setTimeout(() => {
+    if (sparksStopped) return
+    const r = Math.random()
+    const count = r < 0.12 ? 3 : (r < 0.4 ? 2 : 1)   // иногда густо, чаще по одной
+    for (let i = 0; i < count; i++) {
+      const id = window.setTimeout(spawnSpark, i * (500 + Math.random() * 2200))
+      sparkTimers.add(id)
     }
-
-    const emblem = wrap.querySelector('.cls-emblem-box')
-    if (emblem) {
-      const rect = emblem.getBoundingClientRect()
-      setDelay(emblem, rect.top + rect.height / 2)
-    }
-    wrap.querySelectorAll('.cls-thread-node').forEach((node) => {
-      const rect = node.getBoundingClientRect()
-      setDelay(node, rect.top + 23)
-    })
-
-    // Force a shared animation origin after every layout change, so the spark
-    // and every knot remain phase-aligned even when collapsible blocks open.
-    void wrap.offsetWidth
-    wrap.classList.add('is-thread-ready')
-  })
+    scheduleSpawn(false)
+  }, gap)
 }
 
 onMounted(() => {
-  syncClassThreadAnimation()
-  if (typeof ResizeObserver !== 'undefined') {
-    classThreadResizeObserver = new ResizeObserver(syncClassThreadAnimation)
-    classThreadResizeObserver.observe(classWrapRef.value)
-  }
-  if (typeof MutationObserver !== 'undefined') {
-    classThreadMutationObserver = new MutationObserver(syncClassThreadAnimation)
-    classThreadMutationObserver.observe(classWrapRef.value, { childList: true, subtree: true })
-  }
-  window.addEventListener('resize', syncClassThreadAnimation)
+  if (typeof window === 'undefined' || reducedMotion()) return
+  scheduleSpawn(true)
 })
 
 onBeforeUnmount(() => {
-  classThreadResizeObserver?.disconnect()
-  classThreadMutationObserver?.disconnect()
-  window.removeEventListener('resize', syncClassThreadAnimation)
-  window.cancelAnimationFrame(classThreadSyncFrame)
+  sparksStopped = true
+  if (spawnTimeout) window.clearTimeout(spawnTimeout)
+  for (const id of sparkTimers) window.clearTimeout(id)
+  sparkTimers.clear()
+  classWrapRef.value?.querySelectorAll('.cls-spark').forEach((s) => s.remove())
 })
 
 const duplicateArchetypeNames = computed(() => {
@@ -530,7 +570,6 @@ function scrollToClassFeature(featureId) {
 <template>
   <div class="cls-page">
     <div ref="classWrapRef" class="cls-wrap">
-      <span class="cls-thread-spark" aria-hidden="true" />
       <div class="cls-head">
         <NuxtLink class="cls-emblem-box" to="/dnd5e/classes" title="Вернуться к списку классов" aria-label="Вернуться к списку классов">
           <div class="cls-emblem-frame" />
@@ -1427,7 +1466,6 @@ function scrollToClassFeature(featureId) {
 }
 .cls-wrap{
   --cls-rail-left:61px;
-  --cls-thread-cycle:45s;
   --cls-emblem-margin-left:-70px;
   --cls-emblem-margin-right:35px;
   max-width:1080px;
@@ -1445,25 +1483,41 @@ function scrollToClassFeature(featureId) {
    центры малых ромбов-узлов с перемычками к каждому блоку. */
 .cls-wrap{position:relative}
 .cls-wrap::before{content:'';position:absolute;left:var(--cls-rail-left);top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--t-line) 60px,var(--t-line) 92%,transparent)}
-.cls-thread-spark{
+/* Автономная искра: создаётся из JS, едет по рельсу вниз или вверх */
+.cls-spark{
   position:absolute;
   z-index:0;
   left:var(--cls-rail-left);
   top:0;
-  width:6px;
-  height:6px;
+  width:var(--spark-size,4px);
+  height:var(--spark-size,4px);
+  margin-left:calc(var(--spark-size,4px) / -2);
   border-radius:1.5px;
-  background:#fff3c8;
-  box-shadow:0 0 5px #fff3c8,0 0 12px rgba(244,198,104,.92),0 0 22px rgba(214,170,96,.55);
+  background:var(--spark-core,#fff3c8);
+  box-shadow:0 0 4px var(--spark-core,#fff3c8),0 0 11px var(--spark-glow,rgba(244,198,104,.9)),0 0 20px var(--spark-ring,rgba(214,170,96,.5));
   opacity:0;
   pointer-events:none;
-  transform:translate(-50%,-50%) rotate(45deg);
+  transform:translateY(var(--spark-from,-14px)) rotate(45deg);
+  animation-name:cls-spark-travel;
+  animation-timing-function:linear;
+  animation-fill-mode:forwards;
+  will-change:transform,opacity;
 }
-.cls-wrap.is-thread-ready .cls-thread-spark{animation:cls-thread-spark-run var(--cls-thread-cycle) linear infinite}
+@keyframes cls-spark-travel{
+  0%{transform:translateY(var(--spark-from,-14px)) rotate(45deg);opacity:0}
+  6%{opacity:1}
+  94%{opacity:1}
+  100%{transform:translateY(var(--spark-to,100%)) rotate(45deg);opacity:0}
+}
 .cls-thread{position:relative;padding-left:30px}
 .cls-thread-node{position:relative}
 .cls-thread-node::before{content:'';position:absolute;left:-30px;top:18px;width:11px;height:11px;border:1px solid var(--t-gold);background:var(--t-bg);transform:rotate(45deg);z-index:1}
-.cls-wrap.is-thread-ready .cls-thread-node::before{animation:cls-thread-node-flare var(--cls-thread-cycle) linear var(--cls-node-delay,0s) infinite}
+/* искра зажигает узел, проходя мимо */
+.cls-thread-node.is-lit::before{animation:cls-node-lit .7s ease-out}
+@keyframes cls-node-lit{
+  0%{border-color:#fff0bd;background:#d6aa60;box-shadow:0 0 6px #fff0bd,0 0 15px rgba(214,170,96,.9)}
+  100%{border-color:var(--t-gold);background:var(--t-bg);box-shadow:none}
+}
 /* перемычка нить → блок */
 .cls-thread-node::after{content:'';position:absolute;left:-19px;top:23px;width:19px;height:1px;background:var(--t-line)}
 .cls-emblem-box{position:relative;z-index:1;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px;margin-left:var(--cls-emblem-margin-left);margin-right:var(--cls-emblem-margin-right);border-radius:18px;text-decoration:none;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
@@ -1471,7 +1525,7 @@ function scrollToClassFeature(featureId) {
 .cls-emblem-box:hover{background:rgba(255,255,255,.025);box-shadow:0 0 0 1px rgba(214,170,96,.14),0 18px 44px rgba(0,0,0,.18);transform:translateY(-1px)}
 .cls-emblem-box:focus-visible{outline:2px solid rgba(244,224,170,.72);outline-offset:4px}
 .cls-emblem-frame{position:absolute;z-index:1;width:120px;height:120px;transform:rotate(45deg);border:1px solid rgba(214,170,96,.5);border-radius:9px;box-shadow:0 0 22px rgba(214,170,96,.18)}
-.cls-wrap.is-thread-ready .cls-emblem-frame{animation:cls-emblem-flare var(--cls-thread-cycle) linear var(--cls-node-delay,0s) infinite}
+.cls-emblem-box.is-lit .cls-emblem-frame{animation:cls-emblem-lit .7s ease-out}
 .cls-emblem{position:relative;z-index:2;width:120px;height:120px;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 0 16px rgba(214,170,96,.3))}
 .cls-eyebrow{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:rgba(226,230,244,.42)}
 .cls-title{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:rgba(246,248,255,.96);line-height:1}
@@ -1805,21 +1859,8 @@ function scrollToClassFeature(featureId) {
 .cls-open-arch{margin-top:14px;border:1px solid rgba(214,170,96,.42);border-radius:999px;background:rgba(214,170,96,.1);color:rgba(244,224,170,.95);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:9px 14px;cursor:pointer}
 .cls-open-arch:hover{background:rgba(214,170,96,.18)}
 .cls-open-arch.ghost{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.025);color:rgba(226,230,244,.62)}
-@keyframes cls-thread-spark-run{
-  0%{top:0;opacity:0}
-  1.5%,97%{opacity:1}
-  100%{top:100%;opacity:0}
-}
-@keyframes cls-thread-node-flare{
-  0%{border-color:#fff0bd;background:#d6aa60;box-shadow:0 0 5px #fff0bd,0 0 14px rgba(214,170,96,.9)}
-  7%{border-color:rgba(244,224,170,.95);background:rgba(214,170,96,.7);box-shadow:0 0 10px rgba(214,170,96,.65)}
-  24%{border-color:var(--t-gold);background:var(--t-bg);box-shadow:none}
-  100%{border-color:var(--t-gold);background:var(--t-bg);box-shadow:none}
-}
-@keyframes cls-emblem-flare{
+@keyframes cls-emblem-lit{
   0%{border-color:#fff0bd;box-shadow:0 0 8px rgba(255,240,189,.9),0 0 30px rgba(214,170,96,.65)}
-  10%{border-color:rgba(244,224,170,.75);box-shadow:0 0 25px rgba(214,170,96,.35)}
-  28%{border-color:rgba(214,170,96,.5);box-shadow:0 0 22px rgba(214,170,96,.18)}
   100%{border-color:rgba(214,170,96,.5);box-shadow:0 0 22px rgba(214,170,96,.18)}
 }
 @media (max-width: 820px){
@@ -1871,8 +1912,8 @@ function scrollToClassFeature(featureId) {
   .cls-build-summary{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion: reduce){
-  .cls-thread-spark{display:none}
-  .cls-wrap.is-thread-ready .cls-thread-node::before,
-  .cls-wrap.is-thread-ready .cls-emblem-frame{animation:none}
+  .cls-spark{display:none}
+  .cls-thread-node.is-lit::before,
+  .cls-emblem-box.is-lit .cls-emblem-frame{animation:none}
 }
 </style>
