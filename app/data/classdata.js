@@ -1,4 +1,5 @@
 import { CLASS_ARCHETYPES_IMPORTED } from './importedClassArchetypes.js'
+import { SHAMAN_CLASS_OVERRIDE } from './shamanOverride.js'
 
 // D&D class rules data for the class detail pages. CLASSDATA[name] → full record.
 let CLASSDATA;
@@ -489,7 +490,7 @@ let CLASSDATA;
     'Плут':       {en:'Rogue',       hd:8,  save:'Ловкость, Интеллект',  prim:'Ловкость'},
     'Следопыт':   {en:'Ranger',      hd:10, save:'Сила, Ловкость',       prim:'Ловкость и Мудрость'},
     'Чародей':    {en:'Sorcerer',    hd:6,  save:'Телосложение, Харизма',prim:'Харизма'},
-    'Шаман':      {en:'Shaman',      hd:8,  save:'Мудрость, Харизма',    prim:'Мудрость'}
+    'Шаман':      {en:'Shaman',      hd:8,  save:'Телосложение, Интеллект', prim:'Интеллект и Телосложение'}
   };
 
   const DATA = {};
@@ -1717,6 +1718,8 @@ let CLASSDATA;
     features: sorcFeatures
   });
 
+  Object.assign(DATA['Шаман'], SHAMAN_CLASS_OVERRIDE);
+
   function archetypeKey(name) {
     return String(name || '')
       .toLocaleLowerCase('ru')
@@ -1730,6 +1733,7 @@ let CLASSDATA;
   for (const [className, importedArchetypes] of Object.entries(CLASS_ARCHETYPES_IMPORTED)) {
     if (!DATA[className]) continue
     if (className === 'Бард') continue
+    if (className === 'Шаман') continue
     const existing = DATA[className].archetypes || []
     const importList = className === 'Варвар'
       ? importedArchetypes.filter(archetype => archetypeKey(archetype.name).includes('мастодонт'))

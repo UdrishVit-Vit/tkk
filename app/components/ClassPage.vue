@@ -196,11 +196,71 @@ function spellTagNames(tags = []) {
   return tags.map(tag => SPELL_TAGS[tag] || tag).filter(Boolean)
 }
 
+function isAnzuPatron(name) {
+  return name === 'Потусторонний покровитель Анзу'
+}
+
 function featureParagraphs(text) {
   return String(text || '').split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
 }
 
 const FEATURE_SECTION_TITLES = [
+  'Гнев Ильбеша',
+  'Разрушение укрытия',
+  'Ул, Величайший Глад',
+  'Ту, Глад Разума',
+  'Хаз, Иссушающий Глад',
+  'Юл, Жестокий Глад',
+  'Кет, Смеющийся Глад',
+  'Гог, Тихий Глад',
+  'Продолжительный отдых',
+  'Короткий отдых',
+  'Дыхание Сумуга',
+  'Могущество Древних',
+  'Затронутый Вуалью',
+  'Сияние Улунгуров',
+  'Первозданный',
+  'Бессмертная Искра',
+  'Пожиратели',
+  'Ограничения',
+  'Правосудие Ула',
+  'Власть Ту',
+  'Утроба Хаза',
+  'Жестокость Юл',
+  'Дикость Кет',
+  'Безмолвие Гог',
+  'Количество использований',
+  'Размер Кости Вуали',
+  'Другие источники',
+  'На Эфирном плане',
+  'Возвращение',
+  'Порыв Вуали',
+  'Поглощение',
+  'Преобразование',
+  'Множитель цены, за который вы продаёте товар, равен: 2.',
+  'Множитель цены, за который вы продаёте товар, равен: 3.',
+  'Множитель цены, за который вы продаёте товар, равен: 4.',
+  'Множитель цены, за который вы продаёте товар, равен: 5.',
+  'Цена продажи',
+  'Фразы силы',
+  'Типы существ',
+  'Слово Граара',
+  'Слово Раагра',
+  'Удар безмолвия',
+  'Изрекание секрета',
+  'Прилив',
+  'Разжигание Искры',
+  'Сокрушение',
+  'Барьер Вуали',
+  'Изгиб нити',
+  'Шаг стихий',
+  'Фальшивая жизнь',
+  'Знание знамений',
+  'Воля кочевника',
+  'Пример',
+  'Использование Кости Вуали',
+  'Резонанс Вуали',
+  'Мощь Вуали',
   'Заговоры',
   'Ячейки заклинаний',
   'Известные заклинания 1-го и более высоких уровней',
@@ -218,6 +278,65 @@ const FEATURE_SECTION_TITLES = [
   'Проведение ритуала',
   'Успех',
   'Провал',
+  'Магия Духов',
+  'Цепной Дух',
+  'Проклятые Кости',
+  'Шаг Пустоты (Дух Пустоты)',
+  'Хранящее Око Шамаса (Дух Шамаса)',
+  'Благословляющий Свет (Дух Ману)',
+  'Дух Инея (спокойствие, одиночество, задумчивость)',
+  'Дух Красок (радость, праздник, счастье)',
+  'Дух Воли (преодоление, боль)',
+  'Дух Стали (решимость, уверенность)',
+  'Дух Сновидений (сон, ночь, отдых)',
+  'Дюнный огнеус',
+  'Атака Явления',
+  'Перемещение Явления',
+  'Усиленное Явление',
+  'Обо Гнева Акрепы (радиус 30 футов)',
+  'Обо Милости Акрепы (радиус 50 футов)',
+  'Обо Голода Акрепы (радиус 40 футов)',
+  'Перенос обо',
+  'Малый набор обо',
+  'Песчаный хамелеон',
+  'Создание Акрепы',
+  'Странник дюнных рек',
+  'Аура огня',
+  'Песчаный круговорот',
+  'Изменение положения',
+  'Дюнная река',
+  'Защита без доспеха',
+  'Оружие покровителя',
+  'Возмездие Укт’ээ',
+  'Молот Мракоглазых',
+  'Элегия Нулевого Факелоносца',
+  'Надир сердца-пепельницы',
+  'Обугленный хирд',
+  'Зилот Испепелённой',
+  'Защита',
+  'Тактика стаи',
+  'Расплавленный клинок',
+  'Ожоги внутренней искры',
+  'Плетение урона',
+  'Печать Вуали',
+  'Клинок Инферно',
+  'Связь сознаний',
+  'Влияние на Анзу',
+  'Неугасающая жизнь',
+  'Смена особого захвата',
+  'Захват Анаконды',
+  'Сохранение Искры',
+  'Наложение нитей',
+  'Извлечение Искры',
+  'Цена урона',
+  'Цена исцеления',
+  'Вызов',
+  'Воля золы',
+  'Раж войны',
+  'Ваш противник',
+  'Зов Вуали',
+  'Прилив/отлив Вуали',
+  'Дух Крови (ярость, страх, боль, жизнь)',
   'Использование',
   'Количество имплантов',
   'Снижение риска отторжения',
@@ -265,28 +384,259 @@ function isDiceLabel(text) {
 function inlineParts(text) {
   const value = String(text || '')
   const parts = []
-  const pattern = /((?:\d+)?[кd](?:4|6|8|10|12|20|100))/giu
+  const pattern = /(\*\*[^*\n]+\*\*|Гнев(?:а)? Ильбеша|(?:\d+)?[кd](?:4|6|8|10|12|20|100))/giu
   let lastIndex = 0
   for (const match of value.matchAll(pattern)) {
     const start = match.index || 0
     if (start > lastIndex) parts.push({ type: 'text', value: value.slice(lastIndex, start) })
-    parts.push({ type: 'dice', value: match[0] })
+    parts.push(match[0].startsWith('**')
+      ? { type: 'bold', value: match[0].slice(2, -2) }
+      : /^гнева? ильбеша$/iu.test(match[0])
+        ? { type: 'link', value: match[0], href: '/dnd5e/wrath' }
+        : { type: 'dice', value: match[0] })
     lastIndex = start + match[0].length
   }
   if (lastIndex < value.length) parts.push({ type: 'text', value: value.slice(lastIndex) })
   return parts
 }
 
+const featureTableRolls = reactive({})
+
+function featureTableRollDefinition(featureName) {
+  if (featureName === 'Откровение Эсхи') return { sides: 100, button: 'Бросить к100', result: 'Откровение' }
+  if (featureName === 'Печати Вуали') return { sides: 6, button: 'Сгенерировать Печать', result: 'Печать' }
+  return null
+}
+
+function tableRangeContains(value, roll) {
+  const match = String(value || '').replace(/\s+/g, '').replace(/[–—−]/g, '-').match(/^(\d+)(?:-(\d+))?$/)
+  if (!match) return false
+  const from = Number(match[1])
+  const to = Number(match[2] || match[1])
+  return roll >= from && roll <= to
+}
+
+function isFeatureTableRollMatch(featureName, row) {
+  const result = featureTableRolls[featureName]
+  return Boolean(result && tableRangeContains(row?.[0], result.roll))
+}
+
+function rollFeatureTable(featureName, block, event) {
+  const definition = featureTableRollDefinition(featureName)
+  if (!definition) return
+  const roll = 1 + Math.floor(Math.random() * definition.sides)
+  const row = block.rows.find(item => tableRangeContains(item?.[0], roll))
+  featureTableRolls[featureName] = {
+    roll,
+    label: definition.result,
+    text: row?.slice(1).join(' · ') || 'Результат отсутствует в таблице.'
+  }
+  const wrap = event?.currentTarget?.closest('.cls-feature-table-wrap')
+  nextTick(() => wrap?.querySelector('tr.is-roll-match')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
+}
+
+const inlineDiceTimers = new Set()
+
+function parseInlineDice(value) {
+  const normalized = String(value || '').replace(/\s+/g, '').replace(/−/g, '-')
+  const match = normalized.match(/^(\d+)?[кd](4|6|8|10|12|20|100)([+-]\d+)?$/iu)
+  if (!match) return null
+  return {
+    count: Number(match[1] || 1),
+    sides: Number(match[2]),
+    modifier: Number(match[3] || 0)
+  }
+}
+
+function rollInlineDice(target) {
+  const dice = parseInlineDice(target.textContent)
+  if (!dice) return
+
+  const rolls = Array.from({ length: dice.count }, () => 1 + Math.floor(Math.random() * dice.sides))
+  const total = rolls.reduce((sum, roll) => sum + roll, 0) + dice.modifier
+  const formula = target.textContent.trim()
+  let breakdown = rolls.join(' + ')
+  if (dice.modifier) breakdown += dice.modifier > 0 ? ` + ${dice.modifier}` : ` − ${Math.abs(dice.modifier)}`
+
+  target.dataset.roll = String(total)
+  target.classList.add('is-rolled')
+  target.title = `${formula}: ${breakdown} = ${total}`
+  target.setAttribute('aria-label', `Бросок ${formula}: выпало ${total}. Нажмите, чтобы бросить снова`)
+
+  const previousTimer = Number(target.dataset.rollTimer || 0)
+  if (previousTimer) window.clearTimeout(previousTimer)
+  const timer = window.setTimeout(() => {
+    target.classList.remove('is-rolled')
+    delete target.dataset.roll
+    delete target.dataset.rollTimer
+    target.setAttribute('aria-label', `Бросить ${formula}`)
+    inlineDiceTimers.delete(timer)
+  }, 2600)
+  target.dataset.rollTimer = String(timer)
+  inlineDiceTimers.add(timer)
+}
+
+function classDiceTarget(event) {
+  const target = event.target instanceof Element ? event.target.closest('.cls-dice-token') : null
+  return target && classWrapRef.value?.contains(target) ? target : null
+}
+
+function onClassDiceClick(event) {
+  const target = classDiceTarget(event)
+  if (target) rollInlineDice(target)
+}
+
+function onClassDiceKeydown(event) {
+  if (event.key !== 'Enter' && event.key !== ' ') return
+  const target = classDiceTarget(event)
+  if (!target) return
+  event.preventDefault()
+  rollInlineDice(target)
+}
+
+function enhanceInlineDiceTokens() {
+  classWrapRef.value?.querySelectorAll('.cls-dice-token').forEach((token) => {
+    token.setAttribute('role', 'button')
+    token.setAttribute('tabindex', '0')
+    token.setAttribute('aria-label', `Бросить ${token.textContent.trim()}`)
+    if (!token.title) token.title = 'Нажмите, чтобы бросить кубик'
+  })
+}
+
+onMounted(() => nextTick(enhanceInlineDiceTokens))
+onUpdated(() => nextTick(enhanceInlineDiceTokens))
+
+onBeforeUnmount(() => {
+  for (const timer of inlineDiceTimers) window.clearTimeout(timer)
+  inlineDiceTimers.clear()
+})
+
 function splitFeatureLead(text) {
-  const match = String(text || '').match(/^([^.!?]{2,80}\.)\s*(.*)$/u)
+  const match = String(text || '').match(/^([^.!?…]{2,80}[.!?…])\s*(.*)$/u)
   if (!match) return { lead: '', rest: String(text || '') }
   return { lead: match[1], rest: match[2] }
+}
+
+const ROYAL_BLOOD_KINGS = new Set([
+  'Тусус', 'Гулом', 'Фатза', 'Фахат', 'Ветомон',
+  'Кхуджим', 'Му и Ло', 'Эктор', 'Сабара', 'Аегус'
+])
+
+function isRoyalBloodKing(value) {
+  return ROYAL_BLOOD_KINGS.has(String(value || '').trim())
+}
+
+function highlightsListLead(featureName) {
+  return [
+    'Подчинение духа',
+    'Диффузия духовного естества',
+    'Покров песков',
+    'Текучесть',
+    'Пожирание Искры',
+    'Возвышение',
+    'Поглощающий облик',
+    'Образ короля',
+    'Королевский триумф',
+    'Жизнь за жизнь',
+    'Явление',
+    'Узел',
+    'Узор',
+    'Превзойдя запреты',
+    'Одержимость духом',
+    'Источнение',
+    'Единство с оружием',
+    'Воля базаров',
+    'Догматы Слова',
+    'Воин Слова',
+    'Догмы секретов',
+    'Связующие секреты',
+    'Хранитель секретов',
+    'Принципы Пожирателя',
+    'Божественный канал: Поглощённый враг',
+    'Божественный канал: Пожирающая кара',
+    'Ра’а',
+    'Принципы нукера',
+    'Путь кочевника',
+    'Догматы Жнеца Имён',
+    'Кость Вуали',
+    'Жнец Имён',
+    'Изменения плоти',
+    'Божественный канал: Реликвии войны',
+    'Божественный канал: Пар судьбы',
+    'Металл жизни',
+    'Сальбарит',
+    'Живой металл',
+    'Малые духи',
+    'Средние духи',
+    'Дополнительный предмет договора: Договор Костей',
+    'Лик Сияния',
+    'Лик Ужаса',
+    'Лик Любви',
+    'Лик Обличителя',
+    'Гнев песков',
+    'Опека Шаха Дюн',
+    'Дары Акрепы',
+    'Договор Цепи: дюнный огнеус',
+    'Милостивое благословение, окровавленный песок',
+    'Повелитель пустыни',
+    'Приговор Укт’ээ',
+    'Дополнительные таинственные воззвания',
+    'Зилот Испепелённой',
+    'Дары Огнерукой',
+    'Чемпион Инферно',
+    'Знания прошлой жизни',
+    'Воля Анзу',
+    'Вечный дозор',
+    'Общая жизнь',
+    'Змеиные захваты и броски',
+    'Развитые змеиные приёмы',
+    'Нить Ки',
+    'Мастерские змеиные приёмы',
+    'Совершенный змеиный приём',
+    'Король Земли',
+    'Техники пожирателей',
+    'Поглощённый враг',
+    'Пожирающая метка',
+    'Неостановимый танец смерти',
+    'Догматы Бесклыкого',
+    'Тысячи глаз Галантара',
+    'Догматы клятвы',
+    'Божественный канал',
+    'Воплощение Эсхи'
+  ].includes(featureName)
+}
+
+function highlightsParagraphLead(featureName) {
+  return [
+    'Связь с оружием',
+    'Заварщик судеб',
+    'Сальбарит'
+  ].includes(featureName)
+}
+
+function salbariteInfusionParts(text) {
+  const value = String(text || '')
+  const match = value.match(/^Требование:\s*([^.]+)\.\s*(.*)$/u)
+  if (!match) return { level: '', item: '', text: value }
+
+  const requirement = match[1].trim()
+  const levelMatch = requirement.match(/^(\d+-й уровень)(?:\s+и\s+(.+))?$/u)
+  const rawItem = levelMatch ? (levelMatch[2] || '') : requirement
+  const item = rawItem.toLocaleLowerCase('ru') === 'нет'
+    ? ''
+    : rawItem.charAt(0).toLocaleUpperCase('ru') + rawItem.slice(1)
+
+  return {
+    level: levelMatch?.[1] || '',
+    item,
+    text: match[2].trim()
+  }
 }
 
 function featureBlocks(text) {
   return featureParagraphs(text).map(paragraph => {
     if (isMarkdownTable(paragraph)) return markdownTableBlock(paragraph)
-    const formula = paragraph.match(/^(Сл(?: проверки| спасброск(?:а|ов)(?: [^=]+)?)?|Модификатор броска атаки)\s*=\s*(.+)$/i)
+    const formula = paragraph.match(/^(КД|Сл(?: проверки| спасброск(?:а|ов)(?: [^=]+)?)?|Модификатор броска атаки)\s*=\s*(.+)$/i)
     if (formula) return { type: 'formula', label: formula[1], value: formula[2] }
     if (/^Например,/i.test(paragraph)) return { type: 'example', text: paragraph }
     const exactTitle = FEATURE_SECTION_TITLES.find(name => paragraph === name)
@@ -622,7 +972,7 @@ function scrollToClassFeature(featureId) {
     >
       <span class="cls-scrub-thumb" :style="{ top: (scrubRatio * 100) + '%' }" aria-hidden="true" />
     </div>
-    <div ref="classWrapRef" class="cls-wrap">
+    <div ref="classWrapRef" class="cls-wrap" @click="onClassDiceClick" @keydown="onClassDiceKeydown">
       <span ref="classSparkRef" class="cls-spark" :class="{ 'is-suppressed': scrubDragging }" aria-hidden="true" />
       <div class="cls-head">
         <NuxtLink class="cls-emblem-box" to="/dnd5e/classes" title="Вернуться к списку классов" aria-label="Вернуться к списку классов">
@@ -903,9 +1253,16 @@ function scrollToClassFeature(featureId) {
                 <span class="cls-feature-lvl">{{ vm.classSelectedArchetypeDescription.level }}</span>
               </div>
               <blockquote v-if="vm.classSelectedArchetypeDescription.hasQuote" class="cls-arch-quote compact">{{ vm.classSelectedArchetypeDescription.quote }}</blockquote>
+              <div v-if="isAnzuPatron(vm.classSelectedArchetypeDescription.name)" class="cls-archetype-warning">
+                <span class="cls-archetype-warning-mark">!</span>
+                <div>
+                  <strong>Только для Мор’хоров</strong>
+                  <span>Выбор представителем другой расы возможен только с разрешения Мастера.</span>
+                </div>
+              </div>
               <div class="cls-subclass-description-text">
                 <p v-for="(p, i) in vm.classSelectedArchetypeDescription.intro" :key="i">{{ p }}</p>
-                <p v-if="vm.classSelectedArchetypeDescription.summary">{{ vm.classSelectedArchetypeDescription.summary }}</p>
+                <p v-if="vm.classSelectedArchetypeDescription.summary && !isAnzuPatron(vm.classSelectedArchetypeDescription.name)">{{ vm.classSelectedArchetypeDescription.summary }}</p>
               </div>
             </div>
           </template>
@@ -931,13 +1288,16 @@ function scrollToClassFeature(featureId) {
                   </span>
                 </summary>
                 <div class="cls-feature-content">
-                  <div class="cls-feature-prose" :class="{ 'is-option-list': f.name === 'Изменения плоти', 'is-weapon-link': f.name === 'Связь с оружием' }">
+                  <div class="cls-feature-prose" :class="{ 'is-option-list': f.name === 'Изменения плоти', 'is-weapon-link': f.name === 'Связь с оружием', 'is-relic-list': f.name === 'Божественный канал: Реликвии войны', 'is-bullet-list': ['Слово базаров', 'Звезда базаров', 'Единство с оружием', 'Ядовитый язык', 'Чешуя', 'Преображение', 'Источнение', 'Одержимость духом', 'Подчинение духа', 'Диффузия духовного естества', 'Покров песков', 'Текучесть', 'Пожирание Искры', 'Возвышение', 'Поглощающий облик', 'Образ короля', 'Королевский триумф', 'Жизнь за жизнь', 'Явление', 'Узел', 'Узор', 'Превзойдя запреты'].includes(f.name) }">
                     <template v-for="(block, bi) in featureBlocks(f.text)" :key="bi">
                       <section v-if="block.type === 'section'" class="cls-feature-section">
-                        <h4>{{ block.title }}</h4>
+                        <h4>
+                          <NuxtLink v-if="block.title === 'Гнев Ильбеша'" class="cls-inline-reference" to="/dnd5e/wrath">{{ block.title }}</NuxtLink>
+                          <template v-else>{{ block.title }}</template>
+                        </h4>
                         <p v-if="block.text">
                           <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                            <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                           </template>
                         </p>
                       </section>
@@ -949,12 +1309,15 @@ function scrollToClassFeature(featureId) {
                       </div>
                       <ul v-else-if="block.type === 'list'" class="cls-feature-list">
                         <li v-for="(item, li) in block.items" :key="li">
-                          <template v-if="f.name === 'Изменения плоти'">
+                          <template v-if="highlightsListLead(f.name)">
                             <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
-                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span></template>
+                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi">
+                              <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
+                              <span v-else :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                            </template>
                           </template>
                           <template v-else v-for="(part, pi) in inlineParts(item)" :key="pi">
-                            <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                           </template>
                         </li>
                       </ul>
@@ -964,41 +1327,70 @@ function scrollToClassFeature(featureId) {
                           <li v-for="(item, li) in block.items" :key="li">
                             <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
                             <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi">
-                              <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                             </template>
                           </li>
                         </ul>
                       </div>
                       <div v-else-if="block.type === 'diceHeading'" class="cls-dice-heading">{{ block.die }}</div>
                       <div v-else-if="block.type === 'table'" class="cls-feature-table-wrap">
+                        <div v-if="featureTableRollDefinition(f.name)" class="cls-table-roll-control">
+                          <button type="button" class="cls-table-roll-button" @click="rollFeatureTable(f.name, block, $event)">
+                            {{ featureTableRollDefinition(f.name).button }}
+                          </button>
+                          <div v-if="featureTableRolls[f.name]" class="cls-table-roll-result" aria-live="polite">
+                            <strong>{{ featureTableRolls[f.name].label }}: {{ featureTableRolls[f.name].roll }}</strong>
+                            <span>{{ featureTableRolls[f.name].text }}</span>
+                          </div>
+                        </div>
                         <table class="cls-feature-table">
                           <thead>
                             <tr>
-                              <th v-for="(header, hi) in block.headers" :key="hi">{{ header }}</th>
+                              <th v-for="(header, hi) in block.headers" :key="hi">
+                                <template v-for="(part, pi) in inlineParts(header)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(row, ri) in block.rows" :key="ri">
-                              <td v-for="(cell, ci) in row" :key="ci">{{ cell }}</td>
+                            <tr v-for="(row, ri) in block.rows" :key="ri" :class="{ 'is-roll-match': isFeatureTableRollMatch(f.name, row) }">
+                              <td v-for="(cell, ci) in row" :key="ci">
+                                <strong v-if="isRoyalBloodKing(cell)" class="cls-dance-option">{{ cell }}</strong>
+                                <template v-else v-for="(part, pi) in inlineParts(cell)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
                       <p v-else>
-                        <template v-if="f.name === 'Связь с оружием'">
+                        <template v-if="highlightsParagraphLead(f.name)">
                           <strong v-if="splitFeatureLead(block.text).lead" class="cls-dance-option">{{ splitFeatureLead(block.text).lead }}</strong>
-                          <template v-for="(part, pi) in inlineParts(splitFeatureLead(block.text).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span></template>
+                          <template v-for="(part, pi) in inlineParts(splitFeatureLead(block.text).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
                         </template>
                         <template v-else v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                          <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                         </template>
                       </p>
                     </template>
                   </div>
+                  <NuxtLink v-if="f.resourceLink" class="cls-open-arch" :to="f.resourceLink.href">{{ f.resourceLink.label }} →</NuxtLink>
                   <blockquote v-if="f.hasQuote" class="cls-arch-quote compact">{{ f.quote }}</blockquote>
                   <NuxtLink v-if="f.archetypeName === 'Школа Клыков' && (f.name === 'Импланты' || f.name === 'Список Имплантов')" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/implants">Открыть справочник 35 имплантов →</NuxtLink>
                   <NuxtLink v-if="f.archetypeName === 'Школа Клыков' && f.name === 'Создание фамильяра: Сошид-е-Мута'" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/familiars">Создать патчфамильяра · 105 вариантов →</NuxtLink>
-                  <template v-if="f.hasItems && f.itemsTitle && f.name === f.itemsTitle">
+                  <div v-if="f.hasItems && f.name === 'Сальбаритовые инфузии'" class="cls-inline-infusions">
+                    <article v-for="item in f.items" :key="item.name" class="cls-card cls-inline-infusion-card">
+                      <div class="cls-feature-head">
+                        <span class="cls-feature-name">{{ item.name }}</span>
+                        <span v-if="salbariteInfusionParts(item.text).level" class="cls-badge">{{ salbariteInfusionParts(item.text).level }}</span>
+                        <span v-if="salbariteInfusionParts(item.text).item" class="cls-feature-lvl">{{ salbariteInfusionParts(item.text).item }}</span>
+                      </div>
+                      <div class="cls-feature-text">
+                        <template v-for="(part, pi) in inlineParts(salbariteInfusionParts(item.text).text)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                        </template>
+                      </div>
+                    </article>
+                  </div>
+                  <template v-else-if="f.hasItems && f.itemsTitle && f.name === f.itemsTitle">
                     <div v-if="f.itemsRollTitle" class="cls-arch-roll" :class="{ implants: f.itemsRollMode === 'implants-4d4' }">
                       <button type="button" class="cls-arch-roll-btn" :class="{ 'implant-roll-btn': f.itemsRollMode === 'implants-4d4' }" @click="rollFeatureItem(f)">
                         <svg v-if="f.itemsRollMode === 'implants-4d4'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></svg>
@@ -1040,14 +1432,20 @@ function scrollToClassFeature(featureId) {
                               <strong>{{ level.level }}</strong>
                               <p>
                                 <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                                 </template>
                               </p>
                             </article>
                           </div>
                           <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
                         </div>
-                        <span v-else>{{ item.text }}</span>
+                        <div v-else class="cls-arch-item-text">
+                          <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
+                            <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
+                            <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
+                            <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                          </template>
+                        </div>
                       </details>
                     </div>
                   </template>
@@ -1097,14 +1495,20 @@ function scrollToClassFeature(featureId) {
                               <strong>{{ level.level }}</strong>
                               <p>
                                 <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                                 </template>
                               </p>
                             </article>
                           </div>
                           <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
                         </div>
-                        <span v-else>{{ item.text }}</span>
+                        <div v-else class="cls-arch-item-text">
+                          <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
+                            <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
+                            <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
+                            <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                          </template>
+                        </div>
                       </details>
                     </div>
                   </details>
@@ -1283,7 +1687,14 @@ function scrollToClassFeature(featureId) {
               <button type="button" class="cls-open-arch inline" @click.stop="selectArchetype(arch.id)">Применить подкласс</button>
             </div>
             <div v-if="state.openSubclass === arch.id" class="cls-subclass-body">
-              <div v-if="arch.summary" class="cls-feature-text">{{ arch.summary }}</div>
+              <div v-if="isAnzuPatron(arch.name)" class="cls-archetype-warning compact">
+                <span class="cls-archetype-warning-mark">!</span>
+                <div>
+                  <strong>Только для Мор’хоров</strong>
+                  <span>Выбор представителем другой расы возможен только с разрешения Мастера.</span>
+                </div>
+              </div>
+              <div v-else-if="arch.summary" class="cls-feature-text">{{ arch.summary }}</div>
               <blockquote v-if="arch.quote" class="cls-arch-quote compact">{{ arch.quote }}</blockquote>
               <div v-if="arch.intro?.length" class="cls-subclass-prose">
                 <p v-for="(p, i) in arch.intro" :key="i">{{ p }}</p>
@@ -1295,13 +1706,16 @@ function scrollToClassFeature(featureId) {
                     <span class="cls-badge" :title="sourceTitle(arch.source, arch.sourceFullName)">{{ arch.source }}</span>
                     <span class="cls-feature-lvl">{{ feature.level }}</span>
                   </div>
-                  <div class="cls-feature-prose compact" :class="{ 'is-option-list': feature.name === 'Изменения плоти', 'is-weapon-link': feature.name === 'Связь с оружием' }">
+                  <div class="cls-feature-prose compact" :class="{ 'is-option-list': feature.name === 'Изменения плоти', 'is-weapon-link': feature.name === 'Связь с оружием', 'is-relic-list': feature.name === 'Божественный канал: Реликвии войны', 'is-bullet-list': ['Слово базаров', 'Звезда базаров', 'Единство с оружием', 'Ядовитый язык', 'Чешуя', 'Преображение', 'Источнение', 'Одержимость духом', 'Подчинение духа', 'Диффузия духовного естества', 'Покров песков', 'Текучесть', 'Пожирание Искры', 'Возвышение', 'Поглощающий облик', 'Образ короля', 'Королевский триумф', 'Жизнь за жизнь', 'Явление', 'Узел', 'Узор', 'Превзойдя запреты'].includes(feature.name) }">
                     <template v-for="(block, bi) in featureBlocks(feature.text)" :key="bi">
                       <section v-if="block.type === 'section'" class="cls-feature-section">
-                        <h4>{{ block.title }}</h4>
+                        <h4>
+                          <NuxtLink v-if="block.title === 'Гнев Ильбеша'" class="cls-inline-reference" to="/dnd5e/wrath">{{ block.title }}</NuxtLink>
+                          <template v-else>{{ block.title }}</template>
+                        </h4>
                         <p v-if="block.text">
                           <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                            <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                           </template>
                         </p>
                       </section>
@@ -1311,12 +1725,15 @@ function scrollToClassFeature(featureId) {
                       </div>
                       <ul v-else-if="block.type === 'list'" class="cls-feature-list">
                         <li v-for="(item, li) in block.items" :key="li">
-                          <template v-if="feature.name === 'Изменения плоти'">
+                          <template v-if="highlightsListLead(feature.name)">
                             <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
-                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span></template>
+                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi">
+                              <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
+                              <span v-else :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                            </template>
                           </template>
                           <template v-else v-for="(part, pi) in inlineParts(item)" :key="pi">
-                            <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                           </template>
                         </li>
                       </ul>
@@ -1326,40 +1743,69 @@ function scrollToClassFeature(featureId) {
                           <li v-for="(item, li) in block.items" :key="li">
                             <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
                             <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi">
-                              <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                             </template>
                           </li>
                         </ul>
                       </div>
                       <div v-else-if="block.type === 'diceHeading'" class="cls-dice-heading">{{ block.die }}</div>
                       <div v-else-if="block.type === 'table'" class="cls-feature-table-wrap">
+                        <div v-if="featureTableRollDefinition(feature.name)" class="cls-table-roll-control">
+                          <button type="button" class="cls-table-roll-button" @click="rollFeatureTable(feature.name, block, $event)">
+                            {{ featureTableRollDefinition(feature.name).button }}
+                          </button>
+                          <div v-if="featureTableRolls[feature.name]" class="cls-table-roll-result" aria-live="polite">
+                            <strong>{{ featureTableRolls[feature.name].label }}: {{ featureTableRolls[feature.name].roll }}</strong>
+                            <span>{{ featureTableRolls[feature.name].text }}</span>
+                          </div>
+                        </div>
                         <table class="cls-feature-table">
                           <thead>
                             <tr>
-                              <th v-for="(header, hi) in block.headers" :key="hi">{{ header }}</th>
+                              <th v-for="(header, hi) in block.headers" :key="hi">
+                                <template v-for="(part, pi) in inlineParts(header)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(row, ri) in block.rows" :key="ri">
-                              <td v-for="(cell, ci) in row" :key="ci">{{ cell }}</td>
+                            <tr v-for="(row, ri) in block.rows" :key="ri" :class="{ 'is-roll-match': isFeatureTableRollMatch(feature.name, row) }">
+                              <td v-for="(cell, ci) in row" :key="ci">
+                                <strong v-if="isRoyalBloodKing(cell)" class="cls-dance-option">{{ cell }}</strong>
+                                <template v-else v-for="(part, pi) in inlineParts(cell)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
                       <p v-else>
-                        <template v-if="feature.name === 'Связь с оружием'">
+                        <template v-if="highlightsParagraphLead(feature.name)">
                           <strong v-if="splitFeatureLead(block.text).lead" class="cls-dance-option">{{ splitFeatureLead(block.text).lead }}</strong>
-                          <template v-for="(part, pi) in inlineParts(splitFeatureLead(block.text).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span></template>
+                          <template v-for="(part, pi) in inlineParts(splitFeatureLead(block.text).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
                         </template>
                         <template v-else v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                          <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                         </template>
                       </p>
                     </template>
                   </div>
+                  <NuxtLink v-if="feature.resourceLink" class="cls-open-arch" :to="feature.resourceLink.href">{{ feature.resourceLink.label }} →</NuxtLink>
                   <NuxtLink v-if="feature.archetypeName === 'Школа Клыков' && (feature.name === 'Импланты' || feature.name === 'Список Имплантов')" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/implants">Все правила и 35 имплантов в едином справочнике →</NuxtLink>
                   <NuxtLink v-if="feature.archetypeName === 'Школа Клыков' && feature.name === 'Создание фамильяра: Сошид-е-Мута'" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/familiars">Создать патчфамильяра · малый, средний или большой →</NuxtLink>
-                  <template v-if="feature.hasItems && feature.itemsTitle && feature.name === feature.itemsTitle">
+                  <div v-if="feature.hasItems && feature.name === 'Сальбаритовые инфузии'" class="cls-inline-infusions">
+                    <article v-for="item in feature.items" :key="item.name" class="cls-card cls-inline-infusion-card">
+                      <div class="cls-feature-head">
+                        <span class="cls-feature-name">{{ item.name }}</span>
+                        <span v-if="salbariteInfusionParts(item.text).level" class="cls-badge">{{ salbariteInfusionParts(item.text).level }}</span>
+                        <span v-if="salbariteInfusionParts(item.text).item" class="cls-feature-lvl">{{ salbariteInfusionParts(item.text).item }}</span>
+                      </div>
+                      <div class="cls-feature-text">
+                        <template v-for="(part, pi) in inlineParts(salbariteInfusionParts(item.text).text)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                        </template>
+                      </div>
+                    </article>
+                  </div>
+                  <template v-else-if="feature.hasItems && feature.itemsTitle && feature.name === feature.itemsTitle">
                     <div v-if="feature.itemsRollTitle" class="cls-arch-roll" :class="{ implants: feature.itemsRollMode === 'implants-4d4' }">
                       <button type="button" class="cls-arch-roll-btn" :class="{ 'implant-roll-btn': feature.itemsRollMode === 'implants-4d4' }" @click="rollFeatureItem(feature)">
                         <svg v-if="feature.itemsRollMode === 'implants-4d4'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></svg>
@@ -1401,14 +1847,20 @@ function scrollToClassFeature(featureId) {
                               <strong>{{ level.level }}</strong>
                               <p>
                                 <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                                 </template>
                               </p>
                             </article>
                           </div>
                           <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
                         </div>
-                        <span v-else>{{ item.text }}</span>
+                        <div v-else class="cls-arch-item-text">
+                          <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
+                            <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
+                            <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
+                            <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                          </template>
+                        </div>
                       </details>
                     </div>
                   </template>
@@ -1458,14 +1910,20 @@ function scrollToClassFeature(featureId) {
                               <strong>{{ level.level }}</strong>
                               <p>
                                 <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
                                 </template>
                               </p>
                             </article>
                           </div>
                           <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
                         </div>
-                        <span v-else>{{ item.text }}</span>
+                        <div v-else class="cls-arch-item-text">
+                          <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
+                            <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
+                            <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
+                            <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                          </template>
+                        </div>
                       </details>
                     </div>
                   </details>
@@ -1492,7 +1950,30 @@ function scrollToClassFeature(featureId) {
                       <span>Компоненты: {{ spell.components }}</span>
                       <span>Длительность: {{ spell.duration }}</span>
                     </div>
-                    <div class="cls-feature-text">{{ spell.text }}</div>
+                    <div class="cls-feature-text rich">
+                      <template v-for="(block, bi) in featureBlocks(spell.text)" :key="bi">
+                        <section v-if="block.type === 'section'" class="cls-feature-section">
+                          <h4>{{ block.title }}</h4>
+                          <p v-if="block.text">
+                            <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                            </template>
+                          </p>
+                        </section>
+                        <ul v-else-if="block.type === 'list'" class="cls-feature-list">
+                          <li v-for="(item, li) in block.items" :key="li">
+                            <template v-for="(part, pi) in inlineParts(item)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                            </template>
+                          </li>
+                        </ul>
+                        <p v-else>
+                          <template v-for="(part, pi) in inlineParts(block.text || '')" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                          </template>
+                        </p>
+                      </template>
+                    </div>
                     <div v-if="spell.hasHigher" class="cls-higher"><strong>На больших уровнях.</strong> {{ spell.higher }}</div>
                   </div>
                 </div>
@@ -1830,6 +2311,7 @@ function scrollToClassFeature(featureId) {
 .cls-badge.alt{border:1px solid rgba(214,170,96,.35);background:rgba(214,170,96,.1);color:rgba(244,224,170,.9)}
 .cls-feature-lvl{font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;line-height:1.25;letter-spacing:.13em;text-transform:uppercase;color:rgba(226,230,244,.44)}
 .cls-feature-text{font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.5;color:rgba(226,230,244,.78)}
+.cls-inline-bold{font-weight:700;color:rgba(244,224,170,.96)}
 .cls-feature-text.rich{display:flex;flex-direction:column;gap:10px}
 .cls-feature-text.rich p{margin:0}
 .cls-feature-prose{display:flex;max-width:900px;flex-direction:column;gap:13px;font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.55;color:rgba(226,230,244,.8)}
@@ -1842,11 +2324,28 @@ function scrollToClassFeature(featureId) {
 .cls-feature-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0 0 0 22px}
 .cls-feature-list li{padding-left:2px}
 .cls-feature-list li::marker{color:rgba(244,224,170,.78)}
-.cls-dice-token{display:inline-flex;align-items:center;justify-content:center;min-width:2.2em;margin:0 .1em;border:1px solid rgba(var(--subclass-accent,214,170,96),.24);border-radius:7px;background:rgba(var(--subclass-accent,214,170,96),.09);padding:0 .38em;font-family:'Hanken Grotesk',sans-serif;font-size:.78em;font-weight:800;line-height:1.45;letter-spacing:.04em;color:rgba(var(--subclass-strong,244,224,170),.94);vertical-align:.08em}
+.cls-inline-infusions{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.cls-inline-infusion-card .cls-feature-name{font-size:21px}
+.cls-inline-infusion-card .cls-feature-lvl{letter-spacing:.05em;text-transform:none}
+.cls-inline-infusion-card .cls-feature-text{font-size:16.5px}
+.cls-feature-prose.is-relic-list .cls-feature-list{list-style:disc outside;padding-left:24px}
+.cls-feature-prose.is-relic-list .cls-feature-list li::marker{color:rgba(var(--subclass-strong,244,224,170),.96);font-size:.9em}
+.cls-feature-prose.is-relic-list .cls-dance-option{color:rgba(var(--subclass-strong,244,224,170),.96)}
+.cls-feature-prose.is-bullet-list .cls-feature-list{list-style:disc outside;padding-left:30px}
+.cls-feature-prose.is-bullet-list .cls-feature-list li::marker{color:rgba(var(--subclass-strong,244,224,170),.96);font-size:.95em}
+.cls-dice-token{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:2.2em;margin:0 .1em;border:1px solid rgba(var(--subclass-accent,214,170,96),.24);border-radius:7px;background:rgba(var(--subclass-accent,214,170,96),.09);padding:0 .38em;font-family:'Hanken Grotesk',sans-serif;font-size:.78em;font-weight:800;line-height:1.45;letter-spacing:.04em;color:rgba(var(--subclass-strong,244,224,170),.94);vertical-align:.08em;cursor:pointer;user-select:none;transition:background .16s ease,border-color .16s ease,transform .1s ease}
+.cls-dice-token:hover{border-color:rgba(var(--subclass-strong,244,224,170),.62);background:rgba(var(--subclass-accent,214,170,96),.17)}
+.cls-dice-token:active{transform:translateY(1px)}
+.cls-dice-token:focus-visible{outline:1px solid rgba(var(--subclass-strong,244,224,170),.7);outline-offset:2px}
+.cls-dice-token.is-rolled::after{content:attr(data-roll);position:absolute;left:50%;bottom:calc(100% + 7px);z-index:20;min-width:30px;transform:translateX(-50%);border:1px solid rgba(var(--subclass-accent,214,170,96),.42);border-radius:8px;background:rgba(13,15,21,.97);box-shadow:0 8px 24px rgba(0,0,0,.42);padding:5px 9px;font-family:'Hanken Grotesk',sans-serif;font-size:15px;font-weight:900;line-height:1;color:rgba(var(--subclass-strong,244,224,170),1);text-align:center;letter-spacing:0;pointer-events:none;animation:cls-dice-pop .16s ease-out}
+@keyframes cls-dice-pop{from{opacity:0;transform:translate(-50%,4px) scale(.92)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
 .cls-dice-group{display:flex;flex-direction:column;gap:10px;margin:4px 0 2px;border:1px solid rgba(var(--subclass-accent,214,170,96),.16);border-radius:12px;background:linear-gradient(145deg,rgba(var(--subclass-accent,214,170,96),.055),rgba(255,255,255,.012));padding:12px 14px 14px}
 .cls-dice-group .cls-feature-list{padding-left:20px}
 .cls-dice-group .cls-feature-list li{line-height:1.58}
 .cls-dance-option{display:inline;font-family:'Hanken Grotesk',sans-serif;font-size:.82em;font-weight:900;letter-spacing:.035em;color:rgba(var(--subclass-strong,244,224,170),.96);text-shadow:0 0 14px rgba(var(--subclass-accent,214,170,96),.12)}
+.cls-inline-reference{color:rgba(var(--subclass-strong,244,224,170),.98);font-weight:900;text-decoration:underline;text-decoration-color:rgba(var(--subclass-accent,214,170,96),.55);text-decoration-thickness:1px;text-underline-offset:3px;transition:color .16s ease,text-decoration-color .16s ease}
+.cls-inline-reference:hover{color:#fff2c8;text-decoration-color:currentColor}
+.cls-inline-reference:focus-visible{border-radius:3px;outline:1px solid rgba(var(--subclass-strong,244,224,170),.8);outline-offset:2px}
 .cls-dance-option::after{content:' ';white-space:pre}
 .cls-feature-prose.is-option-list .cls-feature-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;padding:0;list-style:none}
 .cls-feature-prose.is-option-list .cls-feature-list li{position:relative;padding:13px 15px 13px 18px;border:1px solid rgba(var(--subclass-accent,214,170,96),.14);border-radius:9px;background:rgba(var(--subclass-accent,214,170,96),.035);line-height:1.5}
@@ -1856,6 +2355,14 @@ function scrollToClassFeature(featureId) {
 .cls-feature-prose.is-weapon-link>p:has(.cls-dance-option) .cls-dance-option{display:block;margin-bottom:5px;font-size:.88em}
 .cls-dice-heading{align-self:flex-start;border:1px solid rgba(var(--subclass-accent,214,170,96),.36);border-radius:999px;background:rgba(var(--subclass-accent,214,170,96),.12);padding:5px 11px;font-family:'Hanken Grotesk',sans-serif;font-size:12px;font-weight:900;line-height:1;letter-spacing:.12em;text-transform:uppercase;color:rgba(var(--subclass-strong,244,224,170),.96);box-shadow:0 0 18px rgba(var(--subclass-accent,214,170,96),.08)}
 .cls-feature-table-wrap{max-width:100%;overflow:auto;border:1px solid rgba(214,170,96,.18);border-radius:10px;background:rgba(7,8,12,.24)}
+.cls-table-roll-control{position:sticky;left:0;z-index:2;display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid rgba(var(--subclass-accent,214,170,96),.18);background:linear-gradient(135deg,rgba(var(--subclass-accent,214,170,96),.1),rgba(7,8,12,.88));padding:12px}
+.cls-table-roll-button{flex:0 0 auto;border:1px solid rgba(var(--subclass-strong,244,224,170),.5);border-radius:9px;background:rgba(var(--subclass-accent,214,170,96),.14);padding:8px 13px;font-family:'Hanken Grotesk',sans-serif;font-size:11px;font-weight:900;letter-spacing:.06em;color:rgba(var(--subclass-strong,244,224,170),.98);cursor:pointer;transition:background .16s ease,border-color .16s ease,transform .1s ease}
+.cls-table-roll-button:hover{border-color:rgba(var(--subclass-strong,244,224,170),.82);background:rgba(var(--subclass-accent,214,170,96),.24)}
+.cls-table-roll-button:active{transform:translateY(1px)}
+.cls-table-roll-button:focus-visible{outline:1px solid rgba(var(--subclass-strong,244,224,170),.9);outline-offset:2px}
+.cls-table-roll-result{display:flex;min-width:0;flex-direction:column;gap:2px;font-family:'Hanken Grotesk',sans-serif;font-size:11px;line-height:1.45;color:rgba(226,230,244,.72)}
+.cls-table-roll-result strong{color:rgba(var(--subclass-strong,244,224,170),.98);font-size:12px}
+.cls-feature-table tr.is-roll-match td{background:rgba(var(--subclass-accent,214,170,96),.18);box-shadow:inset 3px 0 0 rgba(var(--subclass-strong,244,224,170),.88);color:rgba(245,246,252,.96)}
 .cls-feature-table{width:100%;border-collapse:collapse;font-family:'Hanken Grotesk',sans-serif;font-size:12.5px;line-height:1.45;color:rgba(226,230,244,.78)}
 .cls-feature-table th{padding:9px 10px;background:rgba(214,170,96,.12);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,224,170,.92);text-align:left;white-space:nowrap}
 .cls-feature-table td{padding:9px 10px;border-top:1px solid rgba(255,255,255,.06);vertical-align:top}
@@ -1880,6 +2387,12 @@ function scrollToClassFeature(featureId) {
 .cls-arch-detail-title{font-family:'Cormorant Garamond',serif;font-size:42px;letter-spacing:.03em;text-transform:uppercase;color:rgba(236,240,252,.96);line-height:1.04;margin-top:6px}
 .cls-arch-detail-sub{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(214,170,96,.78);margin-top:6px}
 .cls-arch-quote{margin:22px 0 18px;border-left:2px solid rgba(214,170,96,.45);padding:4px 0 4px 18px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;line-height:1.55;color:rgba(244,224,170,.78)}
+.cls-archetype-warning{display:flex;align-items:center;gap:14px;margin:18px 0;padding:14px 17px;border:1px solid rgba(255,190,64,.72);border-radius:10px;background:linear-gradient(100deg,rgba(255,135,24,.2),rgba(255,205,73,.08));box-shadow:0 0 24px rgba(255,153,31,.12);color:#ffe7a1}
+.cls-archetype-warning.compact{margin:0 0 18px}
+.cls-archetype-warning-mark{display:grid;flex:0 0 30px;width:30px;height:30px;place-items:center;border-radius:50%;background:#ffb52e;color:#171008;font-family:Inter,sans-serif;font-size:19px;font-weight:900;box-shadow:0 0 18px rgba(255,181,46,.38)}
+.cls-archetype-warning div{display:flex;flex-direction:column;gap:2px}
+.cls-archetype-warning strong{font-family:Inter,sans-serif;font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:#ffd166}
+.cls-archetype-warning span:not(.cls-archetype-warning-mark){font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.35;color:rgba(255,239,197,.82)}
 .cls-arch-prose{display:flex;flex-direction:column;gap:12px;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.62;color:rgba(226,230,244,.76)}
 .cls-arch-prose p{margin:0}
 .cls-arch-items-group{margin-top:16px;border:1px solid rgba(214,170,96,.18);border-radius:12px;background:rgba(7,8,12,.24);overflow:hidden}
@@ -1934,6 +2447,9 @@ function scrollToClassFeature(featureId) {
 .cls-arch-items.roomy .cls-arch-item{padding:18px 20px}
 .cls-arch-item summary{cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.25;color:rgba(244,224,170,.95)}
 .cls-arch-item span{display:block;margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:16.5px;line-height:1.58;color:rgba(226,230,244,.78);white-space:pre-line}
+.cls-arch-item-text{margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:16.5px;line-height:1.58;color:rgba(226,230,244,.78);white-space:pre-line}
+.cls-arch-item .cls-arch-item-text span{display:inline;margin:0;font:inherit;line-height:inherit;color:inherit;white-space:inherit}
+.cls-arch-item-text strong{font-weight:700;color:rgba(244,224,170,.96)}
 .cls-spell-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0 12px;font-family:'Hanken Grotesk',sans-serif;font-size:11.5px;color:rgba(226,230,244,.55)}
 .cls-feature-spells{display:flex;flex-direction:column;gap:12px;margin-top:14px}
 .cls-spell-card{border:1px solid rgba(214,170,96,.16);border-radius:12px;background:rgba(7,8,12,.22);padding:16px}

@@ -567,18 +567,26 @@ const vm = computed(() => {
   const filteredClassArchetypes = classArchetypes.filter(a => activeArchetypeSource === 'all' || a.source === activeArchetypeSource)
   const selectedClassArchetype = classArchetypes.find(a => a.id === S.activeArchetype) || null
   const baseClassFeatures = (cd.features||[]).map((f, order) => {
-    const id = classFeatureId(S.cls, f[2], f[0])
+    const feature = Array.isArray(f)
+      ? { name: f[0], src: f[1], lvl: f[2], text: f[3], spellTable: f[4] || [] }
+      : { ...f, lvl: f.lvl || f.level, src: f.src || f.source, spellTable: f.spellTable || [] }
+    const id = classFeatureId(S.cls, feature.lvl, feature.name)
     return {
+      ...feature,
       id,
       featureUrl: classFeatureUrl(id),
-      name:f[0],
-      src:f[1],
-      lvl:f[2],
-      text:f[3],
       order,
-      rank: featureLevel(f[2]),
-      hasSpellTable: !!(f[4] && f[4].length),
-      spellTable: (f[4]||[]).map(s=>({ lvl:s[0], spell:s[1] }))
+      rank: feature.rank || featureLevel(feature.lvl),
+      hasSpellTable: !!feature.spellTable.length,
+      spellTable: feature.spellTable.map(s => Array.isArray(s) ? { lvl:s[0], spell:s[1] } : s),
+      hasItems: !!(feature.items && feature.items.length),
+      hasLongItems: !!(feature.items && feature.items.length > 3),
+      itemsTitle: feature.itemsTitle || '',
+      itemsRollTitle: feature.itemsRollTitle || '',
+      itemsRollMode: feature.itemsRollMode || '',
+      resourceLink: feature.resourceLink || null,
+      itemsCollapsed: !!feature.itemsCollapsed,
+      items: classFeatureItems(feature.items)
     }
   })
   const archetypeFeatureEntries = (arch, archetypeOrder = 0) => [
@@ -600,6 +608,7 @@ const vm = computed(() => {
       itemsTitle: f.itemsTitle || '',
       itemsRollTitle: f.itemsRollTitle || '',
       itemsRollMode: f.itemsRollMode || '',
+      resourceLink: f.resourceLink || null,
       itemsCollapsed: !!f.itemsCollapsed,
       items: f.items || []
     })),

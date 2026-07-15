@@ -1610,14 +1610,14 @@ if (toothlessDomain) {
     },
     {
       name: 'Божественный канал: Реликвии войны', level: '6-й уровень', rank: 6,
-      text: `Начиная с 6-го уровня бонусным действием используйте «Божественный канал», чтобы на 1 минуту воззвать к одной из шести реликвий, которые Бесклыкий несёт в бой на тысячеглазом Галантаре. Выберите один эффект:
+      text: `Начиная с 6-го уровня вы можете бонусным действием использовать «Божественный канал», чтобы на 1 минуту воззвать к одной из шести реликвий, которые Бесклыкий несёт в бой на тысячеглазом Галантаре. Выберите один из следующих эффектов:
 
-- Жизнь. Когда заклинание 1-го уровня или выше восстанавливает хиты, перебросьте на костях лечения результаты 1 или 2. Новый результат необходимо использовать.
-- Смерть. Выберите существо в пределах 30 футов и тип урона. Вы и цель получаете уязвимость к выбранному типу урона от атак, заклинаний и способностей друг друга и не можете восстанавливать хиты.
-- Победа. Совершая действие «Атака», вы выполняете одну дополнительную атаку оружием. Вы и союзники в пределах 30 футов наносите дополнительно излучающий урон, равный вашему модификатору Мудрости.
-- Поражение. Выберите существо в пределах 30 футов. Оно совершает спасбросок Харизмы против Сл ваших заклинаний. При провале цель совершает с помехой проверки и спасброски одной выбранной вами характеристики.
-- Храбрость. Вы и союзники в пределах 30 футов совершаете с преимуществом спасброски против испуга и в начале своего хода получаете временные хиты, равные вашему модификатору Мудрости.
-- Трусость. Когда враждебное существо в пределах 30 футов атакует вас или союзника, оно совершает спасбросок Мудрости. При провале получает психический урон, равный вашему уровню жреца, и становится испуганным до конца своего следующего хода.
+- Жизнь. Когда заклинание 1-го уровня или выше восстанавливает хиты, перебросьте все выпавшие значения 1 и 2 на костях лечения. Вы должны использовать новые результаты.
+- Смерть. Выберите существо в пределах 30 футов и один тип урона. Вы и выбранное существо получаете уязвимость к урону выбранного типа, наносимому друг другу атаками, заклинаниями и способностями, и не можете восстанавливать хиты.
+- Победа. Когда вы совершаете действие «Атака», вы можете выполнить одну дополнительную атаку оружием. Кроме того, вы и ваши союзники в пределах 30 футов наносите дополнительный урон излучением, равный вашему модификатору Мудрости.
+- Поражение. Выберите существо в пределах 30 футов. Оно должно совершить спасбросок Харизмы против Сл ваших заклинаний. При провале цель совершает с помехой проверки характеристик и спасброски, связанные с одной выбранной вами характеристикой.
+- Храбрость. Вы и ваши союзники в пределах 30 футов совершаете с преимуществом спасброски против испуга. Кроме того, в начале каждого своего хода затронутое существо получает временные хиты, равные вашему модификатору Мудрости.
+- Трусость. Когда враждебное существо в пределах 30 футов атакует вас или вашего союзника, оно должно совершить спасбросок Мудрости против Сл ваших заклинаний. При провале существо получает урон психической энергией, равный вашему уровню жреца, и становится испуганным до конца своего следующего хода.
 
 Эффект заканчивается досрочно, если вы становитесь недееспособны.`
     },
@@ -1847,13 +1847,10 @@ if (salbaraChild) {
 
 Сальбарит исчезает через 1 час или при снижении хитов до 0. Действием вы можете поглотить его и восстановить хиты в количестве, равном половине оставшихся у него хитов, с округлением в меньшую сторону.
 
-Преобразование. Бонусным действием, находясь в пределах 60 футов, вы можете переместить сальбарит на 30 футов в свободное пространство и придать ему одну из доступных форм.`,
-      itemsTitle: 'Преобразования сальбарита',
-      itemsCollapsed: true,
-      items: [
-        { name: 'Клинки', text: 'Сальбарит врастает в ваше тело в виде лёгкого фехтовального оружия, которым вы владеете. При попадании клинки наносят 2к6 + бонус мастерства рубящего урона.' },
-        { name: 'Режущая нить', text: 'Совершите дальнобойную атаку заклинанием из пространства сальбарита по цели в пределах 120 футов. При попадании цель получает 2к6 рубящего урона. Существо также совершает спасбросок Телосложения против Сл ваших заклинаний. При провале оно теряет 1к6 хитов в начале каждого своего хода, пока кто-либо не остановит кровотечение действием и успешной проверкой Мудрости (Медицина) Сл 12.' }
-      ]
+Преобразование. Если вы находитесь в пределах 60 футов от сальбарита, бонусным действием вы можете переместить его на 30 футов в свободное пространство и придать ему одну из следующих форм:
+
+- Клинки. Сальбарит врастает в ваше тело в виде лёгкого фехтовального оружия, которым вы владеете. При попадании клинки наносят 2к6 + ваш бонус мастерства рубящего урона.
+- Режущая нить. Совершите дальнобойную атаку заклинанием из пространства сальбарита по цели в пределах 120 футов. При попадании цель получает 2к6 рубящего урона. Если цель — существо, она также должна совершить спасбросок Телосложения против Сл ваших заклинаний. При провале цель теряет 1к6 хитов в начале каждого своего хода, пока она или другое существо не остановит кровотечение действием и успешной проверкой Мудрости (Медицина) Сл 12.`
     },
     {
       name: 'Кромсало', level: '5-й уровень', rank: 5,
@@ -1861,13 +1858,10 @@ if (salbaraChild) {
     },
     {
       name: 'Живой металл', level: '9-й уровень', rank: 9,
-      text: 'Начиная с 9-го уровня вы можете видеть через сальбарит и перемещать его в пределах 120 футов. Кроме того, вам становятся доступны новые преобразования.',
-      itemsTitle: 'Новые преобразования',
-      itemsCollapsed: true,
-      items: [
-        { name: 'Купол', text: 'Создайте вокруг сальбарита металлический купол радиусом 10 футов. Купол не позволяет выбранным вами враждебным существам войти внутрь.' },
-        { name: 'Плоть', text: 'Бонусным действием вживите сальбарит в своё тело на 1 минуту. Вы получаете временные хиты, равные половине его текущих хитов, сопротивление огню и преимущество на спасброски Ловкости.' }
-      ]
+      text: `Начиная с 9-го уровня вы можете видеть через сальбарит и перемещать его в пределах 120 футов. Кроме того, вам становятся доступны следующие формы:
+
+- Купол. Создайте вокруг сальбарита металлический купол радиусом 10 футов. Купол не позволяет выбранным вами враждебным существам войти внутрь.
+- Плоть. Бонусным действием вживите сальбарит в своё тело на 1 минуту. Вы получаете временные хиты, равные половине его текущих хитов, сопротивление огню и преимущество на спасброски Ловкости.`
     },
     {
       name: 'Разделение', level: '15-й уровень', rank: 15,
@@ -1876,10 +1870,8 @@ if (salbaraChild) {
 Бонусным действием вы можете переместить любое количество этих частей по правилам перемещения обычного сальбарита.`
     },
     {
-      name: 'Сальбаритовые инфузии', level: '15-й уровень', rank: 15,
-      text: 'Ваше мастерство позволяет создавать устойчивые изделия и заменять части тела живым металлом. Требования и эффекты каждой инфузии приведены отдельно.',
-      itemsTitle: 'Список сальбаритовых инфузий',
-      itemsCollapsed: true,
+      name: 'Сальбаритовые инфузии', level: '3-й уровень', rank: 3,
+      text: 'Начиная с 3-го уровня следующие сальбаритовые инфузии добавляются в список доступных вам инфузий изобретателя. Для выбора отдельных инфузий необходимо соответствовать указанным требованиям.',
       items: [
         { name: 'Длань Сальбары', text: 'Требование: нет. Дополнительная гибкая рука даёт скорость лазания, равную половине скорости ходьбы. Можно создать до четырёх таких конечностей, но скорость лазания не складывается.' },
         { name: 'Медицинские иглы Сальбары', text: 'Требование: набор целителя. Вы совершаете с преимуществом проверки Мудрости (Медицина), используя гибкие и удлиняющиеся иглы.' },
@@ -1896,16 +1888,115 @@ if (salbaraChild) {
   ]
 })
 
+const salbaraChildTu = imported['Изобретатель']?.find(archetype => archetype.name === 'Дитя Сальбары' && archetype.source === 'TU')
+salbaraChildTu?.features.sort((a, b) => (a.rank || 999) - (b.rank || 999))
+
 if (imported['Жрец']) {
   imported['Жрец'] = imported['Жрец'].filter(archetype => archetype.name !== 'Домен крови')
+}
+
+if (imported['Колдун']) {
+  const hiddenWarlockArchetypes = new Set(['Меридир', 'Эфирный Царь', 'Наследник Акрамов'])
+  imported['Колдун'] = imported['Колдун'].filter(archetype => !hiddenWarlockArchetypes.has(archetype.name))
+}
+
+if (imported['Монах']) {
+  const hiddenMonkArchetypes = new Set(['Путь Порчи', 'Путь Порывов', 'Путь Хищника'])
+  imported['Монах'] = imported['Монах'].filter(archetype => !hiddenMonkArchetypes.has(archetype.name))
 }
 
 for (const list of Object.values(imported)) {
   list.sort((a, b) => a.name.localeCompare(b.name, 'ru'))
 }
 
-const banner = `// Generated from local ENOA class archetype markdown files.\n// Excludes 0.33 versions, Blood Hunter and Reaper source folders.\n\n`
-fs.writeFileSync(outFile, `${banner}export const CLASS_ARCHETYPES_IMPORTED = ${JSON.stringify(imported, null, 2)}\n`, 'utf8')
+const banner = `// Generated from local ENOA class archetype markdown files.\n// Excludes 0.33 versions, Blood Hunter and Reaper source folders.\n\nimport { ANCIENT_SPIRIT_OVERRIDE } from './ancientSpiritOverride.js'\nimport { IMPRISONED_PATRON_OVERRIDE } from './imprisonedPatronOverride.js'\nimport { AKREPA_CHOSEN_OVERRIDE } from './akrepaChosenOverride.js'\nimport { UKTEE_BLADE_OVERRIDE } from './ukteeBladeOverride.js'\nimport { ANZU_PATRON_OVERRIDE } from './anzuPatronOverride.js'\nimport { SNAKE_WAY_OVERRIDE } from './snakeWayOverride.js'\nimport { DEVOURING_HAND_WAY_OVERRIDE } from './devouringHandWayOverride.js'\nimport { TOOTHLESS_OATH_OVERRIDE } from './toothlessOathOverride.js'\nimport { BATTLE_OATH_OVERRIDE } from './battleOathOverride.js'\nimport { VEIL_OATH_OVERRIDE } from './veilOathOverride.js'\n\n`
+const footer = `\nconst ancientSpirit = CLASS_ARCHETYPES_IMPORTED['Колдун']?.find(archetype => archetype.name === 'Древний Дух')\nif (ancientSpirit) Object.assign(ancientSpirit, ANCIENT_SPIRIT_OVERRIDE)\n\nconst imprisonedPatron = CLASS_ARCHETYPES_IMPORTED['Колдун']?.find(archetype => archetype.name === 'Заточенный покровитель')\nif (imprisonedPatron) Object.assign(imprisonedPatron, IMPRISONED_PATRON_OVERRIDE)\n\nconst akrepaChosen = CLASS_ARCHETYPES_IMPORTED['Колдун']?.find(archetype => archetype.name === 'Избранник Акрепы')\nif (akrepaChosen) Object.assign(akrepaChosen, AKREPA_CHOSEN_OVERRIDE)\n\nconst ukteeBlade = CLASS_ARCHETYPES_IMPORTED['Колдун']?.find(archetype => archetype.name === 'Клинок Укт’ээ')\nif (ukteeBlade) Object.assign(ukteeBlade, UKTEE_BLADE_OVERRIDE)\n\nconst anzuPatron = CLASS_ARCHETYPES_IMPORTED['Колдун']?.find(archetype => archetype.name === 'Потусторонний покровитель Анзу')\nif (anzuPatron) Object.assign(anzuPatron, ANZU_PATRON_OVERRIDE)\n\nconst snakeWay = CLASS_ARCHETYPES_IMPORTED['Монах']?.find(archetype => archetype.name === 'Путь Змеи')\nif (snakeWay) Object.assign(snakeWay, SNAKE_WAY_OVERRIDE)\n\nconst devouringHandWay = CLASS_ARCHETYPES_IMPORTED['Монах']?.find(archetype => archetype.name === 'Путь Пожирающей Длани')\nif (devouringHandWay) Object.assign(devouringHandWay, DEVOURING_HAND_WAY_OVERRIDE)\n\nconst toothlessOath = CLASS_ARCHETYPES_IMPORTED['Паладин']?.find(archetype => archetype.name === 'Клятва Бесклыкого')\nif (toothlessOath) Object.assign(toothlessOath, TOOTHLESS_OATH_OVERRIDE)\n\nconst battleOath = CLASS_ARCHETYPES_IMPORTED['Паладин']?.find(archetype => archetype.name === 'Клятва Битвы')\nif (battleOath) Object.assign(battleOath, BATTLE_OATH_OVERRIDE)\n\nconst veilOath = CLASS_ARCHETYPES_IMPORTED['Паладин']?.find(archetype => archetype.name === 'Клятва Вуали')\nif (veilOath) Object.assign(veilOath, VEIL_OATH_OVERRIDE)\n\nconst hiddenWarlockArchetypes = new Set(['Меридир', 'Эфирный Царь', 'Наследник Акрамов'])\nif (CLASS_ARCHETYPES_IMPORTED['Колдун']) {\n  CLASS_ARCHETYPES_IMPORTED['Колдун'] = CLASS_ARCHETYPES_IMPORTED['Колдун']\n    .filter(archetype => !hiddenWarlockArchetypes.has(archetype.name))\n}\n\nconst hiddenMonkArchetypes = new Set(['Путь Порчи', 'Путь Порывов', 'Путь Хищника'])\nif (CLASS_ARCHETYPES_IMPORTED['Монах']) {\n  CLASS_ARCHETYPES_IMPORTED['Монах'] = CLASS_ARCHETYPES_IMPORTED['Монах']\n    .filter(archetype => !hiddenMonkArchetypes.has(archetype.name))\n}\n`
+const bannerWithNameReaper = banner.replace(
+  "import { VEIL_OATH_OVERRIDE } from './veilOathOverride.js'\n",
+  "import { VEIL_OATH_OVERRIDE } from './veilOathOverride.js'\nimport { NAME_REAPER_OATH_OVERRIDE } from './nameReaperOathOverride.js'\n"
+)
+const footerWithNameReaper = footer.replace(
+  "const hiddenWarlockArchetypes =",
+  "const nameReaperOath = CLASS_ARCHETYPES_IMPORTED['Паладин']?.find(archetype => archetype.name === 'Клятва жнеца Имен')\nif (nameReaperOath) Object.assign(nameReaperOath, NAME_REAPER_OATH_OVERRIDE)\n\nconst hiddenWarlockArchetypes ="
+)
+const bannerWithOverrides = bannerWithNameReaper.replace(
+  "import { NAME_REAPER_OATH_OVERRIDE } from './nameReaperOathOverride.js'\n",
+  "import { NAME_REAPER_OATH_OVERRIDE } from './nameReaperOathOverride.js'\nimport { NOMAD_OATH_OVERRIDE } from './nomadOathOverride.js'\nimport { WORD_OATH_OVERRIDE } from './wordOathOverride.js'\nimport { SECRETS_OATH_OVERRIDE } from './secretsOathOverride.js'\nimport { DEVOURER_OATH_OVERRIDE } from './devourerOathOverride.js'\nimport { VIRTUOSO_MERCHANT_OVERRIDE } from './virtuosoMerchantOverride.js'\nimport { SALBAR_SEEKER_OVERRIDE } from './salbarSeekerOverride.js'\nimport { THREAD_CUTTER_OVERRIDE } from './threadCutterOverride.js'\nimport { SPIRIT_WANDERER_OVERRIDE } from './spiritWandererOverride.js'\nimport { VEIL_SHADOW_OVERRIDE } from './veilShadowOverride.js'\nimport { SPIRIT_TRAPPER_OVERRIDE } from './spiritTrapperOverride.js'\n"
+)
+const bannerWithSandGhost = bannerWithOverrides.replace(
+  "import { SPIRIT_TRAPPER_OVERRIDE } from './spiritTrapperOverride.js'\n",
+  "import { SPIRIT_TRAPPER_OVERRIDE } from './spiritTrapperOverride.js'\nimport { SAND_GHOST_OVERRIDE } from './sandGhostOverride.js'\n"
+)
+const bannerWithChildOfHunger = bannerWithSandGhost.replace(
+  "import { SAND_GHOST_OVERRIDE } from './sandGhostOverride.js'\n",
+  "import { SAND_GHOST_OVERRIDE } from './sandGhostOverride.js'\nimport { CHILD_OF_HUNGER_OVERRIDE } from './childOfHungerOverride.js'\n"
+)
+const bannerWithGreatHunger = bannerWithChildOfHunger.replace(
+  "import { CHILD_OF_HUNGER_OVERRIDE } from './childOfHungerOverride.js'\n",
+  "import { CHILD_OF_HUNGER_OVERRIDE } from './childOfHungerOverride.js'\nimport { GREAT_HUNGER_OVERRIDE } from './greatHungerOverride.js'\n"
+)
+const bannerWithAzrakSpark = bannerWithGreatHunger.replace(
+  "import { GREAT_HUNGER_OVERRIDE } from './greatHungerOverride.js'\n",
+  "import { GREAT_HUNGER_OVERRIDE } from './greatHungerOverride.js'\nimport { AZRAK_SPARK_OVERRIDE } from './azrakSparkOverride.js'\n"
+)
+const bannerWithRoyalBlood = bannerWithAzrakSpark.replace(
+  "import { AZRAK_SPARK_OVERRIDE } from './azrakSparkOverride.js'\n",
+  "import { AZRAK_SPARK_OVERRIDE } from './azrakSparkOverride.js'\nimport { ROYAL_BLOOD_OVERRIDE } from './royalBloodOverride.js'\n"
+)
+const bannerWithTususDescendant = bannerWithRoyalBlood.replace(
+  "import { ROYAL_BLOOD_OVERRIDE } from './royalBloodOverride.js'\n",
+  "import { ROYAL_BLOOD_OVERRIDE } from './royalBloodOverride.js'\nimport { TUSUS_DESCENDANT_OVERRIDE } from './tususDescendantOverride.js'\n"
+)
+const bannerWithVeilBorn = bannerWithTususDescendant.replace(
+  "import { TUSUS_DESCENDANT_OVERRIDE } from './tususDescendantOverride.js'\n",
+  "import { TUSUS_DESCENDANT_OVERRIDE } from './tususDescendantOverride.js'\nimport { VEIL_BORN_OVERRIDE } from './veilBornOverride.js'\n"
+)
+const bannerWithSparkWeaver = bannerWithVeilBorn.replace(
+  "import { VEIL_BORN_OVERRIDE } from './veilBornOverride.js'\n",
+  "import { VEIL_BORN_OVERRIDE } from './veilBornOverride.js'\nimport { SPARK_WEAVER_OVERRIDE } from './sparkWeaverOverride.js'\n"
+)
+const footerWithOverrides = footerWithNameReaper.replace(
+  "const hiddenWarlockArchetypes =",
+  "const nomadOath = CLASS_ARCHETYPES_IMPORTED['Паладин']?.find(archetype => archetype.name === 'Клятва Кочевника')\nif (nomadOath) Object.assign(nomadOath, NOMAD_OATH_OVERRIDE)\n\nconst wordOath = CLASS_ARCHETYPES_IMPORTED['Паладин']?.find(archetype => archetype.name === 'Клятва Слова')\nif (wordOath) Object.assign(wordOath, WORD_OATH_OVERRIDE)\n\nconst secretsOath = CLASS_ARCHETYPES_IMPORTED['Паладин']?.find(archetype => archetype.name === 'Клятва Секретов')\nif (secretsOath) Object.assign(secretsOath, SECRETS_OATH_OVERRIDE)\n\nconst devourerOath = CLASS_ARCHETYPES_IMPORTED['Паладин']?.find(archetype => archetype.name === 'Клятва Пожирателя')\nif (devourerOath) Object.assign(devourerOath, DEVOURER_OATH_OVERRIDE)\n\nconst virtuosoMerchant = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Виртуозный торгаш')\nif (virtuosoMerchant) Object.assign(virtuosoMerchant, VIRTUOSO_MERCHANT_OVERRIDE)\n\nconst salbarSeeker = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Искатель Сальбара')\nif (salbarSeeker) Object.assign(salbarSeeker, SALBAR_SEEKER_OVERRIDE)\n\nconst threadCutter = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Рвущий нити')\nif (threadCutter) Object.assign(threadCutter, THREAD_CUTTER_OVERRIDE)\n\nconst spiritWanderer = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Странник Духов')\nif (spiritWanderer) Object.assign(spiritWanderer, SPIRIT_WANDERER_OVERRIDE)\n\nconst veilShadow = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Тень Вуали')\nif (veilShadow) Object.assign(veilShadow, VEIL_SHADOW_OVERRIDE)\n\nconst spiritTrapper = CLASS_ARCHETYPES_IMPORTED['Следопыт']?.find(archetype => archetype.name === 'Ловец Духов')\nif (spiritTrapper) Object.assign(spiritTrapper, SPIRIT_TRAPPER_OVERRIDE)\n\nconst sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')\nfor (const feature of sandSnake?.features || []) {\n  if (['Ядовитый язык', 'Чешуя', 'Преображение'].includes(feature.name)) {\n    feature.text = feature.text.replace(/(^- [^\\n]+)\\n\\n(?=- )/gm, '$1\\n')\n  }\n}\n\nconst hiddenWarlockArchetypes ="
+)
+const footerWithSandGhost = footerWithOverrides.replace(
+  "const sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')",
+  "const sandGhost = CLASS_ARCHETYPES_IMPORTED['Следопыт']?.find(archetype => archetype.name === 'Призрак Песков')\nif (sandGhost) Object.assign(sandGhost, SAND_GHOST_OVERRIDE)\n\nconst sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')"
+)
+const footerWithChildOfHunger = footerWithSandGhost.replace(
+  "const sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')",
+  "const childOfHunger = CLASS_ARCHETYPES_IMPORTED['Чародей']?.find(archetype => archetype.name === 'Дитя Глада')\nif (childOfHunger) Object.assign(childOfHunger, CHILD_OF_HUNGER_OVERRIDE)\n\nconst sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')"
+)
+const footerWithGreatHunger = footerWithChildOfHunger.replace(
+  "const sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')",
+  "const greatHunger = CLASS_ARCHETYPES_IMPORTED['Чародей']?.find(archetype => archetype.name === 'Великий Глад')\nif (greatHunger) Object.assign(greatHunger, GREAT_HUNGER_OVERRIDE)\n\nconst sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')"
+)
+const footerWithAzrakSpark = footerWithGreatHunger.replace(
+  "const sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')",
+  "const azrakSpark = CLASS_ARCHETYPES_IMPORTED['Чародей']?.find(archetype => archetype.name === 'Искра Азрака')\nif (azrakSpark) Object.assign(azrakSpark, AZRAK_SPARK_OVERRIDE)\n\nconst sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')"
+)
+const footerWithRoyalBlood = footerWithAzrakSpark.replace(
+  "const sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')",
+  "const royalBlood = CLASS_ARCHETYPES_IMPORTED['Чародей']?.find(archetype => archetype.name === 'Кровь королей')\nif (royalBlood) Object.assign(royalBlood, ROYAL_BLOOD_OVERRIDE)\n\nconst sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')"
+)
+const footerWithTususDescendant = footerWithRoyalBlood.replace(
+  "const sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')",
+  "const tususDescendant = CLASS_ARCHETYPES_IMPORTED['Чародей']?.find(archetype => archetype.name === 'Потомок Тусуса')\nif (tususDescendant) Object.assign(tususDescendant, TUSUS_DESCENDANT_OVERRIDE)\n\nconst sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')"
+)
+const footerWithVeilBorn = footerWithTususDescendant.replace(
+  "const sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')",
+  "const veilBorn = CLASS_ARCHETYPES_IMPORTED['Чародей']?.find(archetype => archetype.name === 'Рождённый Вуалью')\nif (veilBorn) Object.assign(veilBorn, VEIL_BORN_OVERRIDE)\n\nconst sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')"
+)
+const footerWithSparkWeaver = footerWithVeilBorn.replace(
+  "const sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')",
+  "const sparkWeaver = CLASS_ARCHETYPES_IMPORTED['Чародей']?.find(archetype => archetype.name === 'Ткач Искры')\nif (sparkWeaver) Object.assign(sparkWeaver, SPARK_WEAVER_OVERRIDE)\n\nconst sandSnake = CLASS_ARCHETYPES_IMPORTED['Плут']?.find(archetype => archetype.name === 'Песчаная Змея')"
+)
+const footerWithHiddenRogue = footerWithSparkWeaver.replace(
+  "const hiddenWarlockArchetypes =",
+  "if (CLASS_ARCHETYPES_IMPORTED['Плут']) {\n  CLASS_ARCHETYPES_IMPORTED['Плут'] = CLASS_ARCHETYPES_IMPORTED['Плут']\n    .filter(archetype => archetype.name !== 'Тени')\n}\n\nconst hiddenWarlockArchetypes ="
+)
+
+fs.writeFileSync(outFile, `${bannerWithSparkWeaver}export const CLASS_ARCHETYPES_IMPORTED = ${JSON.stringify(imported, null, 2)}\n${footerWithHiddenRogue}`, 'utf8')
 
 console.log(JSON.stringify({
   outFile,
