@@ -382,30 +382,12 @@ function isDiceLabel(text) {
   return /^[кd](?:4|6|8|10|12|20|100)$/i.test(String(text || '').trim())
 }
 
-function inlineParts(text) {
-  const value = String(text || '')
-  const parts = []
-  const pattern = /(\*\*[^*\n]+\*\*|Гнев(?:а)? Ильбеша|(?:\d+)?[кd](?:4|6|8|10|12|20|100))/giu
-  let lastIndex = 0
-  for (const match of value.matchAll(pattern)) {
-    const start = match.index || 0
-    if (start > lastIndex) parts.push({ type: 'text', value: value.slice(lastIndex, start) })
-    parts.push(match[0].startsWith('**')
-      ? { type: 'bold', value: match[0].slice(2, -2) }
-      : /^гнева? ильбеша$/iu.test(match[0])
-        ? { type: 'link', value: match[0], href: '/dnd5e/wrath' }
-        : { type: 'dice', value: match[0] })
-    lastIndex = start + match[0].length
-  }
-  if (lastIndex < value.length) parts.push({ type: 'text', value: value.slice(lastIndex) })
-  return parts
-}
-
 const featureTableRolls = reactive({})
 
 function featureTableRollDefinition(featureName) {
   if (featureName === 'Откровение Эсхи') return { sides: 100, button: 'Бросить к100', result: 'Откровение' }
   if (featureName === 'Печати Вуали') return { sides: 6, button: 'Сгенерировать Печать', result: 'Печать' }
+  if (featureName === 'Магическое безумие') return { sides: 12, button: 'Бросить 1к12', result: 'Эффект безумия' }
   return null
 }
 
@@ -1219,7 +1201,7 @@ function scrollToClassFeature(featureId) {
         <div class="cls-build-top cls-thread-node">
           <div class="cls-build-main">
             <h2>{{ activeBuildTitle }}</h2>
-            <p>{{ activeBuildSummary }}</p>
+            <p><RuleRichText :text="activeBuildSummary" /></p>
             <div class="cls-build-meta">
               <span>{{ activeBuildMeta }}</span>
             </div>
@@ -1250,9 +1232,9 @@ function scrollToClassFeature(featureId) {
               <span>Хиты</span>
             </button>
             <div v-if="state.classHitsOpen" class="cls-rule-body">
-              <div class="cls-rule-row"><strong>Кость хитов</strong><span>1к{{ vm.classHd }} за уровень</span></div>
-              <div class="cls-rule-row"><strong>На 1 уровне</strong><span>{{ vm.classHpFirst }}</span></div>
-              <div class="cls-rule-row"><strong>Далее</strong><span>{{ vm.classHpNext }} (мин. 1)</span></div>
+              <div class="cls-rule-row"><strong>Кость хитов</strong><span><RuleRichText :text="`1к${vm.classHd} за уровень`" /></span></div>
+              <div class="cls-rule-row"><strong>На 1 уровне</strong><span><RuleRichText :text="vm.classHpFirst" /></span></div>
+              <div class="cls-rule-row"><strong>Далее</strong><span><RuleRichText :text="`${vm.classHpNext} (мин. 1)`" /></span></div>
             </div>
           </section>
 
@@ -1263,9 +1245,9 @@ function scrollToClassFeature(featureId) {
             </button>
             <div v-if="state.classEquipOpen" class="cls-rule-body">
               <div v-for="(e, i) in vm.classEquip" :key="i" class="cls-rule-row">
-                <strong class="equip-label">Список предметов №{{ i + 1 }}</strong><span>{{ e }}</span>
+                <strong class="equip-label">Список предметов №{{ i + 1 }}</strong><span><RuleRichText :text="e" /></span>
               </div>
-              <div v-if="vm.classEquipNote" class="cls-rule-row note"><strong>Примечание</strong><span>{{ vm.classEquipNote }}</span></div>
+              <div v-if="vm.classEquipNote" class="cls-rule-row note"><strong>Примечание</strong><span><RuleRichText :text="vm.classEquipNote" /></span></div>
             </div>
           </section>
 
@@ -1275,11 +1257,11 @@ function scrollToClassFeature(featureId) {
               <span>Владение</span>
             </button>
             <div v-if="state.classProfOpen" class="cls-rule-body">
-              <div class="cls-rule-row"><strong>Доспехи</strong><span>{{ vm.classArmor }}</span></div>
-              <div class="cls-rule-row"><strong>Оружие</strong><span>{{ vm.classWeapons }}</span></div>
-              <div class="cls-rule-row"><strong>Инструменты</strong><span>{{ vm.classTools }}</span></div>
-              <div class="cls-rule-row"><strong>Спасброски</strong><span>{{ vm.classSaves }}</span></div>
-              <div class="cls-rule-row"><strong>Навыки</strong><span>{{ vm.classSkills }}</span></div>
+              <div class="cls-rule-row"><strong>Доспехи</strong><span><RuleRichText :text="vm.classArmor" /></span></div>
+              <div class="cls-rule-row"><strong>Оружие</strong><span><RuleRichText :text="vm.classWeapons" /></span></div>
+              <div class="cls-rule-row"><strong>Инструменты</strong><span><RuleRichText :text="vm.classTools" /></span></div>
+              <div class="cls-rule-row"><strong>Спасброски</strong><span><RuleRichText :text="vm.classSaves" /></span></div>
+              <div class="cls-rule-row"><strong>Навыки</strong><span><RuleRichText :text="vm.classSkills" /></span></div>
             </div>
           </section>
         </div>
@@ -1334,7 +1316,7 @@ function scrollToClassFeature(featureId) {
                 </div>
                 <span class="cls-feature-lvl">{{ vm.classSelectedArchetypeDescription.level }}</span>
               </div>
-              <blockquote v-if="vm.classSelectedArchetypeDescription.hasQuote" class="cls-arch-quote compact">{{ vm.classSelectedArchetypeDescription.quote }}</blockquote>
+              <blockquote v-if="vm.classSelectedArchetypeDescription.hasQuote" class="cls-arch-quote compact"><RuleRichText :text="vm.classSelectedArchetypeDescription.quote" /></blockquote>
               <div v-if="isAnzuPatron(vm.classSelectedArchetypeDescription.name)" class="cls-archetype-warning">
                 <span class="cls-archetype-warning-mark">!</span>
                 <div>
@@ -1343,8 +1325,8 @@ function scrollToClassFeature(featureId) {
                 </div>
               </div>
               <div class="cls-subclass-description-text">
-                <p v-for="(p, i) in vm.classSelectedArchetypeDescription.intro" :key="i">{{ p }}</p>
-                <p v-if="vm.classSelectedArchetypeDescription.summary && !isAnzuPatron(vm.classSelectedArchetypeDescription.name)">{{ vm.classSelectedArchetypeDescription.summary }}</p>
+                <p v-for="(p, i) in vm.classSelectedArchetypeDescription.intro" :key="i"><RuleRichText :text="p" /></p>
+                <p v-if="vm.classSelectedArchetypeDescription.summary && !isAnzuPatron(vm.classSelectedArchetypeDescription.name)"><RuleRichText :text="vm.classSelectedArchetypeDescription.summary" /></p>
               </div>
             </div>
           </template>
@@ -1378,29 +1360,22 @@ function scrollToClassFeature(featureId) {
                           <template v-else>{{ block.title }}</template>
                         </h4>
                         <p v-if="block.text">
-                          <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                          </template>
+                          <RuleRichText :text="block.text" />
                         </p>
                       </section>
                       <aside v-else-if="block.type === 'example'" class="cls-feature-example">
-                        {{ block.text }}
+                        <RuleRichText :text="block.text" />
                       </aside>
                       <div v-else-if="block.type === 'formula'" class="cls-feature-formula">
-                        <strong>{{ block.label }}</strong> = {{ block.value }}
+                        <strong>{{ block.label }}</strong> = <RuleRichText :text="block.value" />
                       </div>
                       <ul v-else-if="block.type === 'list'" class="cls-feature-list">
                         <li v-for="(item, li) in block.items" :key="li">
                           <template v-if="highlightsListLead(f.name)">
                             <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
-                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi">
-                              <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
-                              <span v-else :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                            </template>
+                            <RuleRichText :text="splitFeatureLead(item).rest" />
                           </template>
-                          <template v-else v-for="(part, pi) in inlineParts(item)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                          </template>
+                          <RuleRichText v-else :text="item" />
                         </li>
                       </ul>
                       <div v-else-if="block.type === 'diceGroup'" class="cls-dice-group">
@@ -1408,9 +1383,7 @@ function scrollToClassFeature(featureId) {
                         <ul class="cls-feature-list">
                           <li v-for="(item, li) in block.items" :key="li">
                             <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
-                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                            </template>
+                            <RuleRichText :text="splitFeatureLead(item).rest" />
                           </li>
                         </ul>
                       </div>
@@ -1422,14 +1395,14 @@ function scrollToClassFeature(featureId) {
                           </button>
                           <div v-if="featureTableRolls[f.name]" class="cls-table-roll-result" aria-live="polite">
                             <strong>{{ featureTableRolls[f.name].label }}: {{ featureTableRolls[f.name].roll }}</strong>
-                            <span>{{ featureTableRolls[f.name].text }}</span>
+                            <span><RuleRichText :text="featureTableRolls[f.name].text" /></span>
                           </div>
                         </div>
                         <table class="cls-feature-table">
                           <thead>
                             <tr>
                               <th v-for="(header, hi) in block.headers" :key="hi">
-                                <template v-for="(part, pi) in inlineParts(header)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
+                                <RuleRichText :text="header" />
                               </th>
                             </tr>
                           </thead>
@@ -1437,7 +1410,7 @@ function scrollToClassFeature(featureId) {
                             <tr v-for="(row, ri) in block.rows" :key="ri" :class="{ 'is-roll-match': isFeatureTableRollMatch(f.name, row) }">
                               <td v-for="(cell, ci) in row" :key="ci">
                                 <strong v-if="isRoyalBloodKing(cell)" class="cls-dance-option">{{ cell }}</strong>
-                                <template v-else v-for="(part, pi) in inlineParts(cell)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
+                                <RuleRichText v-else :text="cell" />
                               </td>
                             </tr>
                           </tbody>
@@ -1446,11 +1419,9 @@ function scrollToClassFeature(featureId) {
                       <p v-else>
                         <template v-if="highlightsParagraphLead(f.name)">
                           <strong v-if="splitFeatureLead(block.text).lead" class="cls-dance-option">{{ splitFeatureLead(block.text).lead }}</strong>
-                          <template v-for="(part, pi) in inlineParts(splitFeatureLead(block.text).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
+                          <RuleRichText :text="splitFeatureLead(block.text).rest" />
                         </template>
-                        <template v-else v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                        </template>
+                        <RuleRichText v-else :text="block.text" />
                       </p>
                     </template>
                   </div>
@@ -1469,9 +1440,7 @@ function scrollToClassFeature(featureId) {
                         <span v-if="salbariteInfusionParts(item.text).item" class="cls-feature-lvl">{{ salbariteInfusionParts(item.text).item }}</span>
                       </div>
                       <div class="cls-feature-text">
-                        <template v-for="(part, pi) in inlineParts(salbariteInfusionParts(item.text).text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                        </template>
+                        <RuleRichText :text="salbariteInfusionParts(item.text).text" />
                       </div>
                     </article>
                   </div>
@@ -1516,13 +1485,11 @@ function scrollToClassFeature(featureId) {
                             <article v-for="level in implantParts(item.text).levels" :key="level.level">
                               <strong>{{ level.level }}</strong>
                               <p>
-                                <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                                </template>
+                                <RuleRichText :text="level.text" />
                               </p>
                             </article>
                           </div>
-                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
+                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note"><RuleRichText :text="note" /></p>
                         </div>
                         <div v-else-if="f.lvl === 'Категория напевов'" class="cls-shaman-chant">
                           <div class="cls-shaman-chant-head">
@@ -1540,28 +1507,22 @@ function scrollToClassFeature(featureId) {
                             <template v-for="(block, bi) in shamanChantParts(item.text).blocks" :key="bi">
                               <ul v-if="block.type === 'list'" class="cls-shaman-list">
                                 <li v-for="(entry, ei) in block.items" :key="ei">
-                                  <template v-for="(part, pi) in inlineParts(entry)" :key="pi">
-                                    <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                                  </template>
+                                  <RuleRichText :text="entry" />
                                 </li>
                               </ul>
                               <aside v-else-if="block.type === 'accent'" class="cls-shaman-accent">
                                 <strong>{{ block.title }}</strong>
-                                <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                                </template>
+                                <RuleRichText :text="block.text" />
                               </aside>
                               <p v-else>
-                                <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                                </template>
+                                <RuleRichText :text="block.text" />
                               </p>
                             </template>
                           </div>
                         </div>
                         <div v-else-if="f.lvl === 'Категория духов'" class="cls-shaman-spirit">
                           <div v-if="shamanSpiritParts(item.text).intro.length" class="cls-shaman-spirit-intro">
-                            <p v-for="paragraph in shamanSpiritParts(item.text).intro" :key="paragraph">{{ paragraph }}</p>
+                            <p v-for="paragraph in shamanSpiritParts(item.text).intro" :key="paragraph"><RuleRichText :text="paragraph" /></p>
                           </div>
                           <div v-if="shamanSpiritParts(item.text).requirement" class="cls-shaman-requirement">
                             <span>Требование</span>
@@ -1572,19 +1533,13 @@ function scrollToClassFeature(featureId) {
                               <div class="cls-shaman-ability-label">{{ ability.isChant ? 'Напев Духа' : 'Одержимость' }}</div>
                               <strong>{{ ability.title }}</strong>
                               <p>
-                                <template v-for="(part, pi) in inlineParts(ability.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                                </template>
+                                <RuleRichText :text="ability.text" />
                               </p>
                             </article>
                           </div>
                         </div>
                         <div v-else class="cls-arch-item-text">
-                          <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
-                            <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
-                            <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
-                            <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
-                          </template>
+                          <RuleRichText :text="item.text" />
                         </div>
                       </details>
                     </div>
@@ -1634,20 +1589,14 @@ function scrollToClassFeature(featureId) {
                             <article v-for="level in implantParts(item.text).levels" :key="level.level">
                               <strong>{{ level.level }}</strong>
                               <p>
-                                <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                                </template>
+                                <RuleRichText :text="level.text" />
                               </p>
                             </article>
                           </div>
-                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
+                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note"><RuleRichText :text="note" /></p>
                         </div>
                         <div v-else class="cls-arch-item-text">
-                          <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
-                            <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
-                            <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
-                            <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
-                          </template>
+                          <RuleRichText :text="item.text" />
                         </div>
                       </details>
                     </div>
@@ -1656,11 +1605,7 @@ function scrollToClassFeature(featureId) {
                     <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="!f.itemsCollapsed">
                       <summary>{{ item.name }}</summary>
                       <div class="cls-arch-item-text">
-                        <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
-                          <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
-                          <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
-                          <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
-                        </template>
+                        <RuleRichText :text="item.text" />
                       </div>
                     </details>
                   </div>
@@ -1687,8 +1632,8 @@ function scrollToClassFeature(featureId) {
                         <span>Компоненты: {{ spell.components }}</span>
                         <span>Длительность: {{ spell.duration }}</span>
                       </div>
-                      <div class="cls-feature-text">{{ spell.text }}</div>
-                      <div v-if="spell.hasHigher" class="cls-higher"><strong>На больших уровнях.</strong> {{ spell.higher }}</div>
+                      <div class="cls-feature-text"><RuleRichText :text="spell.text" /></div>
+                      <div v-if="spell.hasHigher" class="cls-higher"><strong>На больших уровнях.</strong> <RuleRichText :text="spell.higher" /></div>
                     </div>
                   </div>
                 </div>
@@ -1702,19 +1647,19 @@ function scrollToClassFeature(featureId) {
             <div class="cls-eyebrow">{{ classDescription.source }}</div>
             <h3>{{ classDescription.title || vm.className }}</h3>
             <div class="cls-description-prose">
-              <p v-for="(p, i) in classDescription.intro" :key="'class-description-'+i">{{ p }}</p>
+              <p v-for="(p, i) in classDescription.intro" :key="'class-description-'+i"><RuleRichText :text="p" /></p>
             </div>
           </section>
           <section v-for="section in classDescription.sections" :key="section.title" class="cls-description-panel" :class="{ accent: section.accent, 'has-table': section.table, 'has-notes': section.items?.length }">
             <div class="cls-eyebrow">{{ section.eyebrow || 'Описание' }}</div>
             <h3>{{ section.title }}</h3>
             <div class="cls-description-prose">
-              <p v-for="(p, i) in section.paragraphs" :key="section.title+'-p-'+i">{{ p }}</p>
+              <p v-for="(p, i) in section.paragraphs" :key="section.title+'-p-'+i"><RuleRichText :text="p" /></p>
             </div>
             <div v-if="section.items?.length" class="cls-description-notes">
               <article v-for="item in section.items" :key="item.title" class="cls-description-note">
                 <h4>{{ item.title }}</h4>
-                <p>{{ item.text }}</p>
+                <p><RuleRichText :text="item.text" /></p>
               </article>
             </div>
             <div v-if="section.table" class="cls-description-table">
@@ -1722,7 +1667,7 @@ function scrollToClassFeature(featureId) {
                 <span v-for="col in section.table.cols" :key="col">{{ col }}</span>
               </div>
               <div v-for="row in section.table.rows" :key="row[0] + row[1]" class="cls-description-table-row">
-                <span v-for="(cell, i) in row" :key="i">{{ cell }}</span>
+                <span v-for="(cell, i) in row" :key="i"><RuleRichText :text="cell" /></span>
               </div>
             </div>
           </section>
@@ -1760,10 +1705,10 @@ function scrollToClassFeature(featureId) {
                   <span v-for="tag in spellTagNames(spell.tags)" :key="tag">{{ tag }}</span>
                 </div>
                 <div class="cls-feature-prose compact">
-                  <p>{{ spell.description }}</p>
+                  <p><RuleRichText :text="spell.description" /></p>
                   <section v-for="section in spell.sections" :key="section.title" class="cls-feature-section">
                     <h4>{{ section.title }}</h4>
-                    <p>{{ section.text }}</p>
+                    <p><RuleRichText :text="section.text" /></p>
                   </section>
                 </div>
               </div>
@@ -1788,7 +1733,7 @@ function scrollToClassFeature(featureId) {
                 <span v-if="inf.hasReq" class="cls-badge">{{ inf.req }}</span>
                 <span class="cls-feature-lvl" style="letter-spacing:.05em;text-transform:none">{{ inf.item }}</span>
               </div>
-              <div class="cls-feature-text" style="font-size:16.5px">{{ inf.text }}</div>
+              <div class="cls-feature-text" style="font-size:16.5px"><RuleRichText :text="inf.text" /></div>
             </div>
           </div>
         </template>
@@ -1805,7 +1750,7 @@ function scrollToClassFeature(featureId) {
                 <span class="cls-feature-name" style="font-size:21px">{{ inv.name }}</span>
                 <span v-if="inv.hasReq" class="cls-badge">{{ inv.req }}</span>
               </div>
-              <div class="cls-feature-text" style="font-size:16.5px">{{ inv.text }}</div>
+              <div class="cls-feature-text" style="font-size:16.5px"><RuleRichText :text="inv.text" /></div>
             </div>
           </div>
         </template>
@@ -1840,10 +1785,10 @@ function scrollToClassFeature(featureId) {
                   <span>Выбор представителем другой расы возможен только с разрешения Мастера.</span>
                 </div>
               </div>
-              <div v-else-if="arch.summary" class="cls-feature-text">{{ arch.summary }}</div>
-              <blockquote v-if="arch.quote" class="cls-arch-quote compact">{{ arch.quote }}</blockquote>
+              <div v-else-if="arch.summary" class="cls-feature-text"><RuleRichText :text="arch.summary" /></div>
+              <blockquote v-if="arch.quote" class="cls-arch-quote compact"><RuleRichText :text="arch.quote" /></blockquote>
               <div v-if="arch.intro?.length" class="cls-subclass-prose">
-                <p v-for="(p, i) in arch.intro" :key="i">{{ p }}</p>
+                <p v-for="(p, i) in arch.intro" :key="i"><RuleRichText :text="p" /></p>
               </div>
               <div class="cls-subclass-rules">
                 <article v-for="feature in arch.features" :key="feature.name" class="cls-subclass-rule">
@@ -1859,28 +1804,19 @@ function scrollToClassFeature(featureId) {
                           <NuxtLink v-if="block.title === 'Гнев Ильбеша'" class="cls-inline-reference" to="/dnd5e/wrath">{{ block.title }}</NuxtLink>
                           <template v-else>{{ block.title }}</template>
                         </h4>
-                        <p v-if="block.text">
-                          <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                          </template>
-                        </p>
+                        <p v-if="block.text"><RuleRichText :text="block.text" /></p>
                       </section>
-                      <aside v-else-if="block.type === 'example'" class="cls-feature-example">{{ block.text }}</aside>
+                      <aside v-else-if="block.type === 'example'" class="cls-feature-example"><RuleRichText :text="block.text" /></aside>
                       <div v-else-if="block.type === 'formula'" class="cls-feature-formula">
-                        <strong>{{ block.label }}</strong> = {{ block.value }}
+                        <strong>{{ block.label }}</strong> = <RuleRichText :text="block.value" />
                       </div>
                       <ul v-else-if="block.type === 'list'" class="cls-feature-list">
                         <li v-for="(item, li) in block.items" :key="li">
                           <template v-if="highlightsListLead(feature.name)">
                             <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
-                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi">
-                              <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
-                              <span v-else :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                            </template>
+                            <RuleRichText :text="splitFeatureLead(item).rest" />
                           </template>
-                          <template v-else v-for="(part, pi) in inlineParts(item)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                          </template>
+                          <RuleRichText v-else :text="item" />
                         </li>
                       </ul>
                       <div v-else-if="block.type === 'diceGroup'" class="cls-dice-group">
@@ -1888,9 +1824,7 @@ function scrollToClassFeature(featureId) {
                         <ul class="cls-feature-list">
                           <li v-for="(item, li) in block.items" :key="li">
                             <strong v-if="splitFeatureLead(item).lead" class="cls-dance-option">{{ splitFeatureLead(item).lead }}</strong>
-                            <template v-for="(part, pi) in inlineParts(splitFeatureLead(item).rest)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                            </template>
+                            <RuleRichText :text="splitFeatureLead(item).rest" />
                           </li>
                         </ul>
                       </div>
@@ -1902,14 +1836,14 @@ function scrollToClassFeature(featureId) {
                           </button>
                           <div v-if="featureTableRolls[feature.name]" class="cls-table-roll-result" aria-live="polite">
                             <strong>{{ featureTableRolls[feature.name].label }}: {{ featureTableRolls[feature.name].roll }}</strong>
-                            <span>{{ featureTableRolls[feature.name].text }}</span>
+                            <span><RuleRichText :text="featureTableRolls[feature.name].text" /></span>
                           </div>
                         </div>
                         <table class="cls-feature-table">
                           <thead>
                             <tr>
                               <th v-for="(header, hi) in block.headers" :key="hi">
-                                <template v-for="(part, pi) in inlineParts(header)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
+                                <RuleRichText :text="header" />
                               </th>
                             </tr>
                           </thead>
@@ -1917,7 +1851,7 @@ function scrollToClassFeature(featureId) {
                             <tr v-for="(row, ri) in block.rows" :key="ri" :class="{ 'is-roll-match': isFeatureTableRollMatch(feature.name, row) }">
                               <td v-for="(cell, ci) in row" :key="ci">
                                 <strong v-if="isRoyalBloodKing(cell)" class="cls-dance-option">{{ cell }}</strong>
-                                <template v-else v-for="(part, pi) in inlineParts(cell)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
+                                <RuleRichText v-else :text="cell" />
                               </td>
                             </tr>
                           </tbody>
@@ -1926,11 +1860,9 @@ function scrollToClassFeature(featureId) {
                       <p v-else>
                         <template v-if="highlightsParagraphLead(feature.name)">
                           <strong v-if="splitFeatureLead(block.text).lead" class="cls-dance-option">{{ splitFeatureLead(block.text).lead }}</strong>
-                          <template v-for="(part, pi) in inlineParts(splitFeatureLead(block.text).rest)" :key="pi"><span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span></template>
+                          <RuleRichText :text="splitFeatureLead(block.text).rest" />
                         </template>
-                        <template v-else v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                        </template>
+                        <RuleRichText v-else :text="block.text" />
                       </p>
                     </template>
                   </div>
@@ -1947,11 +1879,7 @@ function scrollToClassFeature(featureId) {
                         <span v-if="salbariteInfusionParts(item.text).level" class="cls-badge">{{ salbariteInfusionParts(item.text).level }}</span>
                         <span v-if="salbariteInfusionParts(item.text).item" class="cls-feature-lvl">{{ salbariteInfusionParts(item.text).item }}</span>
                       </div>
-                      <div class="cls-feature-text">
-                        <template v-for="(part, pi) in inlineParts(salbariteInfusionParts(item.text).text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                        </template>
-                      </div>
+                      <div class="cls-feature-text"><RuleRichText :text="salbariteInfusionParts(item.text).text" /></div>
                     </article>
                   </div>
                   <template v-else-if="feature.hasItems && feature.itemsTitle && feature.name === feature.itemsTitle">
@@ -1994,22 +1922,12 @@ function scrollToClassFeature(featureId) {
                           <div v-if="implantParts(item.text).levels.length" class="cls-implant-levels">
                             <article v-for="level in implantParts(item.text).levels" :key="level.level">
                               <strong>{{ level.level }}</strong>
-                              <p>
-                                <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                                </template>
-                              </p>
+                              <p><RuleRichText :text="level.text" /></p>
                             </article>
                           </div>
-                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
+                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note"><RuleRichText :text="note" /></p>
                         </div>
-                        <div v-else class="cls-arch-item-text">
-                          <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
-                            <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
-                            <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
-                            <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
-                          </template>
-                        </div>
+                        <div v-else class="cls-arch-item-text"><RuleRichText :text="item.text" /></div>
                       </details>
                     </div>
                   </template>
@@ -2057,35 +1975,19 @@ function scrollToClassFeature(featureId) {
                           <div v-if="implantParts(item.text).levels.length" class="cls-implant-levels">
                             <article v-for="level in implantParts(item.text).levels" :key="level.level">
                               <strong>{{ level.level }}</strong>
-                              <p>
-                                <template v-for="(part, pi) in inlineParts(level.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                                </template>
-                              </p>
+                              <p><RuleRichText :text="level.text" /></p>
                             </article>
                           </div>
-                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
+                          <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note"><RuleRichText :text="note" /></p>
                         </div>
-                        <div v-else class="cls-arch-item-text">
-                          <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
-                            <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
-                            <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
-                            <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
-                          </template>
-                        </div>
+                        <div v-else class="cls-arch-item-text"><RuleRichText :text="item.text" /></div>
                       </details>
                     </div>
                   </details>
                   <div v-else-if="feature.hasItems" class="cls-arch-items" :class="{ roomy: feature.items.length > 3 }">
                     <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="!feature.itemsCollapsed">
                       <summary>{{ item.name }}</summary>
-                      <div class="cls-arch-item-text">
-                        <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
-                          <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
-                          <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
-                          <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
-                        </template>
-                      </div>
+                      <div class="cls-arch-item-text"><RuleRichText :text="item.text" /></div>
                     </details>
                   </div>
                 </article>
@@ -2109,27 +2011,15 @@ function scrollToClassFeature(featureId) {
                       <template v-for="(block, bi) in featureBlocks(spell.text)" :key="bi">
                         <section v-if="block.type === 'section'" class="cls-feature-section">
                           <h4>{{ block.title }}</h4>
-                          <p v-if="block.text">
-                            <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                            </template>
-                          </p>
+                          <p v-if="block.text"><RuleRichText :text="block.text" /></p>
                         </section>
                         <ul v-else-if="block.type === 'list'" class="cls-feature-list">
-                          <li v-for="(item, li) in block.items" :key="li">
-                            <template v-for="(part, pi) in inlineParts(item)" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                            </template>
-                          </li>
+                          <li v-for="(item, li) in block.items" :key="li"><RuleRichText :text="item" /></li>
                         </ul>
-                        <p v-else>
-                          <template v-for="(part, pi) in inlineParts(block.text || '')" :key="pi">
-                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
-                          </template>
-                        </p>
+                        <p v-else><RuleRichText :text="block.text || ''" /></p>
                       </template>
                     </div>
-                    <div v-if="spell.hasHigher" class="cls-higher"><strong>На больших уровнях.</strong> {{ spell.higher }}</div>
+                    <div v-if="spell.hasHigher" class="cls-higher"><strong>На больших уровнях.</strong> <RuleRichText :text="spell.higher" /></div>
                   </div>
                 </div>
               </div>
@@ -2358,10 +2248,10 @@ function scrollToClassFeature(featureId) {
 .cls-rule-panel.balanced .cls-rule-body{display:grid;grid-template-rows:repeat(4,minmax(44px,max-content)) minmax(max-content,1fr);flex:1}
 .cls-rule-row{display:grid;grid-template-columns:minmax(128px,.36fr) minmax(0,1fr);align-items:stretch;border-top:1px solid rgba(255,255,255,.045)}
 .cls-rule-row:first-child{border-top:0}
-.cls-rule-row strong{display:flex;align-items:center;padding:8px 14px;background:rgba(214,170,96,.07);font-family:'Hanken Grotesk',sans-serif;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,224,170,.88)}
-.cls-rule-row span{display:flex;align-items:center;padding:8px 14px;border-left:1px solid rgba(255,255,255,.045);font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.32;color:rgba(226,230,244,.79)}
-.cls-rule-row.note strong,.cls-rule-row.note span,.cls-rule-row:last-child strong,.cls-rule-row:last-child span{align-items:flex-start}
-.cls-rule-row.note span{font-style:normal;color:rgba(226,230,244,.78)}
+.cls-rule-row>strong{display:flex;align-items:center;padding:8px 14px;background:rgba(214,170,96,.07);font-family:'Hanken Grotesk',sans-serif;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,224,170,.88)}
+.cls-rule-row>span{display:flex;align-items:center;padding:8px 14px;border-left:1px solid rgba(255,255,255,.045);font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.32;color:rgba(226,230,244,.79)}
+.cls-rule-row.note>strong,.cls-rule-row.note>span,.cls-rule-row:last-child>strong,.cls-rule-row:last-child>span{align-items:flex-start}
+.cls-rule-row.note>span{font-style:normal;color:rgba(226,230,244,.78)}
 .cls-rule-row .equip-label{font-size:9px;line-height:1.22;letter-spacing:.055em}
 .cls-class-table-panel{overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(7,8,12,.24)}
 .cls-table-headline{border-bottom:1px solid rgba(255,255,255,.06)}
@@ -2700,7 +2590,7 @@ function scrollToClassFeature(featureId) {
   .cls-source-filter{margin-left:0;width:100%}
   .cls-rule-panel.balanced .cls-rule-body{display:block;height:auto}
   .cls-rule-row{grid-template-columns:1fr}
-  .cls-rule-row span{border-left:0;border-top:1px solid rgba(255,255,255,.045)}
+  .cls-rule-row>span{border-left:0;border-top:1px solid rgba(255,255,255,.045)}
   .cls-rule-row .equip-label{min-height:34px;padding:10px 14px}
   .cls-features-heading{align-items:flex-start}
   .cls-feature-summary-main{align-items:flex-start;flex-direction:column;gap:7px}
@@ -2718,7 +2608,37 @@ function scrollToClassFeature(featureId) {
   .cls-implant-levels article{grid-template-columns:1fr;gap:6px}
 }
 @media (max-width: 540px){
+  .cls-page{max-width:calc(100vw - 68px);overflow-x:hidden}
+  .cls-wrap{
+    --cls-rail-left:14px;
+    --cls-emblem-margin-left:-30px;
+    --cls-emblem-margin-right:8px;
+    width:100%;
+    min-width:0;
+    padding:26px 12px 72px;
+  }
+  .cls-thread{min-width:0;padding-left:18px}
+  .cls-thread-node::before{left:-18px}
+  .cls-thread-node::after{left:-7px;width:7px}
+  .cls-head{gap:8px}
+  .cls-emblem-box{width:76px;height:76px}
+  .cls-emblem-box::before,.cls-emblem-frame,.cls-emblem{width:64px;height:64px}
+  .cls-title{font-size:32px;overflow-wrap:anywhere}
+  .cls-toolbar{margin-top:22px}
+  .cls-icon-tools,.cls-section-tools,.cls-mode-top{
+    max-width:100%;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .cls-icon-tools::-webkit-scrollbar,.cls-section-tools::-webkit-scrollbar,.cls-mode-top::-webkit-scrollbar{display:none}
+  .cls-icon-btn,.cls-section-btn,.cls-mode-btn{flex:0 0 auto}
   .cls-build-summary{grid-template-columns:1fr}
+  .cls-card,.cls-subclass-description,.cls-description-intro-panel{padding:16px}
+  .cls-feature-content{padding:14px 15px 18px}
+  .cls-subclass-description-text,.cls-description-notes,.cls-feature-prose.is-option-list .cls-feature-list{grid-template-columns:minmax(0,1fr)}
+  .cls-feature-prose,.cls-description-prose,.cls-card-body,.cls-subclass-description-text{min-width:0;overflow-wrap:anywhere}
+  .cls-feature-list{padding-left:20px}
 }
 @media (prefers-reduced-motion: reduce){
   .cls-spark{display:none}

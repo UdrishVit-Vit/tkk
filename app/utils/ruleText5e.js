@@ -4,6 +4,11 @@
 import { RULE_LINK_INDEX_5E } from '~/data/ruleLinkIndex5e.js'
 import { RULE_SCREENS_5E } from '~/data/ruleScreens5e.js'
 import { RULE_SCREEN_LOADERS_5E } from '~/data/ruleScreenRegistry5e.js'
+import { EQUIPMENT_5E } from '~/data/equipment5e.js'
+import { WEAPONS_5E } from '~/data/weapons5e.js'
+import { ARMOR_5E } from '~/data/armor5e.js'
+import { MAGIC_ITEMS_5E, MAGIC_ITEM_RARITY_SINGULAR, MAGIC_ITEM_TYPES } from '~/data/magicItems5e.js'
+import { SPELLS_5E, SPELL_LEVELS, SPELL_SCHOOLS } from '~/data/spells5e.js'
 
 let compiled = null
 
@@ -21,6 +26,7 @@ const LINK_EXCLUDE_PATHS = new Set([
   '/dnd5e/screens/origins/punishment-events', // «Наказание»
   '/dnd5e/screens/origins/crime-events', // «Преступление»
   '/dnd5e/screens/planar_travel/spells-planar', // «Заклинания» — только о планарных перемещениях
+  '/dnd5e/screens/spells/saving-throw', // общий «спасбросок» относится к проверкам характеристик
   '/dnd5e/screens/monster/monstrosity', // «Монстры» — тип существа, есть одноимённый раздел
   '/dnd5e/screens/monster/proficiency-bonus', // «Бонус мастерства» — про монстров, не про персонажей
   '/dnd5e/screens/equipment/special', // «Особое»
@@ -43,6 +49,103 @@ const LINK_ALIASES = [
   { title: 'Состояние', path: '/dnd5e/screens/conditions_and_disease' }
 ]
 
+const SEMANTIC_RULE_PATH = '/dnd5e/screens/damage_and_attack/advantage-and-disadvantage'
+
+// Короткие названия, которые в текстах классов регулярно являются частью
+// другого слова, именем или игровым термином. Их страницы остаются доступны
+// из каталогов, но автоматическая ссылка по одиночному слову не создаётся.
+const ITEM_AUTO_LINK_EXCLUDE = new Set([
+  '/dnd5e/equipment?e=book', // линкуем только точное «книга заклинаний» ниже
+  '/dnd5e/equipment?e=pole', // «шест» совпадает с числительным «шестью»
+  '/dnd5e/equipment?e=perfume', // «духи» почти всегда означает сущностей
+  '/dnd5e/equipment?e=arrows', // «стрела» встречается в названиях заклинаний
+  '/dnd5e/weapons?w=war-pick' // основа «кирк» совпадает с именем Кирк
+])
+
+// Слова, которые в обычном тексте гораздо чаще означают не предмет.
+const ITEM_CAPITAL_ONLY = new Set([
+  '/dnd5e/equipment?e=lock'
+])
+
+function itemTitles(title) {
+  const full = String(title || '').trim()
+  const short = full.replace(/\s*(?:[,([]).*$/, '').trim()
+  return [...new Set([full, short].filter(value => value.length >= 4))]
+}
+
+function itemEntries(items, path, queryKey, section, summary) {
+  return items.flatMap(item => {
+    const itemPath = `${path}?${queryKey}=${encodeURIComponent(item.id)}`
+    if (ITEM_AUTO_LINK_EXCLUDE.has(itemPath)) return []
+    return itemTitles(item.title).map(title => ({
+      title,
+      titleEn: item.englishName || '',
+      path: itemPath,
+      summary: summary(item),
+      section,
+      kind: 'item'
+    }))
+  })
+}
+
+const REFERENCE_LINKS = [
+  ...itemEntries(
+    EQUIPMENT_5E,
+    '/dnd5e/equipment',
+    'e',
+    'Снаряжение',
+    item => [item.description, item.cost && `Стоимость: ${item.cost}.`, item.weight && `Вес: ${item.weight}.`].filter(Boolean).join(' ')
+  ),
+  ...itemEntries(
+    WEAPONS_5E,
+    '/dnd5e/weapons',
+    'w',
+    'Оружие',
+    item => [item.lore, item.damage && `Урон: ${item.damage}.`, item.cost && `Стоимость: ${item.cost}.`].filter(Boolean).join(' ')
+  ),
+  ...itemEntries(
+    ARMOR_5E,
+    '/dnd5e/armor',
+    'a',
+    'Доспехи',
+    item => [item.lore, item.armorClass && `КД: ${item.armorClass}.`, item.cost && `Стоимость: ${item.cost}.`].filter(Boolean).join(' ')
+  ),
+  ...itemEntries(
+    MAGIC_ITEMS_5E,
+    '/dnd5e/magic-items',
+    'm',
+    'Магические предметы',
+    item => [item.description, MAGIC_ITEM_RARITY_SINGULAR[item.rarity], MAGIC_ITEM_TYPES[item.type]].filter(Boolean).join(' · ')
+  ),
+  ...itemEntries(
+    SPELLS_5E,
+    '/dnd5e/spells',
+    's',
+    'Заклинания',
+    spell => [spell.description, SPELL_LEVELS[spell.level], SPELL_SCHOOLS[spell.school]].filter(Boolean).join(' · ')
+  ),
+  {
+    title: 'Гнев Ильбеша',
+    titleEn: 'Wrath of Ilbesh',
+    path: '/dnd5e/wrath',
+    summary: 'Особая система последствий, возникающих при обращении к силе Ильбеша.',
+    section: 'Правила Эноа',
+    kind: 'reference'
+  }
+]
+
+const REFERENCE_TOOLTIP_BY_PATH = new Map()
+for (const entry of REFERENCE_LINKS) {
+  if (!REFERENCE_TOOLTIP_BY_PATH.has(entry.path)) {
+    REFERENCE_TOOLTIP_BY_PATH.set(entry.path, {
+      title: entry.title,
+      titleEn: entry.titleEn,
+      summary: entry.summary,
+      section: entry.section
+    })
+  }
+}
+
 function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -59,14 +162,14 @@ function wordPattern(word) {
 }
 
 function compileIndex() {
-  compiled = [...RULE_LINK_INDEX_5E, ...LINK_ALIASES]
-    .filter(entry => entry.title && entry.title.length >= 5 && !LINK_EXCLUDE_PATHS.has(entry.path))
+  compiled = [...RULE_LINK_INDEX_5E, ...LINK_ALIASES, ...REFERENCE_LINKS]
+    .filter(entry => entry.title && entry.title.length >= (entry.kind ? 4 : 5) && !LINK_EXCLUDE_PATHS.has(entry.path))
     .map(entry => {
       const pattern = entry.title.trim().split(/\s+/).map(wordPattern).join('\\s+')
       return {
         path: entry.path,
         title: entry.title,
-        capitalOnly: LINK_CAPITAL_ONLY_PATHS.has(entry.path),
+        capitalOnly: LINK_CAPITAL_ONLY_PATHS.has(entry.path) || ITEM_CAPITAL_ONLY.has(entry.path),
         rx: new RegExp(`(?<![а-яёa-z0-9])(?:${pattern})(?![а-яёa-z0-9])`, 'iu'),
         weight: entry.title.length
       }
@@ -93,6 +196,12 @@ const tooltipCache = new Map()
  */
 export async function getRuleTooltip(path) {
   if (tooltipCache.has(path)) return tooltipCache.get(path)
+
+  const reference = REFERENCE_TOOLTIP_BY_PATH.get(path)
+  if (reference) {
+    tooltipCache.set(path, reference)
+    return reference
+  }
 
   const parts = String(path).split('/').filter(Boolean) // ['dnd5e', 'screens', section, rule?]
   const sectionSlug = parts[2]
@@ -135,6 +244,18 @@ export function tokenizeRuleText(text, currentPath = '', excludePaths = []) {
   // Раздел, внутри которого находится текущее правило: ссылка на него — шум.
   const ownSectionPath = currentPath.split('/').slice(0, 4).join('/')
 
+  // Цветовая семантика важнее обычной ссылки: даже внутри названия правила
+  // «Преимущество и помеха» каждое слово сохраняет свой цвет.
+  for (const [rx, type] of [[ADVANTAGE_RX, 'adv'], [DISADVANTAGE_RX, 'dis']]) {
+    rx.lastIndex = 0
+    let match
+    while ((match = rx.exec(text))) {
+      const start = match.index
+      const end = start + match[0].length
+      if (!overlaps(ranges, start, end)) ranges.push({ start, end, type, path: SEMANTIC_RULE_PATH })
+    }
+  }
+
   for (const entry of index) {
     if (entry.path === currentPath || entry.path === ownSectionPath || contextualExcludes.has(entry.path)) continue
     const match = entry.rx.exec(text)
@@ -145,16 +266,6 @@ export function tokenizeRuleText(text, currentPath = '', excludePaths = []) {
     if (overlaps(ranges, start, end)) continue
     if (ranges.some(r => r.path === entry.path)) continue
     ranges.push({ start, end, type: 'link', path: entry.path })
-  }
-
-  for (const [rx, type] of [[ADVANTAGE_RX, 'adv'], [DISADVANTAGE_RX, 'dis']]) {
-    rx.lastIndex = 0
-    let match
-    while ((match = rx.exec(text))) {
-      const start = match.index
-      const end = start + match[0].length
-      if (!overlaps(ranges, start, end)) ranges.push({ start, end, type })
-    }
   }
 
   DICE_RX.lastIndex = 0
