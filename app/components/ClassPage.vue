@@ -156,6 +156,7 @@ const SOURCE_FULL_NAMES = {
   TS: 'The Threads of Shkad',
   TJB: 'The Threads of JorasBashu',
   TU: 'The Threads of Unseen',
+  TA: 'The Threads of Ainur',
   TKK: 'TKK.club'
 }
 
