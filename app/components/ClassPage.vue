@@ -633,10 +633,82 @@ function salbariteInfusionParts(text) {
   }
 }
 
+function shamanRichBlocks(paragraphs) {
+  const blocks = []
+  for (const paragraph of paragraphs) {
+    const value = String(paragraph || '').trim()
+    if (!value) continue
+    if (/^[-•]\s*/u.test(value)) {
+      const item = value.replace(/^[-•]\s*/u, '').trim()
+      const previous = blocks[blocks.length - 1]
+      if (previous?.type === 'list') previous.items.push(item)
+      else blocks.push({ type: 'list', items: [item] })
+      continue
+    }
+    const lead = value.match(/^(На больших уровнях|Усиление напева)\.\s*(.*)$/iu)
+    blocks.push(lead
+      ? { type: 'accent', title: `${lead[1]}.`, text: lead[2] }
+      : { type: 'paragraph', text: value })
+  }
+  return blocks
+}
+
+function shamanChantParts(text) {
+  const paragraphs = featureParagraphs(text)
+  const first = paragraphs.shift() || ''
+  const heading = first.match(/^(\d+)\s+уров(?:ень|ня),\s*(.+)$/iu)
+  const meta = []
+  const body = []
+
+  for (const paragraph of paragraphs) {
+    const match = paragraph.match(/^(Сотворение|Дистанция|Длительность|Компоненты):\s*(.+)$/iu)
+    if (match) meta.push({ label: match[1], value: match[2] })
+    else body.push(paragraph)
+  }
+
+  return {
+    level: heading ? `${heading[1]}-й уровень` : first,
+    school: heading?.[2] || '',
+    ritual: /ритуал/iu.test(heading?.[2] || ''),
+    meta,
+    blocks: shamanRichBlocks(body)
+  }
+}
+
+function shamanSpiritParts(text) {
+  const normalized = String(text || '').replace(/\s*Напев Духа:\s*/giu, '\n\nНапев Духа\n\n')
+  const paragraphs = featureParagraphs(normalized)
+  const requirementIndex = paragraphs.findIndex(paragraph => /^Требование:/iu.test(paragraph))
+  const intro = requirementIndex > 0 ? paragraphs.slice(0, requirementIndex) : []
+  const requirement = requirementIndex >= 0
+    ? paragraphs[requirementIndex].replace(/^Требование:\s*/iu, '').trim()
+    : ''
+  const content = paragraphs.slice(requirementIndex >= 0 ? requirementIndex + 1 : 0)
+  const abilities = []
+  let isChant = false
+
+  for (const paragraph of content) {
+    if (paragraph === 'Напев Духа') {
+      isChant = true
+      continue
+    }
+    const split = splitFeatureLead(paragraph)
+    abilities.push({
+      title: split.lead || (isChant ? 'Напев Духа' : 'Свойство духа'),
+      text: split.rest || paragraph,
+      isChant
+    })
+  }
+
+  return { intro, requirement, abilities }
+}
+
 function featureBlocks(text) {
   return featureParagraphs(text).map(paragraph => {
     if (isMarkdownTable(paragraph)) return markdownTableBlock(paragraph)
-    const formula = paragraph.match(/^(КД|Сл(?: проверки| спасброск(?:а|ов)(?: [^=]+)?)?|Модификатор броска атаки)\s*=\s*(.+)$/i)
+    const formula = paragraph.includes('**')
+      ? null
+      : paragraph.match(/^(КД|Сл(?: проверки| спасброск(?:а|ов)(?: [^=]+)?)?|Модификатор броска атаки)\s*=\s*(.+)$/i)
     if (formula) return { type: 'formula', label: formula[1], value: formula[2] }
     if (/^Например,/i.test(paragraph)) return { type: 'example', text: paragraph }
     const exactTitle = FEATURE_SECTION_TITLES.find(name => paragraph === name)
@@ -657,6 +729,15 @@ function featureBlocks(text) {
 
 function sourceRoute(source) {
   return SOURCE_URLS[source] || `/dnd5e/class-features?source=${encodeURIComponent(source || '')}`
+}
+
+function openClassFeatureAnchor(href) {
+  if (!import.meta.client || !String(href || '').startsWith('#')) return
+  const target = document.getElementById(String(href).slice(1))
+  if (!target) return
+  if (target instanceof HTMLDetailsElement) target.open = true
+  window.history.replaceState(null, '', href)
+  window.requestAnimationFrame(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }))
 }
 
 function isExternalSource(source) {
@@ -1373,6 +1454,9 @@ function scrollToClassFeature(featureId) {
                     </template>
                   </div>
                   <NuxtLink v-if="f.resourceLink" class="cls-open-arch" :to="f.resourceLink.href">{{ f.resourceLink.label }} →</NuxtLink>
+                  <nav v-if="f.resourceLinks?.length" class="cls-feature-links" aria-label="Связанные разделы">
+                    <a v-for="link in f.resourceLinks" :key="link.href" :href="link.href" @click.prevent="openClassFeatureAnchor(link.href)">{{ link.label }} →</a>
+                  </nav>
                   <blockquote v-if="f.hasQuote" class="cls-arch-quote compact">{{ f.quote }}</blockquote>
                   <NuxtLink v-if="f.archetypeName === 'Школа Клыков' && (f.name === 'Импланты' || f.name === 'Список Имплантов')" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/implants">Открыть справочник 35 имплантов →</NuxtLink>
                   <NuxtLink v-if="f.archetypeName === 'Школа Клыков' && f.name === 'Создание фамильяра: Сошид-е-Мута'" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/familiars">Создать патчфамильяра · 105 вариантов →</NuxtLink>
@@ -1438,6 +1522,61 @@ function scrollToClassFeature(featureId) {
                             </article>
                           </div>
                           <p v-for="note in implantParts(item.text).notes" :key="note" class="cls-implant-note">{{ note }}</p>
+                        </div>
+                        <div v-else-if="f.lvl === 'Категория напевов'" class="cls-shaman-chant">
+                          <div class="cls-shaman-chant-head">
+                            <span class="cls-shaman-level">{{ shamanChantParts(item.text).level }}</span>
+                            <span v-if="shamanChantParts(item.text).school" class="cls-shaman-school">{{ shamanChantParts(item.text).school }}</span>
+                            <span v-if="shamanChantParts(item.text).ritual" class="cls-shaman-ritual">Ритуал</span>
+                          </div>
+                          <dl v-if="shamanChantParts(item.text).meta.length" class="cls-shaman-meta">
+                            <div v-for="meta in shamanChantParts(item.text).meta" :key="meta.label">
+                              <dt>{{ meta.label }}</dt>
+                              <dd>{{ meta.value }}</dd>
+                            </div>
+                          </dl>
+                          <div class="cls-shaman-body">
+                            <template v-for="(block, bi) in shamanChantParts(item.text).blocks" :key="bi">
+                              <ul v-if="block.type === 'list'" class="cls-shaman-list">
+                                <li v-for="(entry, ei) in block.items" :key="ei">
+                                  <template v-for="(part, pi) in inlineParts(entry)" :key="pi">
+                                    <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                                  </template>
+                                </li>
+                              </ul>
+                              <aside v-else-if="block.type === 'accent'" class="cls-shaman-accent">
+                                <strong>{{ block.title }}</strong>
+                                <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                                </template>
+                              </aside>
+                              <p v-else>
+                                <template v-for="(part, pi) in inlineParts(block.text)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                                </template>
+                              </p>
+                            </template>
+                          </div>
+                        </div>
+                        <div v-else-if="f.lvl === 'Категория духов'" class="cls-shaman-spirit">
+                          <div v-if="shamanSpiritParts(item.text).intro.length" class="cls-shaman-spirit-intro">
+                            <p v-for="paragraph in shamanSpiritParts(item.text).intro" :key="paragraph">{{ paragraph }}</p>
+                          </div>
+                          <div v-if="shamanSpiritParts(item.text).requirement" class="cls-shaman-requirement">
+                            <span>Требование</span>
+                            <strong>{{ shamanSpiritParts(item.text).requirement }}</strong>
+                          </div>
+                          <div class="cls-shaman-abilities">
+                            <article v-for="(ability, ai) in shamanSpiritParts(item.text).abilities" :key="ai" :class="{ 'is-spirit-chant': ability.isChant }">
+                              <div class="cls-shaman-ability-label">{{ ability.isChant ? 'Напев Духа' : 'Одержимость' }}</div>
+                              <strong>{{ ability.title }}</strong>
+                              <p>
+                                <template v-for="(part, pi) in inlineParts(ability.text)" :key="pi">
+                                  <span :class="{ 'cls-dice-token': part.type === 'dice', 'cls-inline-bold': part.type === 'bold' }">{{ part.value }}</span>
+                                </template>
+                              </p>
+                            </article>
+                          </div>
                         </div>
                         <div v-else class="cls-arch-item-text">
                           <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
@@ -1513,9 +1652,15 @@ function scrollToClassFeature(featureId) {
                     </div>
                   </details>
                   <div v-else-if="f.hasItems" class="cls-arch-items" :class="{ roomy: f.hasLongItems }">
-                    <details v-for="item in f.items" :key="item.name" class="cls-arch-item" open>
+                    <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="!f.itemsCollapsed">
                       <summary>{{ item.name }}</summary>
-                      <span>{{ item.text }}</span>
+                      <div class="cls-arch-item-text">
+                        <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
+                          <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
+                          <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
+                          <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                        </template>
+                      </div>
                     </details>
                   </div>
                   <div v-if="f.hasSpellTable" class="cls-spell-table">
@@ -1789,6 +1934,9 @@ function scrollToClassFeature(featureId) {
                     </template>
                   </div>
                   <NuxtLink v-if="feature.resourceLink" class="cls-open-arch" :to="feature.resourceLink.href">{{ feature.resourceLink.label }} →</NuxtLink>
+                  <nav v-if="feature.resourceLinks?.length" class="cls-feature-links" aria-label="Связанные разделы">
+                    <a v-for="link in feature.resourceLinks" :key="link.href" :href="link.href" @click.prevent="openClassFeatureAnchor(link.href)">{{ link.label }} →</a>
+                  </nav>
                   <NuxtLink v-if="feature.archetypeName === 'Школа Клыков' && (feature.name === 'Импланты' || feature.name === 'Список Имплантов')" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/implants">Все правила и 35 имплантов в едином справочнике →</NuxtLink>
                   <NuxtLink v-if="feature.archetypeName === 'Школа Клыков' && feature.name === 'Создание фамильяра: Сошид-е-Мута'" class="cls-open-arch" to="/dnd5e/classes/wizard/school-of-fangs/familiars">Создать патчфамильяра · малый, средний или большой →</NuxtLink>
                   <div v-if="feature.hasItems && feature.name === 'Сальбаритовые инфузии'" class="cls-inline-infusions">
@@ -1928,9 +2076,15 @@ function scrollToClassFeature(featureId) {
                     </div>
                   </details>
                   <div v-else-if="feature.hasItems" class="cls-arch-items" :class="{ roomy: feature.items.length > 3 }">
-                    <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" open>
+                    <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="!feature.itemsCollapsed">
                       <summary>{{ item.name }}</summary>
-                      <span>{{ item.text }}</span>
+                      <div class="cls-arch-item-text">
+                        <template v-for="(part, pi) in inlineParts(item.text)" :key="pi">
+                          <NuxtLink v-if="part.type === 'link'" class="cls-inline-reference" :to="part.href">{{ part.value }}</NuxtLink>
+                          <strong v-else-if="part.type === 'bold'">{{ part.value }}</strong>
+                          <span v-else :class="{ 'cls-dice-token': part.type === 'dice' }">{{ part.value }}</span>
+                        </template>
+                      </div>
                     </details>
                   </div>
                 </article>
@@ -2450,6 +2604,34 @@ function scrollToClassFeature(featureId) {
 .cls-arch-item-text{margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:16.5px;line-height:1.58;color:rgba(226,230,244,.78);white-space:pre-line}
 .cls-arch-item .cls-arch-item-text span{display:inline;margin:0;font:inherit;line-height:inherit;color:inherit;white-space:inherit}
 .cls-arch-item-text strong{font-weight:700;color:rgba(244,224,170,.96)}
+.cls-shaman-chant,.cls-shaman-spirit{margin-top:14px;border-top:1px solid rgba(214,170,96,.14);padding-top:16px;font-family:'Cormorant Garamond',serif;color:rgba(226,230,244,.82)}
+.cls-arch-item .cls-shaman-chant span,.cls-arch-item .cls-shaman-spirit span{display:inline;margin:0;font:inherit;line-height:inherit;white-space:normal}
+.cls-shaman-chant-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px}
+.cls-arch-item .cls-shaman-chant-head>span{display:inline-flex;align-items:center;width:auto;border-radius:999px;padding:5px 10px;font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:800;line-height:1;letter-spacing:.08em;text-transform:uppercase}
+.cls-shaman-level{border:1px solid rgba(214,170,96,.34);background:rgba(214,170,96,.1);color:rgba(244,224,170,.95)}
+.cls-shaman-school{border:1px solid rgba(130,199,190,.28);background:rgba(86,157,151,.08);color:rgba(164,220,211,.9)}
+.cls-shaman-ritual{border:1px solid rgba(174,142,220,.3);background:rgba(128,91,181,.1);color:rgba(205,181,239,.92)}
+.cls-shaman-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin:0 0 16px;border:1px solid rgba(214,170,96,.12);border-radius:9px;overflow:hidden;background:rgba(214,170,96,.1)}
+.cls-shaman-meta>div{display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:rgba(7,8,12,.88)}
+.cls-shaman-meta dt{font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:rgba(226,230,244,.42)}
+.cls-shaman-meta dd{margin:0;font-size:16px;line-height:1.3;color:rgba(244,224,170,.88)}
+.cls-shaman-body{display:flex;flex-direction:column;gap:11px}
+.cls-shaman-body p,.cls-shaman-spirit-intro p,.cls-shaman-abilities p{margin:0;font-size:16.5px;line-height:1.58}
+.cls-shaman-list{display:flex;flex-direction:column;gap:6px;margin:0;padding:2px 0 2px 22px}
+.cls-shaman-list li{padding-left:4px;font-size:16.5px;line-height:1.48}
+.cls-shaman-list li::marker{color:#d6aa60}
+.cls-shaman-accent{border-left:3px solid rgba(214,170,96,.65);border-radius:0 8px 8px 0;background:rgba(214,170,96,.07);padding:11px 14px;font-size:16.5px;line-height:1.5}
+.cls-shaman-accent strong{margin-right:5px;color:rgba(244,224,170,.96)}
+.cls-shaman-spirit-intro{margin-bottom:14px;border-left:2px solid rgba(130,199,190,.38);padding-left:13px;font-style:italic;color:rgba(207,220,227,.7)}
+.cls-shaman-requirement{display:flex;align-items:center;gap:10px;margin-bottom:14px;border:1px solid rgba(214,170,96,.2);border-radius:9px;background:rgba(214,170,96,.07);padding:9px 12px}
+.cls-arch-item .cls-shaman-requirement>span{font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(214,170,96,.7)}
+.cls-shaman-requirement strong{font-size:15.5px;color:rgba(244,224,170,.94)}
+.cls-shaman-abilities{display:flex;flex-direction:column;gap:10px}
+.cls-shaman-abilities article{position:relative;border:1px solid rgba(226,230,244,.1);border-radius:9px;background:rgba(7,8,12,.38);padding:13px 14px}
+.cls-shaman-abilities article.is-spirit-chant{border-color:rgba(130,199,190,.3);background:linear-gradient(135deg,rgba(61,121,117,.12),rgba(7,8,12,.38))}
+.cls-shaman-ability-label{margin-bottom:5px;font-family:'Hanken Grotesk',sans-serif;font-size:8px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:rgba(130,199,190,.68)}
+.cls-shaman-abilities article>strong{display:block;margin-bottom:5px;font-size:18px;color:rgba(244,224,170,.95)}
+@media (max-width:720px){.cls-shaman-meta{grid-template-columns:1fr}.cls-shaman-requirement{align-items:flex-start;flex-direction:column;gap:4px}}
 .cls-spell-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0 12px;font-family:'Hanken Grotesk',sans-serif;font-size:11.5px;color:rgba(226,230,244,.55)}
 .cls-feature-spells{display:flex;flex-direction:column;gap:12px;margin-top:14px}
 .cls-spell-card{border:1px solid rgba(214,170,96,.16);border-radius:12px;background:rgba(7,8,12,.22);padding:16px}
@@ -2482,6 +2664,9 @@ function scrollToClassFeature(featureId) {
 .cls-open-arch{margin-top:14px;border:1px solid rgba(214,170,96,.42);border-radius:999px;background:rgba(214,170,96,.1);color:rgba(244,224,170,.95);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:9px 14px;cursor:pointer}
 .cls-open-arch:hover{background:rgba(214,170,96,.18)}
 .cls-open-arch.ghost{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.025);color:rgba(226,230,244,.62)}
+.cls-feature-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.cls-feature-links a{display:inline-flex;align-items:center;border:1px solid rgba(130,199,190,.28);border-radius:999px;background:rgba(68,132,127,.09);padding:8px 12px;font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;line-height:1;letter-spacing:.1em;text-transform:uppercase;color:rgba(166,222,213,.92);text-decoration:none;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.cls-feature-links a:hover{border-color:rgba(130,199,190,.5);background:rgba(68,132,127,.17);transform:translateY(-1px)}
 @keyframes cls-emblem-lit{
   0%{border-color:#fff0bd;box-shadow:0 0 8px rgba(255,240,189,.9),0 0 30px rgba(214,170,96,.65)}
   100%{border-color:rgba(214,170,96,.5);box-shadow:0 0 22px rgba(214,170,96,.18)}

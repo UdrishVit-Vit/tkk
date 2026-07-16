@@ -3,6 +3,10 @@ import SHAMAN_DOC from './shamanDoc.generated.json' with { type: 'json' }
 const nodeAt = index => SHAMAN_DOC.find(node => node.index === index)
 const nodesBetween = (start, end) => SHAMAN_DOC.filter(node => node.index >= start && node.index < end)
 const clean = value => String(value || '').replace(/\s+/g, ' ').trim()
+const emphasizeParagraphs = (text, headings) => String(text || '')
+  .split(/\n{2,}/)
+  .map(paragraph => headings.includes(paragraph.trim()) ? `**${paragraph.trim()}**` : paragraph)
+  .join('\n\n')
 
 function sourceText(start, end) {
   return nodesBetween(start, end).map(node => {
@@ -102,6 +106,13 @@ const sharedSpiritFeatures = spiritCategories.map(category => ({
   itemsCollapsed: true,
   items: spiritItems.filter(item => item.category.toLocaleLowerCase('ru') === category.toLocaleLowerCase('ru'))
 }))
+
+const spiritCategoryLinks = {
+  small: '#class-feature-шаман--категория-духов--малые-духи',
+  medium: '#class-feature-шаман--категория-духов--средние-духи',
+  high: '#class-feature-шаман--категория-духов--высшие-духи',
+  ancient: '#class-feature-шаман--категория-духов--древние-духи'
+}
 
 const table = (headers, rows) => [
   `|${headers.join('|')}|`,
@@ -240,17 +251,43 @@ export const SHAMAN_CLASS_OVERRIDE = {
     ]
   },
   features: [
-    { name: 'Призванный духами', src: 'ENOA', lvl: '1-й уровень', rank: 1, text: sourceText(33, 34) },
-    { name: 'Напевы', src: 'ENOA', lvl: '1-й уровень', rank: 1, text: sourceText(35, 47) },
-    { name: 'Удержание духа', src: 'ENOA', lvl: '2-й уровень', rank: 2, text: sourceText(49, 51) },
-    { name: 'Одержимость духом', src: 'ENOA', lvl: '2-й уровень', rank: 2, text: sourceText(52, 57) },
+    {
+      name: 'Призванный Духами', src: 'ENOA', lvl: '1-й уровень', rank: 1,
+      text: 'Духи призвали вас. Вы хорошо понимаете, что всё вокруг населено духами, и то, как они влияют на окружающий мир.',
+      resourceLinks: [
+        { href: spiritCategoryLinks.small, label: 'Малые духи' },
+        { href: spiritCategoryLinks.medium, label: 'Средние духи' },
+        { href: spiritCategoryLinks.high, label: 'Большие духи' },
+        { href: spiritCategoryLinks.ancient, label: 'Древние духи' }
+      ]
+    },
+    {
+      name: 'Напевы', src: 'ENOA', lvl: '1-й уровень', rank: 1,
+      text: emphasizeParagraphs(sourceText(35, 47), ['Использование напевов', 'Базовая характеристика напевов', 'Ритуальное колдовство'])
+    },
+    {
+      name: 'Удержание духа', src: 'ENOA', lvl: '2-й уровень', rank: 2, text: sourceText(49, 51),
+      resourceLinks: [{ href: spiritCategoryLinks.small, label: 'Перейти к малым духам' }]
+    },
+    {
+      name: 'Одержимость духом', src: 'ENOA', lvl: '2-й уровень', rank: 2,
+      text: emphasizeParagraphs(sourceText(52, 57), [
+        'Сл испытаний против Напева Духа, которые вам даёт Одержимость Духом = Сл испытаний против ваших Напевов.'
+      ])
+    },
     { name: 'Судьба шамана', src: 'ENOA', lvl: '3-й уровень', rank: 3, text: `${sourceText(59, 62)}\n\n**Взрывы костей.** ${clean(nodeAt(62)?.rows?.[0]?.[0])}` },
     { name: 'Мудра шамана', src: 'ENOA', lvl: '3-й уровень', rank: 3, text: sourceText(65, 67) },
     { name: 'Повышение характеристик', src: 'ENOA', lvl: '4-й уровень', rank: 4, text: sourceText(68, 69) },
     { name: 'Око Предзнаменования', src: 'ENOA', lvl: '5-й уровень', rank: 5, text: `${sourceText(70, 72)}\n\nПолный справочник знамений вынесен на отдельную страницу.`, resourceLink: { href: '/dnd5e/omens', label: 'Открыть страницу «Знамения»' } },
-    { name: 'Могучее Око Предзнаменования', src: 'ENOA', lvl: '10-й уровень', rank: 10, text: sourceText(73, 74), resourceLink: { href: '/dnd5e/omens', label: 'Открыть страницу «Знамения»' } },
+    {
+      name: 'Могучее Око Предзнаменования', src: 'ENOA', lvl: '10-й уровень', rank: 10, text: sourceText(73, 74),
+      resourceLinks: [{ href: spiritCategoryLinks.small, label: 'Перейти к малым духам' }]
+    },
     { name: 'Улучшение Воли Шамана', src: 'ENOA', lvl: '11-й уровень', rank: 11, text: sourceText(75, 76) },
-    { name: 'Связь с духом', src: 'ENOA', lvl: '14-й уровень', rank: 14, text: sourceText(78, 80) },
+    {
+      name: 'Связь с духом', src: 'ENOA', lvl: '14-й уровень', rank: 14, text: sourceText(78, 80),
+      resourceLinks: [{ href: spiritCategoryLinks.medium, label: 'Перейти к средним духам' }]
+    },
     { name: 'Ткач Судьбы', src: 'ENOA', lvl: '20-й уровень', rank: 20, text: sourceText(81, 83) },
     ...sharedChantFeatures,
     ...sharedSpiritFeatures

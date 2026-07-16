@@ -585,6 +585,7 @@ const vm = computed(() => {
       itemsRollTitle: feature.itemsRollTitle || '',
       itemsRollMode: feature.itemsRollMode || '',
       resourceLink: feature.resourceLink || null,
+      resourceLinks: feature.resourceLinks || [],
       itemsCollapsed: !!feature.itemsCollapsed,
       items: classFeatureItems(feature.items)
     }
@@ -609,6 +610,7 @@ const vm = computed(() => {
       itemsRollTitle: f.itemsRollTitle || '',
       itemsRollMode: f.itemsRollMode || '',
       resourceLink: f.resourceLink || null,
+      resourceLinks: f.resourceLinks || [],
       itemsCollapsed: !!f.itemsCollapsed,
       items: f.items || []
     })),

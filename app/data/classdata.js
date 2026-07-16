@@ -1,5 +1,6 @@
 import { CLASS_ARCHETYPES_IMPORTED } from './importedClassArchetypes.js'
 import { SHAMAN_CLASS_OVERRIDE } from './shamanOverride.js'
+import { DRIFTER_CLASS_OVERRIDE } from './drifterOverride.js'
 
 // D&D class rules data for the class detail pages. CLASSDATA[name] → full record.
 let CLASSDATA;
@@ -1718,6 +1719,7 @@ let CLASSDATA;
     features: sorcFeatures
   });
 
+  Object.assign(DATA['Дрифтер'], DRIFTER_CLASS_OVERRIDE);
   Object.assign(DATA['Шаман'], SHAMAN_CLASS_OVERRIDE);
 
   function archetypeKey(name) {
@@ -1733,6 +1735,7 @@ let CLASSDATA;
   for (const [className, importedArchetypes] of Object.entries(CLASS_ARCHETYPES_IMPORTED)) {
     if (!DATA[className]) continue
     if (className === 'Бард') continue
+    if (className === 'Дрифтер') continue
     if (className === 'Шаман') continue
     const existing = DATA[className].archetypes || []
     const importList = className === 'Варвар'
