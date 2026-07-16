@@ -25,6 +25,7 @@ const LINK_EXCLUDE_PATHS = new Set([
   '/dnd5e/screens/origins/random-occupation', // «Род занятий»
   '/dnd5e/screens/origins/punishment-events', // «Наказание»
   '/dnd5e/screens/origins/crime-events', // «Преступление»
+  '/dnd5e/screens/stats_and_skills/honor', // «Честь» в описаниях обычно означает почёт, а не опциональную характеристику
   '/dnd5e/screens/planar_travel/spells-planar', // «Заклинания» — только о планарных перемещениях
   '/dnd5e/screens/spells/saving-throw', // общий «спасбросок» относится к проверкам характеристик
   '/dnd5e/screens/monster/monstrosity', // «Монстры» — тип существа, есть одноимённый раздел
@@ -32,7 +33,8 @@ const LINK_EXCLUDE_PATHS = new Set([
   '/dnd5e/screens/equipment/special', // «Особое»
   '/dnd5e/screens/equipment/hidden', // «Скрытое» — свойство оружия, совпадает с обычным прилагательным
   '/dnd5e/screens/equipment/heavy', // «Тяжёлое»
-  '/dnd5e/screens/equipment/light' // «Лёгкое»
+  '/dnd5e/screens/equipment/light', // «Лёгкое»
+  '/dnd5e/screens/language' // «Язык» в обычном тексте не означает каталог игровых языков
 ])
 
 // Односложные названия навыков и действий, совпадающие с обычными словами:
@@ -59,7 +61,8 @@ const ITEM_AUTO_LINK_EXCLUDE = new Set([
   '/dnd5e/equipment?e=pole', // «шест» совпадает с числительным «шестью»
   '/dnd5e/equipment?e=perfume', // «духи» почти всегда означает сущностей
   '/dnd5e/equipment?e=arrows', // «стрела» встречается в названиях заклинаний
-  '/dnd5e/weapons?w=war-pick' // основа «кирк» совпадает с именем Кирк
+  '/dnd5e/weapons?w=war-pick', // основа «кирк» совпадает с именем Кирк
+  '/dnd5e/spells?s=void' // «пустота» часто употребляется как обычное слово
 ])
 
 // Слова, которые в обычном тексте гораздо чаще означают не предмет.
@@ -178,7 +181,9 @@ function compileIndex() {
   return compiled
 }
 
-const ADVANTAGE_RX = /преимуществ[а-яё]*/giu
+// Механический термин обычно употребляется как «преимущество» или
+// «с преимуществом». Не захватываем обычные «преимущества» и «преимущественно».
+const ADVANTAGE_RX = /(?<![а-яё])преимуществ(?:о|ом)(?![а-яё])/giu
 const DISADVANTAGE_RX = /помех[а-яё]*/giu
 
 // Обозначения бросков: 1к6, 2к8, к20, 1к10 + 2, поддерживается и латинское d.
