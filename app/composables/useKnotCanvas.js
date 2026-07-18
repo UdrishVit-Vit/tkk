@@ -1,5 +1,5 @@
 // Ambient gold-thread particle background, ported from the Claude Design prototype's canvas loop.
-export function useKnotCanvas(canvasRef, density = 46) {
+export function useKnotCanvas(canvasRef, density = 46, themeRef = null) {
   let raf = null, onResize = null
   let W = 0, H = 0, arcs = [], orbits = [], stars = []
 
@@ -95,11 +95,18 @@ export function useKnotCanvas(canvasRef, density = 46) {
     build()
     const loop = (now) => {
       const t = now/1000
-      const gold = 'rgba(216,178,108,'
+      const theme = themeRef?.value || 'void'
+      const gold = theme === 'manu'
+        ? 'rgba(148,169,196,'
+        : theme === 'madness'
+          ? 'rgba(164,121,245,'
+          : 'rgba(216,178,108,'
+      const starTone = theme === 'madness' ? 'rgba(211,174,255,' : gold
+      const orbitTone = theme === 'madness' ? 'rgba(116,119,232,' : gold
       ctx.clearRect(0,0,W,H)
       for (const s of stars){
         const a = 0.10 + 0.4*(0.5+0.5*Math.sin(t*s.sp + s.ph))
-        ctx.fillStyle = gold + (a*0.6).toFixed(3) + ')'
+        ctx.fillStyle = (theme === 'madness' && Math.sin(s.ph) > 0 ? starTone : gold) + (a*0.6).toFixed(3) + ')'
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fill()
       }
       ctx.setLineDash([])
@@ -129,8 +136,8 @@ export function useKnotCanvas(canvasRef, density = 46) {
         if (p < TR){ sparkOn = true; sparkProg = p/TR; lit = Math.pow(sparkProg, 0.7) }
         else { lit = Math.pow(1 - (p-TR)/(1-TR), 2.2) }
         const al = (o.alpha * (0.4 + 2.9*lit) * env).toFixed(3)
-        ctx.strokeStyle = gold + al + ')'
-        ctx.fillStyle = gold + al + ')'
+        ctx.strokeStyle = orbitTone + al + ')'
+        ctx.fillStyle = starTone + al + ')'
         ctx.lineWidth = o.lw + 0.8*lit
         ctx.lineCap = 'round'
         if (o.kind==='chain'){
@@ -156,7 +163,8 @@ export function useKnotCanvas(canvasRef, density = 46) {
         if (sparkOn){
           const ang = o.ang0 + o.dirn * sparkProg * 6.283
           const px = o.cx + Math.cos(ang)*o.r, py = o.cy + Math.sin(ang)*o.r
-          const core = o.glow.core, halo = o.glow.halo
+          const core = theme === 'manu' ? 'rgba(246,247,248,' : o.glow.core
+          const halo = theme === 'manu' ? 'rgba(54,64,82,' : o.glow.halo
           const rad = o.sz + 3.0
           const g = ctx.createRadialGradient(px,py,0,px,py,rad)
           g.addColorStop(0, core + (0.98*env).toFixed(3) + ')')

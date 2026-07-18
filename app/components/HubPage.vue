@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { CLASSDATA } from '~/data/classdata.js'
 import { SYSTEMS, POOL, IMG, THEMES, nodeImg, classImg, layoutPoints, entriesFor } from '~/data/hub.js'
 import { useKnotCanvas } from '~/composables/useKnotCanvas.js'
@@ -13,14 +13,20 @@ const props = defineProps({
 
 const route = useRoute()
 const router = useRouter()
+const { theme: selectedTheme } = useKnotTheme()
+const sparkMaskId = `spark-occlusion-${useId().replace(/[^a-z0-9_-]/gi, '')}`
+const sparkFadeId = `spark-fade-${useId().replace(/[^a-z0-9_-]/gi, '')}`
 
 const state = reactive({
   view: 'home', active: null, group: null, section: null, cls: null, overlay: null,
-  theme: 'void', authed: false, bookmarks: [], query: '', cardQuery: '', classToolMessage: '', infOpen: false, invOpen: false,
+  theme: selectedTheme.value, authed: false, bookmarks: [], query: '', cardQuery: '', classToolMessage: '', infOpen: false, invOpen: false,
   classMode: 'base', activeArchetype: null, archetypeSource: 'all', classCardTab: 'skills', classHitsOpen: true, classProfOpen: true,
   classEquipOpen: true, classTableOpen: true, classFilterOpen: false, classFilterTouched: false, classFeatureSource: 'all',
   classFeatureLevel: 'all', classFeatureSubclass: 'base', subclassesOpen: false, openSubclass: null
 })
+
+watch(() => state.theme, value => { selectedTheme.value = value })
+watch(selectedTheme, value => { state.theme = value })
 
 const CLASS_QUERY = {
   'Бард': 'bard',
@@ -117,7 +123,7 @@ watch(() => state.active, (id) => {
 })
 
 const canvasEl = ref(null)
-const { start, stop } = useKnotCanvas(canvasEl, 46)
+const { start, stop } = useKnotCanvas(canvasEl, 46, selectedTheme)
 onMounted(start)
 onUnmounted(stop)
 
@@ -231,8 +237,17 @@ function mkNode(o, th) {
   const ga = o.active ? '0.5' : '0.2'
   const gap = Math.round(o.knot*0.12)+6
   const dc = th.disc || '7,8,12'
+  const discScale = th.discScale || 1.16
+  const screenOpaqueAsset = selectedTheme.value === 'manu' && typeof src === 'string' && src.endsWith('/shaman.png')
+  const manuShadow = o.active
+    ? 'brightness(1.26) contrast(1.08) drop-shadow(0 6px 10px rgba(3,7,13,.38)) drop-shadow(0 0 17px rgba(204,219,238,.32))'
+    : 'brightness(1.14) contrast(1.06) drop-shadow(0 4px 7px rgba(3,7,13,.3)) drop-shadow(0 0 9px rgba(204,219,238,.18))'
+  const knotFilter = selectedTheme.value === 'manu'
+    ? manuShadow
+    : 'drop-shadow(0 0 '+blur+'px '+th.glow+ga+'))'
   return {
     label: o.label, sub: o.sub || '', onClick: o.onClick || null,
+    sparkOccluder: { x:o.x, y:o.y, r:Math.max(18, o.knot*0.72) },
     noImg: !hasImg,
     hasFrame: o.frame === 'diamond',
     frameStyle: { position:'absolute', left:'0', top:'0',
@@ -247,14 +262,18 @@ function mkNode(o, th) {
       cursor:(o.opacity && o.onClick)?'pointer':'default', pointerEvents:o.opacity?'auto':'none', color:o.color },
     knotStyle: { position:'absolute', left:'0', top:'0', transform:'translate(-50%,-50%)',
       width:o.knot+'px', height:o.knot+'px', color:o.color,
-      filter:'drop-shadow(0 0 '+blur+'px '+th.glow+ga+'))',
+      filter:knotFilter,
+      mixBlendMode:screenOpaqueAsset?'screen':'normal',
+      WebkitMaskImage:screenOpaqueAsset?'radial-gradient(ellipse 50% 54% at center,#000 58%,rgba(0,0,0,.72) 74%,transparent 100%)':'none',
+      maskImage:screenOpaqueAsset?'radial-gradient(ellipse 50% 54% at center,#000 58%,rgba(0,0,0,.72) 74%,transparent 100%)':'none',
       transition:'filter .45s, color .5s, transform .45s cubic-bezier(.34,1.4,.5,1)',
       backgroundImage: hasImg ? ('url("'+src+'")') : 'none',
       backgroundSize:'contain', backgroundRepeat:'no-repeat', backgroundPosition:'center',
       animation: hasImg ? (shimmer ? ('knotTwinkle '+(o.active?2.8:4.8)+'s ease-in-out infinite') : 'none') : ('knotSpin '+(o.active?70:150)+'s linear infinite') },
     discStyle: { position:'absolute', left:'0', top:'0', transform:'translate(-50%,-50%)',
-      width:Math.round(o.knot*1.16)+'px', height:Math.round(o.knot*1.16)+'px', borderRadius:'50%',
-      background:'radial-gradient(circle, rgba('+dc+',1) 44%, rgba('+dc+',0) 74%)', pointerEvents:'none' },
+      width:Math.round(o.knot*discScale)+'px', height:Math.round(o.knot*discScale)+'px', borderRadius:'50%',
+      background:th.discBg || 'radial-gradient(circle, rgba('+dc+',1) 44%, rgba('+dc+',0) 74%)',
+      filter:th.discBlur?('blur('+th.discBlur+')'):'none', pointerEvents:'none' },
     textStyle: { position:'absolute', left:'0', top:'0', width:'180px',
       display:'flex', flexDirection:'column', alignItems:'center', gap:'2px', pointerEvents:'none',
       transform: o.labelAbove
@@ -263,11 +282,11 @@ function mkNode(o, th) {
     labelStyle: { fontFamily:"'Cormorant Garamond',serif", fontSize:(o.lsize||16)+'px', fontWeight:500,
       letterSpacing:o.dense?'.05em':'.2em', textTransform:'uppercase', color:o.color, opacity:o.active?1:0.85,
       whiteSpace:o.wrap?'normal':'nowrap', maxWidth:o.wrap?'160px':'none', textAlign:'center', lineHeight:1.18,
-      textShadow:'0 0 7px rgba(5,6,10,.95), 0 0 16px rgba(5,6,10,.85), 0 1px 3px rgba(5,6,10,.95)',
+      textShadow:th.labelShadow || '0 0 7px rgba(5,6,10,.95), 0 0 16px rgba(5,6,10,.85), 0 1px 3px rgba(5,6,10,.95)',
       transition:'opacity .5s' },
     subStyle: { fontFamily:"'Hanken Grotesk',sans-serif", fontSize:'9px', letterSpacing:'.32em',
       textTransform:'uppercase', color:o.color, opacity:o.sub?0.55:0, textAlign:'center',
-      textShadow:'0 0 6px rgba(5,6,10,.95), 0 0 13px rgba(5,6,10,.85)' },
+      textShadow:th.subShadow || '0 0 6px rgba(5,6,10,.95), 0 0 13px rgba(5,6,10,.85)' },
   }
 }
 
@@ -312,7 +331,7 @@ function mkMarker(x, y, s, open, th) {
     d: 'M '+x+' '+(y-s)+' L '+(x+s)+' '+y+' L '+x+' '+(y+s)+' L '+(x-s)+' '+y+' Z',
     style: open
       ? { stroke:'rgba(246,208,126,0.95)', strokeWidth:'1.5', fill:'rgba(238,190,98,0.95)', filter:'drop-shadow(0 0 7px rgba(236,196,120,0.9))' }
-      : { stroke: th.thread+'0.66)', strokeWidth:'1', fill:'rgba(7,8,12,0.95)' }
+      : { stroke: th.thread+'0.66)', strokeWidth:'1', fill:'rgba(var(--theme-surface-rgb),0.95)' }
   }
 }
 
@@ -714,9 +733,9 @@ const vm = computed(() => {
             fontFamily: feat ? "'Hanken Grotesk',sans-serif" : "'Cormorant Garamond',serif",
             fontSize: feat ? '11.5px' : (ci===0 ? '16px' : '15px'),
             lineHeight: feat ? 1.3 : 1.2,
-            color: ci===0 ? 'rgba(244,224,170,.9)' : 'rgba(226,230,244,.72)',
-            borderBottom:'1px solid rgba(255,255,255,.05)',
-            background: hasArchetypeParts ? 'linear-gradient(90deg, rgba(126,196,184,.105), rgba(7,8,12,.02))' : (ci===0 ? 'rgba(255,255,255,.012)' : 'transparent'),
+            color: ci===0 ? 'rgba(var(--theme-accent-strong-rgb),.9)' : 'rgba(var(--theme-text-rgb),.72)',
+            borderBottom:'1px solid rgba(var(--theme-contrast-rgb),.05)',
+            background: hasArchetypeParts ? 'linear-gradient(90deg, rgba(126,196,184,.105), rgba(var(--theme-surface-rgb),.02))' : (ci===0 ? 'rgba(var(--theme-contrast-rgb),.012)' : 'transparent'),
             boxShadow: hasArchetypeParts ? 'inset 2px 0 0 rgba(126,196,184,.7)' : 'none'
           }
         }
@@ -803,10 +822,10 @@ function addBookmark() {
 </script>
 
 <template>
-  <div class="tkk" :style="{ background: vm.th.bg }">
+  <div class="tkk" :class="`theme-${state.theme}`" :style="{ background: vm.th.bg }">
     <canvas ref="canvasEl" class="tkk-canvas" />
 
-    <svg class="tkk-rings" :style="{ color: 'rgba(216,178,108,0.5)' }">
+    <svg class="tkk-rings" :style="{ color: vm.th.ring }">
       <g :transform="`translate(${center.x},${center.y})`">
         <g style="animation:ringTurn 240s linear infinite">
           <circle r="318" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="1 13" opacity="0.5" />
@@ -820,11 +839,29 @@ function addBookmark() {
 
     <svg class="tkk-conn">
       <g :transform="`translate(${center.x},${center.y}) scale(${fit})`">
+        <defs>
+          <radialGradient :id="sparkFadeId">
+            <stop offset="0%" stop-color="black" />
+            <stop offset="68%" stop-color="black" />
+            <stop offset="100%" stop-color="white" />
+          </radialGradient>
+          <mask :id="sparkMaskId" maskUnits="userSpaceOnUse" x="-2000" y="-2000" width="4000" height="4000">
+            <rect x="-2000" y="-2000" width="4000" height="4000" fill="white" />
+            <circle
+              v-for="(node, i) in vm.nodes"
+              :key="`spark-mask-${i}`"
+              :cx="node.sparkOccluder.x"
+              :cy="node.sparkOccluder.y"
+              :r="node.sparkOccluder.r"
+              :fill="`url(#${sparkFadeId})`"
+            />
+          </mask>
+        </defs>
         <g class="tkk-halo" aria-hidden="true">
           <rect x="-300" y="-300" width="600" height="600" transform="rotate(45)" />
           <rect x="-436" y="-436" width="872" height="872" transform="rotate(45)" />
         </g>
-        <g v-for="(c, i) in vm.connectors" :key="'c'+i">
+        <g v-for="(c, i) in vm.connectors" :key="'c'+i" :mask="`url(#${sparkMaskId})`">
           <path v-if="c.hasGlow" :d="c.d" :style="c.glow" />
           <path :d="c.d" :style="c.base" />
           <path :d="c.d" :style="c.flow" />
@@ -832,9 +869,11 @@ function addBookmark() {
             <animateMotion :dur="c.sparkDur" :begin="c.sparkBegin" repeatCount="indefinite" :path="c.d" />
           </circle>
         </g>
-        <path v-for="(m, i) in vm.markers" :key="'m'+i" :d="m.d" :style="m.style" />
-        <path v-for="(e, i) in vm.embers" :key="'e'+i" :d="e.d" :style="e.style" />
-        <circle v-for="(s, i) in vm.sparks" :key="'s'+i" cx="0" cy="0" :r="s.r" :style="s.style" />
+        <g :mask="`url(#${sparkMaskId})`">
+          <path v-for="(m, i) in vm.markers" :key="'m'+i" :d="m.d" :style="m.style" />
+          <path v-for="(e, i) in vm.embers" :key="'e'+i" :d="e.d" :style="e.style" />
+          <circle v-for="(s, i) in vm.sparks" :key="'s'+i" cx="0" cy="0" :r="s.r" :style="s.style" />
+        </g>
       </g>
     </svg>
 
@@ -933,27 +972,49 @@ function addBookmark() {
 @keyframes sparkRun{from{offset-distance:0%}to{offset-distance:100%}}
 @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes popIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes madnessDrift{
+  0%{transform:translate3d(-1.5%,-1%,0) scale(1);opacity:.7}
+  50%{transform:translate3d(1.5%,1.2%,0) scale(1.045);opacity:.92}
+  100%{transform:translate3d(-.5%,2%,0) scale(1.02);opacity:.76}
+}
 
-.tkk{position:fixed;inset:0;overflow:hidden;font-family:'Hanken Grotesk',sans-serif;color:rgba(226,230,244,.92);transition:background .8s ease}
+.tkk{position:fixed;inset:0;overflow:hidden;font-family:'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.92);transition:background .8s ease}
+.tkk.theme-madness::before,.tkk.theme-madness::after{content:'';position:absolute;inset:-10%;z-index:0;pointer-events:none}
+.tkk.theme-madness::before{
+  background:
+    radial-gradient(ellipse 24% 20% at 18% 20%,rgba(218,177,255,.17),rgba(169,104,244,.065) 42%,transparent 72%),
+    radial-gradient(ellipse 30% 23% at 82% 27%,rgba(113,111,239,.17),rgba(67,61,164,.055) 48%,transparent 74%),
+    radial-gradient(ellipse 27% 22% at 64% 78%,rgba(190,117,255,.11),rgba(121,71,190,.035) 50%,transparent 76%);
+  filter:blur(18px);
+  animation:madnessDrift 26s ease-in-out infinite alternate;
+}
+.tkk.theme-madness::after{
+  inset:0;
+  background:
+    linear-gradient(118deg,transparent 0 28%,rgba(211,183,255,.022) 28.08%,transparent 28.36% 66%,rgba(111,111,228,.028) 66.08%,transparent 66.42%),
+    radial-gradient(ellipse 72% 54% at 50% 46%,transparent 42%,rgba(4,2,10,.22) 100%);
+}
+.tkk.theme-madness .tkk-sidebar{border-right-color:rgba(215,187,255,.1);background:linear-gradient(180deg,rgba(30,20,50,.72),rgba(12,8,22,.62));box-shadow:10px 0 42px rgba(4,2,10,.16)}
+.tkk.theme-madness .tkk-sidebar-btn:hover{color:rgba(235,221,255,.98);background:linear-gradient(135deg,rgba(174,116,255,.14),rgba(90,89,211,.1));box-shadow:0 0 18px rgba(160,105,238,.09)}
 .tkk-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
 .tkk-rings{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
 .tkk-conn{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
-.tkk-halo rect{fill:none;stroke:rgba(214,170,96,.14);stroke-width:1}
-.tkk-halo rect:first-child{stroke:rgba(214,170,96,.22)}
+.tkk-halo rect{fill:none;stroke:rgba(var(--theme-accent-rgb),.14);stroke-width:1}
+.tkk-halo rect:first-child{stroke:rgba(var(--theme-accent-rgb),.22)}
 .tkk-nodes{position:absolute;inset:0;z-index:4;pointer-events:none;transform-origin:calc(50% + 34px) 50%}
 .tkk-node{cursor:default}
 .tkk-knot:hover{transform:translate(-50%,-50%) scale(1.2) !important}
 .tkk-wordmark{position:absolute;top:24px;left:92px;z-index:30;pointer-events:none}
-.tkk-wordmark-eyebrow{font-family:'Hanken Grotesk';font-size:9.5px;letter-spacing:.42em;text-transform:uppercase;color:rgba(226,230,244,.42)}
-.tkk-wordmark-title{font-family:'Cormorant Garamond',serif;font-size:21px;letter-spacing:.32em;color:rgba(232,236,250,.92);margin-top:3px}
+.tkk-wordmark-eyebrow{font-family:'Hanken Grotesk';font-size:9.5px;letter-spacing:.42em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.42)}
+.tkk-wordmark-title{font-family:'Cormorant Garamond',serif;font-size:21px;letter-spacing:.32em;color:rgba(var(--theme-heading-rgb),.92);margin-top:3px}
 .tkk-crumb{position:absolute;top:26px;right:34px;z-index:30;display:flex;align-items:center;gap:9px;animation:riseIn .5s ease both}
-.tkk-crumb-sep{font-size:11px;color:rgba(226,230,244,.28)}
+.tkk-crumb-sep{font-size:11px;color:rgba(var(--theme-text-rgb),.28)}
 .tkk-crumb-link{cursor:pointer}
-.tkk-crumb-link:not(.tkk-crumb-strong):not(.tkk-crumb-gold){font-family:'Hanken Grotesk';font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:rgba(226,230,244,.4)}
-.tkk-crumb-strong{font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:.12em;color:rgba(232,236,250,.92)}
-.tkk-crumb-gold{font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:.12em;color:rgba(244,224,170,.95);cursor:pointer}
-.tkk-crumb-exit{margin-left:6px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(226,230,244,.5);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:5px 11px;cursor:pointer}
-.tkk-crumb-exit:hover{background:rgba(255,255,255,.05);color:rgba(234,238,252,.95)}
+.tkk-crumb-link:not(.tkk-crumb-strong):not(.tkk-crumb-gold){font-family:'Hanken Grotesk';font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.4)}
+.tkk-crumb-strong{font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:.12em;color:rgba(var(--theme-heading-rgb),.92)}
+.tkk-crumb-gold{font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:.12em;color:rgba(var(--theme-accent-strong-rgb),.95);cursor:pointer}
+.tkk-crumb-exit{margin-left:6px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.5);border:1px solid rgba(var(--theme-contrast-rgb),.14);border-radius:20px;padding:5px 11px;cursor:pointer}
+.tkk-crumb-exit:hover{background:rgba(var(--theme-contrast-rgb),.05);color:rgba(var(--theme-heading-rgb),.95)}
 
 .tkk-ornate-frame{position:absolute;top:18px;right:18px;bottom:18px;left:86px;z-index:60;pointer-events:none;border:1px solid var(--tint, rgba(176,188,232,.22));border-radius:3px}
 .tkk-ornate-frame-inner{position:absolute;inset:7px;border:1px solid rgba(176,188,232,.1);border-radius:2px}
@@ -963,8 +1024,9 @@ function addBookmark() {
 .corner-br{right:-3px;bottom:-3px;transform:rotate(180deg)}
 .corner-bl{left:-3px;bottom:-3px;transform:rotate(270deg)}
 
-.tkk-sidebar{position:absolute;top:0;left:0;bottom:0;width:68px;z-index:50;display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:4px;border-right:1px solid rgba(255,255,255,.06);background:rgba(7,8,12,.5);backdrop-filter:blur(10px)}
-.tkk-sidebar-btn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:rgba(226,230,244,.55);cursor:pointer;border-radius:11px;transition:all .25s}
-.tkk-sidebar-btn:hover{color:rgba(234,238,252,.95);background:rgba(255,255,255,.05)}
-.tkk-sidebar-main{margin-bottom:6px;color:rgba(232,236,250,.85)}
+.tkk-sidebar{position:absolute;top:0;left:0;bottom:0;width:68px;z-index:50;display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:4px;border-right:1px solid rgba(var(--theme-contrast-rgb),.06);background:rgba(var(--theme-surface-rgb),.5);backdrop-filter:blur(10px)}
+.tkk-sidebar-btn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:rgba(var(--theme-text-rgb),.55);cursor:pointer;border-radius:11px;transition:all .25s}
+.tkk-sidebar-btn:hover{color:rgba(var(--theme-heading-rgb),.95);background:rgba(var(--theme-contrast-rgb),.05)}
+.tkk-sidebar-main{margin-bottom:6px;color:rgba(var(--theme-heading-rgb),.85)}
+@media (prefers-reduced-motion:reduce){.tkk.theme-madness::before{animation:none}}
 </style>

@@ -46,18 +46,18 @@ const parts = computed(() => {
 .imp-combo{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:14px; }
 .fam-face{
   display:inline-flex; align-items:center; gap:6px;
-  border:1px solid rgba(214,170,96,.28); border-radius:999px;
-  background:rgba(214,170,96,.06); padding:4px 11px 4px 5px;
-  font-size:11px; font-weight:700; color:rgba(232,236,248,.72);
+  border:1px solid rgba(var(--theme-accent-rgb),.28); border-radius:999px;
+  background:rgba(var(--theme-accent-rgb),.06); padding:4px 11px 4px 5px;
+  font-size:11px; font-weight:700; color:rgba(var(--theme-text-rgb),.72);
 }
 .fam-face img{ width:20px; height:20px; object-fit:contain; border-radius:50%; background:radial-gradient(120% 120% at 30% 25%, #efe6d2, #cabb9a); padding:2px; }
-.fam-face b{ color:rgba(244,224,170,.9); }
-.imp-diff{ border:1px solid rgba(214,170,96,.32); border-radius:999px; background:rgba(214,170,96,.08); padding:5px 12px; font-size:11px; font-weight:700; color:rgba(244,224,170,.9); }
+.fam-face b{ color:rgba(var(--theme-accent-strong-rgb),.9); }
+.imp-diff{ border:1px solid rgba(var(--theme-accent-rgb),.32); border-radius:999px; background:rgba(var(--theme-accent-rgb),.08); padding:5px 12px; font-size:11px; font-weight:700; color:rgba(var(--theme-accent-strong-rgb),.9); }
 
 .imp-levels{ display:flex; flex-direction:column; gap:8px; }
-.imp-level{ display:grid; grid-template-columns:74px 1fr; gap:12px; padding:12px 14px; border:1px solid rgba(232,236,248,.08); border-radius:8px; background:rgba(255,255,255,.012); }
-.imp-level-tag{ font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:rgba(214,170,96,.8); }
-.imp-level p{ margin:0; font-family:'Cormorant Garamond',serif; font-size:16px; line-height:1.5; color:rgba(224,232,242,.82); }
+.imp-level{ display:grid; grid-template-columns:74px 1fr; gap:12px; padding:12px 14px; border:1px solid rgba(var(--theme-text-rgb),.08); border-radius:8px; background:rgba(var(--theme-contrast-rgb),.012); }
+.imp-level-tag{ font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:rgba(var(--theme-accent-rgb),.8); }
+.imp-level p{ margin:0; font-family:'Cormorant Garamond',serif; font-size:16px; line-height:1.5; color:rgba(var(--theme-text-rgb),.82); }
 
 .imp-note{ margin-top:12px; }
 

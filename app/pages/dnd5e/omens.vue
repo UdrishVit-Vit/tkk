@@ -110,9 +110,9 @@ useSeoMeta({
 }
 
 .omens-lore{
-  border:1px solid rgba(232,236,248,.1);
+  border:1px solid rgba(var(--theme-text-rgb),.1);
   border-radius:10px;
-  background:rgba(255,255,255,.012);
+  background:rgba(var(--theme-contrast-rgb),.012);
   padding:0 16px;
 }
 
@@ -122,7 +122,7 @@ useSeoMeta({
   font-weight:800;
   letter-spacing:.16em;
   text-transform:uppercase;
-  color:rgba(214,170,96,.8);
+  color:rgba(var(--theme-accent-rgb),.8);
   cursor:pointer;
   list-style:none;
 }
@@ -131,7 +131,7 @@ useSeoMeta({
 
 .omens-lore summary::before{
   content:'+ ';
-  color:rgba(214,170,96,.7);
+  color:rgba(var(--theme-accent-rgb),.7);
 }
 
 .omens-lore[open] summary::before{
@@ -147,11 +147,11 @@ useSeoMeta({
   font-family:'Cormorant Garamond',serif;
   font-size:17px;
   line-height:1.55;
-  color:rgba(224,232,242,.78);
+  color:rgba(var(--theme-text-rgb),.78);
 }
 
 .omens-lore-body b{
-  color:rgba(244,224,170,.9);
+  color:rgba(var(--theme-accent-strong-rgb),.9);
 }
 
 .omens-roll-btn{
@@ -159,11 +159,11 @@ useSeoMeta({
   align-items:center;
   gap:10px;
   margin-top:18px;
-  border:1px solid rgba(214,170,96,.45);
+  border:1px solid rgba(var(--theme-accent-rgb),.45);
   border-radius:10px;
-  background:rgba(214,170,96,.1);
+  background:rgba(var(--theme-accent-rgb),.1);
   padding:12px 22px;
-  color:#f4e0aa;
+  color:var(--theme-accent-strong);
   font-family:'Cormorant Garamond',serif;
   font-size:20px;
   font-weight:600;
@@ -179,8 +179,8 @@ useSeoMeta({
 }
 
 .omens-roll-btn:hover{
-  border-color:rgba(244,224,170,.7);
-  background:rgba(214,170,96,.18);
+  border-color:rgba(var(--theme-accent-strong-rgb),.7);
+  background:rgba(var(--theme-accent-rgb),.18);
 }
 
 .omens-roll-btn:active{
@@ -203,24 +203,24 @@ useSeoMeta({
   display:inline-flex;
   align-items:baseline;
   gap:6px;
-  border:1px solid rgba(214,170,96,.32);
+  border:1px solid rgba(var(--theme-accent-rgb),.32);
   border-radius:8px;
-  background:rgba(214,170,96,.08);
+  background:rgba(var(--theme-accent-rgb),.08);
   padding:6px 12px;
   font-size:13px;
   font-weight:700;
   letter-spacing:.04em;
-  color:rgba(232,236,248,.8);
+  color:rgba(var(--theme-text-rgb),.8);
 }
 
 .omens-die b{
   font-size:16px;
-  color:#f4e0aa;
+  color:var(--theme-accent-strong);
   font-variant-numeric:tabular-nums;
 }
 
 .omens-arrow{
-  color:rgba(214,170,96,.6);
+  color:rgba(var(--theme-accent-rgb),.6);
   font-size:18px;
 }
 
@@ -229,6 +229,6 @@ useSeoMeta({
   font-size:20px;
   font-weight:600;
   letter-spacing:.04em;
-  color:rgba(246,248,255,.95);
+  color:rgba(var(--theme-heading-rgb),.95);
 }
 </style>

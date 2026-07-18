@@ -142,20 +142,20 @@ async function copyPageLink() {
 
 <style scoped>
 .rdetail-page{
-  --t-bg:#07080d;
-  --t-line:rgba(232,236,248,.12);
-  --t-text:rgba(232,236,248,.9);
-  --t-muted:rgba(232,236,248,.58);
-  --t-faint:rgba(232,236,248,.38);
-  --t-gold:#d6aa60;
-  --t-gold-soft:rgba(244,224,170,.9);
+  --t-bg:var(--theme-bg);
+  --t-line:rgba(var(--theme-text-rgb),.12);
+  --t-text:rgba(var(--theme-text-rgb),.9);
+  --t-muted:rgba(var(--theme-text-rgb),.58);
+  --t-faint:rgba(var(--theme-text-rgb),.38);
+  --t-gold:var(--theme-accent);
+  --t-gold-soft:rgba(var(--theme-accent-strong-rgb),.9);
   min-height:100vh;
   display:grid;
   grid-template-columns:270px minmax(0,720px);
   justify-content:center;
   column-gap:44px;
   padding:0 24px;
-  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 300px),var(--t-bg);
+  background:linear-gradient(180deg,rgba(var(--theme-contrast-rgb),.02),transparent 300px),var(--t-bg);
   color:var(--t-text);
   font-family:'Hanken Grotesk',system-ui,sans-serif;
 }
@@ -167,7 +167,7 @@ async function copyPageLink() {
   display:flex;
   flex-direction:column;
   gap:16px;
-  border-right:1px solid rgba(232,236,248,.08);
+  border-right:1px solid rgba(var(--theme-text-rgb),.08);
   padding:30px 20px 24px;
 }
 
@@ -189,7 +189,7 @@ async function copyPageLink() {
 }
 
 .rdetail-side-back:hover{
-  color:#f4e0aa;
+  color:var(--theme-accent-strong);
 }
 
 /* Нить в навигации */
@@ -250,13 +250,13 @@ async function copyPageLink() {
   height:5px;
   margin-top:-2.5px;
   border-radius:50%;
-  background:rgba(232,236,248,.22);
+  background:rgba(var(--theme-text-rgb),.22);
   transition:background .16s ease,box-shadow .16s ease;
 }
 
 .rdetail-nav-link:hover{
   color:var(--t-text);
-  background:rgba(255,255,255,.03);
+  background:rgba(var(--theme-contrast-rgb),.03);
 }
 
 .rdetail-nav-link:hover::before{
@@ -264,12 +264,12 @@ async function copyPageLink() {
 }
 
 .rdetail-nav-link.active{
-  color:#f4e0aa;
+  color:var(--theme-accent-strong);
 }
 
 .rdetail-nav-link.active::before{
   background:var(--t-gold);
-  box-shadow:0 0 0 3px rgba(214,170,96,.18);
+  box-shadow:0 0 0 3px rgba(var(--theme-accent-rgb),.18);
 }
 
 .rdetail-nav-icon{
@@ -277,7 +277,7 @@ async function copyPageLink() {
   place-items:center;
   width:22px;
   height:22px;
-  color:rgba(214,170,96,.6);
+  color:rgba(var(--theme-accent-rgb),.6);
 }
 
 .rdetail-nav-link.active .rdetail-nav-icon,
@@ -335,7 +335,7 @@ async function copyPageLink() {
 }
 
 .rdetail-crumb a:hover{
-  color:#f4e0aa;
+  color:var(--theme-accent-strong);
 }
 
 .rdetail-head h1{
@@ -346,7 +346,7 @@ async function copyPageLink() {
   font-weight:500;
   letter-spacing:.05em;
   text-transform:uppercase;
-  color:rgba(246,248,255,.96);
+  color:rgba(var(--theme-heading-rgb),.96);
 }
 
 .rdetail-subtitle{
@@ -390,7 +390,7 @@ async function copyPageLink() {
 
 .rdetail-icon-btn:hover,
 .rdetail-icon-btn.active{
-  border-color:rgba(214,170,96,.5);
+  border-color:rgba(var(--theme-accent-rgb),.5);
   color:var(--t-gold-soft);
 }
 
@@ -442,16 +442,16 @@ async function copyPageLink() {
 .rdetail-fact a{
   color:inherit;
   text-decoration:none;
-  border-bottom:1px solid rgba(214,170,96,.4);
+  border-bottom:1px solid rgba(var(--theme-accent-rgb),.4);
 }
 
 .rdetail-fact a:hover{
-  color:#f4e0aa;
+  color:var(--theme-accent-strong);
 }
 
 .rdetail-source-tag{
   cursor:help;
-  border-bottom:1px dotted rgba(214,170,96,.4);
+  border-bottom:1px dotted rgba(var(--theme-accent-rgb),.4);
 }
 
 .rdetail-block{
@@ -468,7 +468,7 @@ async function copyPageLink() {
   font-weight:500;
   letter-spacing:.06em;
   text-transform:uppercase;
-  color:rgba(246,248,255,.94);
+  color:rgba(var(--theme-heading-rgb),.94);
 }
 
 .rdetail-block h2::before{
@@ -487,7 +487,7 @@ async function copyPageLink() {
   font-family:'Cormorant Garamond',serif;
   font-size:20px;
   line-height:1.55;
-  color:rgba(224,232,242,.84);
+  color:rgba(var(--theme-text-rgb),.84);
 }
 
 .rdetail-block p+p{
@@ -503,7 +503,7 @@ async function copyPageLink() {
   font-family:'Cormorant Garamond',serif;
   font-size:20px;
   line-height:1.48;
-  color:rgba(224,232,242,.84);
+  color:rgba(var(--theme-text-rgb),.84);
 }
 
 .rdetail-block li::marker{
@@ -540,7 +540,7 @@ async function copyPageLink() {
     order:2;
     height:auto;
     border-right:0;
-    border-top:1px solid rgba(232,236,248,.08);
+    border-top:1px solid rgba(var(--theme-text-rgb),.08);
     padding:22px 16px 40px;
   }
 

@@ -61,7 +61,21 @@ export function classImg(name){ return CLASS_IMG[name] ? ('/assets/classes/'+CLA
 
 export const THEMES = {
   void:  { bg:'radial-gradient(130% 120% at 50% 28%,#0c0e14 0%,#070810 52%,#040406 100%)', ink:'rgba(226,230,244,', glow:'rgba(176,188,232,', thread:'rgba(196,208,240,', ring:'rgba(196,208,240,.5)', hi:'238,243,255', disc:'7,8,12' },
-  sepia: { bg:'radial-gradient(130% 120% at 50% 28%,#16110a 0%,#0c0805 52%,#050302 100%)', ink:'rgba(244,234,216,', glow:'rgba(232,196,142,', thread:'rgba(236,210,168,', ring:'rgba(236,210,168,.5)', hi:'255,244,222', disc:'12,8,4' },
+  shamas: { bg:'radial-gradient(130% 120% at 50% 28%,#16110a 0%,#0c0805 52%,#050302 100%)', ink:'rgba(244,234,216,', glow:'rgba(232,196,142,', thread:'rgba(236,210,168,', ring:'rgba(236,210,168,.5)', hi:'255,244,222', disc:'12,8,4' },
+  manu: {
+    bg:'radial-gradient(circle at 50% 29%,rgba(221,231,242,.18) 0%,rgba(145,165,190,.08) 17%,transparent 40%), linear-gradient(118deg,transparent 0 23%,rgba(223,231,241,.1) 23.08%,transparent 23.42% 61%,rgba(2,6,12,.32) 61.1%,transparent 61.52%), linear-gradient(32deg,transparent 0 36%,rgba(210,222,237,.06) 36.08%,transparent 36.38% 76%,rgba(3,7,13,.28) 76.08%,transparent 76.5%), radial-gradient(135% 115% at 50% 24%,#3e4854 0%,#252c35 52%,#12171e 100%)',
+    ink:'rgba(235,240,247,', glow:'rgba(197,213,232,', thread:'rgba(137,158,184,', ring:'rgba(163,184,210,.34)', hi:'242,247,253', disc:'29,35,44',
+    discBg:'none',
+    labelShadow:'0 1px 2px rgba(0,0,0,.86), 0 0 12px rgba(187,205,228,.16)',
+    subShadow:'0 1px 2px rgba(0,0,0,.86)'
+  },
+  madness: {
+    bg:'radial-gradient(circle at 50% 45%,rgba(201,151,255,.13) 0%,rgba(132,90,211,.055) 18%,transparent 38%), radial-gradient(ellipse 58% 45% at 14% 4%,rgba(200,132,255,.18),transparent 68%), radial-gradient(ellipse 52% 48% at 88% 9%,rgba(82,83,211,.2),transparent 70%), radial-gradient(ellipse 42% 36% at 66% 82%,rgba(157,94,224,.09),transparent 72%), linear-gradient(146deg,#19102d 0%,#100a1b 48%,#07040f 100%)',
+    ink:'rgba(232,227,244,', glow:'rgba(184,128,255,', thread:'rgba(137,128,230,', ring:'rgba(193,154,255,.46)', hi:'238,225,255', disc:'18,11,31',
+    discBg:'radial-gradient(circle,rgba(38,24,63,.82) 0 38%,rgba(25,15,43,.4) 58%,transparent 76%)',
+    labelShadow:'0 1px 2px rgba(3,1,9,.92),0 0 14px rgba(172,120,245,.2)',
+    subShadow:'0 1px 2px rgba(3,1,9,.94),0 0 10px rgba(104,101,220,.15)'
+  },
 };
 
 export function layoutPoints(n){

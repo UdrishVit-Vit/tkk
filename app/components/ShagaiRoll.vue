@@ -101,10 +101,10 @@ onBeforeUnmount(clearTimers)
   place-items:center;
   width:74px;
   height:74px;
-  border:1px solid rgba(214,170,96,.4);
+  border:1px solid rgba(var(--theme-accent-rgb),.4);
   border-radius:12px;
   background:radial-gradient(120% 120% at 30% 25%, #efe6d2, #d8cbb0 70%, #c9ba99);
-  box-shadow:inset 0 1px 2px rgba(255,255,255,.5), 0 6px 14px rgba(0,0,0,.3);
+  box-shadow:inset 0 1px 2px rgba(var(--theme-contrast-rgb),.5), 0 6px 14px rgba(0,0,0,.3);
 }
 
 .shagai-die img{
@@ -143,7 +143,7 @@ onBeforeUnmount(clearTimers)
   font-size:9.5px;
   font-weight:700;
   letter-spacing:.04em;
-  color:rgba(214,170,96,.8);
+  color:rgba(var(--theme-accent-rgb),.8);
 }
 
 .shagai-controls{
@@ -158,11 +158,11 @@ onBeforeUnmount(clearTimers)
   display:inline-flex;
   align-items:center;
   gap:10px;
-  border:1px solid rgba(214,170,96,.45);
+  border:1px solid rgba(var(--theme-accent-rgb),.45);
   border-radius:10px;
-  background:rgba(214,170,96,.1);
+  background:rgba(var(--theme-accent-rgb),.1);
   padding:12px 22px;
-  color:#f4e0aa;
+  color:var(--theme-accent-strong);
   font-family:'Cormorant Garamond',serif;
   font-size:20px;
   font-weight:600;
@@ -175,8 +175,8 @@ onBeforeUnmount(clearTimers)
 .shagai-btn svg{ width:20px; height:20px; }
 
 .shagai-btn:hover:not(:disabled){
-  border-color:rgba(244,224,170,.7);
-  background:rgba(214,170,96,.18);
+  border-color:rgba(var(--theme-accent-strong-rgb),.7);
+  background:rgba(var(--theme-accent-rgb),.18);
 }
 
 .shagai-btn:active:not(:disabled){ transform:translateY(1px); }
@@ -187,7 +187,7 @@ onBeforeUnmount(clearTimers)
   font-weight:700;
   letter-spacing:.08em;
   text-transform:uppercase;
-  color:rgba(232,236,248,.4);
+  color:rgba(var(--theme-text-rgb),.4);
 }
 
 .shagai-result{ margin-top:20px; }
@@ -204,7 +204,7 @@ onBeforeUnmount(clearTimers)
   font-weight:800;
   letter-spacing:.16em;
   text-transform:uppercase;
-  color:rgba(232,236,248,.4);
+  color:rgba(var(--theme-text-rgb),.4);
 }
 
 .shagai-combo b{
@@ -212,11 +212,11 @@ onBeforeUnmount(clearTimers)
   font-size:19px;
   font-weight:600;
   letter-spacing:.03em;
-  color:rgba(244,224,170,.92);
+  color:rgba(var(--theme-accent-strong-rgb),.92);
 }
 
 .shagai-empty{
-  color:rgba(232,236,248,.5);
+  color:rgba(var(--theme-text-rgb),.5);
   font-style:italic;
 }
 

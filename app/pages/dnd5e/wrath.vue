@@ -127,9 +127,9 @@ useSeoMeta({
 }
 
 .wrath-lore{
-  border:1px solid rgba(232,236,248,.1);
+  border:1px solid rgba(var(--theme-text-rgb),.1);
   border-radius:10px;
-  background:rgba(255,255,255,.012);
+  background:rgba(var(--theme-contrast-rgb),.012);
   padding:0 16px;
 }
 
@@ -139,7 +139,7 @@ useSeoMeta({
   font-weight:800;
   letter-spacing:.16em;
   text-transform:uppercase;
-  color:rgba(214,170,96,.8);
+  color:rgba(var(--theme-accent-rgb),.8);
   cursor:pointer;
   list-style:none;
 }
@@ -148,7 +148,7 @@ useSeoMeta({
 
 .wrath-lore summary::before{
   content:'+ ';
-  color:rgba(214,170,96,.7);
+  color:rgba(var(--theme-accent-rgb),.7);
 }
 
 .wrath-lore[open] summary::before{
@@ -164,11 +164,11 @@ useSeoMeta({
   font-family:'Cormorant Garamond',serif;
   font-size:17px;
   line-height:1.55;
-  color:rgba(224,232,242,.78);
+  color:rgba(var(--theme-text-rgb),.78);
 }
 
 .wrath-lore-body b{
-  color:rgba(244,224,170,.9);
+  color:rgba(var(--theme-accent-strong-rgb),.9);
 }
 
 .wrath-lore-body h4{
@@ -177,12 +177,12 @@ useSeoMeta({
   font-weight:800;
   letter-spacing:.16em;
   text-transform:uppercase;
-  color:rgba(214,170,96,.75);
+  color:rgba(var(--theme-accent-rgb),.75);
 }
 
 .wrath-tiers-table{
   margin:6px 0 12px;
-  border:1px solid rgba(214,170,96,.18);
+  border:1px solid rgba(var(--theme-accent-rgb),.18);
   border-radius:8px;
   overflow:hidden;
 }
@@ -191,7 +191,7 @@ useSeoMeta({
   display:grid;
   grid-template-columns:1.3fr .8fr 1.3fr 1fr;
   gap:1px;
-  border-top:1px solid rgba(232,236,248,.06);
+  border-top:1px solid rgba(var(--theme-text-rgb),.06);
 }
 
 .wrath-tiers-row:first-child{ border-top:0; }
@@ -200,7 +200,7 @@ useSeoMeta({
   padding:8px 12px;
   font-size:13px;
   line-height:1.4;
-  color:rgba(224,232,242,.75);
+  color:rgba(var(--theme-text-rgb),.75);
 }
 
 .wrath-tiers-head span{
@@ -208,12 +208,12 @@ useSeoMeta({
   font-weight:800;
   letter-spacing:.12em;
   text-transform:uppercase;
-  color:rgba(214,170,96,.75);
-  background:rgba(214,170,96,.06);
+  color:rgba(var(--theme-accent-rgb),.75);
+  background:rgba(var(--theme-accent-rgb),.06);
 }
 
 .wrath-tiers-name{
-  color:rgba(244,224,170,.88) !important;
+  color:rgba(var(--theme-accent-strong-rgb),.88) !important;
   font-weight:700;
 }
 
@@ -221,11 +221,11 @@ useSeoMeta({
   margin:0 0 10px;
   font-size:14px;
   line-height:1.6;
-  color:rgba(224,232,242,.72);
+  color:rgba(var(--theme-text-rgb),.72);
 }
 
 .wrath-face b{
-  color:rgba(244,224,170,.9);
+  color:rgba(var(--theme-accent-strong-rgb),.9);
 }
 
 .wrath-result-name{
@@ -233,7 +233,7 @@ useSeoMeta({
   font-size:20px;
   font-weight:600;
   letter-spacing:.04em;
-  color:rgba(246,248,255,.95);
+  color:rgba(var(--theme-heading-rgb),.95);
 }
 
 @media (max-width: 700px){

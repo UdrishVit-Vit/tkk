@@ -109,9 +109,9 @@ useSeoMeta({
 }
 
 .tea-lore{
-  border:1px solid rgba(232,236,248,.1);
+  border:1px solid rgba(var(--theme-text-rgb),.1);
   border-radius:10px;
-  background:rgba(255,255,255,.012);
+  background:rgba(var(--theme-contrast-rgb),.012);
   padding:0 16px;
 }
 
@@ -121,7 +121,7 @@ useSeoMeta({
   font-weight:800;
   letter-spacing:.16em;
   text-transform:uppercase;
-  color:rgba(214,170,96,.8);
+  color:rgba(var(--theme-accent-rgb),.8);
   cursor:pointer;
   list-style:none;
 }
@@ -130,7 +130,7 @@ useSeoMeta({
 
 .tea-lore summary::before{
   content:'+ ';
-  color:rgba(214,170,96,.7);
+  color:rgba(var(--theme-accent-rgb),.7);
 }
 
 .tea-lore[open] summary::before{
@@ -146,11 +146,11 @@ useSeoMeta({
   font-family:'Cormorant Garamond',serif;
   font-size:17px;
   line-height:1.55;
-  color:rgba(224,232,242,.78);
+  color:rgba(var(--theme-text-rgb),.78);
 }
 
 .tea-lore-body b{
-  color:rgba(244,224,170,.9);
+  color:rgba(var(--theme-accent-strong-rgb),.9);
 }
 
 .tea-result-name{
@@ -158,6 +158,6 @@ useSeoMeta({
   font-size:20px;
   font-weight:600;
   letter-spacing:.04em;
-  color:rgba(246,248,255,.95);
+  color:rgba(var(--theme-heading-rgb),.95);
 }
 </style>

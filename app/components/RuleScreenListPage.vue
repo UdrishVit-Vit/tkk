@@ -107,15 +107,15 @@ async function copyPageLink() {
 
 <style scoped>
 .rlist-page{
-  --t-bg:#07080d;
-  --t-line:rgba(232,236,248,.12);
-  --t-text:rgba(232,236,248,.9);
-  --t-muted:rgba(232,236,248,.58);
-  --t-faint:rgba(232,236,248,.38);
-  --t-gold:#d6aa60;
-  --t-gold-soft:rgba(244,224,170,.9);
+  --t-bg:var(--theme-bg);
+  --t-line:rgba(var(--theme-text-rgb),.12);
+  --t-text:rgba(var(--theme-text-rgb),.9);
+  --t-muted:rgba(var(--theme-text-rgb),.58);
+  --t-faint:rgba(var(--theme-text-rgb),.38);
+  --t-gold:var(--theme-accent);
+  --t-gold-soft:rgba(var(--theme-accent-strong-rgb),.9);
   min-height:100vh;
-  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 300px),var(--t-bg);
+  background:linear-gradient(180deg,rgba(var(--theme-contrast-rgb),.02),transparent 300px),var(--t-bg);
   color:var(--t-text);
   font-family:'Hanken Grotesk',system-ui,sans-serif;
 }
@@ -151,7 +151,7 @@ async function copyPageLink() {
 }
 
 .rlist-crumb a:hover{
-  color:#f4e0aa;
+  color:var(--theme-accent-strong);
 }
 
 .rlist-head h1{
@@ -162,7 +162,7 @@ async function copyPageLink() {
   font-weight:500;
   letter-spacing:.06em;
   text-transform:uppercase;
-  color:rgba(246,248,255,.96);
+  color:rgba(var(--theme-heading-rgb),.96);
 }
 
 .rlist-subtitle{
@@ -206,7 +206,7 @@ async function copyPageLink() {
 
 .rlist-icon-btn:hover,
 .rlist-icon-btn.active{
-  border-color:rgba(214,170,96,.5);
+  border-color:rgba(var(--theme-accent-rgb),.5);
   color:var(--t-gold-soft);
 }
 
@@ -270,7 +270,7 @@ async function copyPageLink() {
   font-weight:500;
   letter-spacing:.07em;
   text-transform:uppercase;
-  color:rgba(246,248,255,.94);
+  color:rgba(var(--theme-heading-rgb),.94);
 }
 
 .rlist-group-head p{
@@ -293,7 +293,7 @@ async function copyPageLink() {
   gap:14px;
   align-items:center;
   padding:10px 2px;
-  border-bottom:1px solid rgba(232,236,248,.05);
+  border-bottom:1px solid rgba(var(--theme-text-rgb),.05);
   color:inherit;
   text-decoration:none;
 }
@@ -311,13 +311,13 @@ async function copyPageLink() {
   height:5px;
   margin-top:-2.5px;
   border-radius:50%;
-  background:rgba(232,236,248,.28);
+  background:rgba(var(--theme-text-rgb),.28);
   transition:background .16s ease,box-shadow .16s ease;
 }
 
 .rlist-item:hover::before{
   background:var(--t-gold);
-  box-shadow:0 0 0 3px rgba(214,170,96,.18);
+  box-shadow:0 0 0 3px rgba(var(--theme-accent-rgb),.18);
 }
 
 .rlist-item-icon{
@@ -325,7 +325,7 @@ async function copyPageLink() {
   place-items:center;
   width:26px;
   height:26px;
-  color:rgba(214,170,96,.66);
+  color:rgba(var(--theme-accent-rgb),.66);
   transition:color .16s ease;
 }
 
@@ -349,12 +349,12 @@ async function copyPageLink() {
   font-size:16px;
   line-height:1.3;
   font-weight:750;
-  color:rgba(246,248,255,.92);
+  color:rgba(var(--theme-heading-rgb),.92);
   transition:color .16s ease;
 }
 
 .rlist-item:hover .rlist-item-title{
-  color:#f4e0aa;
+  color:var(--theme-accent-strong);
 }
 
 .rlist-item-meta{

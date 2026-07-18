@@ -140,16 +140,16 @@ useSeoMeta({
 .imp-result-name{
   margin-bottom:12px;
   font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:600;
-  letter-spacing:.04em; color:rgba(246,248,255,.95);
+  letter-spacing:.04em; color:rgba(var(--theme-heading-rgb),.95);
 }
 .imp-result-card{
   position:relative; padding:22px 24px 20px;
-  border:1px solid rgba(214,170,96,.22); border-radius:10px;
-  background:linear-gradient(180deg,rgba(214,170,96,.05),rgba(255,255,255,.008));
+  border:1px solid rgba(var(--theme-accent-rgb),.22); border-radius:10px;
+  background:linear-gradient(180deg,rgba(var(--theme-accent-rgb),.05),rgba(var(--theme-contrast-rgb),.008));
 }
 .rt-corner{ position:absolute; width:14px; height:14px; pointer-events:none; }
-.rt-corner-tl{ top:6px; left:6px; border-top:1.5px solid rgba(214,170,96,.5); border-left:1.5px solid rgba(214,170,96,.5); border-radius:5px 0 0 0; }
-.rt-corner-tr{ top:6px; right:6px; border-top:1.5px solid rgba(214,170,96,.5); border-right:1.5px solid rgba(214,170,96,.5); border-radius:0 5px 0 0; }
-.rt-corner-bl{ bottom:6px; left:6px; border-bottom:1.5px solid rgba(214,170,96,.5); border-left:1.5px solid rgba(214,170,96,.5); border-radius:0 0 0 5px; }
-.rt-corner-br{ bottom:6px; right:6px; border-bottom:1.5px solid rgba(214,170,96,.5); border-right:1.5px solid rgba(214,170,96,.5); border-radius:0 0 5px 0; }
+.rt-corner-tl{ top:6px; left:6px; border-top:1.5px solid rgba(var(--theme-accent-rgb),.5); border-left:1.5px solid rgba(var(--theme-accent-rgb),.5); border-radius:5px 0 0 0; }
+.rt-corner-tr{ top:6px; right:6px; border-top:1.5px solid rgba(var(--theme-accent-rgb),.5); border-right:1.5px solid rgba(var(--theme-accent-rgb),.5); border-radius:0 5px 0 0; }
+.rt-corner-bl{ bottom:6px; left:6px; border-bottom:1.5px solid rgba(var(--theme-accent-rgb),.5); border-left:1.5px solid rgba(var(--theme-accent-rgb),.5); border-radius:0 0 0 5px; }
+.rt-corner-br{ bottom:6px; right:6px; border-bottom:1.5px solid rgba(var(--theme-accent-rgb),.5); border-right:1.5px solid rgba(var(--theme-accent-rgb),.5); border-radius:0 0 5px 0; }
 </style>
