@@ -746,6 +746,7 @@ const CLEAN_CENTRAL_KNOT_PATHS = new Set([
   '/dnd5e/races/ehornur'
 ])
 const hasCleanCentralKnot = computed(() => CLEAN_CENTRAL_KNOT_PATHS.has(selectedPath.value))
+const hasLargeCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/hudduliny')
 
 // Per-race, per-variety portraits — for merged races (e.g. Люди) whose varieties
 // are visually distinct peoples, the hero portrait swaps with the chosen variety.
@@ -1069,7 +1070,10 @@ function printRace() {
             <NuxtLink
               to="/dnd5e/races"
               class="rd-central-emblem"
-              :class="{ 'rd-central-emblem--clean-knot': hasCleanCentralKnot }"
+              :class="{
+                'rd-central-emblem--clean-knot': hasCleanCentralKnot,
+                'rd-central-emblem--large-knot': hasLargeCentralKnot
+              }"
               title="Назад к расам"
               aria-label="Назад к списку рас"
             >
@@ -1737,6 +1741,7 @@ function printRace() {
 .rd-central-emblem-knot{position:relative;z-index:2;width:88px;height:88px;display:block;object-fit:contain;pointer-events:none;user-select:none;filter:drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.28));transition:filter .3s ease,transform .3s ease}
 .rd-central-emblem:hover .rd-central-emblem-frame,.rd-central-emblem.is-spark-active .rd-central-emblem-frame{border-color:#fff0bd;background:rgba(var(--theme-accent-rgb),.08);box-shadow:0 0 5px rgba(255,240,189,.7),0 0 18px rgba(var(--theme-accent-rgb),.46),0 0 30px rgba(var(--theme-accent-rgb),.18)}
 .rd-central-emblem:hover .rd-central-emblem-knot,.rd-central-emblem.is-spark-active .rd-central-emblem-knot{filter:drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.68)) brightness(1.22);transform:scale(1.04)}
+.rd-central-emblem--large-knot .rd-central-emblem-knot{width:117px;height:117px}
 .rd-filter-defs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
 .rd-central-emblem--clean-knot .rd-central-emblem-knot{filter:url('#rd-knot-alpha-clean')}
 .rd-central-emblem--clean-knot:hover .rd-central-emblem-frame,.rd-central-emblem--clean-knot.is-spark-active .rd-central-emblem-frame{background:transparent}
@@ -1963,6 +1968,7 @@ function printRace() {
   .rd-central-head{min-height:76px}
   .rd-central-emblem{width:76px;height:76px;margin-left:-64px;margin-right:8px}
   .rd-central-emblem::before,.rd-central-emblem-frame,.rd-central-emblem-knot{width:64px;height:64px}
+  .rd-central-emblem--large-knot .rd-central-emblem-knot{width:85px;height:85px}
   .rd-central-emblem::before,.rd-central-emblem-frame{border-radius:6px}
   .rd-hero-text-card{padding:18px 18px}
   .rd-title{font-size:32px}
