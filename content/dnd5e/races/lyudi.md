@@ -11,7 +11,8 @@ region:
 playable: true
 hasDndRules: true
 
-source: ENOA
+source: TL
+sourceTitle: The Threads of Largo
 originalName: Humans
 image: ""
 imageAlt: Люди

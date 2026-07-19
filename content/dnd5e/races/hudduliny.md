@@ -9,7 +9,8 @@ region:
 playable: true
 hasDndRules: true
 
-source: ENOA
+source: TL
+sourceTitle: The Threads of Largo
 originalName: Huddulin
 image: ""
 imageAlt: Худдулин

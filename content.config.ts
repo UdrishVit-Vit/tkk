@@ -17,9 +17,43 @@ const primaryTraitSchema = z.object({
   text: z.string()
 })
 
+const windTattooTableSchema = z.object({
+  title: z.string(),
+  entries: z.array(z.object({
+    whiteTitle: z.string(),
+    whiteText: z.string(),
+    blackTitle: z.string(),
+    blackText: z.string(),
+    darknessPoints: z.number().int().min(1)
+  })).default([])
+})
+
 const ruleSectionSchema = z.object({
   title: z.string(),
   text: z.string()
+})
+
+const bloodTablesSchema = z.object({
+  mother: z.array(z.object({ dice: z.string(), name: z.string(), text: z.string() })).default([]),
+  father: z.array(z.object({ dice: z.string(), name: z.string(), text: z.string() })).default([])
+})
+
+const nameDataSchema = z.object({
+  intro: z.string(),
+  examples: z.string().optional(),
+  varieties: z.array(z.string()).default([]),
+  d13: z.object({
+    intro: z.string().optional(),
+    entries: z.array(z.object({ roll: z.number(), desc: z.string(), value: z.string() })).default([])
+  }).optional(),
+  d4x4: z.object({
+    intro: z.string().optional(),
+    entries: z.array(z.object({ roll: z.string(), sign: z.string(), value: z.string(), g: z.string().optional() })).default([])
+  }).optional(),
+  lost: z.object({
+    desc: z.string(),
+    entries: z.array(z.object({ d13: z.number(), roll: z.string(), sign: z.string() })).default([])
+  }).optional()
 })
 
 const themedImagesSchema = z.object({
@@ -29,6 +63,41 @@ const themedImagesSchema = z.object({
   dangun: z.string().optional(),
   brall: z.string().optional()
 }).default({})
+
+// Every Thread Source is a complete, independently authored version of a race.
+// Fields remain optional so a source may inherit unchanged values, but every
+// visible and mechanical part of the dossier can be replaced.
+const raceThreadSourceSchema = z.object({
+  id: z.string(),
+  source: z.string(),
+  sourceTitle: z.string(),
+  sourceAuthor: z.string().optional(),
+  sourceUrl: z.string().optional(),
+  sourceNote: z.string().optional(),
+  publishedAt: z.string().optional(),
+  title: z.string().optional(),
+  originalName: z.string().optional(),
+  description: z.string().optional(),
+  lore: z.array(z.string()).optional(),
+  region: z.array(z.string()).optional(),
+  playable: z.boolean().optional(),
+  hasDndRules: z.boolean().optional(),
+  tags: z.array(z.string()).optional(),
+  related: z.array(z.string()).optional(),
+  creatureType: z.string().optional(),
+  abilityScore: z.string().optional(),
+  raceSize: z.string().optional(),
+  speed: z.string().optional(),
+  primaryTraits: z.array(primaryTraitSchema).optional(),
+  windTattooTable: windTattooTableSchema.optional(),
+  ruleSections: z.array(ruleSectionSchema).optional(),
+  bloodTables: bloodTablesSchema.optional(),
+  nameData: nameDataSchema.optional(),
+  image: z.string().optional(),
+  imageAlt: z.string().optional(),
+  cardImages: themedImagesSchema.optional(),
+  detailImages: themedImagesSchema.optional()
+})
 
 export default defineContentConfig({
   collections: {
@@ -56,35 +125,23 @@ export default defineContentConfig({
         playable: z.boolean().default(true),
         hasDndRules: z.boolean().default(false),
 
-        source: z.string().default('ENOA'),
+        source: z.string().default('TL'),
+        sourceTitle: z.string().default('The Threads of Largo'),
+        sourceAuthor: z.string().optional(),
+        sourceUrl: z.string().optional(),
+        sourceNote: z.string().optional(),
+        publishedAt: z.string().optional(),
+        threadSources: z.array(raceThreadSourceSchema).default([]),
         originalName: z.string().default(''),
         creatureType: z.string().default('гуманоид'),
         abilityScore: z.string().default('—'),
         raceSize: z.string().default('Средний'),
         speed: z.string().default('30 фт.'),
         primaryTraits: z.array(primaryTraitSchema).default([]),
+        windTattooTable: windTattooTableSchema.optional(),
         ruleSections: z.array(ruleSectionSchema).default([]),
-        bloodTables: z.object({
-          mother: z.array(z.object({ dice: z.string(), name: z.string(), text: z.string() })).default([]),
-          father: z.array(z.object({ dice: z.string(), name: z.string(), text: z.string() })).default([])
-        }).optional(),
-        nameData: z.object({
-          intro: z.string(),
-          examples: z.string().optional(),
-          varieties: z.array(z.string()).default([]),
-          d13: z.object({
-            intro: z.string().optional(),
-            entries: z.array(z.object({ roll: z.number(), desc: z.string(), value: z.string() })).default([])
-          }).optional(),
-          d4x4: z.object({
-            intro: z.string().optional(),
-            entries: z.array(z.object({ roll: z.string(), sign: z.string(), value: z.string(), g: z.string().optional() })).default([])
-          }).optional(),
-          lost: z.object({
-            desc: z.string(),
-            entries: z.array(z.object({ d13: z.number(), roll: z.string(), sign: z.string() })).default([])
-          }).optional()
-        }).optional(),
+        bloodTables: bloodTablesSchema.optional(),
+        nameData: nameDataSchema.optional(),
 
         image: z.string().default(''),
         imageAlt: z.string().default(''),

@@ -10,7 +10,8 @@ region:
 playable: true
 hasDndRules: true
 
-source: ENOA
+source: TL
+sourceTitle: The Threads of Largo
 originalName: Marakiyets
 image: ""
 cardImages:
