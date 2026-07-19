@@ -737,6 +737,15 @@ const activeKnot = computed(() => {
   if (map && activeVariety.value) return map[varietyShortTitle(activeVariety.value)] || ''
   return RACE_KNOT_DEFAULT[selectedPath.value] || ''
 })
+const CLEAN_CENTRAL_KNOT_PATHS = new Set([
+  '/dnd5e/races/borosy',
+  '/dnd5e/races/jabari',
+  '/dnd5e/races/vetu',
+  '/dnd5e/races/oyrdugi',
+  '/dnd5e/races/samaghi',
+  '/dnd5e/races/ehornur'
+])
+const hasCleanCentralKnot = computed(() => CLEAN_CENTRAL_KNOT_PATHS.has(selectedPath.value))
 
 // Per-race, per-variety portraits — for merged races (e.g. Люди) whose varieties
 // are visually distinct peoples, the hero portrait swaps with the chosen variety.
@@ -992,6 +1001,16 @@ function printRace() {
 
     <!-- DETAIL DOSSIER -->
     <div v-else class="rd">
+      <svg class="rd-filter-defs" aria-hidden="true" focusable="false">
+        <defs>
+          <filter id="rd-knot-alpha-clean" color-interpolation-filters="sRGB">
+            <feComponentTransfer>
+              <feFuncA type="discrete" tableValues="0 0 1 1" />
+            </feComponentTransfer>
+          </filter>
+        </defs>
+      </svg>
+
       <aside class="rd-nav">
         <NuxtLink to="/" class="rd-nav-btn rd-nav-main" title="Главный узел">
           <img src="/assets/knot-main.png" width="24" height="24" style="display:block;object-fit:contain">
@@ -1047,7 +1066,13 @@ function printRace() {
           <span ref="raceSparkRef" class="rd-spark" aria-hidden="true" />
 
           <section class="rd-central-head">
-            <NuxtLink to="/dnd5e/races" class="rd-central-emblem" title="Назад к расам" aria-label="Назад к списку рас">
+            <NuxtLink
+              to="/dnd5e/races"
+              class="rd-central-emblem"
+              :class="{ 'rd-central-emblem--clean-knot': hasCleanCentralKnot }"
+              title="Назад к расам"
+              aria-label="Назад к списку рас"
+            >
               <span class="rd-central-emblem-frame" />
               <img
                 v-if="activeKnot"
@@ -1116,9 +1141,6 @@ function printRace() {
 
               <div class="rd-hero rd-thread-node">
                 <div class="rd-hero-card rd-hero-text-card">
-                  <span class="rd-corner rd-corner-tl" /><span class="rd-corner rd-corner-tr" />
-                  <span class="rd-corner rd-corner-br" /><span class="rd-corner rd-corner-bl" />
-
                   <div v-if="selectedRace.description" class="rd-overview-lead">
                     <p class="rd-quote">«{{ selectedRace.description }}»</p>
                   </div>
@@ -1715,6 +1737,10 @@ function printRace() {
 .rd-central-emblem-knot{position:relative;z-index:2;width:88px;height:88px;display:block;object-fit:contain;pointer-events:none;user-select:none;filter:drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.28));transition:filter .3s ease,transform .3s ease}
 .rd-central-emblem:hover .rd-central-emblem-frame,.rd-central-emblem.is-spark-active .rd-central-emblem-frame{border-color:#fff0bd;background:rgba(var(--theme-accent-rgb),.08);box-shadow:0 0 5px rgba(255,240,189,.7),0 0 18px rgba(var(--theme-accent-rgb),.46),0 0 30px rgba(var(--theme-accent-rgb),.18)}
 .rd-central-emblem:hover .rd-central-emblem-knot,.rd-central-emblem.is-spark-active .rd-central-emblem-knot{filter:drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.68)) brightness(1.22);transform:scale(1.04)}
+.rd-filter-defs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+.rd-central-emblem--clean-knot .rd-central-emblem-knot{filter:url('#rd-knot-alpha-clean')}
+.rd-central-emblem--clean-knot:hover .rd-central-emblem-frame,.rd-central-emblem--clean-knot.is-spark-active .rd-central-emblem-frame{background:transparent}
+.rd-central-emblem--clean-knot:hover .rd-central-emblem-knot,.rd-central-emblem--clean-knot.is-spark-active .rd-central-emblem-knot{filter:url('#rd-knot-alpha-clean')}
 .rd-central-heading{flex:1;min-width:0}
 .rd-original-name{margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.4)}
 .rd-presentation{overflow:visible;border:1px solid rgba(var(--theme-accent-rgb),.3);border-radius:18px;background:rgba(var(--theme-contrast-rgb),.018);transition:border-color .28s ease,box-shadow .28s ease,background .28s ease}
