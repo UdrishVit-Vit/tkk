@@ -4,6 +4,38 @@ import { SPELLS_5E, SPELL_LEVELS, SPELL_SCHOOLS, SPELL_TAGS, SPELL_SOURCES } fro
 const props = defineProps(['vm', 'state'])
 const emit = defineEmits(['up'])
 
+// Keep the current class emblem on screen until the next one is fully loaded.
+// Replacing the <img> together with the route caused a brief empty frame and
+// made the main symbol appear to blink several times during class navigation.
+const displayedClassEmblemUrl = ref(props.vm.classEmblemUrl)
+const classEmblemElementRef = ref(null)
+let classEmblemRequestId = 0
+
+async function prepareClassEmblem(src) {
+  const image = new Image()
+  image.decoding = 'sync'
+  await new Promise((resolve, reject) => {
+    image.onload = resolve
+    image.onerror = reject
+    image.src = src
+  })
+  if (typeof image.decode === 'function') await image.decode().catch(() => {})
+}
+
+watch(() => props.vm.classEmblemUrl, async (nextUrl) => {
+  const requestId = ++classEmblemRequestId
+  if (!nextUrl || nextUrl === displayedClassEmblemUrl.value) return
+  try {
+    await prepareClassEmblem(nextUrl)
+    if (requestId === classEmblemRequestId) {
+      displayedClassEmblemUrl.value = nextUrl
+      if (classEmblemElementRef.value) classEmblemElementRef.value.src = nextUrl
+    }
+  } catch {
+    // Keep the already rendered emblem instead of flashing a broken image.
+  }
+})
+
 // ---- Thread spark pointer guide -----------------------------------------
 // The spark follows the pointer vertically along the left rail. It reacts
 // only to the real block under the pointer, glides into its diamond and stays
@@ -207,20 +239,27 @@ onBeforeUnmount(() => {
   classPageRef.value?.removeEventListener('scroll', updateScrubFromScroll)
 })
 
-const duplicateArchetypeNames = computed(() => {
-  const counts = new Map()
-  for (const archetype of props.vm.classArchetypes || []) counts.set(archetype.name, (counts.get(archetype.name) || 0) + 1)
-  return new Set([...counts].filter(([, count]) => count > 1).map(([name]) => name))
-})
-
 const SOURCE_FULL_NAMES = {
   PHB: 'Player’s Handbook',
   TCE: 'Tasha’s Cauldron of Everything',
+  TJB: 'The Threads of JorasBashu',
   TLDC: 'The Threads of Lost Dice Club',
   TS: 'The Threads of Shkad',
-  TJB: 'The Threads of JorasBashu',
   TU: 'The Threads of Unseen',
+  TL: 'The Threads of Largo',
+  TM: 'The Threads of Marn',
+  TVV: 'The Threads of Vit-Vit',
+  TMC: 'The Threads of Magnificent Cringelord',
+  TST: 'The Threads of Stekly',
+  TLEG: 'The Threads of Legolaisik',
   TA: 'The Threads of Ainur',
+  TOMU: 'The Threads of Ob.med.uza',
+  TH: 'The Threads of Hekych',
+  TMG: 'The Threads of Mogrion',
+  TRC: 'The Threads of RandCarter',
+  TAX: 'The Threads of Axtimag',
+  TLU: 'The Threads of Lui',
+  TX: 'The Threads of Xrustalb',
   TKK: 'TKK.club'
 }
 
@@ -816,6 +855,33 @@ const sourceFilteredArchetypes = computed(() => props.vm.classArchetypes.filter(
   if (!props.state.classFilterTouched) return true
   return props.state.classFeatureSource === 'all' || arch.source === props.state.classFeatureSource
 }))
+const canonicalArchetypeName = name => String(name || '')
+  .replace(/\s+[—-]\s+[A-ZА-ЯЁ0-9]+$/u, '')
+  .trim()
+const sourceFilteredArchetypeCards = computed(() => {
+  const cards = []
+  const seenNames = new Set()
+  for (const archetype of sourceFilteredArchetypes.value) {
+    const name = canonicalArchetypeName(archetype.name)
+    if (seenNames.has(name)) continue
+    seenNames.add(name)
+    cards.push({ ...archetype, name, shortName: name })
+  }
+  return cards
+})
+const fullAuthorName = archetype => String(SOURCE_FULL_NAMES[archetype.source] || archetype.sourceFullName || archetype.source)
+  .replace(/^The Treads of\b/, 'The Threads of')
+const selectedAuthorVariants = computed(() => {
+  const selected = props.vm.classSelectedArchetype
+  if (!selected) return []
+  const canonicalName = canonicalArchetypeName(selected.name)
+  return props.vm.classArchetypes
+    .filter(arch => canonicalArchetypeName(arch.name) === canonicalName)
+    .map(arch => ({
+      ...arch,
+      authorName: fullAuthorName(arch)
+    }))
+})
 const visibleClassArchetypes = computed(() => sourceFilteredArchetypes.value.filter(arch => {
   if (!props.state.classFilterTouched) return true
   if (props.state.classFeatureSubclass !== 'all' && props.state.classFeatureSubclass !== 'base' && arch.id !== props.state.classFeatureSubclass) return false
@@ -839,8 +905,8 @@ const CLASS_BASE_SUMMARIES = {
   'Бард': 'Бард соединяет магию слова, музыку, знание и вдохновение. Он поддерживает союзников, влияет на ход сцены и гибко закрывает пробелы группы за счёт навыков и заклинаний.'
 }
 const activeBuildTitle = computed(() => props.vm.classHasSelectedArchetype
-  ? `${props.vm.className}: ${props.vm.classSelectedArchetype.name}`
-  : props.vm.className
+  ? props.vm.classSelectedArchetype.name
+  : 'Базовый класс'
 )
 const activeBuildSummary = computed(() => props.vm.classHasSelectedArchetype
   ? (props.vm.classSelectedArchetype.summary || 'Подкласс добавляет свои особенности к базовому развитию класса.')
@@ -988,16 +1054,42 @@ function selectClassTab(tab) {
   props.state.classCardTab = tab
 }
 
-function selectBase() {
+function clearClassSelection() {
+  props.state.classMode = 'none'
+  props.state.activeArchetype = null
+  if (props.state.classFilterTouched) props.state.classFeatureSubclass = 'base'
+}
+
+function activateBase() {
   props.state.classMode = 'base'
   props.state.activeArchetype = null
   if (props.state.classFilterTouched) props.state.classFeatureSubclass = 'base'
 }
 
+function selectBase() {
+  if (props.state.classMode === 'base' && !props.state.activeArchetype) clearClassSelection()
+  else activateBase()
+}
+
 function selectArchetype(id) {
+  if (props.state.classMode === 'archetype' && props.state.activeArchetype === id) {
+    clearClassSelection()
+    return
+  }
   props.state.classMode = 'archetype'
   props.state.activeArchetype = id
   if (props.state.classFilterTouched) props.state.classFeatureSubclass = id
+}
+
+function isArchetypeCardActive(archetype) {
+  if (props.state.classMode !== 'archetype' || !props.state.activeArchetype) return false
+  const selected = props.vm.classArchetypes.find(item => item.id === props.state.activeArchetype)
+  return canonicalArchetypeName(selected?.name) === canonicalArchetypeName(archetype.name)
+}
+
+function selectArchetypeCard(archetype) {
+  if (isArchetypeCardActive(archetype)) clearClassSelection()
+  else selectArchetype(archetype.id)
 }
 
 function toggleSubclass(id) {
@@ -1013,7 +1105,7 @@ function chooseFeatureSource(source) {
   }
   if (source !== 'all' && props.state.activeArchetype) {
     const activeArchetype = props.vm.classArchetypes.find(arch => arch.id === props.state.activeArchetype)
-    if (!activeArchetype || activeArchetype.source !== source) selectBase()
+    if (!activeArchetype || activeArchetype.source !== source) activateBase()
   }
 }
 
@@ -1025,7 +1117,7 @@ function chooseFeatureLevel(level) {
 function chooseFeatureSubclass(id) {
   props.state.classFilterTouched = true
   props.state.classFeatureSubclass = id
-  if (id === 'base') selectBase()
+  if (id === 'base') activateBase()
   else if (id !== 'all') selectArchetype(id)
 }
 
@@ -1034,7 +1126,7 @@ function resetFeatureFilters() {
   props.state.classFeatureLevel = 'all'
   props.state.classFeatureSubclass = 'base'
   props.state.classFilterTouched = false
-  selectBase()
+  activateBase()
 }
 
 async function copyClassLink() {
@@ -1093,6 +1185,7 @@ function scrollToClassFeature(featureId) {
 
 <template>
   <div ref="classPageRef" class="cls-page">
+    <div v-once class="cls-page-surface" aria-hidden="true" />
     <div
       ref="scrubTrackRef"
       class="cls-scrub"
@@ -1107,10 +1200,18 @@ function scrollToClassFeature(featureId) {
     </div>
     <div ref="classWrapRef" class="cls-wrap" @click="onClassDiceClick" @keydown="onClassDiceKeydown">
       <span ref="classSparkRef" class="cls-spark" :class="{ 'is-suppressed': scrubDragging }" aria-hidden="true" />
-      <div class="cls-head">
-        <NuxtLink class="cls-emblem-box" to="/dnd5e/classes" title="Вернуться к списку классов" aria-label="Вернуться к списку классов">
+      <div v-memo="[vm.className, displayedClassEmblemUrl]" class="cls-head">
+        <NuxtLink v-once class="cls-emblem-box" to="/dnd5e/classes" title="Вернуться к списку классов" aria-label="Вернуться к списку классов">
           <div class="cls-emblem-frame" />
-          <div class="cls-emblem" :style="{ backgroundImage: `url(${vm.classEmblemUrl})` }" />
+          <img
+            ref="classEmblemElementRef"
+            class="cls-emblem"
+            :src="vm.classEmblemUrl"
+            alt=""
+            decoding="sync"
+            fetchpriority="high"
+            draggable="false"
+          >
         </NuxtLink>
         <div class="cls-heading">
           <nav class="cls-crumb" aria-label="Навигация">
@@ -1246,20 +1347,24 @@ function scrollToClassFeature(featureId) {
           <button
             type="button"
             class="cls-mode-btn"
-            :class="{ active: state.classMode !== 'archetype' }"
+            :class="{ active: state.classMode === 'base' }"
+            :aria-pressed="state.classMode === 'base'"
             @click="selectBase"
           >
-            Базовое описание
+            <span class="cls-mode-name">Базовый класс</span>
+            <span class="cls-mode-summary">Хиты, характеристики, спасброски</span>
           </button>
           <button
-            v-for="arch in sourceFilteredArchetypes"
+            v-for="arch in sourceFilteredArchetypeCards"
             :key="arch.id"
             type="button"
             class="cls-mode-btn"
-            :class="{ active: state.classMode === 'archetype' && state.activeArchetype === arch.id }"
-            @click="selectArchetype(arch.id)"
+            :class="{ active: isArchetypeCardActive(arch) }"
+            :aria-pressed="isArchetypeCardActive(arch)"
+            @click="selectArchetypeCard(arch)"
           >
-            {{ arch.name }}<template v-if="duplicateArchetypeNames.has(arch.name)"> · {{ arch.source }}</template>
+            <span class="cls-mode-name">{{ arch.name }}</span>
+            <span class="cls-mode-summary">{{ arch.summary }}</span>
           </button>
         </div>
         <div v-if="!vm.classHasArchetypes" class="cls-arch-empty">Подклассы для этого класса пока не добавлены.</div>
@@ -1267,121 +1372,49 @@ function scrollToClassFeature(featureId) {
       </div>
 
       <section class="cls-build-panel">
-        <div class="cls-build-top cls-thread-node">
-          <div class="cls-build-main">
-            <h2>{{ activeBuildTitle }}</h2>
-            <p><RuleRichText :text="activeBuildSummary" /></p>
-            <div class="cls-build-meta">
-              <span>{{ activeBuildMeta }}</span>
-            </div>
-          </div>
-          <div class="cls-source-row">
-            <span>Источники</span>
-            <div>
-              <template v-for="source in classSources" :key="source">
-                <a v-if="isExternalSource(source)" class="cls-mini-source" :href="sourceRoute(source)" target="_blank" rel="noreferrer" :title="classSourceTitle(source)">{{ source }}</a>
-                <NuxtLink v-else class="cls-mini-source" :to="sourceRoute(source)" :title="classSourceTitle(source)">{{ source }}</NuxtLink>
-              </template>
-            </div>
-          </div>
-        </div>
-
-        <template v-if="activeClassTab === 'skills'">
-        <div class="cls-build-summary">
-          <button v-for="stat in classQuickStats" :key="stat.label" type="button" class="cls-summary-pill" @click="scrollToClassPart(stat.part)">
-            <span>{{ stat.label }}</span>
-            <strong>{{ stat.value }}</strong>
-          </button>
-        </div>
-
-        <div id="class-overview" class="cls-rule-panels cls-thread-node">
-          <section class="cls-rule-panel wide">
-            <button type="button" class="cls-rule-head" @click="state.classHitsOpen = !state.classHitsOpen">
-              <span class="cls-rule-mark">{{ state.classHitsOpen ? '−' : '+' }}</span>
-              <span>Хиты</span>
-            </button>
-            <div v-if="state.classHitsOpen" class="cls-rule-body">
-              <div class="cls-rule-row"><strong>Кость хитов</strong><span><RuleRichText :text="`1к${vm.classHd} за уровень`" /></span></div>
-              <div class="cls-rule-row"><strong>На 1 уровне</strong><span><RuleRichText :text="vm.classHpFirst" /></span></div>
-              <div class="cls-rule-row"><strong>Далее</strong><span><RuleRichText :text="`${vm.classHpNext} (мин. 1)`" /></span></div>
-            </div>
-          </section>
-
-          <section v-if="vm.classHasEquip" id="class-equipment" class="cls-rule-panel balanced">
-            <button type="button" class="cls-rule-head" @click="state.classEquipOpen = !state.classEquipOpen">
-              <span class="cls-rule-mark">{{ state.classEquipOpen ? '−' : '+' }}</span>
-              <span>Снаряжение</span>
-            </button>
-            <div v-if="state.classEquipOpen" class="cls-rule-body">
-              <div v-for="(e, i) in vm.classEquip" :key="i" class="cls-rule-row">
-                <strong class="equip-label">Список предметов №{{ i + 1 }}</strong><span><RuleRichText :text="e" /></span>
+          <div v-if="state.classMode === 'base'" class="cls-build-top cls-thread-node">
+            <div class="cls-build-main">
+              <h2>{{ activeBuildTitle }}</h2>
+              <p><RuleRichText :text="activeBuildSummary" /></p>
+              <div class="cls-build-meta">
+                <span>{{ activeBuildMeta }}</span>
               </div>
-              <div v-if="vm.classEquipNote" class="cls-rule-row note"><strong>Примечание</strong><span><RuleRichText :text="vm.classEquipNote" /></span></div>
             </div>
-          </section>
-
-          <section class="cls-rule-panel balanced" :class="{ wide: !vm.classHasEquip }">
-            <button type="button" class="cls-rule-head" @click="state.classProfOpen = !state.classProfOpen">
-              <span class="cls-rule-mark">{{ state.classProfOpen ? '−' : '+' }}</span>
-              <span>Владение</span>
-            </button>
-            <div v-if="state.classProfOpen" class="cls-rule-body">
-              <div class="cls-rule-row"><strong>Доспехи</strong><span><RuleRichText :text="vm.classArmor" /></span></div>
-              <div class="cls-rule-row"><strong>Оружие</strong><span><RuleRichText :text="vm.classWeapons" /></span></div>
-              <div class="cls-rule-row"><strong>Инструменты</strong><span><RuleRichText :text="vm.classTools" /></span></div>
-              <div class="cls-rule-row"><strong>Спасброски</strong><span><RuleRichText :text="vm.classSaves" /></span></div>
-              <div class="cls-rule-row"><strong>Навыки</strong><span><RuleRichText :text="vm.classSkills" /></span></div>
-            </div>
-          </section>
-        </div>
-
-        <template v-if="vm.classHasRules">
-          <div class="cls-thread-node cls-node-wrap">
-          <div id="class-table" class="cls-class-table-panel">
-            <button type="button" class="cls-rule-head cls-table-headline" @click="state.classTableOpen = !state.classTableOpen">
-              <span class="cls-rule-mark">{{ state.classTableOpen ? '−' : '+' }}</span>
-              <span>Таблица класса</span>
-            </button>
-            <div v-if="state.classTableOpen" class="cls-table-wrap in-card">
-              <div class="cls-table" :style="{ gridTemplateColumns: vm.classTableGrid }">
-                <div v-for="(col, i) in vm.classTableCols" :key="'col'+i" class="cls-table-head">{{ col }}</div>
-                <template v-for="(r, ri) in vm.classTableRows" :key="'row'+ri">
-                  <div v-for="(c, ci) in r.cells" :key="'cell'+ri+'-'+ci" class="cls-table-cell" :class="c.className" :style="c.style" :title="c.title">
-                    <template v-if="c.parts?.length">
-                      <template v-for="part in c.parts" :key="part.key">
-                        <button
-                          v-if="part.featureId"
-                          type="button"
-                          class="cls-table-feature-part cls-table-feature-link"
-                          :class="{ archetype: part.isArchetype }"
-                          :title="`Перейти к умению: ${part.text}`"
-                          @click="scrollToClassFeature(part.featureId)"
-                        >
-                          {{ part.text }}
-                        </button>
-                        <span
-                          v-else
-                          class="cls-table-feature-part"
-                          :class="{ archetype: part.isArchetype }"
-                        >
-                          {{ part.text }}
-                        </span>
-                      </template>
-                    </template>
-                    <template v-else>{{ c.v }}</template>
-                  </div>
+            <div class="cls-source-row">
+              <span>Источники</span>
+              <div>
+                <template v-for="source in classSources" :key="source">
+                  <a v-if="isExternalSource(source)" class="cls-mini-source" :href="sourceRoute(source)" target="_blank" rel="noreferrer" :title="classSourceTitle(source)">{{ source }}</a>
+                  <NuxtLink v-else class="cls-mini-source" :to="sourceRoute(source)" :title="classSourceTitle(source)">{{ source }}</NuxtLink>
                 </template>
               </div>
             </div>
           </div>
-          </div>
-
-          <template v-if="vm.classHasSelectedArchetype">
-            <div id="class-description" class="cls-subclass-description cls-thread-node">
+          <div v-else-if="vm.classHasSelectedArchetype" class="cls-subclass-selection cls-thread-node">
+            <div class="cls-author-thread" :class="{ 'has-variants': selectedAuthorVariants.length > 1 }">
+              <button
+                v-for="variant in selectedAuthorVariants"
+                :key="variant.id"
+                type="button"
+                class="cls-author-tab"
+                :class="{ active: state.activeArchetype === variant.id }"
+                :aria-pressed="state.activeArchetype === variant.id"
+                @click="selectArchetype(variant.id)"
+              >
+                <span class="cls-author-line">
+                  <small class="cls-author-caption">Источник Нити</small>
+                  <span class="cls-author-separator">—</span>
+                  <span class="cls-author-code">{{ variant.source }}</span>
+                  <span class="cls-author-separator">—</span>
+                  <strong class="cls-author-name">{{ variant.authorName }}</strong>
+                </span>
+              </button>
+            </div>
+            <div id="class-description" class="cls-subclass-description">
               <div class="cls-subclass-description-head">
                 <div>
                   <div class="cls-eyebrow">{{ vm.classSelectedArchetypeDescription.type }} · {{ vm.classSelectedArchetypeDescription.source }}</div>
-                  <div class="cls-subclass-description-title">{{ vm.classSelectedArchetypeDescription.name }}</div>
+                  <div class="cls-subclass-description-title">{{ canonicalArchetypeName(vm.classSelectedArchetypeDescription.name) }}</div>
                 </div>
                 <span class="cls-feature-lvl">{{ vm.classSelectedArchetypeDescription.level }}</span>
               </div>
@@ -1398,8 +1431,96 @@ function scrollToClassFeature(featureId) {
                 <p v-if="vm.classSelectedArchetypeDescription.summary && !isAnzuPatron(vm.classSelectedArchetypeDescription.name)"><RuleRichText :text="vm.classSelectedArchetypeDescription.summary" /></p>
               </div>
             </div>
-          </template>
+          </div>
 
+        <template v-if="activeClassTab === 'skills'">
+        <div class="cls-build-summary">
+          <button v-for="stat in classQuickStats" :key="stat.label" type="button" class="cls-summary-pill" @click="scrollToClassPart(stat.part)">
+            <span>{{ stat.label }}</span>
+            <strong>{{ stat.value }}</strong>
+          </button>
+        </div>
+
+        <div id="class-overview" class="cls-rule-panels cls-thread-node">
+          <section class="cls-rule-panel balanced" :class="{ wide: !vm.classHasEquip }">
+            <button type="button" class="cls-rule-head" @click="state.classProfOpen = !state.classProfOpen">
+              <span class="cls-rule-mark">{{ state.classProfOpen ? '−' : '+' }}</span>
+              <span>Владение</span>
+            </button>
+            <div v-if="state.classProfOpen" class="cls-rule-body">
+              <div class="cls-rule-row"><strong>Доспехи</strong><span><RuleRichText :text="vm.classArmor" /></span></div>
+              <div class="cls-rule-row"><strong>Оружие</strong><span><RuleRichText :text="vm.classWeapons" /></span></div>
+              <div class="cls-rule-row"><strong>Инструменты</strong><span><RuleRichText :text="vm.classTools" /></span></div>
+              <div class="cls-rule-row"><strong>Спасброски</strong><span><RuleRichText :text="vm.classSaves" /></span></div>
+              <div class="cls-rule-row"><strong>Навыки</strong><span><RuleRichText :text="vm.classSkills" /></span></div>
+            </div>
+          </section>
+
+          <section v-if="vm.classHasEquip" id="class-equipment" class="cls-rule-panel balanced">
+            <button type="button" class="cls-rule-head" @click="state.classEquipOpen = !state.classEquipOpen">
+              <span class="cls-rule-mark">{{ state.classEquipOpen ? '−' : '+' }}</span>
+              <span>Снаряжение</span>
+            </button>
+            <div v-if="state.classEquipOpen" class="cls-rule-body">
+              <div v-for="(e, i) in vm.classEquip" :key="i" class="cls-rule-row">
+                <strong class="equip-label">Список предметов №{{ i + 1 }}</strong><span><RuleRichText :text="e" /></span>
+              </div>
+              <div v-if="vm.classEquipNote" class="cls-rule-row note"><strong>Примечание</strong><span><RuleRichText :text="vm.classEquipNote" /></span></div>
+            </div>
+          </section>
+
+          <section class="cls-rule-panel">
+            <button type="button" class="cls-rule-head" @click="state.classHitsOpen = !state.classHitsOpen">
+              <span class="cls-rule-mark">{{ state.classHitsOpen ? '−' : '+' }}</span>
+              <span>Хиты</span>
+            </button>
+            <div v-if="state.classHitsOpen" class="cls-rule-body">
+              <div class="cls-rule-row"><strong>Кость хитов</strong><span><RuleRichText :text="`1к${vm.classHd} за уровень`" /></span></div>
+              <div class="cls-rule-row"><strong>На 1 уровне</strong><span><RuleRichText :text="vm.classHpFirst" /></span></div>
+              <div class="cls-rule-row"><strong>Далее</strong><span><RuleRichText :text="`${vm.classHpNext} (мин. 1)`" /></span></div>
+            </div>
+          </section>
+
+          <section v-if="vm.classHasRules" id="class-table" class="cls-class-table-panel" :class="{ 'is-open': state.classTableOpen }">
+              <button type="button" class="cls-rule-head cls-table-headline" @click="state.classTableOpen = !state.classTableOpen">
+                <span class="cls-rule-mark">{{ state.classTableOpen ? '−' : '+' }}</span>
+                <span>Таблица класса</span>
+              </button>
+              <div v-if="state.classTableOpen" class="cls-table-wrap in-card">
+                <div class="cls-table" :style="{ gridTemplateColumns: vm.classTableGrid }">
+                  <div v-for="(col, i) in vm.classTableCols" :key="'col'+i" class="cls-table-head">{{ col }}</div>
+                  <template v-for="(r, ri) in vm.classTableRows" :key="'row'+ri">
+                    <div v-for="(c, ci) in r.cells" :key="'cell'+ri+'-'+ci" class="cls-table-cell" :class="c.className" :style="c.style" :title="c.title">
+                      <template v-if="c.parts?.length">
+                        <template v-for="part in c.parts" :key="part.key">
+                          <button
+                            v-if="part.featureId"
+                            type="button"
+                            class="cls-table-feature-part cls-table-feature-link"
+                            :class="{ archetype: part.isArchetype }"
+                            :title="`Перейти к умению: ${part.text}`"
+                            @click="scrollToClassFeature(part.featureId)"
+                          >
+                            {{ part.text }}
+                          </button>
+                          <span
+                            v-else
+                            class="cls-table-feature-part"
+                            :class="{ archetype: part.isArchetype }"
+                          >
+                            {{ part.text }}
+                          </span>
+                        </template>
+                      </template>
+                      <template v-else>{{ c.v }}</template>
+                    </div>
+                </template>
+                </div>
+              </div>
+          </section>
+        </div>
+
+        <template v-if="vm.classHasRules">
           <div id="class-features" class="cls-features-heading cls-thread-node">
             <div>
               <div class="cls-eyebrow">Раздел класса</div>
@@ -1409,7 +1530,7 @@ function scrollToClassFeature(featureId) {
           </div>
           <div class="cls-features-list">
               <div v-if="!visibleClassFeatures.length" class="cls-stub">По выбранным фильтрам умения не найдены.</div>
-              <details v-for="(f, i) in visibleClassFeatures" :id="`class-feature-${f.id}`" :key="f.id || i" class="cls-card cls-feature-card cls-thread-node" :class="{ 'is-archetype-feature': f.isArchetype }" :open="!f.itemsCollapsed">
+              <details v-for="(f, i) in visibleClassFeatures" :id="`class-feature-${f.id}`" :key="f.id || i" class="cls-card cls-feature-card cls-thread-node" :class="{ 'is-archetype-feature': f.isArchetype }" :open="i < 2 && !f.itemsCollapsed">
                 <summary class="cls-feature-summary">
                   <span class="cls-feature-summary-main">
                     <span class="cls-feature-name">{{ f.name }}</span>
@@ -2113,6 +2234,18 @@ function scrollToClassFeature(featureId) {
   --cls-page-left:68px;
   --cls-workspace-max:1080px;
   position:absolute;top:0;right:0;bottom:0;left:68px;z-index:58;overflow-y:auto;
+  isolation:isolate;
+  background:transparent;
+}
+.cls-page-surface{
+  position:fixed;
+  top:0;
+  right:0;
+  bottom:0;
+  left:var(--cls-page-left);
+  z-index:0;
+  contain:strict;
+  pointer-events:none;
   background:linear-gradient(180deg,rgba(var(--theme-contrast-rgb),.02),transparent 300px),var(--t-bg);
 }
 .cls-wrap{
@@ -2120,6 +2253,8 @@ function scrollToClassFeature(featureId) {
   --cls-emblem-margin-left:-70px;
   --cls-emblem-margin-right:35px;
   max-width:var(--cls-workspace-max);
+  position:relative;
+  z-index:1;
   margin:0 auto;
   padding:44px 56px 100px;
 }
@@ -2132,7 +2267,6 @@ function scrollToClassFeature(featureId) {
 /* Нить: одна прямая вертикаль по левому краю, от верха страницы до низа.
    Центр большой эмблемы класса лежит точно на нити; ниже она проходит через
    центры малых ромбов-узлов с перемычками к каждому блоку. */
-.cls-wrap{position:relative}
 .cls-wrap::before{content:'';position:absolute;left:var(--cls-rail-left);top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--t-line) 60px,var(--t-line) 92%,transparent)}
 /* Искра следует за курсором только между реальными блоками, плавно входит
    в их ромбы и остаётся внутри активного узла до выбора следующего. */
@@ -2220,13 +2354,11 @@ function scrollToClassFeature(featureId) {
 }
 /* перемычка нить → блок */
 .cls-thread-node::after{content:'';position:absolute;left:-19px;top:23px;width:19px;height:1px;background:var(--t-line)}
-.cls-emblem-box{position:relative;z-index:1;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px;margin-left:var(--cls-emblem-margin-left);margin-right:var(--cls-emblem-margin-right);border-radius:18px;text-decoration:none;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
+.cls-emblem-box{position:relative;z-index:1;isolation:isolate;flex:none;display:flex;align-items:center;justify-content:center;width:150px;height:150px;margin-left:var(--cls-emblem-margin-left);margin-right:var(--cls-emblem-margin-right);border-radius:18px;text-decoration:none;cursor:pointer;transform:translate3d(0,0,0);backface-visibility:hidden;will-change:transform}
 .cls-emblem-box::before{content:'';position:absolute;z-index:0;width:120px;height:120px;border-radius:9px;background:var(--t-bg);transform:rotate(45deg)}
-.cls-emblem-box:hover{background:rgba(var(--theme-contrast-rgb),.025);box-shadow:0 0 0 1px rgba(var(--theme-accent-rgb),.14),0 18px 44px rgba(0,0,0,.18);transform:translateY(-1px)}
 .cls-emblem-box:focus-visible{outline:2px solid rgba(var(--theme-accent-strong-rgb),.72);outline-offset:4px}
 .cls-emblem-frame{position:absolute;z-index:1;width:120px;height:120px;transform:rotate(45deg);border:1px solid rgba(var(--theme-accent-rgb),.5);border-radius:9px;box-shadow:0 0 22px rgba(var(--theme-accent-rgb),.18)}
-.cls-emblem-box.is-spark-active .cls-emblem-frame{border-color:#fff0bd;box-shadow:0 0 8px rgba(255,240,189,.72),0 0 30px rgba(var(--theme-accent-rgb),.48)}
-.cls-emblem{position:relative;z-index:2;width:120px;height:120px;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 0 16px rgba(var(--theme-accent-rgb),.3))}
+.cls-emblem{position:relative;z-index:2;width:120px;height:120px;display:block;object-fit:contain;pointer-events:none;user-select:none}
 .cls-eyebrow{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.42)}
 .cls-title{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:rgba(var(--theme-heading-rgb),.96);line-height:1}
 .cls-en{font-family:'Hanken Grotesk',sans-serif;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t-faint);margin-top:6px}
@@ -2645,6 +2777,233 @@ function scrollToClassFeature(featureId) {
 .cls-feature-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .cls-feature-links a{display:inline-flex;align-items:center;border:1px solid rgba(130,199,190,.28);border-radius:999px;background:rgba(68,132,127,.09);padding:8px 12px;font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;line-height:1;letter-spacing:.1em;text-transform:uppercase;color:rgba(166,222,213,.92);text-decoration:none;transition:background .18s ease,border-color .18s ease,transform .18s ease}
 .cls-feature-links a:hover{border-color:rgba(130,199,190,.5);background:rgba(68,132,127,.17);transform:translateY(-1px)}
+
+/* Компактная схема класса: визуальная композиция из макета поверх прежней
+   нити и прежней логики узлов. */
+.cls-page{--cls-workspace-max:1000px}
+.cls-wrap{
+  --cls-rail-left:50px;
+  --cls-emblem-margin-left:-50px;
+  --cls-emblem-margin-right:24px;
+  padding:30px 44px 88px;
+}
+.cls-head{min-height:112px;align-items:center;gap:20px}
+.cls-emblem-box{width:112px;height:112px;border-radius:14px}
+.cls-emblem-box::before,.cls-emblem-frame,.cls-emblem{width:88px;height:88px}
+.cls-emblem-box::before,.cls-emblem-frame{border-radius:7px}
+.cls-heading{align-self:center}
+.cls-crumb{gap:7px;margin-bottom:10px;font-size:10px;letter-spacing:.14em}
+.cls-title{font-size:43px;line-height:.94}
+.cls-en{margin-top:8px;font-size:11px;letter-spacing:.13em}
+.cls-icon-tools{opacity:.56;transition:opacity .18s ease}
+.cls-icon-tools:hover,.cls-icon-tools:focus-within{opacity:1}
+.cls-icon-btn{width:34px;height:34px}
+
+.cls-thread{padding-left:28px}
+.cls-thread-node::before{left:-28px}
+.cls-thread-node::after{left:-17px;width:17px}
+.cls-toolbar{margin-top:16px;padding:0}
+.cls-section-tools{gap:8px}
+.cls-section-btn{
+  min-height:36px;
+  border-color:rgba(var(--theme-contrast-rgb),.1);
+  border-radius:9px;
+  background:rgba(var(--theme-surface-rgb),.22);
+  color:rgba(var(--theme-text-rgb),.7);
+  padding:0 16px;
+}
+.cls-section-btn:hover,.cls-section-btn.active{
+  border-color:rgba(var(--theme-accent-rgb),.52);
+  background:rgba(var(--theme-accent-rgb),.13);
+  color:rgba(var(--theme-accent-strong-rgb),.98);
+}
+
+.cls-mode-panel{margin-top:26px;padding:0;border-top:0}
+.cls-mode-top{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cls-mode-btn{
+  display:flex;
+  min-width:0;
+  min-height:68px;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:5px;
+  border-color:rgba(var(--theme-contrast-rgb),.09);
+  border-radius:11px;
+  background:rgba(var(--theme-surface-rgb),.18);
+  padding:12px 15px;
+  text-align:left;
+  text-transform:none;
+  transition:none;
+}
+.cls-mode-btn:hover:not(:disabled){background:rgba(var(--theme-contrast-rgb),.026)}
+.cls-mode-btn.active{
+  border-color:rgba(var(--theme-accent-rgb),.56);
+  background:linear-gradient(135deg,rgba(var(--theme-accent-rgb),.13),rgba(var(--theme-accent-rgb),.055));
+}
+.cls-mode-name{
+  display:block;
+  max-width:100%;
+  overflow:hidden;
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;
+  font-weight:600;
+  line-height:1.08;
+  letter-spacing:.01em;
+  color:rgba(var(--theme-heading-rgb),.92);
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.cls-mode-btn.active .cls-mode-name{color:rgba(var(--theme-accent-strong-rgb),.98)}
+.cls-mode-summary{
+  display:block;
+  width:100%;
+  overflow:hidden;
+  font-family:'Hanken Grotesk',sans-serif;
+  font-size:9px;
+  font-weight:600;
+  line-height:1.25;
+  letter-spacing:.015em;
+  color:rgba(var(--theme-text-rgb),.43);
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.cls-build-panel{gap:18px;margin-top:16px}
+.cls-build-top{
+  border:1px solid rgba(var(--theme-accent-rgb),.3);
+  border-radius:14px;
+  background:linear-gradient(145deg,rgba(var(--theme-accent-rgb),.055),rgba(var(--theme-surface-rgb),.15));
+  padding:22px 24px;
+}
+.cls-build-main h2{margin:0 0 10px;font-size:27px;text-transform:none}
+.cls-build-main p{max-width:820px;font-size:16px;line-height:1.58;color:rgba(var(--theme-text-rgb),.78)}
+.cls-build-meta{margin-top:10px;font-size:9px}
+.cls-source-row{min-width:120px;padding-left:12px}
+.cls-build-summary{display:none}
+
+.cls-subclass-selection{
+  overflow:visible;
+  border:1px solid rgba(var(--theme-accent-rgb),.34);
+  border-radius:14px;
+  background:linear-gradient(145deg,rgba(var(--theme-accent-rgb),.045),rgba(var(--theme-surface-rgb),.14));
+}
+.cls-author-thread{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  overflow:hidden;
+  border-bottom:1px solid rgba(var(--theme-accent-rgb),.22);
+  border-radius:13px 13px 0 0;
+  background:rgba(var(--theme-accent-rgb),.055);
+}
+.cls-author-thread.has-variants{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.cls-author-tab{
+  position:relative;
+  display:flex;
+  min-width:0;
+  min-height:50px;
+  align-items:center;
+  justify-content:center;
+  border:0;
+  border-left:1px solid rgba(var(--theme-contrast-rgb),.07);
+  background:transparent;
+  padding:10px 16px;
+  color:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+.cls-author-tab:first-child{border-left:0}
+.cls-author-tab::after{
+  content:'';
+  position:absolute;
+  right:0;
+  bottom:-1px;
+  left:0;
+  height:2px;
+  background:rgba(var(--theme-accent-rgb),.88);
+  opacity:0;
+  transform:scaleX(.3);
+  transition:opacity .2s ease,transform .2s ease;
+}
+.cls-author-tab:hover{background:rgba(var(--theme-contrast-rgb),.025)}
+.cls-author-tab.active{background:rgba(var(--theme-accent-rgb),.09)}
+.cls-author-tab.active::after{opacity:1;transform:scaleX(1)}
+.cls-author-line{
+  display:flex;
+  min-width:0;
+  width:100%;
+  align-items:center;
+  gap:8px;
+  overflow:hidden;
+  white-space:nowrap;
+}
+.cls-author-code{
+  flex:none;
+  font-family:'Hanken Grotesk',sans-serif;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:rgba(var(--theme-accent-strong-rgb),.92);
+}
+.cls-author-name{
+  min-width:0;
+  overflow:hidden;
+  font-family:'Hanken Grotesk',sans-serif;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.035em;
+  color:rgba(var(--theme-heading-rgb),.82);
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.cls-author-caption{
+  flex:none;
+  font-family:'Hanken Grotesk',sans-serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:rgba(var(--theme-accent-strong-rgb),.88);
+}
+.cls-author-separator{flex:none;color:rgba(var(--theme-text-rgb),.28)}
+.cls-subclass-selection .cls-subclass-description{
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+.cls-rule-panels{gap:11px}
+.cls-rule-panel,.cls-class-table-panel{border-radius:11px;background:rgba(var(--theme-surface-rgb),.2)}
+.cls-class-table-panel.is-open{grid-column:1/-1}
+.cls-rule-head{grid-template-columns:minmax(0,1fr) 24px;gap:10px;padding:13px 16px}
+.cls-rule-head .cls-rule-mark{grid-column:2;grid-row:1;border:0;background:transparent;order:2}
+.cls-rule-head span:not(.cls-rule-mark):not(.cls-feature-count){grid-column:1;grid-row:1;font-size:19px;letter-spacing:.055em;order:1}
+.cls-rule-row{grid-template-columns:minmax(110px,.31fr) minmax(0,1fr)}
+.cls-rule-row>strong{padding:8px 12px;font-size:8.5px}
+.cls-rule-row>span{padding:8px 12px;font-size:15px;line-height:1.36}
+.cls-class-table-panel .cls-rule-head{border-bottom:0}
+
+.cls-features-heading{margin-top:10px;border-bottom:0;padding:7px 0 1px}
+.cls-features-heading .cls-eyebrow{display:none}
+.cls-features-heading h3{font-size:25px;letter-spacing:.1em}
+.cls-feature-count{display:none}
+.cls-features-list{gap:10px;margin-top:0}
+.cls-feature-card{border-color:rgba(var(--theme-accent-rgb),.2);background:rgba(var(--theme-surface-rgb),.17);box-shadow:none}
+.cls-feature-card + .cls-feature-card{margin-top:0}
+.cls-feature-card::before{display:none}
+.cls-feature-card.cls-thread-node::before{display:block}
+.cls-feature-summary{align-items:center;border-bottom:0;padding:14px 16px}
+.cls-feature-card[open] .cls-feature-summary{border-bottom:1px solid rgba(var(--theme-accent-rgb),.11)}
+.cls-feature-name{font-size:22px;letter-spacing:.02em}
+.cls-feature-summary-main{gap:2px}
+.cls-feature-meta-row{align-self:center}
+.cls-feature-content{padding:14px 17px 18px}
+.cls-feature-prose{font-size:15.5px;line-height:1.54}
+.cls-feature-card.cls-thread-node::before{left:-28px}
+
+.cls-subclass-description{border-radius:14px;padding:22px 24px}
+.cls-subclass-description-title{font-size:29px;text-transform:none}
+.cls-subclass-description-text{margin-top:12px;font-size:16px;line-height:1.55}
 @media (max-width: 820px){
   .cls-wrap{
     --cls-rail-left:27px;
@@ -2661,6 +3020,10 @@ function scrollToClassFeature(featureId) {
   .cls-source-row{align-items:flex-start;border-left:0;border-top:1px solid rgba(var(--theme-accent-rgb),.16);padding:14px 0 0}
   .cls-source-row div{justify-content:flex-start}
   .cls-build-summary{grid-template-columns:1fr 1fr}
+  .cls-mode-top{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cls-author-thread.has-variants{grid-template-columns:1fr}
+  .cls-author-tab{border-left:0;border-top:1px solid rgba(var(--theme-contrast-rgb),.07)}
+  .cls-author-tab:first-child{border-top:0}
   .cls-description-head,.cls-spell-tab-head,.cls-filter-card-head{flex-direction:column}
   .cls-rule-panels{grid-template-columns:1fr}
   .cls-rule-panel.wide{grid-column:auto}
@@ -2717,6 +3080,8 @@ function scrollToClassFeature(featureId) {
   .cls-icon-tools::-webkit-scrollbar,.cls-section-tools::-webkit-scrollbar,.cls-mode-top::-webkit-scrollbar{display:none}
   .cls-icon-btn,.cls-section-btn,.cls-mode-btn{flex:0 0 auto}
   .cls-build-summary{grid-template-columns:1fr}
+  .cls-mode-top{display:flex}
+  .cls-mode-btn{min-width:220px}
   .cls-card,.cls-subclass-description,.cls-description-intro-panel{padding:16px}
   .cls-feature-content{padding:14px 15px 18px}
   .cls-subclass-description-text,.cls-description-notes,.cls-feature-prose.is-option-list .cls-feature-list{grid-template-columns:minmax(0,1fr)}

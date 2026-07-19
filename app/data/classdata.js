@@ -1746,7 +1746,11 @@ let CLASSDATA;
     const additions = importList.filter(archetype => {
       const key = archetypeKey(archetype.name)
       const identity = `${key}|${archetype.source || ''}`
-      const allowSourceVariant = className === 'Изобретатель' && key === archetypeKey('Дитя Сальбары')
+      const allowSourceVariant = (
+        className === 'Изобретатель' && key === archetypeKey('Дитя Сальбары')
+      ) || (
+        className === 'Волшебник' && key === archetypeKey('Хакар')
+      )
       if (seenIdentities.has(identity) || (seen.has(key) && !allowSourceVariant)) return false
       seen.add(key)
       seenIdentities.add(identity)

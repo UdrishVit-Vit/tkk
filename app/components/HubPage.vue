@@ -21,7 +21,7 @@ const state = reactive({
   view: 'home', active: null, group: null, section: null, cls: null, overlay: null,
   theme: selectedTheme.value, authed: false, bookmarks: [], query: '', cardQuery: '', classToolMessage: '', infOpen: false, invOpen: false,
   classMode: 'base', activeArchetype: null, archetypeSource: 'all', classCardTab: 'skills', classHitsOpen: true, classProfOpen: true,
-  classEquipOpen: true, classTableOpen: true, classFilterOpen: false, classFilterTouched: false, classFeatureSource: 'all',
+  classEquipOpen: true, classTableOpen: false, classFilterOpen: false, classFilterTouched: false, classFeatureSource: 'all',
   classFeatureLevel: 'all', classFeatureSubclass: 'base', subclassesOpen: false, openSubclass: null
 })
 
@@ -100,7 +100,7 @@ watch(() => [props.initialSystem, props.initialSection, props.initialClass], ([s
   state.classHitsOpen = true
   state.classProfOpen = true
   state.classEquipOpen = true
-  state.classTableOpen = true
+  state.classTableOpen = false
   state.classFilterOpen = false
   state.classFilterTouched = false
   state.classFeatureSource = 'all'
@@ -190,7 +190,7 @@ function openClass(name) {
   state.classHitsOpen = true
   state.classProfOpen = true
   state.classEquipOpen = true
-  state.classTableOpen = true
+  state.classTableOpen = false
   state.classFilterOpen = false
   state.classFilterTouched = false
   state.classFeatureSource = 'all'
