@@ -64,6 +64,11 @@ const themedImagesSchema = z.object({
   brall: z.string().optional()
 }).default({})
 
+const raceThreadLoreBlockSchema = z.object({
+  title: z.string().optional(),
+  text: z.string()
+})
+
 // Every Thread Source is a complete, independently authored version of a race.
 // Fields remain optional so a source may inherit unchanged values, but every
 // visible and mechanical part of the dossier can be replaced.
@@ -78,7 +83,8 @@ const raceThreadSourceSchema = z.object({
   title: z.string().optional(),
   originalName: z.string().optional(),
   description: z.string().optional(),
-  lore: z.array(z.string()).optional(),
+  lore: z.array(z.union([z.string(), raceThreadLoreBlockSchema])).optional(),
+  inheritNames: z.boolean().optional(),
   region: z.array(z.string()).optional(),
   playable: z.boolean().optional(),
   hasDndRules: z.boolean().optional(),

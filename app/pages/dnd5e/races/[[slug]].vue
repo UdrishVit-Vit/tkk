@@ -259,7 +259,10 @@ const overviewBlocks = computed(() => {
   const blocks = []
   const lead = selectedRace.value?.description?.trim() || ''
   if (threadSourceLore.value.length) {
-    for (const paragraph of threadSourceLore.value) {
+    for (const entry of threadSourceLore.value) {
+      const title = typeof entry === 'string' ? '' : normalizeOverviewParagraph(entry?.title || '')
+      const paragraph = typeof entry === 'string' ? entry : entry?.text || ''
+      if (title) blocks.push({ type: 'heading', text: title })
       const text = normalizeOverviewParagraph(paragraph)
       if (text) blocks.push({ type: 'paragraph', text })
     }
@@ -899,7 +902,10 @@ const summaryRows = computed(() => {
 // Names are a standard race block. A Thread may replace them with its own
 // "Имена" section; otherwise the shared race names remain visible.
 const namesText = computed(() => {
-  return findRuleText(selectedRace.value, 'Имена') || findRuleText(selectedRaceDocument.value, 'Имена')
+  const sourceNames = findRuleText(selectedRace.value, 'Имена')
+  if (sourceNames) return sourceNames
+  if (selectedThreadSource.value?.id !== 'base' && selectedThreadSource.value?.inheritNames === false) return ''
+  return findRuleText(selectedRaceDocument.value, 'Имена')
 })
 const namesParagraphs = computed(() => namesText.value ? sectionParagraphs({ title: 'Имена', text: namesText.value }) : [])
 
