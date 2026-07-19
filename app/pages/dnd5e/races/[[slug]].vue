@@ -202,7 +202,6 @@ const threadSourceOptions = computed(() => {
       id: 'base',
       source: race.source || 'TL',
       sourceTitle: race.sourceTitle || 'The Threads of Largo',
-      sourceTitle: race.sourceTitle,
       sourceAuthor: race.sourceAuthor,
       sourceUrl: race.sourceUrl,
       sourceNote: race.sourceNote,
@@ -239,12 +238,55 @@ const sourceMeta = computed(() => {
     title: view.sourceTitle || 'The Threads of Largo',
     author: view.sourceAuthor || '',
     url: view.sourceUrl || '',
-    note: view.sourceNote || 'Источник, определяющий полное представление этой расы',
+    note: view.sourceNote || '',
     publishedAt: view.publishedAt || ''
   }
 })
 
 const threadSourceLore = computed(() => selectedThreadSource.value?.lore || [])
+
+function minimarkPlainText(node) {
+  if (typeof node === 'string') return node
+  if (!Array.isArray(node)) return ''
+  return node.slice(2).map(minimarkPlainText).join('')
+}
+
+function normalizeOverviewParagraph(text = '') {
+  return text.replace(/\s+/g, ' ').trim()
+}
+
+const overviewBlocks = computed(() => {
+  const blocks = []
+  const lead = selectedRace.value?.description?.trim() || ''
+  if (threadSourceLore.value.length) {
+    for (const paragraph of threadSourceLore.value) {
+      const text = normalizeOverviewParagraph(paragraph)
+      if (text) blocks.push({ type: 'paragraph', text })
+    }
+    return blocks
+  }
+
+  const nodes = selectedRace.value?.body?.value
+  if (!Array.isArray(nodes)) return blocks
+  let firstParagraph = true
+  for (const node of nodes) {
+    if (!Array.isArray(node)) continue
+    const tag = node[0]
+    const rawText = minimarkPlainText(node).trim()
+    if (!rawText) continue
+    if (/^h[2-4]$/.test(tag)) {
+      blocks.push({ type: 'heading', text: rawText })
+      continue
+    }
+    if (tag !== 'p') continue
+    let paragraph = rawText
+    if (firstParagraph && lead && paragraph.startsWith(lead)) paragraph = paragraph.slice(lead.length).trim()
+    firstParagraph = false
+    paragraph = normalizeOverviewParagraph(paragraph)
+    if (paragraph) blocks.push({ type: 'paragraph', text: paragraph })
+  }
+  return blocks
+})
 
 useSeoMeta({
   title: () => selectedRace.value?.title ? `${selectedRace.value.title} — TKK.club` : 'Расы и происхождения — TKK.club',
@@ -798,10 +840,10 @@ const activeBloodTables = computed(() => {
 // "Стигматы") still needs somewhere to render, even for races with no varieties.
 const SHOWN_ELSEWHERE = ['Увеличение характеристик', 'Возраст', 'Мировоззрение', 'Размер', 'Скорость', 'Языки', 'Имена', 'Разновидности']
 const extraRuleSections = computed(() => {
-  if (varietyItemSections.value.length) return []
-  return (selectedRace.value?.ruleSections || [])
-    .filter(s => !SHOWN_ELSEWHERE.includes(s.title))
-    .map((s, i) => ({ ...s, id: 'extra-' + i }))
+  const varietyIds = new Set(varietyItemSections.value.map(section => section.id))
+  return detailSections.value
+    .filter(section => !SHOWN_ELSEWHERE.includes(section.title) && !varietyIds.has(section.id))
+    .map(section => ({ ...section, id: 'extra-' + section.id }))
 })
 
 const activeWindTattooTable = computed(() => {
@@ -844,7 +886,11 @@ const summaryRows = computed(() => {
   ]
 })
 
-const namesText = computed(() => findRuleText(selectedRace.value, 'Имена'))
+// Names are a standard race block. A Thread may replace them with its own
+// "Имена" section; otherwise the shared race names remain visible.
+const namesText = computed(() => {
+  return findRuleText(selectedRace.value, 'Имена') || findRuleText(selectedRaceDocument.value, 'Имена')
+})
 const namesParagraphs = computed(() => namesText.value ? sectionParagraphs({ title: 'Имена', text: namesText.value }) : [])
 
 async function copyRaceLink() {
@@ -1025,107 +1071,110 @@ function printRace() {
             </div>
           </section>
 
-          <!-- HERO: text card + portrait card, side by side -->
-          <section class="rd-hero rd-thread-node">
-            <div class="rd-hero-card rd-hero-text-card">
-              <span class="rd-corner rd-corner-tl" /><span class="rd-corner rd-corner-tr" />
-              <span class="rd-corner rd-corner-br" /><span class="rd-corner rd-corner-bl" />
+          <div class="rd-thread">
+            <!-- Standard race presentation: Thread Source strip + shared overview + portrait -->
+            <section class="rd-presentation" aria-label="Представление расы">
+              <div class="rd-source-panel rd-thread-node" aria-label="Источник Нити">
+                <div
+                  class="rd-source-choices"
+                  :class="{ 'has-variants': threadSourceOptions.length > 1 }"
+                  role="tablist"
+                  aria-label="Доступные Источники Нити"
+                >
+                  <button
+                    v-for="option in threadSourceOptions"
+                    :key="option.id"
+                    type="button"
+                    class="rd-source-choice"
+                    :class="{ active: option.id === activeThreadSourceId }"
+                    role="tab"
+                    :aria-selected="option.id === activeThreadSourceId"
+                    @click="selectThreadSource(option.id)"
+                  >
+                    <span class="rd-source-line">
+                      <small>Источник Нити</small>
+                      <i>—</i>
+                      <b>{{ option.source }}</b>
+                      <i>—</i>
+                      <strong>{{ option.sourceTitle }}</strong>
+                    </span>
+                  </button>
+                </div>
 
-              <p v-if="selectedRace.description" class="rd-quote">«{{ selectedRace.description }}»</p>
-
-              <div v-if="threadSourceLore.length" class="rd-desc" :class="{ open: descExpanded }">
-                <div class="rd-desc-inner race-prose">
-                  <p v-for="(paragraph, index) in threadSourceLore" :key="index">{{ paragraph }}</p>
+                <div v-if="sourceMeta?.note || sourceMeta?.publishedAt || sourceMeta?.url" class="rd-source-current">
+                  <span v-if="sourceMeta?.note" class="rd-source-note">{{ sourceMeta.note }}</span>
+                  <span v-if="sourceMeta?.publishedAt">{{ sourceMeta.publishedAt }}</span>
+                  <a
+                    v-if="sourceMeta?.url"
+                    :href="sourceMeta.url"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="rd-source-link"
+                  >Открыть источник ↗</a>
                 </div>
               </div>
-              <div v-else-if="selectedRace.body" class="rd-desc" :class="{ open: descExpanded }">
-                <div class="rd-desc-inner race-prose"><ContentRenderer :value="selectedRace" /></div>
-              </div>
-              <button v-if="threadSourceLore.length || selectedRace.body" class="rd-desc-toggle" type="button" @click="toggleDesc">
-                <span v-if="descExpanded" class="rd-desc-toggle-arrow">↑</span>
-                <span v-else class="rd-desc-toggle-ellipsis">…</span>
-                {{ descExpanded ? 'Свернуть описание' : 'Продолжить чтение' }}
-              </button>
-            </div>
 
-            <button
-              v-if="activePortrait"
-              type="button"
-              class="rd-hero-card rd-hero-portrait-card"
-              title="Открыть изображение"
-              @click="isPortraitOpen = true"
-            >
-              <span class="rd-corner rd-corner-tl" /><span class="rd-corner rd-corner-tr" />
-              <span class="rd-corner rd-corner-br" /><span class="rd-corner rd-corner-bl" />
-              <span class="rd-portrait-star">✦</span>
-              <img
-                class="themed"
-                :src="activePortrait"
-                :style="detailImageStyle(selectedRace)"
-                :alt="selectedRace.imageAlt || selectedRace.title"
-              >
-            </button>
-            <div v-else class="rd-hero-card rd-hero-portrait-card">
-              <span class="rd-corner rd-corner-tl" /><span class="rd-corner rd-corner-tr" />
-              <span class="rd-corner rd-corner-br" /><span class="rd-corner rd-corner-bl" />
-              <div class="rd-portrait-empty">{{ firstLetter(selectedRace.title) }}</div>
-            </div>
-          </section>
+              <div class="rd-hero rd-thread-node">
+                <div class="rd-hero-card rd-hero-text-card">
+                  <span class="rd-corner rd-corner-tl" /><span class="rd-corner rd-corner-tr" />
+                  <span class="rd-corner rd-corner-br" /><span class="rd-corner rd-corner-bl" />
 
-          <Teleport to="body">
-            <transition name="rd-lightbox">
-              <div v-if="isPortraitOpen" class="rd-lightbox" @click="isPortraitOpen = false">
-                <button class="rd-lightbox-close" type="button" title="Закрыть" @click="isPortraitOpen = false">✕</button>
-                <img
-                  :src="activePortrait"
-                  :alt="selectedRace.imageAlt || selectedRace.title"
-                  @click.stop
-                >
-              </div>
-            </transition>
-          </Teleport>
+                  <div v-if="selectedRace.description" class="rd-overview-lead">
+                    <p class="rd-quote">«{{ selectedRace.description }}»</p>
+                  </div>
 
-          <div class="rd-thread">
-            <section class="rd-source-panel rd-thread-node" aria-label="Источник Нити">
-              <div class="rd-source-panel-copy">
-                <h2 class="rd-source-title">
-                  <span>Источник Нити</span>
-                  <i>—</i>
-                  <b>{{ sourceMeta?.code }}</b>
-                  <i>—</i>
-                  <strong>{{ sourceMeta?.title }}</strong>
-                </h2>
-                <p>{{ sourceMeta?.note }}</p>
-              </div>
+                  <div v-if="overviewBlocks.length" class="rd-desc" :class="{ open: descExpanded }">
+                    <div class="rd-desc-inner rd-overview-blocks">
+                      <template v-for="(block, index) in overviewBlocks" :key="`${block.type}-${index}`">
+                        <h3 v-if="block.type === 'heading'" class="rd-overview-heading">{{ block.text }}</h3>
+                        <p v-else class="rd-overview-paragraph">{{ block.text }}</p>
+                      </template>
+                    </div>
+                  </div>
+                  <button v-if="overviewBlocks.length" class="rd-desc-toggle" type="button" @click="toggleDesc">
+                    <span v-if="descExpanded" class="rd-desc-toggle-arrow">↑</span>
+                    <span v-else class="rd-desc-toggle-ellipsis">…</span>
+                    {{ descExpanded ? 'Свернуть описание' : 'Продолжить чтение' }}
+                  </button>
+                </div>
 
-              <div v-if="sourceMeta?.author || sourceMeta?.publishedAt || sourceMeta?.url" class="rd-source-current">
-                <span v-if="sourceMeta?.author">{{ sourceMeta.author }}</span>
-                <span v-if="sourceMeta?.publishedAt">{{ sourceMeta.publishedAt }}</span>
-                <a
-                  v-if="sourceMeta?.url"
-                  :href="sourceMeta.url"
-                  target="_blank"
-                  rel="noreferrer"
-                  class="rd-source-link"
-                >Открыть источник ↗</a>
-              </div>
-
-              <div v-if="threadSourceOptions.length > 1" class="rd-source-choices" role="tablist" aria-label="Доступные Источники Нити">
                 <button
-                  v-for="option in threadSourceOptions"
-                  :key="option.id"
+                  v-if="activePortrait"
                   type="button"
-                  class="rd-source-choice"
-                  :class="{ active: option.id === activeThreadSourceId }"
-                  role="tab"
-                  :aria-selected="option.id === activeThreadSourceId"
-                  @click="selectThreadSource(option.id)"
+                  class="rd-hero-card rd-hero-portrait-card"
+                  title="Открыть изображение"
+                  @click="isPortraitOpen = true"
                 >
-                  <span>{{ option.source }}</span>
-                  <strong>{{ option.sourceTitle }}</strong>
+                  <span class="rd-corner rd-corner-tl" /><span class="rd-corner rd-corner-tr" />
+                  <span class="rd-corner rd-corner-br" /><span class="rd-corner rd-corner-bl" />
+                  <span class="rd-portrait-star">✦</span>
+                  <img
+                    class="themed"
+                    :src="activePortrait"
+                    :style="detailImageStyle(selectedRace)"
+                    :alt="selectedRace.imageAlt || selectedRace.title"
+                  >
                 </button>
+                <div v-else class="rd-hero-card rd-hero-portrait-card">
+                  <span class="rd-corner rd-corner-tl" /><span class="rd-corner rd-corner-tr" />
+                  <span class="rd-corner rd-corner-br" /><span class="rd-corner rd-corner-bl" />
+                  <div class="rd-portrait-empty">{{ firstLetter(selectedRace.title) }}</div>
+                </div>
               </div>
             </section>
+
+            <Teleport to="body">
+              <transition name="rd-lightbox">
+                <div v-if="isPortraitOpen" class="rd-lightbox" @click="isPortraitOpen = false">
+                  <button class="rd-lightbox-close" type="button" title="Закрыть" @click="isPortraitOpen = false">✕</button>
+                  <img
+                    :src="activePortrait"
+                    :alt="selectedRace.imageAlt || selectedRace.title"
+                    @click.stop
+                  >
+                </div>
+              </transition>
+            </Teleport>
 
             <!-- VARIETY-DRIVEN DOSSIER: tabs → description → summary → features -->
             <section v-if="varietyItemSections.length" class="rd-variety-section">
@@ -1154,7 +1203,7 @@ function printRace() {
                 <!-- 1. variety description -->
                 <div class="rd-block">
                   <h2 class="rd-h2">
-                    Описание
+                    Представители
                     <span class="rd-variety-badge">{{ varietyShortTitle(activeVariety) }}</span>
                   </h2>
                   <div class="rd-variety-desc" :class="{ collapsed: varietyDescParagraphs.length > 3 && !varietyDescOpen }">
@@ -1175,20 +1224,27 @@ function printRace() {
                   </button>
                 </div>
 
-                <!-- 2. race summary -->
-                <div class="rd-block">
-                  <h2 class="rd-h2">Сводка о расе</h2>
+                <!-- 2. race names (generic fallback; structured variety names are rendered below and reordered with CSS) -->
+                <div v-if="namesText && !activeNameData" class="rd-block rd-names-block">
+                  <h2 class="rd-h2">Имена</h2>
+                  <div class="rd-names">
+                    <p v-for="(p, pi) in namesParagraphs" :key="pi">
+                      <strong v-if="p.label" class="rd-names-label">{{ p.label }}:</strong>
+                      {{ p.text }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- 3. unified rules block: summary + traits -->
+                <div class="rd-block rd-summary-block rd-details-block">
+                  <h2 class="rd-h2">Особенности</h2>
                   <div class="rd-summary-grid">
                     <div v-for="row in summaryRows" :key="row.label" class="rd-stat">
                       <span class="rd-stat-label">{{ row.label }}</span>
                       <span class="rd-stat-value">{{ row.value }}</span>
                     </div>
                   </div>
-                </div>
-
-                <!-- 3. variety features + base features together -->
-                <div class="rd-block">
-                  <h2 class="rd-h2">Особенности</h2>
+                  <div class="rd-details-divider" aria-hidden="true"><span /></div>
                   <div class="rd-features">
                     <template v-for="card in varietyFeatures" :key="'v-' + card.title">
                       <!-- Кровь змей: special interactive card with expandable blood lists -->
@@ -1293,7 +1349,7 @@ function printRace() {
                   </div>
                 </div>
 
-                <!-- 4. Names block — only for varieties with nameData (Ча'Нери, Кса'От) -->
+                <!-- Structured names block — only for varieties with nameData (Ча'Нери, Кса'От); CSS places it before summary -->
                 <div v-if="activeNameData" class="rd-block rd-names-block">
                   <h2 class="rd-h2">
                     Имена
@@ -1458,17 +1514,24 @@ function printRace() {
 
             <!-- races without varieties: plain summary + base features -->
             <section v-else class="rd-variety-section">
-            <div class="rd-block">
-              <h2 class="rd-h2">Сводка о расе</h2>
+            <div v-if="namesText" class="rd-block rd-names-block">
+              <h2 class="rd-h2">Имена</h2>
+              <div class="rd-names">
+                <p v-for="(p, pi) in namesParagraphs" :key="pi">
+                  <strong v-if="p.label" class="rd-names-label">{{ p.label }}:</strong>
+                  {{ p.text }}
+                </p>
+              </div>
+            </div>
+            <div class="rd-block rd-summary-block rd-details-block">
+              <h2 class="rd-h2">Особенности</h2>
               <div class="rd-summary-grid">
                 <div v-for="row in summaryRows" :key="row.label" class="rd-stat">
                   <span class="rd-stat-label">{{ row.label }}</span>
                   <span class="rd-stat-value">{{ row.value }}</span>
                 </div>
               </div>
-            </div>
-            <div class="rd-block">
-              <h2 class="rd-h2">Особенности расы</h2>
+              <div class="rd-details-divider" aria-hidden="true"><span /></div>
               <div class="rd-features">
                 <div v-for="trait in baseFeatures" :key="trait.title" class="rd-feat" :class="{ wide: featWide(trait.text) }">
                   <span class="rd-feat-name">{{ trait.title }}</span>
@@ -1476,7 +1539,9 @@ function printRace() {
                 </div>
               </div>
             </div>
+            </section>
 
+            <!-- Source-defined free-form blocks follow the standard dossier in every race. -->
             <div v-if="activeWindTattooTable" class="rd-block rd-wind-block">
               <h2 class="rd-h2">{{ activeWindTattooTable.title }}</h2>
               <div class="rd-wind-table" role="table" :aria-label="activeWindTattooTable.title">
@@ -1530,20 +1595,10 @@ function printRace() {
                 </div>
               </div>
             </div>
-            </section>
 
-            <!-- NAMES + RELATED -->
-            <section v-if="namesText || selectedRace.related?.length" class="rd-foot rd-thread-node">
-              <div v-if="namesText" class="rd-foot-col">
-              <h2 class="rd-h2">Имена</h2>
-              <div class="rd-names">
-                <p v-for="(p, pi) in namesParagraphs" :key="pi">
-                  <strong v-if="p.label" class="rd-names-label">{{ p.label }}:</strong>
-                  {{ p.text }}
-                </p>
-              </div>
-              </div>
-              <div v-if="selectedRace.related?.length" class="rd-foot-col">
+            <!-- Related terms close the dossier; names now live in their standard position above the summary. -->
+            <section v-if="selectedRace.related?.length" class="rd-foot rd-thread-node">
+              <div class="rd-foot-col">
               <h2 class="rd-h2">Связанные нити</h2>
               <div class="rd-related">
                 <span v-for="term in selectedRace.related" :key="term" class="rd-pill">{{ term }}</span>
@@ -1662,10 +1717,14 @@ function printRace() {
 .rd-central-emblem:hover .rd-central-emblem-knot,.rd-central-emblem.is-spark-active .rd-central-emblem-knot{filter:drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.68)) brightness(1.22);transform:scale(1.04)}
 .rd-central-heading{flex:1;min-width:0}
 .rd-original-name{margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.4)}
-.rd-hero{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:stretch}
+.rd-presentation{overflow:visible;border:1px solid rgba(var(--theme-accent-rgb),.3);border-radius:18px;background:rgba(var(--theme-contrast-rgb),.018);transition:border-color .28s ease,box-shadow .28s ease,background .28s ease}
+.rd-hero{display:grid;grid-template-columns:1.3fr 1fr;gap:0;align-items:stretch}
 .rd-hero-card{position:relative;border:1px solid rgba(var(--theme-accent-rgb),.22);border-radius:18px;background:rgba(var(--theme-contrast-rgb),.018)}
+.rd-presentation .rd-hero-card{border:0;border-radius:0;background:transparent}
 .rd-hero-text-card{padding:24px 28px}
+.rd-presentation .rd-hero-text-card{border-radius:0 0 0 17px}
 .rd-hero-portrait-card{padding:0;overflow:hidden;min-height:280px;cursor:zoom-in;border:1px solid rgba(var(--theme-accent-rgb),.22);transition:transform .2s,border-color .2s}
+.rd-presentation .rd-hero-portrait-card{border-left:1px solid rgba(var(--theme-accent-rgb),.18);border-radius:0 0 17px 0}
 .rd-hero-portrait-card:hover{transform:scale(1.01);border-color:rgba(var(--theme-accent-rgb),.4)}
 .rd-hero-portrait-card img{width:100%;height:100%;object-fit:cover;display:block}
 .rd-portrait-empty{display:grid;place-items:center;width:100%;height:100%;min-height:280px;font-family:'Cormorant Garamond',serif;font-size:64px;color:rgba(var(--theme-accent-rgb),.4)}
@@ -1697,11 +1756,15 @@ function printRace() {
 .rd-lightbox-enter-active,.rd-lightbox-leave-active{transition:opacity .2s ease}
 .rd-lightbox-enter-from,.rd-lightbox-leave-to{opacity:0}
 
-.rd-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;line-height:1.5;color:rgba(var(--theme-accent-strong-rgb),.85);margin:20px 0 14px}
+.rd-overview-lead{margin-bottom:14px}
+.rd-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;font-weight:600;line-height:1.5;color:rgba(var(--theme-accent-strong-rgb),.98);margin:0}
 .rd-desc{position:relative;max-height:360px;overflow:hidden;transition:max-height .25s ease}
 .rd-desc.open{max-height:3000px}
 .rd-desc:not(.open)::after,.rd-variety-desc.collapsed::after{content:"…";position:absolute;right:0;bottom:0;display:grid;place-items:center;min-width:30px;height:26px;padding:0 4px 4px 14px;background:rgba(var(--theme-surface-rgb),.96);color:rgba(var(--theme-accent-strong-rgb),.96);font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;line-height:1;letter-spacing:.08em}
 .rd-desc-inner{font-size:14px;line-height:1.75;color:rgba(var(--theme-text-rgb),.78)}
+.rd-overview-blocks{display:grid;gap:8px}
+.rd-overview-paragraph{margin:0;padding:11px 14px;border-left:2px solid rgba(var(--theme-accent-rgb),.3);border-radius:0 9px 9px 0;background:rgba(var(--theme-contrast-rgb),.018);line-height:1.7;color:rgba(var(--theme-text-rgb),.8);transition:border-color .25s ease,background .25s ease,color .25s ease}
+.rd-overview-heading{margin:8px 0 0;padding:0 2px;font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;font-weight:750;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.9)}
 .rd-desc-toggle{display:inline-flex;align-items:center;gap:8px;margin-top:9px;background:none;border:0;padding:2px 0;color:rgba(var(--theme-accent-rgb),.85);font-family:'Hanken Grotesk';font-size:12px;cursor:pointer}
 .rd-desc-toggle:hover{color:rgba(var(--theme-accent-strong-rgb),.95)}
 .rd-desc-toggle-ellipsis{display:inline-grid;place-items:center;min-width:24px;height:18px;border:1px solid rgba(var(--theme-accent-rgb),.32);border-radius:999px;background:rgba(var(--theme-accent-rgb),.07);font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;line-height:.5;padding-bottom:5px}
@@ -1716,9 +1779,11 @@ function printRace() {
 .rd-thread-node::before,.rd-thread .rd-block::before{content:"";position:absolute;z-index:3;left:-36px;top:24px;width:11px;height:11px;border:1px solid var(--theme-accent);background:var(--theme-bg);transform:rotate(45deg);transition:border-color .28s ease,background .28s ease,box-shadow .28s ease}
 .rd-thread-node::after,.rd-thread .rd-block::after{content:"";position:absolute;left:-25px;top:29px;width:25px;height:1px;background:rgba(var(--theme-text-rgb),.14)}
 .rd-thread-node.is-spark-active::before,.rd-thread .rd-block.is-spark-active::before{border-color:#fff0bd;background:rgba(var(--theme-accent-strong-rgb),.92);box-shadow:0 0 5px #fff0bd,0 0 13px rgba(var(--theme-accent-rgb),.72),0 0 25px rgba(var(--theme-accent-rgb),.3)}
-.rd-thread-node.is-spark-active .rd-h2,.rd-thread .rd-block.is-spark-active .rd-h2,.rd-thread-node.is-spark-active .rd-source-title{color:rgba(var(--theme-accent-strong-rgb),1);text-shadow:0 0 12px rgba(var(--theme-accent-rgb),.3)}
+.rd-thread-node.is-spark-active .rd-h2,.rd-thread .rd-block.is-spark-active .rd-h2,.rd-thread-node.is-spark-active .rd-source-line{color:rgba(var(--theme-accent-strong-rgb),1);text-shadow:0 0 12px rgba(var(--theme-accent-rgb),.3)}
+.rd-hero.is-spark-active .rd-quote{color:#fff0bd;text-shadow:0 0 14px rgba(var(--theme-accent-rgb),.34)}
+.rd-hero.is-spark-active .rd-overview-paragraph{border-left-color:rgba(var(--theme-accent-strong-rgb),.7);background:rgba(var(--theme-accent-rgb),.055);color:rgba(var(--theme-text-rgb),.88)}
 .rd-source-panel,.rd-variety-tabs,.rd-block,.rd-hero-card,.rd-names,.rd-related{transition:border-color .28s ease,box-shadow .28s ease,background .28s ease}
-.rd-source-panel.is-spark-active,.rd-variety-tabs.is-spark-active,.rd-block.is-spark-active{border-color:rgba(var(--theme-accent-strong-rgb),.48);box-shadow:0 0 0 1px rgba(var(--theme-accent-rgb),.1),0 0 24px rgba(var(--theme-accent-rgb),.12)}
+.rd-variety-tabs.is-spark-active,.rd-block.is-spark-active{border-color:rgba(var(--theme-accent-strong-rgb),.48);box-shadow:0 0 0 1px rgba(var(--theme-accent-rgb),.1),0 0 24px rgba(var(--theme-accent-rgb),.12)}
 .rd-hero.is-spark-active .rd-hero-card,.rd-foot.is-spark-active .rd-names,.rd-foot.is-spark-active .rd-related{border-color:rgba(var(--theme-accent-strong-rgb),.44);box-shadow:0 0 22px rgba(var(--theme-accent-rgb),.11)}
 
 /* The docked spark also kindles the exact element under the pointer. */
@@ -1728,25 +1793,25 @@ function printRace() {
 .rd-stat.is-spark-kindled .rd-stat-label,.rd-stat.is-spark-kindled .rd-stat-value,.rd-item-row.is-spark-kindled strong{color:rgba(var(--theme-accent-strong-rgb),1);text-shadow:0 0 11px rgba(var(--theme-accent-rgb),.24)}
 .rd-vtab.is-spark-kindled,.rd-source-choice.is-spark-kindled,.rd-pill.is-spark-kindled{border-color:rgba(var(--theme-accent-strong-rgb),.58);background:rgba(var(--theme-accent-rgb),.15);color:rgba(var(--theme-accent-strong-rgb),1);box-shadow:0 0 18px rgba(var(--theme-accent-rgb),.13)}
 
-.rd-source-panel{display:grid;grid-template-columns:1fr;gap:14px;align-items:center;padding:18px 20px;border:1px solid rgba(var(--theme-accent-rgb),.22);border-radius:16px;background:linear-gradient(115deg,rgba(var(--theme-accent-rgb),.075),rgba(var(--theme-contrast-rgb),.018) 52%,rgba(var(--theme-surface-rgb),.18))}
-.rd-source-panel-copy{min-width:0}
-.rd-source-panel h2{margin:0;font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;letter-spacing:.03em;color:rgba(var(--theme-heading-rgb),.96)}
-.rd-source-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.rd-source-title i{font-style:normal;color:rgba(var(--theme-accent-rgb),.52)}
-.rd-source-title b{padding:4px 10px;border:1px solid rgba(var(--theme-accent-rgb),.42);border-radius:8px;background:rgba(var(--theme-accent-rgb),.1);font-family:'Hanken Grotesk';font-size:10px;letter-spacing:.13em;color:rgba(var(--theme-accent-strong-rgb),.96)}
-.rd-source-title strong{font:inherit;color:rgba(var(--theme-accent-strong-rgb),.96)}
-.rd-source-panel-copy p{margin:5px 0 0;font-size:11.5px;line-height:1.5;color:rgba(var(--theme-text-rgb),.5)}
-.rd-source-current{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0;padding-top:12px;border-top:1px solid rgba(var(--theme-accent-rgb),.14)}
-.rd-source-current>span{font-size:10px;letter-spacing:.06em;color:rgba(var(--theme-text-rgb),.52)}
-.rd-source-current>span+span::before{content:"·";margin-right:10px;color:rgba(var(--theme-accent-rgb),.55)}
+.rd-source-panel{display:grid;border-radius:17px 17px 0 0;border-bottom:1px solid rgba(var(--theme-accent-rgb),.22);background:rgba(var(--theme-accent-rgb),.05)}
+.rd-source-choices{display:grid;grid-template-columns:minmax(0,1fr)}
+.rd-source-choices.has-variants{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.rd-source-choice{position:relative;display:flex;min-width:0;min-height:52px;align-items:center;padding:12px 18px;border:0;border-left:1px solid rgba(var(--theme-contrast-rgb),.07);background:transparent;color:rgba(var(--theme-text-rgb),.66);cursor:pointer;text-align:left}
+.rd-source-choice:first-child{border-left:0}
+.rd-source-choice::after{content:"";position:absolute;right:14px;bottom:-1px;left:14px;height:2px;background:rgba(var(--theme-accent-strong-rgb),.92);opacity:0;transform:scaleX(.3);transition:opacity .2s ease,transform .2s ease}
+.rd-source-choice:hover{background:rgba(var(--theme-contrast-rgb),.025);color:rgba(var(--theme-heading-rgb),.92)}
+.rd-source-choice.active{background:rgba(var(--theme-accent-rgb),.09);color:rgba(var(--theme-accent-strong-rgb),.98)}
+.rd-source-choice.active::after{opacity:1;transform:scaleX(1)}
+.rd-source-line{display:flex;min-width:0;width:100%;align-items:center;gap:8px;overflow:hidden;white-space:nowrap}
+.rd-source-line small{flex:none;font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.48)}
+.rd-source-line i{flex:none;font-style:normal;color:rgba(var(--theme-accent-rgb),.45)}
+.rd-source-line b{flex:none;font-family:'Hanken Grotesk',sans-serif;font-size:11px;font-weight:800;letter-spacing:.14em;color:rgba(var(--theme-accent-strong-rgb),.94)}
+.rd-source-line strong{min-width:0;overflow:hidden;font-family:'Hanken Grotesk',sans-serif;font-size:12px;font-weight:650;letter-spacing:.025em;color:rgba(var(--theme-heading-rgb),.84);text-overflow:ellipsis}
+.rd-source-current{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0;padding:10px 18px;border-top:1px solid rgba(var(--theme-accent-rgb),.13);background:rgba(var(--theme-surface-rgb),.14)}
+.rd-source-current>span{font-size:10px;line-height:1.45;letter-spacing:.04em;color:rgba(var(--theme-text-rgb),.54)}
+.rd-source-note{flex:1 1 260px}
 .rd-source-link{font-size:10px;letter-spacing:.06em;white-space:nowrap;color:rgba(var(--theme-accent-rgb),.85);text-decoration:none}
 .rd-source-link:hover{color:rgba(var(--theme-accent-strong-rgb),1);text-decoration:underline}
-.rd-source-choices{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;padding-top:14px;border-top:1px solid rgba(var(--theme-contrast-rgb),.06)}
-.rd-source-choice{display:flex;align-items:center;gap:9px;min-height:36px;padding:6px 12px;border:1px solid rgba(var(--theme-contrast-rgb),.09);border-radius:10px;background:rgba(var(--theme-contrast-rgb),.02);color:rgba(var(--theme-text-rgb),.6);cursor:pointer;text-align:left}
-.rd-source-choice span{font-size:9px;font-weight:800;letter-spacing:.1em;color:rgba(var(--theme-accent-rgb),.74)}
-.rd-source-choice strong{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:500;color:inherit}
-.rd-source-choice:hover{border-color:rgba(var(--theme-accent-rgb),.35);color:rgba(var(--theme-heading-rgb),.9)}
-.rd-source-choice.active{border-color:rgba(var(--theme-accent-rgb),.55);background:rgba(var(--theme-accent-rgb),.12);color:rgba(var(--theme-accent-strong-rgb),.98);box-shadow:inset 0 0 0 1px rgba(var(--theme-accent-rgb),.08)}
 
 /* ---- variety-driven dossier ---- */
 .rd-variety-section{display:grid;gap:16px}
@@ -1758,6 +1823,8 @@ function printRace() {
 .rd-vtab-knot{flex:none;width:22px;height:22px;object-fit:contain;filter:drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.5))}
 
 .rd-variety-body{display:grid;gap:16px}
+.rd-names-block{order:2}
+.rd-summary-block{order:3}
 .rd-block{border:1px solid rgba(var(--theme-contrast-rgb),.08);border-radius:18px;background:rgba(var(--theme-contrast-rgb),.018);padding:20px 22px}
 .rd-h2{display:flex;align-items:center;gap:10px;font-family:'Hanken Grotesk';font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.85);margin:0 0 14px}
 .rd-h2-sub{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:400;letter-spacing:.02em;text-transform:none;color:rgba(var(--theme-text-rgb),.5)}
@@ -1776,6 +1843,10 @@ function printRace() {
 .rd-stat:first-child{border-top:0}
 .rd-stat-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.5);padding-top:3px}
 .rd-stat-value{font-family:'Cormorant Garamond',serif;font-size:15.5px;color:rgba(var(--theme-heading-rgb),.92);line-height:1.55}
+.rd-details-divider{display:flex;align-items:center;gap:10px;margin:18px 0}
+.rd-details-divider::before,.rd-details-divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--theme-accent-rgb),.24))}
+.rd-details-divider::after{background:linear-gradient(90deg,rgba(var(--theme-accent-rgb),.24),transparent)}
+.rd-details-divider span{width:6px;height:6px;border:1px solid rgba(var(--theme-accent-rgb),.54);background:rgba(var(--theme-accent-rgb),.08);transform:rotate(45deg)}
 
 .rd-features{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .rd-feat{display:flex;flex-direction:column;gap:7px;border:1px solid rgba(var(--theme-contrast-rgb),.08);border-radius:13px;background:rgba(var(--theme-contrast-rgb),.02);padding:16px 18px}
@@ -1840,7 +1911,7 @@ function printRace() {
 /* ---- footer (names + related) ---- */
 .rd-foot{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
 .rd-foot-col{min-width:0}
-.rd-names{border:1px solid rgba(var(--theme-contrast-rgb),.08);border-radius:14px;background:rgba(var(--theme-contrast-rgb),.018);padding:18px 20px;font-family:'Cormorant Garamond',serif;font-size:15px;line-height:1.7;color:rgba(var(--theme-text-rgb),.8)}
+.rd-names{font-family:'Cormorant Garamond',serif;font-size:15px;line-height:1.7;color:rgba(var(--theme-text-rgb),.8)}
 .rd-names p{margin:0 0 .6em}
 .rd-names p:last-child{margin-bottom:0}
 .rd-names-label{color:rgba(var(--theme-accent-strong-rgb),.9);font-weight:600}
@@ -1855,6 +1926,8 @@ function printRace() {
 @media (max-width: 900px){
   .rd-hero{grid-template-columns:1fr}
   .rd-hero-portrait-card{min-height:220px}
+  .rd-presentation .rd-hero-text-card{border-radius:0}
+  .rd-presentation .rd-hero-portrait-card{border-top:1px solid rgba(var(--theme-accent-rgb),.18);border-left:0;border-radius:0 0 17px 17px}
 }
 @media (max-width: 760px){
   .rd-nav{flex-direction:row;top:auto;bottom:0;right:0;width:auto;height:54px;padding:0 10px;border-right:0;border-top:1px solid rgba(var(--theme-contrast-rgb),.06)}
@@ -1877,8 +1950,12 @@ function printRace() {
   .rd-foot{grid-template-columns:1fr}
   .rd-thread-node::before,.rd-thread .rd-block::before{left:-32px}
   .rd-thread-node::after,.rd-thread .rd-block::after{left:-21px;width:21px}
-  .rd-source-panel{grid-template-columns:1fr;padding:16px}
-  .rd-source-current{padding:12px 0 0;border-top:1px solid rgba(var(--theme-accent-rgb),.18)}
+  .rd-source-choices.has-variants{grid-template-columns:1fr}
+  .rd-source-choice{border-top:1px solid rgba(var(--theme-contrast-rgb),.07);border-left:0}
+  .rd-source-choice:first-child{border-top:0}
+  .rd-source-line{flex-wrap:wrap;white-space:normal}
+  .rd-source-line strong{flex:1 1 150px;white-space:normal}
+  .rd-source-current{align-items:flex-start;padding:10px 16px}
 }
 
 @media (prefers-reduced-motion: reduce){.rd-spark{display:none}}

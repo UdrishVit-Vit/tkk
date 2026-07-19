@@ -12,10 +12,12 @@ hasDndRules: true
 
 source: TL
 sourceTitle: The Threads of Largo
+sourceAuthor: Largo
 threadSources:
   - id: tu
     source: TU
     sourceTitle: The Threads of Unseen
+    sourceAuthor: Unseen
     creatureType: гуманоид
     abilityScore: Лов +2, Мдр +1
     raceSize: Средний
