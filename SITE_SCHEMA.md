@@ -77,7 +77,7 @@
 | --- | --- | --- | --- |
 | Классы | `/dnd5e/classes` | `classdata.js` | 15 классов |
 | Умения классов | `/dnd5e/class-features` | `classFeatures5e.js` | 194 умения |
-| Расы | `/dnd5e/races` | `content/dnd5e/races/*.md` | 12 файлов |
+| Расы | `/dnd5e/races` | `content/dnd5e/races/*.md` | 14 файлов |
 | Черты | `/dnd5e/feats` | `feats5e.js` | 14 черт |
 | Предыстории | `/dnd5e/backgrounds` | `backgrounds5e.js` | 4 предыстории |
 | Заклинания | `/dnd5e/spells` | `spells5e.js` | 10 заклинаний |
@@ -192,6 +192,7 @@
 
 - `adzhaidy.md`
 - `borosy.md`
+- `chotgory.md`
 - `ehornur.md`
 - `hudduliny.md`
 - `jabari.md`
@@ -202,6 +203,7 @@
 - `samaghi.md`
 - `udrishi.md`
 - `vetu.md`
+- `virmorozhdennye.md`
 
 Связанные изображения:
 

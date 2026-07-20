@@ -398,6 +398,10 @@ function rlPortrait(race) {
   return `/images/races/portraits/${slug}.png`
 }
 
+function rlPortraitStyle() {
+  return {}
+}
+
 const racesMap = computed(() => {
   _rlCi = 0
   const list = filteredRaces.value
@@ -419,6 +423,7 @@ const racesMap = computed(() => {
       x, y, race,
       emblem: rlEmblem(i),
       portrait: rlPortrait(race),
+      portraitStyle: rlPortraitStyle(race),
       label: race.title,
       labelAbove: y < 0
     })
@@ -972,6 +977,7 @@ function printRace() {
             <img
               :src="node.portrait"
               :alt="node.label"
+              :style="node.portraitStyle"
               draggable="false"
               @error="$event.target.src = node.emblem"
             >
