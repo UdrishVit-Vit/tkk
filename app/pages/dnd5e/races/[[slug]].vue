@@ -738,7 +738,9 @@ const RACE_KNOT_DEFAULT = {
   '/dnd5e/races/adzhaidy': '/images/races/adzhaidy/knots/adzhaidy-t.png',
   '/dnd5e/races/oyrdugi': '/images/races/oyrdugi/knots/oyrdugi-t.png',
   '/dnd5e/races/samaghi': '/images/races/samaghi/knots/samaghi-t.png',
-  '/dnd5e/races/ehornur': '/images/races/ehornur/knots/ehornur-t.png'
+  '/dnd5e/races/ehornur': '/images/races/ehornur/knots/ehornur-t.png',
+  '/dnd5e/races/virmorozhdennye': '/images/races/virmorozhdennye/knots/virmbirth.png',
+  '/dnd5e/races/chotgory': '/images/races/chotgory/knots/chotgor.png'
 }
 const activeKnot = computed(() => {
   const map = RACE_KNOTS[selectedPath.value]
@@ -754,7 +756,16 @@ const CLEAN_CENTRAL_KNOT_PATHS = new Set([
   '/dnd5e/races/ehornur'
 ])
 const hasCleanCentralKnot = computed(() => CLEAN_CENTRAL_KNOT_PATHS.has(selectedPath.value))
-const hasLargeCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/hudduliny')
+const LARGE_CENTRAL_KNOT_PATHS = new Set([
+  '/dnd5e/races/hudduliny',
+  '/dnd5e/races/virmorozhdennye',
+  '/dnd5e/races/chotgory'
+])
+const hasLargeCentralKnot = computed(() => LARGE_CENTRAL_KNOT_PATHS.has(selectedPath.value))
+const GOLD_CENTRAL_KNOT_PATHS = new Set([
+  '/dnd5e/races/chotgory'
+])
+const hasGoldCentralKnot = computed(() => GOLD_CENTRAL_KNOT_PATHS.has(selectedPath.value))
 
 // Per-race, per-variety portraits — for merged races (e.g. Люди) whose varieties
 // are visually distinct peoples, the hero portrait swaps with the chosen variety.
@@ -1084,7 +1095,8 @@ function printRace() {
               class="rd-central-emblem"
               :class="{
                 'rd-central-emblem--clean-knot': hasCleanCentralKnot,
-                'rd-central-emblem--large-knot': hasLargeCentralKnot
+                'rd-central-emblem--large-knot': hasLargeCentralKnot,
+                'rd-central-emblem--gold-knot': hasGoldCentralKnot
               }"
               title="Назад к расам"
               aria-label="Назад к списку рас"
@@ -1758,6 +1770,8 @@ function printRace() {
 .rd-central-emblem--clean-knot .rd-central-emblem-knot{filter:url('#rd-knot-alpha-clean')}
 .rd-central-emblem--clean-knot:hover .rd-central-emblem-frame,.rd-central-emblem--clean-knot.is-spark-active .rd-central-emblem-frame{background:transparent}
 .rd-central-emblem--clean-knot:hover .rd-central-emblem-knot,.rd-central-emblem--clean-knot.is-spark-active .rd-central-emblem-knot{filter:url('#rd-knot-alpha-clean')}
+.rd-central-emblem--gold-knot .rd-central-emblem-knot{filter:invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.32))}
+.rd-central-emblem--gold-knot:hover .rd-central-emblem-knot,.rd-central-emblem--gold-knot.is-spark-active .rd-central-emblem-knot{filter:invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
 .rd-central-heading{flex:1;min-width:0}
 .rd-original-name{margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.4)}
 .rd-presentation{overflow:visible;border:1px solid rgba(var(--theme-accent-rgb),.3);border-radius:18px;background:rgba(var(--theme-contrast-rgb),.018);transition:border-color .28s ease,box-shadow .28s ease,background .28s ease}
