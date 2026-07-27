@@ -712,9 +712,9 @@ const RACE_KNOTS = {
     'Омор': '/images/races/hudduliny/knots/omor-t.png'
   },
   '/dnd5e/races/marakiytsy': {
-    'Янтарный': '/images/races/marakiytsy/knots/yantarniy-t.png',
-    'Пепельный': '/images/races/marakiytsy/knots/pepelniy-t.png',
-    'Драгмирец': '/images/races/marakiytsy/knots/dragmirec-t.png'
+    'Янтарный': '/images/races/marakiytsy/knots/yantarniy-v2.png',
+    'Пепельный': '/images/races/marakiytsy/knots/pepelniy-v2.png',
+    'Драгмирец': '/images/races/marakiytsy/knots/dragmirec-v2.png'
   },
   '/dnd5e/races/lyudi': {
     'Дангун': '/images/races/lyudi/knots/dangun-t.png',
@@ -722,50 +722,135 @@ const RACE_KNOTS = {
     'Адаад': '/images/races/lyudi/knots/adaad-t.png'
   },
   '/dnd5e/races/morhory': {
-    'Дитя Анзу': '/images/races/morhory/knots/anzu-t.png',
-    'Дитя Эдры': '/images/races/morhory/knots/edra-t.png'
+    'Дитя Анзу': '/images/races/morhory/knots/anzu-v2.png',
+    'Дитя Эдры': '/images/races/morhory/knots/edra-v2.png'
   },
   '/dnd5e/races/vetu': {
-    "Ча'Нери": '/images/races/vetu/knots/chaneri.png',
-    "Кса'От": '/images/races/vetu/knots/ksaot.png',
-    "Тлан'Каа": '/images/races/vetu/knots/tlaankaa.png'
+    "Ча'Нери": '/images/races/vetu/knots/chaneri-v2.png',
+    "Кса'От": '/images/races/vetu/knots/ksaot-v4.png',
+    "Тлан'Каа": '/images/races/vetu/knots/tlaankaa-v2.png'
   }
 }
 // Default knot for races without varieties
 const RACE_KNOT_DEFAULT = {
-  '/dnd5e/races/borosy': '/images/races/borosy/knots/borosy-t.png',
-  '/dnd5e/races/jabari': '/images/races/jabari/knots/jabari-t.png',
-  '/dnd5e/races/adzhaidy': '/images/races/adzhaidy/knots/adzhaidy-t.png',
-  '/dnd5e/races/oyrdugi': '/images/races/oyrdugi/knots/oyrdugi-t.png',
+  '/dnd5e/races/borosy': '/images/races/borosy/knots/borosy-v2.png',
+  '/dnd5e/races/jabari': '/images/races/jabari/knots/jabari-v4.png',
+  '/dnd5e/races/adzhaidy': '/images/races/adzhaidy/knots/adzhaidy-v2.png',
+  '/dnd5e/races/oyrdugi': '/images/races/oyrdugi/knots/oyrdugi-v2.png',
   '/dnd5e/races/samaghi': '/images/races/samaghi/knots/samaghi-t.png',
   '/dnd5e/races/ehornur': '/images/races/ehornur/knots/ehornur-t.png',
   '/dnd5e/races/virmorozhdennye': '/images/races/virmorozhdennye/knots/virmbirth.png',
-  '/dnd5e/races/chotgory': '/images/races/chotgory/knots/chotgor.png'
+  '/dnd5e/races/chotgory': '/images/races/chotgory/knots/chotgor.png',
+  '/dnd5e/races/morhory': '/images/races/morhory/knots/anzu-v2.png'
 }
 const activeKnot = computed(() => {
   const map = RACE_KNOTS[selectedPath.value]
   if (map && activeVariety.value) return map[varietyShortTitle(activeVariety.value)] || ''
   return RACE_KNOT_DEFAULT[selectedPath.value] || ''
 })
+// The source PNGs have very different transparent margins. These dimensions
+// normalize the visible mark inside the diamond to roughly the same scale as
+// the Amber and Ash Marakian emblems.
+const CENTRAL_KNOT_SIZE_BY_ASSET = {
+  '/images/races/udrishi/knots/urma-t.png': [106, 77],
+  '/images/races/udrishi/knots/eril-t.png': [120, 88],
+  '/images/races/udrishi/knots/pure-pure-t.png': [111, 81],
+  '/images/races/hudduliny/knots/erh-t.png': [113, 82],
+  '/images/races/hudduliny/knots/sar-t.png': [104, 76],
+  '/images/races/hudduliny/knots/omor-t.png': [118, 86],
+  '/images/races/marakiytsy/knots/yantarniy-v2.png': [88, 64],
+  '/images/races/marakiytsy/knots/pepelniy-v2.png': [98, 71],
+  '/images/races/marakiytsy/knots/dragmirec-v2.png': [93, 68],
+  '/images/races/lyudi/knots/dangun-t.png': [103, 75],
+  '/images/races/lyudi/knots/brall-t.png': [93, 68],
+  '/images/races/lyudi/knots/adaad-t.png': [107, 78],
+  '/images/races/morhory/knots/anzu-v2.png': [129, 94],
+  '/images/races/morhory/knots/edra-v2.png': [112, 82],
+  '/images/races/vetu/knots/chaneri-v2.png': [91, 66],
+  '/images/races/vetu/knots/ksaot-v4.png': [93, 68],
+  '/images/races/vetu/knots/tlaankaa-v2.png': [90, 66],
+  '/images/races/borosy/knots/borosy-v2.png': [116, 85],
+  '/images/races/jabari/knots/jabari-v4.png': [93, 68],
+  '/images/races/adzhaidy/knots/adzhaidy-v2.png': [133, 97],
+  '/images/races/oyrdugi/knots/oyrdugi-v2.png': [93, 68],
+  '/images/races/samaghi/knots/samaghi-t.png': [93, 68],
+  '/images/races/ehornur/knots/ehornur-t.png': [93, 68],
+  '/images/races/virmorozhdennye/knots/virmbirth.png': [93, 68],
+  '/images/races/chotgory/knots/chotgor.png': [93, 68]
+}
+const centralKnotStyle = computed(() => {
+  const [desktop, mobile] = CENTRAL_KNOT_SIZE_BY_ASSET[activeKnot.value] || [88, 64]
+  return {
+    '--rd-knot-size': `${desktop}px`,
+    '--rd-knot-size-mobile': `${mobile}px`
+  }
+})
+const VETU_GOLD_VARIETY_KNOTS = new Set(["Ча'Нери", "Кса'От", "Тлан'Каа"])
+const hasVetuGoldCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/vetu'
+  && activeVariety.value
+  && VETU_GOLD_VARIETY_KNOTS.has(varietyShortTitle(activeVariety.value))
+))
+const hasTlaankaaCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/vetu'
+  && activeVariety.value
+  && varietyShortTitle(activeVariety.value) === "Тлан'Каа"
+))
+const hasYantarMarakCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/marakiytsy'
+  && activeVariety.value
+  && varietyShortTitle(activeVariety.value) === 'Янтарный'
+))
+const hasPepelniyMarakCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/marakiytsy'
+  && activeVariety.value
+  && varietyShortTitle(activeVariety.value) === 'Пепельный'
+))
+const hasDragmirecMarakCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/marakiytsy'
+  && activeVariety.value
+  && varietyShortTitle(activeVariety.value) === 'Драгмирец'
+))
 const CLEAN_CENTRAL_KNOT_PATHS = new Set([
   '/dnd5e/races/borosy',
-  '/dnd5e/races/jabari',
   '/dnd5e/races/vetu',
   '/dnd5e/races/oyrdugi',
   '/dnd5e/races/samaghi',
   '/dnd5e/races/ehornur'
 ])
-const hasCleanCentralKnot = computed(() => CLEAN_CENTRAL_KNOT_PATHS.has(selectedPath.value))
+const hasCleanCentralKnot = computed(() => (
+  CLEAN_CENTRAL_KNOT_PATHS.has(selectedPath.value)
+  && !hasVetuGoldCentralKnot.value
+  && selectedPath.value !== '/dnd5e/races/borosy'
+))
+const hasBorosCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/borosy')
+const hasOyrdugiCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/oyrdugi')
+const hasSamaghiCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/samaghi')
+const hasMorhoryCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/morhory')
+const hasMarakiytsyCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/marakiytsy')
 const LARGE_CENTRAL_KNOT_PATHS = new Set([
   '/dnd5e/races/hudduliny',
   '/dnd5e/races/virmorozhdennye',
-  '/dnd5e/races/chotgory'
+  '/dnd5e/races/chotgory',
+  '/dnd5e/races/morhory',
+  '/dnd5e/races/adzhaidy',
+  '/dnd5e/races/jabari'
 ])
 const hasLargeCentralKnot = computed(() => LARGE_CENTRAL_KNOT_PATHS.has(selectedPath.value))
+const hasVirmCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/virmorozhdennye')
 const GOLD_CENTRAL_KNOT_PATHS = new Set([
-  '/dnd5e/races/chotgory'
+  '/dnd5e/races/chotgory',
+  '/dnd5e/races/morhory'
 ])
 const hasGoldCentralKnot = computed(() => GOLD_CENTRAL_KNOT_PATHS.has(selectedPath.value))
+const FILLED_GOLD_CENTRAL_KNOT_PATHS = new Set([
+  '/dnd5e/races/adzhaidy'
+])
+const hasFilledGoldCentralKnot = computed(() => FILLED_GOLD_CENTRAL_KNOT_PATHS.has(selectedPath.value))
+const NATIVE_GOLD_CENTRAL_KNOT_PATHS = new Set([
+  '/dnd5e/races/jabari'
+])
+const hasNativeGoldCentralKnot = computed(() => NATIVE_GOLD_CENTRAL_KNOT_PATHS.has(selectedPath.value))
 
 // Per-race, per-variety portraits — for merged races (e.g. Люди) whose varieties
 // are visually distinct peoples, the hero portrait swaps with the chosen variety.
@@ -1093,10 +1178,24 @@ function printRace() {
             <NuxtLink
               to="/dnd5e/races"
               class="rd-central-emblem"
+              :style="centralKnotStyle"
               :class="{
                 'rd-central-emblem--clean-knot': hasCleanCentralKnot,
                 'rd-central-emblem--large-knot': hasLargeCentralKnot,
-                'rd-central-emblem--gold-knot': hasGoldCentralKnot
+                'rd-central-emblem--virm-knot': hasVirmCentralKnot,
+                'rd-central-emblem--oyrdugi-knot': hasOyrdugiCentralKnot,
+                'rd-central-emblem--samaghi-knot': hasSamaghiCentralKnot,
+                'rd-central-emblem--morhory-knot': hasMorhoryCentralKnot,
+                'rd-central-emblem--marakiytsy-knot': hasMarakiytsyCentralKnot,
+                'rd-central-emblem--gold-knot': hasGoldCentralKnot,
+                'rd-central-emblem--filled-gold-knot': hasFilledGoldCentralKnot,
+                'rd-central-emblem--native-gold-knot': hasNativeGoldCentralKnot,
+                'rd-central-emblem--vetu-gold-knot': hasVetuGoldCentralKnot,
+                'rd-central-emblem--tlaankaa-knot': hasTlaankaaCentralKnot,
+                'rd-central-emblem--yantar-marak-knot': hasYantarMarakCentralKnot,
+                'rd-central-emblem--pepelniy-marak-knot': hasPepelniyMarakCentralKnot,
+                'rd-central-emblem--dragmirec-marak-knot': hasDragmirecMarakCentralKnot,
+                'rd-central-emblem--boros-knot': hasBorosCentralKnot
               }"
               title="Назад к расам"
               aria-label="Назад к списку рас"
@@ -1241,6 +1340,10 @@ function printRace() {
                   v-if="activeVarietyId === section.id && RACE_KNOTS[selectedPath]?.[varietyShortTitle(section)]"
                   :src="RACE_KNOTS[selectedPath][varietyShortTitle(section)]"
                   class="rd-vtab-knot"
+                  :class="{
+                    'rd-vtab-knot--gold': hasGoldCentralKnot,
+                    'rd-vtab-knot--vetu-gold': hasVetuGoldCentralKnot
+                  }"
                   alt=""
                 >
                 <span v-else class="rd-vtab-diamond" />
@@ -1253,7 +1356,7 @@ function printRace() {
                 <!-- 1. variety description -->
                 <div class="rd-block">
                   <h2 class="rd-h2">
-                    Представители
+                    Наследие
                     <span class="rd-variety-badge">{{ varietyShortTitle(activeVariety) }}</span>
                   </h2>
                   <div class="rd-variety-desc" :class="{ collapsed: varietyDescParagraphs.length > 3 && !varietyDescOpen }">
@@ -1762,16 +1865,33 @@ function printRace() {
 .rd-central-emblem{position:relative;z-index:3;isolation:isolate;flex:none;display:flex;align-items:center;justify-content:center;width:112px;height:112px;margin-left:-86px;margin-right:30px;border-radius:14px;text-decoration:none;cursor:pointer;transform:translate3d(0,0,0);transition:filter .3s ease}
 .rd-central-emblem::before{content:"";position:absolute;z-index:0;width:88px;height:88px;border-radius:8px;background:var(--theme-bg);transform:rotate(45deg)}
 .rd-central-emblem-frame{position:absolute;z-index:1;width:88px;height:88px;border:1px solid rgba(var(--theme-accent-rgb),.5);border-radius:8px;box-shadow:0 0 22px rgba(var(--theme-accent-rgb),.18);transform:rotate(45deg);transition:border-color .3s ease,box-shadow .3s ease,background .3s ease}
-.rd-central-emblem-knot{position:relative;z-index:2;width:88px;height:88px;display:block;object-fit:contain;pointer-events:none;user-select:none;filter:drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.28));transition:filter .3s ease,transform .3s ease}
+.rd-central-emblem-knot{position:relative;z-index:2;width:auto;max-width:none;height:var(--rd-knot-size,88px);display:block;object-fit:contain;pointer-events:none;user-select:none;filter:drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.28));transition:filter .3s ease,transform .3s ease}
 .rd-central-emblem:hover .rd-central-emblem-frame,.rd-central-emblem.is-spark-active .rd-central-emblem-frame{border-color:#fff0bd;background:rgba(var(--theme-accent-rgb),.08);box-shadow:0 0 5px rgba(255,240,189,.7),0 0 18px rgba(var(--theme-accent-rgb),.46),0 0 30px rgba(var(--theme-accent-rgb),.18)}
 .rd-central-emblem:hover .rd-central-emblem-knot,.rd-central-emblem.is-spark-active .rd-central-emblem-knot{filter:drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.68)) brightness(1.22);transform:scale(1.04)}
-.rd-central-emblem--large-knot .rd-central-emblem-knot{width:117px;height:117px}
+.rd-central-emblem--samaghi-knot .rd-central-emblem-knot{transform:translateY(6px)}
+.rd-central-emblem--samaghi-knot:hover .rd-central-emblem-knot,.rd-central-emblem--samaghi-knot.is-spark-active .rd-central-emblem-knot{transform:translateY(6px) scale(1.04)}
 .rd-filter-defs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
 .rd-central-emblem--clean-knot .rd-central-emblem-knot{filter:url('#rd-knot-alpha-clean')}
 .rd-central-emblem--clean-knot:hover .rd-central-emblem-frame,.rd-central-emblem--clean-knot.is-spark-active .rd-central-emblem-frame{background:transparent}
 .rd-central-emblem--clean-knot:hover .rd-central-emblem-knot,.rd-central-emblem--clean-knot.is-spark-active .rd-central-emblem-knot{filter:url('#rd-knot-alpha-clean')}
+.rd-central-emblem--oyrdugi-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--oyrdugi-knot:hover .rd-central-emblem-knot,.rd-central-emblem--oyrdugi-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--yantar-marak-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--yantar-marak-knot:hover .rd-central-emblem-knot,.rd-central-emblem--yantar-marak-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--pepelniy-marak-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--pepelniy-marak-knot:hover .rd-central-emblem-knot,.rd-central-emblem--pepelniy-marak-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--dragmirec-marak-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--dragmirec-marak-knot:hover .rd-central-emblem-knot,.rd-central-emblem--dragmirec-marak-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
 .rd-central-emblem--gold-knot .rd-central-emblem-knot{filter:invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.32))}
 .rd-central-emblem--gold-knot:hover .rd-central-emblem-knot,.rd-central-emblem--gold-knot.is-spark-active .rd-central-emblem-knot{filter:invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--filled-gold-knot .rd-central-emblem-knot{clip-path:inset(15%);filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--filled-gold-knot:hover .rd-central-emblem-knot,.rd-central-emblem--filled-gold-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.03)}
+.rd-central-emblem--native-gold-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--native-gold-knot:hover .rd-central-emblem-knot,.rd-central-emblem--native-gold-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--vetu-gold-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--vetu-gold-knot:hover .rd-central-emblem-knot,.rd-central-emblem--vetu-gold-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.03)}
+.rd-central-emblem--boros-knot .rd-central-emblem-knot{clip-path:inset(10%);filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--boros-knot:hover .rd-central-emblem-knot,.rd-central-emblem--boros-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.03)}
 .rd-central-heading{flex:1;min-width:0}
 .rd-original-name{margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.4)}
 .rd-presentation{overflow:visible;border:1px solid rgba(var(--theme-accent-rgb),.3);border-radius:18px;background:rgba(var(--theme-contrast-rgb),.018);transition:border-color .28s ease,box-shadow .28s ease,background .28s ease}
@@ -1878,6 +1998,8 @@ function printRace() {
 .rd-vtab.active{background:rgba(var(--theme-accent-rgb),.18);color:rgba(var(--theme-accent-strong-rgb),.98);box-shadow:inset 0 0 0 1px rgba(var(--theme-accent-rgb),.4)}
 .rd-vtab-diamond{flex:none;width:6px;height:6px;background:rgba(var(--theme-accent-rgb),.5);transform:rotate(45deg)}
 .rd-vtab-knot{flex:none;width:22px;height:22px;object-fit:contain;filter:drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.5))}
+.rd-vtab-knot--gold{filter:invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.58))}
+.rd-vtab-knot--vetu-gold{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.58))}
 
 .rd-variety-body{display:grid;gap:16px}
 .rd-names-block{order:2}
@@ -1993,8 +2115,10 @@ function printRace() {
   .rd-window{--rd-rail-left:46px;padding:18px 16px 80px 72px}
   .rd-central-head{min-height:76px}
   .rd-central-emblem{width:76px;height:76px;margin-left:-64px;margin-right:8px}
-  .rd-central-emblem::before,.rd-central-emblem-frame,.rd-central-emblem-knot{width:64px;height:64px}
-  .rd-central-emblem--large-knot .rd-central-emblem-knot{width:85px;height:85px}
+  .rd-central-emblem::before,.rd-central-emblem-frame{width:64px;height:64px}
+  .rd-central-emblem-knot{height:var(--rd-knot-size-mobile,64px)}
+  .rd-central-emblem--samaghi-knot .rd-central-emblem-knot{transform:translateY(4px)}
+  .rd-central-emblem--samaghi-knot:hover .rd-central-emblem-knot,.rd-central-emblem--samaghi-knot.is-spark-active .rd-central-emblem-knot{transform:translateY(4px) scale(1.04)}
   .rd-central-emblem::before,.rd-central-emblem-frame{border-radius:6px}
   .rd-hero-text-card{padding:18px 18px}
   .rd-title{font-size:32px}
