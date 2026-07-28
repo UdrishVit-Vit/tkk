@@ -702,9 +702,9 @@ const activeVariety = computed(() => varietyItemSections.value.find(s => s.id ==
 // Per-race, per-variety knot symbols — the corner emblem swaps with the chosen variety.
 const RACE_KNOTS = {
   '/dnd5e/races/udrishi': {
-    'Урма': '/images/races/udrishi/knots/urma-t.png',
-    'Эрил': '/images/races/udrishi/knots/eril-t.png',
-    'Пйюр-Пйюр': '/images/races/udrishi/knots/pure-pure-t.png'
+    'Урма': '/images/races/udrishi/knots/urma-v4.png',
+    'Эрил': '/images/races/udrishi/knots/eril-v2.png',
+    'Пйюр-Пйюр': '/images/races/udrishi/knots/pure-pure-v3.png'
   },
   '/dnd5e/races/hudduliny': {
     'Эрх': '/images/races/hudduliny/knots/erh-t.png',
@@ -717,9 +717,9 @@ const RACE_KNOTS = {
     'Драгмирец': '/images/races/marakiytsy/knots/dragmirec-v2.png'
   },
   '/dnd5e/races/lyudi': {
-    'Дангун': '/images/races/lyudi/knots/dangun-t.png',
-    'Бралл': '/images/races/lyudi/knots/brall-t.png',
-    'Адаад': '/images/races/lyudi/knots/adaad-t.png'
+    'Дангун': '/images/races/lyudi/knots/dangun-v2.png',
+    'Бралл': '/images/races/lyudi/knots/brall-v2.png',
+    'Адаад': '/images/races/lyudi/knots/adaad-v2.png'
   },
   '/dnd5e/races/morhory': {
     'Дитя Анзу': '/images/races/morhory/knots/anzu-v2.png',
@@ -736,10 +736,10 @@ const RACE_KNOT_DEFAULT = {
   '/dnd5e/races/borosy': '/images/races/borosy/knots/borosy-v2.png',
   '/dnd5e/races/jabari': '/images/races/jabari/knots/jabari-v4.png',
   '/dnd5e/races/adzhaidy': '/images/races/adzhaidy/knots/adzhaidy-v2.png',
-  '/dnd5e/races/oyrdugi': '/images/races/oyrdugi/knots/oyrdugi-v2.png',
+  '/dnd5e/races/oyrdugi': '/images/races/oyrdugi/knots/oyrdugi-v3.png',
   '/dnd5e/races/samaghi': '/images/races/samaghi/knots/samaghi-t.png',
-  '/dnd5e/races/ehornur': '/images/races/ehornur/knots/ehornur-t.png',
-  '/dnd5e/races/virmorozhdennye': '/images/races/virmorozhdennye/knots/virmbirth.png',
+  '/dnd5e/races/ehornur': '/images/races/ehornur/knots/ehornur-v2.png',
+  '/dnd5e/races/virmorozhdennye': '/images/races/virmorozhdennye/knots/virmbirth-v2.png',
   '/dnd5e/races/chotgory': '/images/races/chotgory/knots/chotgor.png',
   '/dnd5e/races/morhory': '/images/races/morhory/knots/anzu-v2.png'
 }
@@ -752,18 +752,18 @@ const activeKnot = computed(() => {
 // normalize the visible mark inside the diamond to roughly the same scale as
 // the Amber and Ash Marakian emblems.
 const CENTRAL_KNOT_SIZE_BY_ASSET = {
-  '/images/races/udrishi/knots/urma-t.png': [106, 77],
-  '/images/races/udrishi/knots/eril-t.png': [120, 88],
-  '/images/races/udrishi/knots/pure-pure-t.png': [111, 81],
+  '/images/races/udrishi/knots/urma-v4.png': [93, 68],
+  '/images/races/udrishi/knots/eril-v2.png': [93, 68],
+  '/images/races/udrishi/knots/pure-pure-v3.png': [93, 68],
   '/images/races/hudduliny/knots/erh-t.png': [113, 82],
   '/images/races/hudduliny/knots/sar-t.png': [104, 76],
   '/images/races/hudduliny/knots/omor-t.png': [118, 86],
   '/images/races/marakiytsy/knots/yantarniy-v2.png': [88, 64],
   '/images/races/marakiytsy/knots/pepelniy-v2.png': [98, 71],
   '/images/races/marakiytsy/knots/dragmirec-v2.png': [93, 68],
-  '/images/races/lyudi/knots/dangun-t.png': [103, 75],
-  '/images/races/lyudi/knots/brall-t.png': [93, 68],
-  '/images/races/lyudi/knots/adaad-t.png': [107, 78],
+  '/images/races/lyudi/knots/dangun-v2.png': [93, 68],
+  '/images/races/lyudi/knots/brall-v2.png': [93, 68],
+  '/images/races/lyudi/knots/adaad-v2.png': [94, 69],
   '/images/races/morhory/knots/anzu-v2.png': [129, 94],
   '/images/races/morhory/knots/edra-v2.png': [112, 82],
   '/images/races/vetu/knots/chaneri-v2.png': [91, 66],
@@ -772,10 +772,10 @@ const CENTRAL_KNOT_SIZE_BY_ASSET = {
   '/images/races/borosy/knots/borosy-v2.png': [116, 85],
   '/images/races/jabari/knots/jabari-v4.png': [93, 68],
   '/images/races/adzhaidy/knots/adzhaidy-v2.png': [133, 97],
-  '/images/races/oyrdugi/knots/oyrdugi-v2.png': [93, 68],
+  '/images/races/oyrdugi/knots/oyrdugi-v3.png': [93, 68],
   '/images/races/samaghi/knots/samaghi-t.png': [93, 68],
-  '/images/races/ehornur/knots/ehornur-t.png': [93, 68],
-  '/images/races/virmorozhdennye/knots/virmbirth.png': [93, 68],
+  '/images/races/ehornur/knots/ehornur-v2.png': [93, 68],
+  '/images/races/virmorozhdennye/knots/virmbirth-v2.png': [93, 68],
   '/images/races/chotgory/knots/chotgor.png': [93, 68]
 }
 const centralKnotStyle = computed(() => {
@@ -811,6 +811,36 @@ const hasDragmirecMarakCentralKnot = computed(() => (
   && activeVariety.value
   && varietyShortTitle(activeVariety.value) === 'Драгмирец'
 ))
+const hasDangunHumanCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/lyudi'
+  && activeVariety.value
+  && varietyShortTitle(activeVariety.value) === 'Дангун'
+))
+const hasBrallHumanCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/lyudi'
+  && activeVariety.value
+  && varietyShortTitle(activeVariety.value) === 'Бралл'
+))
+const hasAdaadHumanCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/lyudi'
+  && activeVariety.value
+  && varietyShortTitle(activeVariety.value) === 'Адаад'
+))
+const hasErilUdrishCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/udrishi'
+  && activeVariety.value
+  && varietyShortTitle(activeVariety.value) === 'Эрил'
+))
+const hasUrmaUdrishCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/udrishi'
+  && activeVariety.value
+  && varietyShortTitle(activeVariety.value) === 'Урма'
+))
+const hasPurePureUdrishCentralKnot = computed(() => (
+  selectedPath.value === '/dnd5e/races/udrishi'
+  && activeVariety.value
+  && varietyShortTitle(activeVariety.value) === 'Пйюр-Пйюр'
+))
 const CLEAN_CENTRAL_KNOT_PATHS = new Set([
   '/dnd5e/races/borosy',
   '/dnd5e/races/vetu',
@@ -825,6 +855,7 @@ const hasCleanCentralKnot = computed(() => (
 ))
 const hasBorosCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/borosy')
 const hasOyrdugiCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/oyrdugi')
+const hasEhornurCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/ehornur')
 const hasSamaghiCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/samaghi')
 const hasMorhoryCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/morhory')
 const hasMarakiytsyCentralKnot = computed(() => selectedPath.value === '/dnd5e/races/marakiytsy')
@@ -1184,6 +1215,7 @@ function printRace() {
                 'rd-central-emblem--large-knot': hasLargeCentralKnot,
                 'rd-central-emblem--virm-knot': hasVirmCentralKnot,
                 'rd-central-emblem--oyrdugi-knot': hasOyrdugiCentralKnot,
+                'rd-central-emblem--ehornur-knot': hasEhornurCentralKnot,
                 'rd-central-emblem--samaghi-knot': hasSamaghiCentralKnot,
                 'rd-central-emblem--morhory-knot': hasMorhoryCentralKnot,
                 'rd-central-emblem--marakiytsy-knot': hasMarakiytsyCentralKnot,
@@ -1195,6 +1227,12 @@ function printRace() {
                 'rd-central-emblem--yantar-marak-knot': hasYantarMarakCentralKnot,
                 'rd-central-emblem--pepelniy-marak-knot': hasPepelniyMarakCentralKnot,
                 'rd-central-emblem--dragmirec-marak-knot': hasDragmirecMarakCentralKnot,
+                'rd-central-emblem--dangun-human-knot': hasDangunHumanCentralKnot,
+                'rd-central-emblem--brall-human-knot': hasBrallHumanCentralKnot,
+                'rd-central-emblem--adaad-human-knot': hasAdaadHumanCentralKnot,
+                'rd-central-emblem--eril-udrish-knot': hasErilUdrishCentralKnot,
+                'rd-central-emblem--urma-udrish-knot': hasUrmaUdrishCentralKnot,
+                'rd-central-emblem--pure-pure-udrish-knot': hasPurePureUdrishCentralKnot,
                 'rd-central-emblem--boros-knot': hasBorosCentralKnot
               }"
               title="Назад к расам"
@@ -1342,7 +1380,13 @@ function printRace() {
                   class="rd-vtab-knot"
                   :class="{
                     'rd-vtab-knot--gold': hasGoldCentralKnot,
-                    'rd-vtab-knot--vetu-gold': hasVetuGoldCentralKnot
+                    'rd-vtab-knot--vetu-gold': hasVetuGoldCentralKnot,
+                    'rd-vtab-knot--dangun-gold': hasDangunHumanCentralKnot,
+                    'rd-vtab-knot--brall-gold': hasBrallHumanCentralKnot,
+                    'rd-vtab-knot--adaad-gold': hasAdaadHumanCentralKnot,
+                    'rd-vtab-knot--eril-gold': hasErilUdrishCentralKnot,
+                    'rd-vtab-knot--urma-gold': hasUrmaUdrishCentralKnot,
+                    'rd-vtab-knot--pure-pure-gold': hasPurePureUdrishCentralKnot
                   }"
                   alt=""
                 >
@@ -1874,14 +1918,30 @@ function printRace() {
 .rd-central-emblem--clean-knot .rd-central-emblem-knot{filter:url('#rd-knot-alpha-clean')}
 .rd-central-emblem--clean-knot:hover .rd-central-emblem-frame,.rd-central-emblem--clean-knot.is-spark-active .rd-central-emblem-frame{background:transparent}
 .rd-central-emblem--clean-knot:hover .rd-central-emblem-knot,.rd-central-emblem--clean-knot.is-spark-active .rd-central-emblem-knot{filter:url('#rd-knot-alpha-clean')}
+.rd-central-emblem--virm-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--virm-knot:hover .rd-central-emblem-knot,.rd-central-emblem--virm-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
 .rd-central-emblem--oyrdugi-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
 .rd-central-emblem--oyrdugi-knot:hover .rd-central-emblem-knot,.rd-central-emblem--oyrdugi-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--ehornur-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--ehornur-knot:hover .rd-central-emblem-knot,.rd-central-emblem--ehornur-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
 .rd-central-emblem--yantar-marak-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
 .rd-central-emblem--yantar-marak-knot:hover .rd-central-emblem-knot,.rd-central-emblem--yantar-marak-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
 .rd-central-emblem--pepelniy-marak-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
 .rd-central-emblem--pepelniy-marak-knot:hover .rd-central-emblem-knot,.rd-central-emblem--pepelniy-marak-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
 .rd-central-emblem--dragmirec-marak-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
 .rd-central-emblem--dragmirec-marak-knot:hover .rd-central-emblem-knot,.rd-central-emblem--dragmirec-marak-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--dangun-human-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--dangun-human-knot:hover .rd-central-emblem-knot,.rd-central-emblem--dangun-human-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--brall-human-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--brall-human-knot:hover .rd-central-emblem-knot,.rd-central-emblem--brall-human-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--adaad-human-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--adaad-human-knot:hover .rd-central-emblem-knot,.rd-central-emblem--adaad-human-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--eril-udrish-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--eril-udrish-knot:hover .rd-central-emblem-knot,.rd-central-emblem--eril-udrish-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--urma-udrish-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--urma-udrish-knot:hover .rd-central-emblem-knot,.rd-central-emblem--urma-udrish-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
+.rd-central-emblem--pure-pure-udrish-knot .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
+.rd-central-emblem--pure-pure-udrish-knot:hover .rd-central-emblem-knot,.rd-central-emblem--pure-pure-udrish-knot.is-spark-active .rd-central-emblem-knot{filter:brightness(0) saturate(100%) invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
 .rd-central-emblem--gold-knot .rd-central-emblem-knot{filter:invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.32))}
 .rd-central-emblem--gold-knot:hover .rd-central-emblem-knot,.rd-central-emblem--gold-knot.is-spark-active .rd-central-emblem-knot{filter:invert(84%) sepia(32%) saturate(760%) hue-rotate(350deg) brightness(99%) contrast(90%) drop-shadow(0 0 18px rgba(var(--theme-accent-rgb),.72));transform:scale(1.04)}
 .rd-central-emblem--filled-gold-knot .rd-central-emblem-knot{clip-path:inset(15%);filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.38))}
@@ -2000,6 +2060,12 @@ function printRace() {
 .rd-vtab-knot{flex:none;width:22px;height:22px;object-fit:contain;filter:drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.5))}
 .rd-vtab-knot--gold{filter:invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.58))}
 .rd-vtab-knot--vetu-gold{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.58))}
+.rd-vtab-knot--dangun-gold{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.58))}
+.rd-vtab-knot--brall-gold{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.58))}
+.rd-vtab-knot--adaad-gold{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.58))}
+.rd-vtab-knot--eril-gold{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.58))}
+.rd-vtab-knot--urma-gold{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.58))}
+.rd-vtab-knot--pure-pure-gold{filter:brightness(0) saturate(100%) invert(77%) sepia(27%) saturate(720%) hue-rotate(356deg) brightness(91%) contrast(88%) drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.58))}
 
 .rd-variety-body{display:grid;gap:16px}
 .rd-names-block{order:2}
