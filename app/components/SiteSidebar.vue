@@ -1,9 +1,12 @@
 <script setup>
 const route = useRoute()
+const isDnd55e = computed(() => route.path === '/dnd55e' || route.path.startsWith('/dnd55e/'))
+const rulesPath = computed(() => isDnd55e.value ? '/dnd55e/glossary' : '/dnd5e/screens')
+const rulesTitle = computed(() => isDnd55e.value ? 'Глоссарий D&D 5.5e 2024' : 'Справочник D&D 5e 2014')
 
 function active(path) {
-  return path === '/dnd5e'
-    ? route.path === '/dnd5e'
+  return path === '/dnd5e' || path === '/dnd55e'
+    ? route.path === path
     : route.path.startsWith(path)
 }
 </script>
@@ -15,11 +18,11 @@ function active(path) {
     </NuxtLink>
 
     <NuxtLink
-      to="/dnd5e/screens"
+      :to="rulesPath"
       class="site-sidebar-btn"
-      :class="{ active: active('/dnd5e/screens') }"
-      title="Справочник"
-      aria-label="Справочник"
+      :class="{ active: active(rulesPath) }"
+      :title="rulesTitle"
+      :aria-label="rulesTitle"
     >
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
     </NuxtLink>
@@ -34,6 +37,16 @@ function active(path) {
       aria-label="Карта D&D 5e"
     >
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>
+    </NuxtLink>
+
+    <NuxtLink
+      to="/dnd55e"
+      class="site-sidebar-btn"
+      :class="{ active: active('/dnd55e') }"
+      title="Карта D&D 5.5e"
+      aria-label="Карта D&D 5.5e"
+    >
+      <img src="/assets/knot-2024.png" width="24" height="24" alt="">
     </NuxtLink>
 
   </aside>

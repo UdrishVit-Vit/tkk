@@ -3,6 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "audit:rulesets": "node scripts/audit-dnd-ruleset-boundaries.mjs",
     "build": "node --max-old-space-size=4096 ./node_modules/nuxt/bin/nuxt.mjs build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
@@ -10,6 +11,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@iconify-json/game-icons": "1.2.4",
     "@nuxt/content": "^3.14.0",
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.9.0",

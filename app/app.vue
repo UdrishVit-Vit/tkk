@@ -3,10 +3,13 @@ const route = useRoute()
 const { theme } = useKnotTheme()
 
 const hubRoute = computed(() => {
-  if (route.path === '/' || route.path === '/dnd5e') return true
+  if (route.path === '/' || route.path === '/dnd5e' || route.path === '/dnd55e') return true
   return /^\/dnd5e\/classes\/[^/]+\/?$/.test(route.path)
 })
-const embeddedThemeRoute = computed(() => /^\/dnd5e\/races(?:\/|$)/.test(route.path))
+const embeddedThemeRoute = computed(() => (
+  /^\/dnd5e\/races(?:\/|$)/.test(route.path)
+  || /^\/dnd55e\/species(?:\/|$)/.test(route.path)
+))
 const showSiteSidebar = computed(() => !hubRoute.value && !embeddedThemeRoute.value)
 
 useHead(() => ({

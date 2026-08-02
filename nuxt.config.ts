@@ -8,5 +8,10 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@pinia/nuxt'
   ],
-  css: ['~/assets/css/main.css']
+  css: ['~/assets/css/main.css'],
+  vite: {
+    optimizeDeps: {
+      include: []
+    }
+  }
 })

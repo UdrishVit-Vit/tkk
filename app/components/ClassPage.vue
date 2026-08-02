@@ -846,6 +846,7 @@ const activeClassTab = computed(() => ['skills', 'description', 'spells'].includ
   : 'skills'
 )
 const classSpellList = computed(() => {
+  if (props.vm.is2024) return []
   const className = props.vm.className
   const direct = SPELLS_5E.filter(spell => spell.classes?.includes(className))
   if (direct.length) return direct
@@ -914,7 +915,7 @@ const activeBuildSummary = computed(() => props.vm.classHasSelectedArchetype
 )
 const activeBuildMeta = computed(() => props.vm.classHasSelectedArchetype
   ? `${props.vm.classSelectedArchetype.level} · ${sourceTitle(props.vm.classSelectedArchetype.source, props.vm.classSelectedArchetype.sourceFullName)}`
-  : `D&D 5e 2014 · ${visibleClassFeatures.value.length} умений`
+  : `${props.vm.systemEditionLabel || 'D&D 5e 2014'} · ${visibleClassFeatures.value.length} умений`
 )
 const classQuickStats = computed(() => [
   { label: 'Кость хитов', value: `к${props.vm.classHd}`, part: 'overview' },
@@ -1201,7 +1202,7 @@ function scrollToClassFeature(featureId) {
     <div ref="classWrapRef" class="cls-wrap" @click="onClassDiceClick" @keydown="onClassDiceKeydown">
       <span ref="classSparkRef" class="cls-spark" :class="{ 'is-suppressed': scrubDragging }" aria-hidden="true" />
       <div v-memo="[vm.className, displayedClassEmblemUrl]" class="cls-head">
-        <NuxtLink v-once class="cls-emblem-box" to="/dnd5e/classes" title="Вернуться к списку классов" aria-label="Вернуться к списку классов">
+        <NuxtLink class="cls-emblem-box" :to="vm.classesPath || '/dnd5e/classes'" title="Вернуться к карте классов" aria-label="Вернуться к карте классов">
           <div class="cls-emblem-frame" />
           <img
             ref="classEmblemElementRef"
@@ -1215,9 +1216,9 @@ function scrollToClassFeature(featureId) {
         </NuxtLink>
         <div class="cls-heading">
           <nav class="cls-crumb" aria-label="Навигация">
-            <NuxtLink to="/dnd5e">D&D 5e</NuxtLink>
+            <NuxtLink :to="vm.systemPath || '/dnd5e'">{{ vm.sysObj?.name || 'D&D 5e' }}</NuxtLink>
             <span>/</span>
-            <NuxtLink to="/dnd5e/classes">Классы</NuxtLink>
+            <NuxtLink :to="vm.classesPath || '/dnd5e/classes'">Классы</NuxtLink>
             <span>/</span>
             <span>{{ vm.className }}</span>
           </nav>
@@ -1869,7 +1870,7 @@ function scrollToClassFeature(featureId) {
               <div class="cls-eyebrow">Список заклинаний</div>
               <h3>Заклинания {{ vm.className }}</h3>
             </div>
-            <NuxtLink class="cls-open-arch ghost" to="/dnd5e/spells">Открыть раздел заклинаний</NuxtLink>
+            <NuxtLink class="cls-open-arch ghost" :to="vm.is2024 ? '/dnd55e/spells' : '/dnd5e/spells'">Открыть раздел заклинаний</NuxtLink>
           </div>
           <div v-if="!visibleClassSpells.length" class="cls-stub">По выбранным фильтрам заклинания не найдены.</div>
           <div v-else class="cls-class-spell-list">

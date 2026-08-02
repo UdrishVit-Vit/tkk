@@ -1,11 +1,16 @@
 <script setup>
 import { tokenizeRuleText, getRuleTooltip } from '~/utils/ruleText5e.js'
+import { tokenizeRuleText55e, getRuleTooltip55e } from '~/utils/ruleText55e.js'
 
 const props = defineProps({
   text: { type: [String, Number], required: true },
   currentPath: { type: String, default: '' },
-  excludePaths: { type: Array, default: () => [] }
+  excludePaths: { type: Array, default: () => [] },
+  edition: { type: String, default: '' }
 })
+
+const route = useRoute()
+const activeEdition = computed(() => props.edition || (route.path.startsWith('/dnd55e') ? '2024' : '2014'))
 
 const tokens = computed(() => String(props.text || '')
   .split(/(\*\*[^*\n]+\*\*)/g)
@@ -13,7 +18,8 @@ const tokens = computed(() => String(props.text || '')
   .flatMap(segment => {
     const bold = segment.startsWith('**') && segment.endsWith('**')
     const text = bold ? segment.slice(2, -2) : segment
-    return tokenizeRuleText(text, props.currentPath, props.excludePaths).map(token => ({ ...token, bold }))
+    const tokenize = activeEdition.value === '2024' ? tokenizeRuleText55e : tokenizeRuleText
+    return tokenize(text, props.currentPath, props.excludePaths).map(token => ({ ...token, bold }))
   }))
 
 const tip = ref(null)
@@ -37,7 +43,9 @@ function onLinkEnter(event, token) {
   window.clearTimeout(showTimer)
   window.clearTimeout(hideTimer)
   showTimer = window.setTimeout(async () => {
-    const info = await getRuleTooltip(token.path)
+    const info = activeEdition.value === '2024'
+      ? await getRuleTooltip55e(token.path)
+      : await getRuleTooltip(token.path)
     if (!info || hoveredPath !== token.path) return
     tip.value = { mode: 'rule', path: token.path, ...info, ...tipPosition(target) }
   }, 200)

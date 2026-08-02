@@ -116,10 +116,7 @@ export default defineContentConfig({
       })
     }),
 
-    // D&D 5e (2014) races — kept separate from D&D 5.5e (2024) "Виды" and any
-    // future Pathfinder races, since each system has its own rules/terms.
-    // When 5.5e/Pathfinder race content is added, give it its own collection +
-    // source path the same way (e.g. dnd5e5Races: source 'dnd5e5/races/**/*.md').
+    // D&D 5e (2014) races remain immutable source material for the legacy rules.
     dnd5eRaces: defineCollection({
       type: 'page',
       source: 'dnd5e/races/**/*.md',
@@ -141,6 +138,45 @@ export default defineContentConfig({
         originalName: z.string().default(''),
         creatureType: z.string().default('гуманоид'),
         abilityScore: z.string().default('—'),
+        raceSize: z.string().default('Средний'),
+        speed: z.string().default('30 фт.'),
+        primaryTraits: z.array(primaryTraitSchema).default([]),
+        windTattooTable: windTattooTableSchema.optional(),
+        ruleSections: z.array(ruleSectionSchema).default([]),
+        bloodTables: bloodTablesSchema.optional(),
+        nameData: nameDataSchema.optional(),
+
+        image: z.string().default(''),
+        imageAlt: z.string().default(''),
+        cardImages: themedImagesSchema,
+        detailImages: themedImagesSchema
+      })
+    }),
+
+    // D&D 5.5e (2024) species are generated from the complete legacy dossiers,
+    // then adapted so ability scores and languages follow 2024 character origins.
+    dnd55eSpecies: defineCollection({
+      type: 'page',
+      source: 'dnd55e/species/**/*.md',
+      schema: z.object({
+        ...baseEntity,
+        type: z.literal('species').default('species'),
+        rulesEdition: z.literal('2024').default('2024'),
+
+        region: z.array(z.string()).default([]),
+        playable: z.boolean().default(true),
+        hasDndRules: z.boolean().default(false),
+
+        source: z.string().default('TL'),
+        sourceTitle: z.string().default('The Threads of Largo'),
+        sourceAuthor: z.string().optional(),
+        sourceUrl: z.string().optional(),
+        sourceNote: z.string().optional(),
+        publishedAt: z.string().optional(),
+        threadSources: z.array(raceThreadSourceSchema).default([]),
+        originalName: z.string().default(''),
+        creatureType: z.string().default('гуманоид'),
+        abilityScore: z.literal('Определяется предысторией').default('Определяется предысторией'),
         raceSize: z.string().default('Средний'),
         speed: z.string().default('30 фт.'),
         primaryTraits: z.array(primaryTraitSchema).default([]),

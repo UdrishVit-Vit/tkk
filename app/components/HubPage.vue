@@ -1,5 +1,6 @@
 <script setup>
 import { CLASSDATA } from '~/data/classdata.js'
+import { DND55E_CLASSES } from '~/data/dnd55e/catalogues.js'
 import { SYSTEMS, POOL, IMG, THEMES, nodeImg, classImg, layoutPoints, entriesFor } from '~/data/hub.js'
 import { useKnotCanvas } from '~/composables/useKnotCanvas.js'
 
@@ -60,6 +61,9 @@ if (!props.initialClass && route.query.section === 'classes' && route.query.clas
 }
 if (!props.initialSystem && route.path === '/' && route.query.system === '5e' && !route.query.section && !route.query.class) {
   navigateTo('/dnd5e', { replace: true })
+}
+if (!props.initialSystem && route.path === '/' && route.query.system === '2024' && !route.query.section && !route.query.class) {
+  navigateTo('/dnd55e', { replace: true })
 }
 
 // Allow deep-linking straight into a system map, e.g. /dnd5e (used by the
@@ -150,6 +154,10 @@ function selectSystem(id) {
     navigateTo('/dnd5e')
     return
   }
+  if (id === '2024' && !props.initialSystem) {
+    navigateTo('/dnd55e')
+    return
+  }
   Object.assign(state, { view:'system', active:id, group:null, section:null, overlay:null })
 }
 function recenter() { Object.assign(state, { view:'home', active:null, group:null, section:null }) }
@@ -167,9 +175,42 @@ function crumbSystem() {
 // "Расы и происхождения" (D&D 5e/2014) and "Виды" (D&D 5.5e/2024) are different
 // rulesets with their own terms — each gets its own page branch instead of
 // sharing one /races list, the same way Pathfinder will get its own branch.
-const RACE_SECTION_ROUTES = { 'Расы и происхождения': '/dnd5e/races', 'Черты': '/dnd5e/feats', 'Особенности классов': '/dnd5e/class-features', 'Предыстории': '/dnd5e/backgrounds', 'Заклинания': '/dnd5e/spells', 'Оружие': '/dnd5e/weapons', 'Доспехи': '/dnd5e/armor', 'Снаряжение': '/dnd5e/equipment', 'Драгоценности': '/dnd5e/jewelry', 'Магические предметы': '/dnd5e/magic-items', 'Бестиарий': '/dnd5e/bestiary', 'Знамения': '/dnd5e/omens', 'Гнев Ильбеша': '/dnd5e/wrath', 'Чай': '/dnd5e/tea', 'Ширма (справочник)': '/dnd5e/screens' }
+const SECTION_ROUTES_BY_SYSTEM = {
+  '5e': {
+    'Расы и происхождения': '/dnd5e/races',
+    'Черты': '/dnd5e/feats',
+    'Особенности классов': '/dnd5e/class-features',
+    'Предыстории': '/dnd5e/backgrounds',
+    'Заклинания': '/dnd5e/spells',
+    'Оружие': '/dnd5e/weapons',
+    'Доспехи': '/dnd5e/armor',
+    'Снаряжение': '/dnd5e/equipment',
+    'Драгоценности': '/dnd5e/jewelry',
+    'Магические предметы': '/dnd5e/magic-items',
+    'Бестиарий': '/dnd5e/bestiary',
+    'Знамения': '/dnd5e/omens',
+    'Гнев Ильбеша': '/dnd5e/wrath',
+    'Чай': '/dnd5e/tea',
+    'Ширма (справочник)': '/dnd5e/screens'
+  },
+  '2024': {
+    'Классы': '/dnd55e/classes',
+    'Виды': '/dnd55e/species',
+    'Черты': '/dnd55e/feats',
+    'Предыстории': '/dnd55e/backgrounds',
+    'Заклинания': '/dnd55e/spells',
+    'Снаряжение': '/dnd55e/equipment',
+    'Магические предметы': '/dnd55e/magic-items',
+    'Знамения': '/dnd55e/omens',
+    'Гнев Ильбеша': '/dnd55e/wrath',
+    'Чай': '/dnd55e/tea',
+    'Бестиарий': '/dnd55e/bestiary',
+    'Глоссарий': '/dnd55e/glossary'
+  }
+}
 function openSection(name) {
-  if (RACE_SECTION_ROUTES[name]) { navigateTo(RACE_SECTION_ROUTES[name]); return }
+  const sectionRoute = SECTION_ROUTES_BY_SYSTEM[state.active]?.[name]
+  if (sectionRoute) { navigateTo(sectionRoute); return }
   state.section = state.section === name ? null : name; state.cls = null
 }
 function openClass(name) {
@@ -545,7 +586,29 @@ const vm = computed(() => {
   const results = (q ? idx.filter(r => r.label.toLowerCase().indexOf(q)>-1 || r.sys.toLowerCase().indexOf(q)>-1) : idx).slice(0,8)
     .map(r => ({ label:r.label, sys:r.sys, onClick:() => { Object.assign(state, { view:'system', active:r.sid, section:r.label, overlay:null }) } }))
 
-  const cd = (S.cls && CLASSDATA[S.cls]) || {}
+  const class2024 = S.active === '2024'
+    ? DND55E_CLASSES.find(item => item.title === S.cls)
+    : null
+  const cd = class2024
+    ? {
+        en: class2024.originalName,
+        hd: Number(String(class2024.hitDie).replace(/\D/g, '')) || 8,
+        save: class2024.saves,
+        armor: '—',
+        weapons: '—',
+        tools: '—',
+        skills: '—',
+        equipment: [],
+        features: [],
+        archetypes: [],
+        description: {
+          title: class2024.title,
+          source: class2024.source,
+          intro: [class2024.description],
+          sections: []
+        }
+      }
+    : ((S.cls && CLASSDATA[S.cls]) || {})
   const has = !!cd.table
   const classIdx = POOL.classes.indexOf(S.cls)
   const featureLevel = value => {
@@ -775,6 +838,10 @@ const vm = computed(() => {
     className: S.cls || '',
     classEn: cd.en || '',
     classSub: (sysObj ? sysObj.name : '') + ' · Класс',
+    systemPath: S.active === '2024' ? '/dnd55e' : '/dnd5e',
+    classesPath: S.active === '2024' ? '/dnd55e/classes' : '/dnd5e/classes',
+    systemEditionLabel: sysObj ? `${sysObj.name} ${sysObj.tag}` : 'D&D 5e 2014',
+    is2024: S.active === '2024',
     classDescription: cd.description || null,
     classEmblemUrl: classImg(S.cls) || emblem(classIdx<0?0:classIdx),
     classHasRules: has,
@@ -1015,6 +1082,21 @@ function addBookmark() {
 .tkk-crumb-gold{font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:.12em;color:rgba(var(--theme-accent-strong-rgb),.95);cursor:pointer}
 .tkk-crumb-exit{margin-left:6px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.5);border:1px solid rgba(var(--theme-contrast-rgb),.14);border-radius:20px;padding:5px 11px;cursor:pointer}
 .tkk-crumb-exit:hover{background:rgba(var(--theme-contrast-rgb),.05);color:rgba(var(--theme-heading-rgb),.95)}
+@media (max-width:700px){
+  .tkk-wordmark{display:none}
+  .tkk-crumb{
+    top:22px;
+    right:12px;
+    left:84px;
+    justify-content:flex-end;
+    gap:5px;
+  }
+  .tkk-crumb > .tkk-crumb-link:first-child,
+  .tkk-crumb > .tkk-crumb-link:first-child + .tkk-crumb-sep{display:none}
+  .tkk-crumb-strong,
+  .tkk-crumb-gold{font-size:13px;letter-spacing:.08em}
+  .tkk-crumb-exit{margin-left:3px;padding:4px 7px;font-size:8px;letter-spacing:.12em}
+}
 
 .tkk-ornate-frame{position:absolute;top:18px;right:18px;bottom:18px;left:86px;z-index:60;pointer-events:none;border:1px solid var(--tint, rgba(176,188,232,.22));border-radius:3px}
 .tkk-ornate-frame-inner{position:absolute;inset:7px;border:1px solid rgba(176,188,232,.1);border-radius:2px}

@@ -1,9 +1,11 @@
 <script setup>
-// Переиспользуемый каркас справочника в дизайне «нить» (как /dnd5e/screens).
+// Переиспользуемый каркас справочника в дизайне «нить».
 // Данные, фильтры и содержимое раскрытия задаёт страница через props и слоты.
 const props = defineProps({
   emblemImg: { type: String, required: true },
   emblemAlt: { type: String, default: '' },
+  systemPath: { type: String, default: '/dnd5e' },
+  systemLabel: { type: String, default: 'D&D 5e' },
   kicker: { type: String, default: 'D&D 5e' },
   title: { type: String, required: true },
   lead: { type: String, default: '' },
@@ -26,7 +28,8 @@ const props = defineProps({
   // Панель иконок в раскрытой карточке: любой набор из ['expand','print','bookmark','link'].
   cardActions: { type: Array, default: () => [] },
   // Ключ localStorage для закладок (нужен, если в cardActions есть 'bookmark').
-  bookmarkStore: { type: String, default: '' }
+  bookmarkStore: { type: String, default: '' },
+  emptyText: { type: String, default: 'Ничего не найдено. Попробуйте другой запрос или сбросьте фильтр.' }
 })
 
 const listShown = ref(!props.collapsible)
@@ -517,7 +520,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="screens-page">
     <div ref="railEl" class="screens-shell">
-      <NuxtLink to="/dnd5e" class="screens-emblem" title="Вернуться к D&D 5e">
+      <NuxtLink :to="systemPath" class="screens-emblem" :title="`Вернуться к ${systemLabel}`">
         <span class="screens-emblem-badge">
           <img :src="emblemImg" :alt="emblemAlt || title" width="120" height="120">
         </span>
@@ -529,7 +532,7 @@ onBeforeUnmount(() => {
         <nav class="screens-crumb" aria-label="Навигация">
           <NuxtLink to="/">Системы</NuxtLink>
           <span>/</span>
-          <NuxtLink to="/dnd5e">D&D 5e</NuxtLink>
+          <NuxtLink :to="systemPath">{{ systemLabel }}</NuxtLink>
           <span>/</span>
           <span>{{ crumbCurrent }}</span>
         </nav>
@@ -778,7 +781,7 @@ onBeforeUnmount(() => {
           </section>
 
           <div v-if="!groups.length" class="screens-empty">
-            Ничего не найдено. Попробуйте другой запрос или сбросьте фильтр.
+            {{ emptyText }}
           </div>
         </div>
       </main>
