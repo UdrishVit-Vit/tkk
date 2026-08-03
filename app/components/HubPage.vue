@@ -1,5 +1,6 @@
 <script setup>
 import { DND55E_CLASSES } from '~/data/dnd55e/catalogues.js'
+import { DND55E_CLASS_DETAILS } from '~/data/dnd55e/classdata2024.js'
 import { SYSTEMS, POOL, IMG, THEMES, nodeImg, classImg, layoutPoints, entriesFor } from '~/data/hub.js'
 import { useKnotCanvas } from '~/composables/useKnotCanvas.js'
 
@@ -616,23 +617,30 @@ const vm = computed(() => {
   const class2024 = S.active === '2024'
     ? DND55E_CLASSES.find(item => item.title === S.cls)
     : null
+  const details2024 = class2024 ? (DND55E_CLASS_DETAILS[class2024.title] || {}) : null
   const cd = class2024
     ? {
         en: class2024.originalName,
         hd: Number(String(class2024.hitDie).replace(/\D/g, '')) || 8,
+        hpFirst: details2024.hpFirst || `${Number(String(class2024.hitDie).replace(/\D/g, '')) || 8} + модификатор Телосложения`,
+        hpNext: details2024.hpNext || `1к${Number(String(class2024.hitDie).replace(/\D/g, '')) || 8} + модификатор Телосложения за уровень`,
         save: class2024.saves,
-        armor: '—',
-        weapons: '—',
-        tools: '—',
-        skills: '—',
-        equipment: [],
-        features: [],
-        archetypes: [],
+        armor: details2024.armor || '—',
+        weapons: details2024.weapons || '—',
+        tools: details2024.tools || '—',
+        skills: details2024.skills || '—',
+        equipment: details2024.equipment || [],
+        equipNote: details2024.equipNote || '',
+        tableCols: details2024.tableCols || null,
+        tableGrid: details2024.tableGrid || null,
+        table: details2024.table || null,
+        features: details2024.features || [],
+        archetypes: details2024.archetypes || [],
         description: {
           title: class2024.title,
           source: class2024.source,
           intro: [class2024.description],
-          sections: []
+          sections: details2024.sections || []
         }
       }
     : ((S.cls && classDataMap.value?.[S.cls]) || {})
