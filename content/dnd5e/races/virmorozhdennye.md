@@ -13,7 +13,7 @@ source: TH
 sourceTitle: The Thread of Hekych
 sourceAuthor: Hekych
 originalName: ""
-image: /images/races/virmorozhdennye/details/virmorozhdennye.png
+image: /images/races/virmorozhdennye/details/virmorozhdennye.webp
 imageAlt: Вирморожденные
 creatureType: гуманоид
 abilityScore: Тел +1, Сил +1, Хар +1

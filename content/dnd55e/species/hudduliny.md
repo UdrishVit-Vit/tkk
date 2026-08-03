@@ -16,17 +16,17 @@ originalName: Huddulin
 image: ""
 imageAlt: Худдулин
 cardImages:
-  shamas: /images/races/hudduliny/cards/shamas.png
-  manu: /images/races/hudduliny/cards/manu.png
-  marak: /images/races/hudduliny/cards/marak.png
-  dangun: /images/races/hudduliny/cards/dangun.png
-  brall: /images/races/hudduliny/cards/brall.png
+  shamas: /images/races/hudduliny/cards/shamas.webp
+  manu: /images/races/hudduliny/cards/manu.webp
+  marak: /images/races/hudduliny/cards/marak.webp
+  dangun: /images/races/hudduliny/cards/dangun.webp
+  brall: /images/races/hudduliny/cards/brall.webp
 detailImages:
-  shamas: /images/races/hudduliny/details/shamas.png
-  manu: /images/races/hudduliny/details/manu.png
-  marak: /images/races/hudduliny/details/marak.png
-  dangun: /images/races/hudduliny/details/dangun.png
-  brall: /images/races/hudduliny/details/brall.png
+  shamas: /images/races/hudduliny/details/shamas.webp
+  manu: /images/races/hudduliny/details/manu.webp
+  marak: /images/races/hudduliny/details/marak.webp
+  dangun: /images/races/hudduliny/details/dangun.webp
+  brall: /images/races/hudduliny/details/brall.webp
 creatureType: гуманоид
 abilityScore: Определяется предысторией
 raceSize: Средний

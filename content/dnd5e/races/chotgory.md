@@ -15,7 +15,7 @@ sourceTitle: The Thread of JorasBashu
 sourceAuthor: JorasBashu
 sourceNote: "Оригинальный арт: Laska Psy"
 originalName: ""
-image: /images/races/chotgory/details/chotgory.png
+image: /images/races/chotgory/details/chotgory.webp
 imageAlt: Чотгор — оригинальный арт Laska Psy
 creatureType: гуманоид
 abilityScore: Инт +1, Мдр +1

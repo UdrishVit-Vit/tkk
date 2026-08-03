@@ -16,17 +16,17 @@ originalName: Udrish
 image: ""
 imageAlt: Удриш
 cardImages:
-  shamas: /images/races/udrishi/cards/shamas.png
-  manu: /images/races/udrishi/cards/manu.png
-  marak: /images/races/udrishi/cards/marak.png
-  dangun: /images/races/udrishi/cards/dangun.png
-  brall: /images/races/udrishi/cards/brall.png
+  shamas: /images/races/udrishi/cards/shamas.webp
+  manu: /images/races/udrishi/cards/manu.webp
+  marak: /images/races/udrishi/cards/marak.webp
+  dangun: /images/races/udrishi/cards/dangun.webp
+  brall: /images/races/udrishi/cards/brall.webp
 detailImages:
-  shamas: /images/races/udrishi/details/shamas.png
-  manu: /images/races/udrishi/details/manu.png
-  marak: /images/races/udrishi/details/marak.png
-  dangun: /images/races/udrishi/details/dangun.png
-  brall: /images/races/udrishi/details/brall.png
+  shamas: /images/races/udrishi/details/shamas.webp
+  manu: /images/races/udrishi/details/manu.webp
+  marak: /images/races/udrishi/details/marak.webp
+  dangun: /images/races/udrishi/details/dangun.webp
+  brall: /images/races/udrishi/details/brall.webp
 creatureType: гуманоид
 abilityScore: Определяется предысторией
 raceSize: Маленький

@@ -89,17 +89,17 @@ threadSources:
 originalName: Jabari
 image: ""
 cardImages:
-  shamas: /images/races/jabari/cards/shamas.png
-  manu: /images/races/jabari/cards/manu.png
-  marak: /images/races/jabari/cards/marak.png
-  dangun: /images/races/jabari/cards/dangun.png
-  brall: /images/races/jabari/cards/brall.png
+  shamas: /images/races/jabari/cards/shamas.webp
+  manu: /images/races/jabari/cards/manu.webp
+  marak: /images/races/jabari/cards/marak.webp
+  dangun: /images/races/jabari/cards/dangun.webp
+  brall: /images/races/jabari/cards/brall.webp
 detailImages:
-  shamas: /images/races/jabari/details/shamas.png
-  manu: /images/races/jabari/details/manu.png
-  marak: /images/races/jabari/details/marak.png
-  dangun: /images/races/jabari/details/dangun.png
-  brall: /images/races/jabari/details/brall.png
+  shamas: /images/races/jabari/details/shamas.webp
+  manu: /images/races/jabari/details/manu.webp
+  marak: /images/races/jabari/details/marak.webp
+  dangun: /images/races/jabari/details/dangun.webp
+  brall: /images/races/jabari/details/brall.webp
 imageAlt: Джабари
 creatureType: гуманоид
 abilityScore: Тел +2, Сил +1

@@ -16,17 +16,17 @@ sourceTitle: The Threads of Largo
 originalName: Marakiyets
 image: ""
 cardImages:
-  shamas: /images/races/marakiytsy/cards/shamas.png
-  manu: /images/races/marakiytsy/cards/manu.png
-  marak: /images/races/marakiytsy/cards/marak.png
-  dangun: /images/races/marakiytsy/cards/dangun.png
-  brall: /images/races/marakiytsy/cards/brall.png
+  shamas: /images/races/marakiytsy/cards/shamas.webp
+  manu: /images/races/marakiytsy/cards/manu.webp
+  marak: /images/races/marakiytsy/cards/marak.webp
+  dangun: /images/races/marakiytsy/cards/dangun.webp
+  brall: /images/races/marakiytsy/cards/brall.webp
 detailImages:
-  shamas: /images/races/marakiytsy/details/shamas.png
-  manu: /images/races/marakiytsy/details/manu.png
-  marak: /images/races/marakiytsy/details/marak.png
-  dangun: /images/races/marakiytsy/details/dangun.png
-  brall: /images/races/marakiytsy/details/brall.png
+  shamas: /images/races/marakiytsy/details/shamas.webp
+  manu: /images/races/marakiytsy/details/manu.webp
+  marak: /images/races/marakiytsy/details/marak.webp
+  dangun: /images/races/marakiytsy/details/dangun.webp
+  brall: /images/races/marakiytsy/details/brall.webp
 imageAlt: Маракиец
 creatureType: гуманоид
 abilityScore: Определяется предысторией

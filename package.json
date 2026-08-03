@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "audit:rulesets": "node scripts/audit-dnd-ruleset-boundaries.mjs",
+    "images:webp": "node scripts/images-to-webp.mjs",
+    "images:repoint": "node scripts/images-repoint-webp.mjs",
     "build": "node --max-old-space-size=4096 ./node_modules/nuxt/bin/nuxt.mjs build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",

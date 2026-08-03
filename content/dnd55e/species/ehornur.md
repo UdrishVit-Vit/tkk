@@ -16,17 +16,17 @@ originalName: Ekhornur
 image: ""
 imageAlt: Эхор’нур
 cardImages:
-  shamas: /images/races/ehornur/cards/shamas.png
-  manu: /images/races/ehornur/cards/manu.png
-  marak: /images/races/ehornur/cards/marak.png
-  dangun: /images/races/ehornur/cards/dangun.png
-  brall: /images/races/ehornur/cards/brall.png
+  shamas: /images/races/ehornur/cards/shamas.webp
+  manu: /images/races/ehornur/cards/manu.webp
+  marak: /images/races/ehornur/cards/marak.webp
+  dangun: /images/races/ehornur/cards/dangun.webp
+  brall: /images/races/ehornur/cards/brall.webp
 detailImages:
-  shamas: /images/races/ehornur/details/shamas.png
-  manu: /images/races/ehornur/details/manu.png
-  marak: /images/races/ehornur/details/marak.png
-  dangun: /images/races/ehornur/details/dangun.png
-  brall: /images/races/ehornur/details/brall.png
+  shamas: /images/races/ehornur/details/shamas.webp
+  manu: /images/races/ehornur/details/manu.webp
+  marak: /images/races/ehornur/details/marak.webp
+  dangun: /images/races/ehornur/details/dangun.webp
+  brall: /images/races/ehornur/details/brall.webp
 creatureType: гуманоид
 abilityScore: Определяется предысторией
 raceSize: Средний

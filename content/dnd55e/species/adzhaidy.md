@@ -135,17 +135,17 @@ originalName: Adzhaid
 image: ""
 imageAlt: Adzhaid
 cardImages:
-  shamas: /images/races/adzhaidy/cards/shamas.png
-  manu: /images/races/adzhaidy/cards/manu.png
-  marak: /images/races/adzhaidy/cards/marak.png
-  dangun: /images/races/adzhaidy/cards/dangun.png
-  brall: /images/races/adzhaidy/cards/brall.png
+  shamas: /images/races/adzhaidy/cards/shamas.webp
+  manu: /images/races/adzhaidy/cards/manu.webp
+  marak: /images/races/adzhaidy/cards/marak.webp
+  dangun: /images/races/adzhaidy/cards/dangun.webp
+  brall: /images/races/adzhaidy/cards/brall.webp
 detailImages:
-  shamas: /images/races/adzhaidy/details/shamas.png
-  manu: /images/races/adzhaidy/details/manu.png
-  marak: /images/races/adzhaidy/details/marak.png
-  dangun: /images/races/adzhaidy/details/dangun.png
-  brall: /images/races/adzhaidy/details/brall.png
+  shamas: /images/races/adzhaidy/details/shamas.webp
+  manu: /images/races/adzhaidy/details/manu.webp
+  marak: /images/races/adzhaidy/details/marak.webp
+  dangun: /images/races/adzhaidy/details/dangun.webp
+  brall: /images/races/adzhaidy/details/brall.webp
 creatureType: гуманоид
 abilityScore: Определяется предысторией
 raceSize: Средний

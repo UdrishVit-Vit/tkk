@@ -17,9 +17,9 @@ originalName: Vetu
 image: ""
 imageAlt: Вету
 cardImages:
-  shamas: "/images/races/vetu/cards/shamas.png"
+  shamas: "/images/races/vetu/cards/shamas.webp"
 detailImages:
-  shamas: "/images/races/vetu/details/shamas.png"
+  shamas: "/images/races/vetu/details/shamas.webp"
 creatureType: гуманоид
 abilityScore: Определяется предысторией
 raceSize: Средний

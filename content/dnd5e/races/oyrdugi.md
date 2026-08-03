@@ -16,17 +16,17 @@ originalName: Oyrdug
 image: ""
 imageAlt: Ойрдуг
 cardImages:
-  shamas: /images/races/oyrdugi/cards/shamas.png
-  manu: /images/races/oyrdugi/cards/manu.png
-  marak: /images/races/oyrdugi/cards/marak.png
-  dangun: /images/races/oyrdugi/cards/dangun.png
-  brall: /images/races/oyrdugi/cards/brall.png
+  shamas: /images/races/oyrdugi/cards/shamas.webp
+  manu: /images/races/oyrdugi/cards/manu.webp
+  marak: /images/races/oyrdugi/cards/marak.webp
+  dangun: /images/races/oyrdugi/cards/dangun.webp
+  brall: /images/races/oyrdugi/cards/brall.webp
 detailImages:
-  shamas: /images/races/oyrdugi/details/shamas.png
-  manu: /images/races/oyrdugi/details/manu.png
-  marak: /images/races/oyrdugi/details/marak.png
-  dangun: /images/races/oyrdugi/details/dangun.png
-  brall: /images/races/oyrdugi/details/brall.png
+  shamas: /images/races/oyrdugi/details/shamas.webp
+  manu: /images/races/oyrdugi/details/manu.webp
+  marak: /images/races/oyrdugi/details/marak.webp
+  dangun: /images/races/oyrdugi/details/dangun.webp
+  brall: /images/races/oyrdugi/details/brall.webp
 creatureType: гуманоид
 abilityScore: Инт +2, Тел +1
 raceSize: Средний

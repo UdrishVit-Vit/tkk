@@ -18,17 +18,17 @@ originalName: Samaghi
 image: ""
 imageAlt: Самагхи
 cardImages:
-  shamas: /images/races/samaghi/cards/shamas.png
-  manu: /images/races/samaghi/cards/manu.png
-  marak: /images/races/samaghi/cards/marak.png
-  dangun: /images/races/samaghi/cards/dangun.png
-  brall: /images/races/samaghi/cards/brall.png
+  shamas: /images/races/samaghi/cards/shamas.webp
+  manu: /images/races/samaghi/cards/manu.webp
+  marak: /images/races/samaghi/cards/marak.webp
+  dangun: /images/races/samaghi/cards/dangun.webp
+  brall: /images/races/samaghi/cards/brall.webp
 detailImages:
-  shamas: /images/races/samaghi/details/shamas.png
-  manu: /images/races/samaghi/details/manu.png
-  marak: /images/races/samaghi/details/marak.png
-  dangun: /images/races/samaghi/details/dangun.png
-  brall: /images/races/samaghi/details/brall.png
+  shamas: /images/races/samaghi/details/shamas.webp
+  manu: /images/races/samaghi/details/manu.webp
+  marak: /images/races/samaghi/details/marak.webp
+  dangun: /images/races/samaghi/details/dangun.webp
+  brall: /images/races/samaghi/details/brall.webp
 creatureType: гуманоид
 abilityScore: Определяется предысторией
 raceSize: Средний

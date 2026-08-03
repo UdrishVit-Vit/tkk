@@ -90,17 +90,17 @@ threadSources:
 originalName: Morhor
 image: ""
 cardImages:
-  shamas: /images/races/morhory/cards/shamas.png
-  manu: /images/races/morhory/cards/manu.png
-  marak: /images/races/morhory/cards/marak.png
-  dangun: /images/races/morhory/cards/dangun.png
-  brall: /images/races/morhory/cards/brall.png
+  shamas: /images/races/morhory/cards/shamas.webp
+  manu: /images/races/morhory/cards/manu.webp
+  marak: /images/races/morhory/cards/marak.webp
+  dangun: /images/races/morhory/cards/dangun.webp
+  brall: /images/races/morhory/cards/brall.webp
 detailImages:
-  shamas: /images/races/morhory/details/shamas.png
-  manu: /images/races/morhory/details/manu.png
-  marak: /images/races/morhory/details/marak.png
-  dangun: /images/races/morhory/details/dangun.png
-  brall: /images/races/morhory/details/brall.png
+  shamas: /images/races/morhory/details/shamas.webp
+  manu: /images/races/morhory/details/manu.webp
+  marak: /images/races/morhory/details/marak.webp
+  dangun: /images/races/morhory/details/dangun.webp
+  brall: /images/races/morhory/details/brall.webp
 imageAlt: Мор’хор
 creatureType: гуманоид
 abilityScore: Сил +1, Тел +1, Мдр +1

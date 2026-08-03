@@ -16,17 +16,17 @@ originalName: Boros
 image: ""
 imageAlt: Борос
 cardImages:
-  shamas: /images/races/borosy/cards/shamas.png
-  manu: /images/races/borosy/cards/manu.png
-  marak: /images/races/borosy/cards/marak.png
-  dangun: /images/races/borosy/cards/dangun.png
-  brall: /images/races/borosy/cards/brall.png
+  shamas: /images/races/borosy/cards/shamas.webp
+  manu: /images/races/borosy/cards/manu.webp
+  marak: /images/races/borosy/cards/marak.webp
+  dangun: /images/races/borosy/cards/dangun.webp
+  brall: /images/races/borosy/cards/brall.webp
 detailImages:
-  shamas: /images/races/borosy/details/shamas.png
-  manu: /images/races/borosy/details/manu.png
-  marak: /images/races/borosy/details/marak.png
-  dangun: /images/races/borosy/details/dangun.png
-  brall: /images/races/borosy/details/brall.png
+  shamas: /images/races/borosy/details/shamas.webp
+  manu: /images/races/borosy/details/manu.webp
+  marak: /images/races/borosy/details/marak.webp
+  dangun: /images/races/borosy/details/dangun.webp
+  brall: /images/races/borosy/details/brall.webp
 creatureType: гуманоид
 abilityScore: Определяется предысторией
 raceSize: Средний

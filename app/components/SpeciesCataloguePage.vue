@@ -409,7 +409,7 @@ function rlEmblem(i) {
 // procedural mandala emblem if a race has no dedicated portrait yet.
 function rlPortrait(race) {
   const slug = race.path.split('/').filter(Boolean).at(-1) || ''
-  return `/images/races/portraits/${slug}.png`
+  return `/images/races/portraits/${slug}.webp`
 }
 
 function rlPortraitStyle() {
@@ -596,26 +596,26 @@ const paktTitles = ['Договор Густой Крови', 'Договор П
 const anzuRageTitles = ['1', '2', '3', '4-10']
 
 const parasiteImageByTitle = {
-  'Багровый червь': '/images/races/udrishi/parasites/bagrovyy-cherv.png',
-  'Солнечный жук-рогач': '/images/races/udrishi/parasites/solnechnyy-zhuk-rogach.png',
-  'Большой таракан Худа': '/images/races/udrishi/parasites/bolshoy-tarakan-huda.png',
-  'Многохвостая крыса-барсук': '/images/races/udrishi/parasites/mnogohvostaya-krysa-barsuk.png',
-  'Паук-слепун': '/images/races/udrishi/parasites/pauk-slepun.png',
-  'Стеклянный муравей': '/images/races/udrishi/parasites/steklyannyy-muravey.png',
-  'Волосатая сороконожка-альбинос': '/images/races/udrishi/parasites/volosataya-sorokonozhka-albinos.png',
-  'Жадеитовый скарабей': '/images/races/udrishi/parasites/zhadeitovyy-skarabey.png',
-  'Колония лазурных термитов': '/images/races/udrishi/parasites/koloniya-lazurnyh-termitov.png',
-  'Саранча-иллюзионист': '/images/races/udrishi/parasites/sarancha-illyuzionist.png'
+  'Багровый червь': '/images/races/udrishi/parasites/bagrovyy-cherv.webp',
+  'Солнечный жук-рогач': '/images/races/udrishi/parasites/solnechnyy-zhuk-rogach.webp',
+  'Большой таракан Худа': '/images/races/udrishi/parasites/bolshoy-tarakan-huda.webp',
+  'Многохвостая крыса-барсук': '/images/races/udrishi/parasites/mnogohvostaya-krysa-barsuk.webp',
+  'Паук-слепун': '/images/races/udrishi/parasites/pauk-slepun.webp',
+  'Стеклянный муравей': '/images/races/udrishi/parasites/steklyannyy-muravey.webp',
+  'Волосатая сороконожка-альбинос': '/images/races/udrishi/parasites/volosataya-sorokonozhka-albinos.webp',
+  'Жадеитовый скарабей': '/images/races/udrishi/parasites/zhadeitovyy-skarabey.webp',
+  'Колония лазурных термитов': '/images/races/udrishi/parasites/koloniya-lazurnyh-termitov.webp',
+  'Саранча-иллюзионист': '/images/races/udrishi/parasites/sarancha-illyuzionist.webp'
 }
 const tattooImageByTitle = {
-  'Чум': '/images/races/adzhaidy/tattoos/chum.png',
-  'Столб': '/images/races/adzhaidy/tattoos/stolb.png',
-  'Компас': '/images/races/adzhaidy/tattoos/kompas.png',
-  'Ошейник додора': '/images/races/adzhaidy/tattoos/osheynik-dodora.png',
-  'Крепость': '/images/races/adzhaidy/tattoos/krepost.png',
-  'Зубья': '/images/races/adzhaidy/tattoos/zubya.png',
-  'Ману': '/images/races/adzhaidy/tattoos/manu.png',
-  'Шамас': '/images/races/adzhaidy/tattoos/shamas.png'
+  'Чум': '/images/races/adzhaidy/tattoos/chum.webp',
+  'Столб': '/images/races/adzhaidy/tattoos/stolb.webp',
+  'Компас': '/images/races/adzhaidy/tattoos/kompas.webp',
+  'Ошейник додора': '/images/races/adzhaidy/tattoos/osheynik-dodora.webp',
+  'Крепость': '/images/races/adzhaidy/tattoos/krepost.webp',
+  'Зубья': '/images/races/adzhaidy/tattoos/zubya.webp',
+  'Ману': '/images/races/adzhaidy/tattoos/manu.webp',
+  'Шамас': '/images/races/adzhaidy/tattoos/shamas.webp'
 }
 
 function titledItemTitles(sectionTitle = '') {
@@ -719,46 +719,46 @@ const activeVariety = computed(() => varietyItemSections.value.find(s => s.id ==
 // Per-race, per-variety knot symbols — the corner emblem swaps with the chosen variety.
 const RACE_KNOTS = {
   '/dnd5e/races/udrishi': {
-    'Урма': '/images/races/udrishi/knots/urma-v4.png',
-    'Эрил': '/images/races/udrishi/knots/eril-v2.png',
-    'Пйюр-Пйюр': '/images/races/udrishi/knots/pure-pure-v3.png'
+    'Урма': '/images/races/udrishi/knots/urma-v4.webp',
+    'Эрил': '/images/races/udrishi/knots/eril-v2.webp',
+    'Пйюр-Пйюр': '/images/races/udrishi/knots/pure-pure-v3.webp'
   },
   '/dnd5e/races/hudduliny': {
-    'Эрх': '/images/races/hudduliny/knots/erh-t.png',
-    'Сар': '/images/races/hudduliny/knots/sar-t.png',
-    'Омор': '/images/races/hudduliny/knots/omor-t.png'
+    'Эрх': '/images/races/hudduliny/knots/erh-t.webp',
+    'Сар': '/images/races/hudduliny/knots/sar-t.webp',
+    'Омор': '/images/races/hudduliny/knots/omor-t.webp'
   },
   '/dnd5e/races/marakiytsy': {
-    'Янтарный': '/images/races/marakiytsy/knots/yantarniy-v2.png',
-    'Пепельный': '/images/races/marakiytsy/knots/pepelniy-v2.png',
-    'Драгмирец': '/images/races/marakiytsy/knots/dragmirec-v2.png'
+    'Янтарный': '/images/races/marakiytsy/knots/yantarniy-v2.webp',
+    'Пепельный': '/images/races/marakiytsy/knots/pepelniy-v2.webp',
+    'Драгмирец': '/images/races/marakiytsy/knots/dragmirec-v2.webp'
   },
   '/dnd5e/races/lyudi': {
-    'Дангун': '/images/races/lyudi/knots/dangun-v2.png',
-    'Бралл': '/images/races/lyudi/knots/brall-v2.png',
-    'Адаад': '/images/races/lyudi/knots/adaad-v2.png'
+    'Дангун': '/images/races/lyudi/knots/dangun-v2.webp',
+    'Бралл': '/images/races/lyudi/knots/brall-v2.webp',
+    'Адаад': '/images/races/lyudi/knots/adaad-v2.webp'
   },
   '/dnd5e/races/morhory': {
-    'Дитя Анзу': '/images/races/morhory/knots/anzu-v2.png',
-    'Дитя Эдры': '/images/races/morhory/knots/edra-v2.png'
+    'Дитя Анзу': '/images/races/morhory/knots/anzu-v2.webp',
+    'Дитя Эдры': '/images/races/morhory/knots/edra-v2.webp'
   },
   '/dnd5e/races/vetu': {
-    "Ча'Нери": '/images/races/vetu/knots/chaneri-v2.png',
-    "Кса'От": '/images/races/vetu/knots/ksaot-v4.png',
-    "Тлан'Каа": '/images/races/vetu/knots/tlaankaa-v2.png'
+    "Ча'Нери": '/images/races/vetu/knots/chaneri-v2.webp',
+    "Кса'От": '/images/races/vetu/knots/ksaot-v4.webp',
+    "Тлан'Каа": '/images/races/vetu/knots/tlaankaa-v2.webp'
   }
 }
 // Default knot for races without varieties
 const RACE_KNOT_DEFAULT = {
-  '/dnd5e/races/borosy': '/images/races/borosy/knots/borosy-v2.png',
-  '/dnd5e/races/jabari': '/images/races/jabari/knots/jabari-v4.png',
-  '/dnd5e/races/adzhaidy': '/images/races/adzhaidy/knots/adzhaidy-v2.png',
-  '/dnd5e/races/oyrdugi': '/images/races/oyrdugi/knots/oyrdugi-v3.png',
-  '/dnd5e/races/samaghi': '/images/races/samaghi/knots/samaghi-t.png',
-  '/dnd5e/races/ehornur': '/images/races/ehornur/knots/ehornur-v2.png',
-  '/dnd5e/races/virmorozhdennye': '/images/races/virmorozhdennye/knots/virmbirth-v2.png',
-  '/dnd5e/races/chotgory': '/images/races/chotgory/knots/chotgor.png',
-  '/dnd5e/races/morhory': '/images/races/morhory/knots/anzu-v2.png'
+  '/dnd5e/races/borosy': '/images/races/borosy/knots/borosy-v2.webp',
+  '/dnd5e/races/jabari': '/images/races/jabari/knots/jabari-v4.webp',
+  '/dnd5e/races/adzhaidy': '/images/races/adzhaidy/knots/adzhaidy-v2.webp',
+  '/dnd5e/races/oyrdugi': '/images/races/oyrdugi/knots/oyrdugi-v3.webp',
+  '/dnd5e/races/samaghi': '/images/races/samaghi/knots/samaghi-t.webp',
+  '/dnd5e/races/ehornur': '/images/races/ehornur/knots/ehornur-v2.webp',
+  '/dnd5e/races/virmorozhdennye': '/images/races/virmorozhdennye/knots/virmbirth-v2.webp',
+  '/dnd5e/races/chotgory': '/images/races/chotgory/knots/chotgor.webp',
+  '/dnd5e/races/morhory': '/images/races/morhory/knots/anzu-v2.webp'
 }
 const activeKnot = computed(() => {
   const map = RACE_KNOTS[selectedAssetPath.value]
@@ -769,31 +769,31 @@ const activeKnot = computed(() => {
 // normalize the visible mark inside the diamond to roughly the same scale as
 // the Amber and Ash Marakian emblems.
 const CENTRAL_KNOT_SIZE_BY_ASSET = {
-  '/images/races/udrishi/knots/urma-v4.png': [93, 68],
-  '/images/races/udrishi/knots/eril-v2.png': [93, 68],
-  '/images/races/udrishi/knots/pure-pure-v3.png': [93, 68],
-  '/images/races/hudduliny/knots/erh-t.png': [113, 82],
-  '/images/races/hudduliny/knots/sar-t.png': [104, 76],
-  '/images/races/hudduliny/knots/omor-t.png': [118, 86],
-  '/images/races/marakiytsy/knots/yantarniy-v2.png': [88, 64],
-  '/images/races/marakiytsy/knots/pepelniy-v2.png': [98, 71],
-  '/images/races/marakiytsy/knots/dragmirec-v2.png': [93, 68],
-  '/images/races/lyudi/knots/dangun-v2.png': [93, 68],
-  '/images/races/lyudi/knots/brall-v2.png': [93, 68],
-  '/images/races/lyudi/knots/adaad-v2.png': [94, 69],
-  '/images/races/morhory/knots/anzu-v2.png': [129, 94],
-  '/images/races/morhory/knots/edra-v2.png': [112, 82],
-  '/images/races/vetu/knots/chaneri-v2.png': [91, 66],
-  '/images/races/vetu/knots/ksaot-v4.png': [93, 68],
-  '/images/races/vetu/knots/tlaankaa-v2.png': [90, 66],
-  '/images/races/borosy/knots/borosy-v2.png': [116, 85],
-  '/images/races/jabari/knots/jabari-v4.png': [93, 68],
-  '/images/races/adzhaidy/knots/adzhaidy-v2.png': [133, 97],
-  '/images/races/oyrdugi/knots/oyrdugi-v3.png': [93, 68],
-  '/images/races/samaghi/knots/samaghi-t.png': [93, 68],
-  '/images/races/ehornur/knots/ehornur-v2.png': [93, 68],
-  '/images/races/virmorozhdennye/knots/virmbirth-v2.png': [93, 68],
-  '/images/races/chotgory/knots/chotgor.png': [93, 68]
+  '/images/races/udrishi/knots/urma-v4.webp': [93, 68],
+  '/images/races/udrishi/knots/eril-v2.webp': [93, 68],
+  '/images/races/udrishi/knots/pure-pure-v3.webp': [93, 68],
+  '/images/races/hudduliny/knots/erh-t.webp': [113, 82],
+  '/images/races/hudduliny/knots/sar-t.webp': [104, 76],
+  '/images/races/hudduliny/knots/omor-t.webp': [118, 86],
+  '/images/races/marakiytsy/knots/yantarniy-v2.webp': [88, 64],
+  '/images/races/marakiytsy/knots/pepelniy-v2.webp': [98, 71],
+  '/images/races/marakiytsy/knots/dragmirec-v2.webp': [93, 68],
+  '/images/races/lyudi/knots/dangun-v2.webp': [93, 68],
+  '/images/races/lyudi/knots/brall-v2.webp': [93, 68],
+  '/images/races/lyudi/knots/adaad-v2.webp': [94, 69],
+  '/images/races/morhory/knots/anzu-v2.webp': [129, 94],
+  '/images/races/morhory/knots/edra-v2.webp': [112, 82],
+  '/images/races/vetu/knots/chaneri-v2.webp': [91, 66],
+  '/images/races/vetu/knots/ksaot-v4.webp': [93, 68],
+  '/images/races/vetu/knots/tlaankaa-v2.webp': [90, 66],
+  '/images/races/borosy/knots/borosy-v2.webp': [116, 85],
+  '/images/races/jabari/knots/jabari-v4.webp': [93, 68],
+  '/images/races/adzhaidy/knots/adzhaidy-v2.webp': [133, 97],
+  '/images/races/oyrdugi/knots/oyrdugi-v3.webp': [93, 68],
+  '/images/races/samaghi/knots/samaghi-t.webp': [93, 68],
+  '/images/races/ehornur/knots/ehornur-v2.webp': [93, 68],
+  '/images/races/virmorozhdennye/knots/virmbirth-v2.webp': [93, 68],
+  '/images/races/chotgory/knots/chotgor.webp': [93, 68]
 }
 const centralKnotStyle = computed(() => {
   const [desktop, mobile] = CENTRAL_KNOT_SIZE_BY_ASSET[activeKnot.value] || [88, 64]
@@ -904,9 +904,9 @@ const hasNativeGoldCentralKnot = computed(() => NATIVE_GOLD_CENTRAL_KNOT_PATHS.h
 // are visually distinct peoples, the hero portrait swaps with the chosen variety.
 const RACE_PORTRAITS = {
   '/dnd5e/races/lyudi': {
-    'Дангун': '/images/races/danguntsy/details/shamas.png',
-    'Бралл': '/images/races/bralltsy/details/shamas.png',
-    'Адаад': '/images/races/adaady/adaad.png'
+    'Дангун': '/images/races/danguntsy/details/shamas.webp',
+    'Бралл': '/images/races/bralltsy/details/shamas.webp',
+    'Адаад': '/images/races/adaady/adaad.webp'
   }
 }
 const activePortrait = computed(() => {

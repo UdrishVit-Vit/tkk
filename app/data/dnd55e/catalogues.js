@@ -201,7 +201,7 @@ export const DND55E_SPECIES = [
     id: 'adzhaidy',
     title: 'Аджаид',
     originalName: 'Adzhaid',
-    portrait: '/images/races/portraits/adzhaidy.png',
+    portrait: '/images/races/portraits/adzhaidy.webp',
     source: 'TL',
     sourceTitle: 'The Threads of Largo',
     description: 'Низкорослые коренастые аджаиды — наследники великой традиции посыльных бегунов Бараскуса на Даскаре.'
@@ -210,7 +210,7 @@ export const DND55E_SPECIES = [
     id: 'borosy',
     title: 'Борос',
     originalName: 'Boros',
-    portrait: '/images/races/portraits/borosy.png',
+    portrait: '/images/races/portraits/borosy.webp',
     source: 'TL',
     sourceTitle: 'The Threads of Largo',
     description: 'Змеерождённые потомки древних героев, несущие кровь Иджин’Ана, память двенадцати кланов и волю достигать цели любой ценой.'
@@ -219,7 +219,7 @@ export const DND55E_SPECIES = [
     id: 'chotgory',
     title: 'Чотгоры',
     originalName: '',
-    portrait: '/images/races/portraits/chotgory.png',
+    portrait: '/images/races/portraits/chotgory.webp',
     source: 'TJB',
     sourceTitle: 'The Threads of JorasBashu',
     description: 'Слепые провидцы Лета Трёх Солнц, видящие духов и нити судьбы и следующие шёпоту Эсхи по Пути Пустоты.'
@@ -228,7 +228,7 @@ export const DND55E_SPECIES = [
     id: 'ehornur',
     title: 'Эхор’нур',
     originalName: 'Ekhornur',
-    portrait: '/images/races/portraits/ehornur.png',
+    portrait: '/images/races/portraits/ehornur.webp',
     source: 'TL',
     sourceTitle: 'The Threads of Largo',
     description: 'Древний народ Наблюдателей, рождённый Разумом Пуруша, ослепший от нитей Судьбы и обречённый слушать их мелодию вместо взгляда.'
@@ -237,7 +237,7 @@ export const DND55E_SPECIES = [
     id: 'hudduliny',
     title: 'Худдулин',
     originalName: 'Huddulin',
-    portrait: '/images/races/portraits/hudduliny.png',
+    portrait: '/images/races/portraits/hudduliny.webp',
     source: 'TL',
     sourceTitle: 'The Threads of Largo',
     description: 'Высокий кочевой народ Хурхона, живущий по Закону Небес, родовым обычаям и воле богов-кочевников.'
@@ -246,7 +246,7 @@ export const DND55E_SPECIES = [
     id: 'jabari',
     title: 'Джабари',
     originalName: 'Jabari',
-    portrait: '/images/races/portraits/jabari.png',
+    portrait: '/images/races/portraits/jabari.webp',
     source: 'TJB',
     sourceTitle: 'The Threads of JorasBashu',
     description: 'Дети Бесклыкого и Джа, голос дикой природы Даскара, сильные волей и телом и хранящие древние суровые традиции гор.'
@@ -255,7 +255,7 @@ export const DND55E_SPECIES = [
     id: 'lyudi',
     title: 'Человек',
     originalName: 'Humans',
-    portrait: '/images/races/portraits/lyudi.png',
+    portrait: '/images/races/portraits/lyudi.webp',
     source: 'TL',
     sourceTitle: 'The Threads of Largo',
     description: 'Народы Даскара — наследники башен Дангуна, верующие Бралла и вольные адаады степей Хурхона.'
@@ -264,7 +264,7 @@ export const DND55E_SPECIES = [
     id: 'marakiytsy',
     title: 'Маракиец',
     originalName: 'Marakiyets',
-    portrait: '/images/races/portraits/marakiytsy.png',
+    portrait: '/images/races/portraits/marakiytsy.webp',
     source: 'TL',
     sourceTitle: 'The Threads of Largo',
     description: 'Серокожий народ Марака, потомки Драгмира, воспитанные ямами, танцем стали, жаром Шамаса и памятью о власти вирмов.'
@@ -273,7 +273,7 @@ export const DND55E_SPECIES = [
     id: 'morhory',
     title: 'Мор’хор',
     originalName: 'Morhor',
-    portrait: '/images/races/portraits/morhory.png',
+    portrait: '/images/races/portraits/morhory.webp',
     source: 'TL',
     sourceTitle: 'The Threads of Largo',
     description: 'Рогатые выходцы из Спиралей, несущие в себе энергию мхур, память древних изобретателей и опасное табу на Анзу.'
@@ -282,7 +282,7 @@ export const DND55E_SPECIES = [
     id: 'oyrdugi',
     title: 'Ойрдуг',
     originalName: 'Oyrdug',
-    portrait: '/images/races/portraits/oyrdugi.png',
+    portrait: '/images/races/portraits/oyrdugi.webp',
     source: 'TL',
     sourceTitle: 'The Threads of Largo',
     description: 'Дети Лабиринта с двойной Искрой и растущими стигматами, живущие между зовом Призыва, телесной болью и страхом перед собственной природой.'
@@ -291,7 +291,7 @@ export const DND55E_SPECIES = [
     id: 'samaghi',
     title: 'Самагхи',
     originalName: 'Samaghi',
-    portrait: '/images/races/portraits/samaghi.png',
+    portrait: '/images/races/portraits/samaghi.webp',
     source: 'TL',
     sourceTitle: 'The Threads of Largo',
     description: 'Амфибийный народ глубин, кяризов и подземных рек, проклятый солнцем и благословлённый вечной тьмой.'
@@ -300,7 +300,7 @@ export const DND55E_SPECIES = [
     id: 'udrishi',
     title: 'Удриш',
     originalName: 'Udrish',
-    portrait: '/images/races/portraits/udrishi.png',
+    portrait: '/images/races/portraits/udrishi.webp',
     source: 'TL',
     sourceTitle: 'The Threads of Largo',
     description: 'Малый кочевой народ детей Урмы и Эрил, живущий путешествиями, Игрой, мастодонтами и поиском своей Нармеш.'
@@ -309,7 +309,7 @@ export const DND55E_SPECIES = [
     id: 'vetu',
     title: 'Вету',
     originalName: 'Vetu',
-    portrait: '/images/races/portraits/vetu.png',
+    portrait: '/images/races/portraits/vetu.webp',
     source: 'TVV',
     sourceTitle: 'The Threads of Vetu',
     description: 'Змееобразные метисы болот Уатаны, воздвигшие города-зиккураты на Линиях Силы и несущие в себе цикл Иджин’Ана — проклятие, традицию и судьбу.'
@@ -318,7 +318,7 @@ export const DND55E_SPECIES = [
     id: 'virmorozhdennye',
     title: 'Вирморожденные',
     originalName: '',
-    portrait: '/images/races/portraits/virmorozhdennye.png',
+    portrait: '/images/races/portraits/virmorozhdennye.webp',
     source: 'TH',
     sourceTitle: 'The Threads of Hrothgar',
     description: 'Рождённый пламенем древних вирмов и плотью гор народ Таш’Нагара, разделённый Вирмоханой и пытающийся спасти своё затухающее пламя.'
