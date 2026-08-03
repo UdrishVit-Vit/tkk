@@ -263,6 +263,18 @@ function closeClass() {
   }
   state.cls = null
 }
+// Central section knot on a standalone section page (e.g. /dnd55e/classes): the
+// knot *is* the current section, so re-selecting it would navigate to the same
+// route and look dead. Instead step back one level — close an open class card,
+// otherwise return to the system map (mirrors the species catalogue's centre).
+function centreSectionClick() {
+  if (props.initialSection) {
+    if (state.cls) { closeClass(); return }
+    navigateTo(state.active === '5e' ? '/dnd5e' : '/dnd55e')
+    return
+  }
+  openSection(state.section)
+}
 function toggleOverlay(name) { state.overlay = state.overlay === name ? null : name }
 function stopClick(e) { e?.stopPropagation?.() }
 
@@ -494,7 +506,7 @@ const vm = computed(() => {
           img:(classImg(nm)||emblem(i)), label:nm, sub:'', lsize:13.5, dense:true, wrap:true, labelAbove:false, active:isOpen, onClick:() => openClass(nm) }, th))
       })
       nodes.unshift(mkNode({ cx:CX, x:0, y:0, scale:1.05, opacity:1, color:inkHi, knot:176,
-        mask:nodeImg(S.section), label:S.section, sub:sysObj.name, lsize:25, active:true, onClick:() => openSection(S.section) }, th))
+        mask:nodeImg(S.section), label:S.section, sub:sysObj.name, lsize:25, active:true, onClick:() => centreSectionClick() }, th))
     } else {
       const ringOf = (count, idx, radius, squash, phase) => {
         const a = (-90 + phase + idx*(360/count)) * Math.PI/180
@@ -514,7 +526,7 @@ const vm = computed(() => {
           label:nm, sub:'', lsize:12.5, dense:true, wrap:true, labelAbove:(p.y<0), onClick:null }, th))
       })
       nodes.unshift(mkNode({ cx:CX, x:0, y:0, scale:1.1, opacity:1, color:inkHi, knot:120,
-        mask:nodeImg(S.section), label:S.section, sub:sysObj.name, lsize:23, active:true, onClick:() => openSection(S.section) }, th))
+        mask:nodeImg(S.section), label:S.section, sub:sysObj.name, lsize:23, active:true, onClick:() => centreSectionClick() }, th))
     }
   } else if (sysObj) {
     if (sysObj.groups) {
