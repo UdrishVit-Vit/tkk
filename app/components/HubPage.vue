@@ -1,5 +1,4 @@
 <script setup>
-import { CLASSDATA } from '~/data/classdata.js'
 import { DND55E_CLASSES } from '~/data/dnd55e/catalogues.js'
 import { SYSTEMS, POOL, IMG, THEMES, nodeImg, classImg, layoutPoints, entriesFor } from '~/data/hub.js'
 import { useKnotCanvas } from '~/composables/useKnotCanvas.js'
@@ -28,6 +27,22 @@ const state = reactive({
 
 watch(() => state.theme, value => { selectedTheme.value = value })
 watch(selectedTheme, value => { state.theme = value })
+
+// classdata.js статически тянет importedClassArchetypes.js (~1 МБ) и нужен
+// только когда открыта карточка класса. Грузим его по требованию, чтобы он не
+// попадал в бандл главной/хаб-карты, где детали классов не показываются.
+const classDataMap = ref(null)
+let classDataPromise = null
+function loadClassData() {
+  if (!classDataPromise) {
+    classDataPromise = import('~/data/classdata.js').then((m) => {
+      classDataMap.value = m.CLASSDATA
+      return m.CLASSDATA
+    })
+  }
+  return classDataPromise
+}
+watch(() => state.cls, (cls) => { if (cls) loadClassData() })
 
 const CLASS_QUERY = {
   'Бард': 'bard',
@@ -608,7 +623,7 @@ const vm = computed(() => {
           sections: []
         }
       }
-    : ((S.cls && CLASSDATA[S.cls]) || {})
+    : ((S.cls && classDataMap.value?.[S.cls]) || {})
   const has = !!cd.table
   const classIdx = POOL.classes.indexOf(S.cls)
   const featureLevel = value => {
@@ -886,6 +901,14 @@ const vm = computed(() => {
 function addBookmark() {
   if (vm.value.sectionTitle && !state.bookmarks.includes(vm.value.sectionTitle)) state.bookmarks.push(vm.value.sectionTitle)
 }
+
+// Держим этот await последней строкой setup: он делает setup асинхронным, и все
+// lifecycle-хуки (onMounted/onUnmounted выше) должны быть зарегистрированы ДО
+// него, иначе потеряют контекст компонента. На прямых маршрутах класса карточка
+// рендерится при SSR — дожидаемся данных до первого рендера (нет hydration
+// mismatch). На главной/хаб-карте initialClass пуст → await не выполняется, чанк
+// classdata (~1 МБ) не грузится.
+if (initialClass) await loadClassData()
 </script>
 
 <template>
@@ -1021,7 +1044,7 @@ function addBookmark() {
       </div>
     </div>
 
-    <ClassPage v-if="vm.showClassPage" :vm="vm" :state="state" @up="closeClass" />
+    <LazyClassPage v-if="vm.showClassPage" :vm="vm" :state="state" @up="closeClass" />
     <SectionCards v-if="vm.showCards" :vm="vm" @up="goUp" @add-bookmark="addBookmark" v-model:query="state.cardQuery" />
 
     <HubOverlays :vm="vm" :state="state" @close="state.overlay = null" @stop="stopClick" />
