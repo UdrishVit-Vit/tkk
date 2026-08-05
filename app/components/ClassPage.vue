@@ -1663,7 +1663,7 @@ function scrollToClassFeature(featureId) {
                       </div>
                     </div>
                     <div class="cls-arch-items roomy">
-                      <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="!f.itemsCollapsed">
+                      <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="f.itemsExpanded || !f.itemsCollapsed">
                         <summary>{{ item.name }}</summary>
                         <div v-if="f.itemsRollMode === 'implants-4d4'" class="cls-implant-body">
                           <div class="cls-implant-bones">
@@ -1767,7 +1767,7 @@ function scrollToClassFeature(featureId) {
                       </div>
                     </div>
                     <div class="cls-arch-items roomy">
-                      <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="!f.itemsCollapsed">
+                      <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="f.itemsExpanded || !f.itemsCollapsed">
                         <summary>{{ item.name }}</summary>
                         <div v-if="f.itemsRollMode === 'implants-4d4'" class="cls-implant-body">
                           <div class="cls-implant-bones">
@@ -1793,7 +1793,7 @@ function scrollToClassFeature(featureId) {
                     </div>
                   </details>
                   <div v-else-if="f.hasItems" class="cls-arch-items" :class="{ roomy: f.hasLongItems }">
-                    <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="!f.itemsCollapsed">
+                    <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="f.itemsExpanded || !f.itemsCollapsed">
                       <summary>{{ item.name }}</summary>
                       <div class="cls-arch-item-text">
                         <RuleRichText :text="item.text" />
@@ -2101,7 +2101,7 @@ function scrollToClassFeature(featureId) {
                       </div>
                     </div>
                     <div class="cls-arch-items roomy">
-                      <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="!feature.itemsCollapsed">
+                      <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="feature.itemsExpanded || !feature.itemsCollapsed">
                         <summary>{{ item.name }}</summary>
                         <div v-if="feature.itemsRollMode === 'implants-4d4'" class="cls-implant-body">
                           <div class="cls-implant-bones">
@@ -2154,7 +2154,7 @@ function scrollToClassFeature(featureId) {
                       </div>
                     </div>
                     <div class="cls-arch-items roomy">
-                      <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="!feature.itemsCollapsed">
+                      <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="feature.itemsExpanded || !feature.itemsCollapsed">
                         <summary>{{ item.name }}</summary>
                         <div v-if="feature.itemsRollMode === 'implants-4d4'" class="cls-implant-body">
                           <div class="cls-implant-bones">
@@ -2176,7 +2176,7 @@ function scrollToClassFeature(featureId) {
                     </div>
                   </details>
                   <div v-else-if="feature.hasItems" class="cls-arch-items" :class="{ roomy: feature.items.length > 3 }">
-                    <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="!feature.itemsCollapsed">
+                    <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="feature.itemsExpanded || !feature.itemsCollapsed">
                       <summary>{{ item.name }}</summary>
                       <div class="cls-arch-item-text"><RuleRichText :text="item.text" /></div>
                     </details>
@@ -2586,8 +2586,9 @@ function scrollToClassFeature(featureId) {
 .cls-feature-section h4{margin:0;font-family:'Hanken Grotesk',sans-serif;font-size:11.5px;line-height:1.25;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.9)}
 .cls-feature-card.is-archetype-feature .cls-feature-section h4{color:rgba(var(--subclass-strong),.92)}
 .cls-feature-section p{margin:0}
-.cls-feature-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0 0 0 22px}
-.cls-feature-list li{padding-left:2px}
+.cls-feature-list{margin:0;padding:0 0 0 24px;list-style:disc outside}
+.cls-feature-list li{padding-left:4px;margin:0 0 8px}
+.cls-feature-list li:last-child{margin-bottom:0}
 .cls-feature-list li::marker{color:rgba(var(--theme-accent-strong-rgb),.78)}
 .cls-inline-infusions{display:flex;flex-direction:column;gap:14px;margin-top:16px}
 .cls-inline-infusion-card .cls-feature-name{font-size:21px}

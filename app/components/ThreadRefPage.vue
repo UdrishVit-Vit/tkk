@@ -441,7 +441,27 @@ onMounted(() => {
   const initial = String(route.query[props.queryKey] || '')
   if (initial) {
     open.value = initial
-    nextTick(() => document.getElementById(`${props.nodePrefix}-${initial}`)?.scrollIntoView({ block: 'center' }))
+    // Прокручиваем к нужному правилу только ПОСЛЕ того, как карточка
+    // действительно раскрылась (renderedOpen лагает на ~80мс из-за таймера
+    // переключения), и повторяем после анимации раскрытия и перерисовки нити,
+    // иначе центрируем ещё свёрнутый узел и пользователь не видит правило.
+    const scrollToInitial = () => document
+      .getElementById(`${props.nodePrefix}-${initial}`)
+      ?.scrollIntoView({ block: 'center' })
+    let tries = 0
+    const waitAndScroll = () => {
+      tries += 1
+      const ready = renderedOpen.value === initial
+        && document.getElementById(`${props.nodePrefix}-${initial}`)
+      if (ready) {
+        scrollToInitial()
+        setTimeout(scrollToInitial, 240)
+        setTimeout(scrollToInitial, 520)
+        return
+      }
+      if (tries < 40) setTimeout(waitAndScroll, 40)
+    }
+    nextTick(waitAndScroll)
   }
 
   const rail = railEl.value

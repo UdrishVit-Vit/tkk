@@ -13,13 +13,21 @@ const route = useRoute()
 const activeEdition = computed(() => props.edition || (route.path.startsWith('/dnd55e') ? '2024' : '2014'))
 
 const tokens = computed(() => String(props.text || '')
-  .split(/(\*\*[^*\n]+\*\*)/g)
+  // Явные ссылки в формате [текст](/путь) — на страницы черт, заклинаний и т. п.
+  .split(/(\[[^\]\n]+\]\([^)\s]+\))/g)
   .filter(Boolean)
-  .flatMap(segment => {
-    const bold = segment.startsWith('**') && segment.endsWith('**')
-    const text = bold ? segment.slice(2, -2) : segment
-    const tokenize = activeEdition.value === '2024' ? tokenizeRuleText55e : tokenizeRuleText
-    return tokenize(text, props.currentPath, props.excludePaths).map(token => ({ ...token, bold }))
+  .flatMap((chunk) => {
+    const link = chunk.match(/^\[([^\]\n]+)\]\(([^)\s]+)\)$/)
+    if (link) return [{ type: 'extlink', text: link[1], path: link[2], bold: false }]
+    return chunk
+      .split(/(\*\*[^*\n]+\*\*)/g)
+      .filter(Boolean)
+      .flatMap((segment) => {
+        const bold = segment.startsWith('**') && segment.endsWith('**')
+        const text = bold ? segment.slice(2, -2) : segment
+        const tokenize = activeEdition.value === '2024' ? tokenizeRuleText55e : tokenizeRuleText
+        return tokenize(text, props.currentPath, props.excludePaths).map(token => ({ ...token, bold }))
+      })
   }))
 
 const tip = ref(null)
@@ -123,6 +131,12 @@ onBeforeUnmount(() => {
         @focus="onLinkEnter($event, token)"
         @blur="onLeave"
         @click="hideNow"
+      >{{ token.text }}</NuxtLink>
+      <NuxtLink
+        v-else-if="token.type === 'extlink'"
+        :to="token.path"
+        class="rt-link rt-extlink"
+        :class="{ 'rt-bold': token.bold }"
       >{{ token.text }}</NuxtLink>
       <button
         v-else-if="token.type === 'dice'"
