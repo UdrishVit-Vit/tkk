@@ -1,5 +1,6 @@
 <script setup>
 import { SPELLS_5E, SPELL_LEVELS, SPELL_SCHOOLS, SPELL_TAGS, SPELL_SOURCES } from '~/data/spells5e.js'
+import { DND55E_SPELLS, DND55E_SPELL_SCHOOLS } from '~/data/dnd55e/spells.js'
 
 const props = defineProps(['vm', 'state'])
 const emit = defineEmits(['up'])
@@ -241,6 +242,7 @@ onBeforeUnmount(() => {
 
 const SOURCE_FULL_NAMES = {
   PHB: 'Player’s Handbook',
+  'PHB 2024': 'Player’s Handbook 2024',
   TCE: 'Tasha’s Cauldron of Everything',
   TJB: 'The Threads of JorasBashu',
   TLDC: 'The Threads of Lost Dice Club',
@@ -265,11 +267,12 @@ const SOURCE_FULL_NAMES = {
 
 const SOURCE_URLS = {
   PHB: 'https://www.dndbeyond.com/sources/dnd/phb-2014',
+  'PHB 2024': 'https://www.dndbeyond.com/sources/dnd/br-2024/character-classes',
   TCE: 'https://www.dndbeyond.com/sources/dnd/tcoe'
 }
 
 const CLASS_CARD_TABS = [
-  { id: 'skills', label: 'Навыки' },
+  { id: 'skills', label: 'Умения' },
   { id: 'description', label: 'Описание' },
   { id: 'spells', label: 'Заклинания' },
   { id: 'filter', label: 'Фильтр' }
@@ -285,19 +288,26 @@ function classSourceTitle(source) {
 }
 
 function spellLevelName(level) {
+  if (props.vm.is2024) return Number(level) === 0 ? 'Заговор' : `${level}-й уровень`
   return SPELL_LEVELS[level] || `${level} уровень`
 }
 
 function spellSchoolName(school) {
+  if (props.vm.is2024) return DND55E_SPELL_SCHOOLS[school]?.title || school
   return SPELL_SCHOOLS[school] || school
 }
 
 function spellSourceTitle(source) {
+  if (props.vm.is2024 && source === 'PHB') return 'PHB 2024 - Player’s Handbook 2024'
   return SPELL_SOURCES[source] ? `${source} - ${SPELL_SOURCES[source]}` : sourceTitle(source)
 }
 
 function spellTagNames(tags = []) {
   return tags.map(tag => SPELL_TAGS[tag] || tag).filter(Boolean)
+}
+
+function spellComponents(spell) {
+  return Array.isArray(spell.components) ? spell.components.join(', ') : spell.components
 }
 
 function isAnzuPatron(name) {
@@ -338,6 +348,8 @@ const FEATURE_SECTION_TITLES = [
   'Дикость Кет',
   'Безмолвие Гог',
   'Количество использований',
+  'Известные формы',
+  'Правила при смене формы',
   'Размер Кости Вуали',
   'Другие источники',
   'На Эфирном плане',
@@ -370,7 +382,16 @@ const FEATURE_SECTION_TITLES = [
   'Резонанс Вуали',
   'Мощь Вуали',
   'Заговоры',
+  'Книга заклинаний',
   'Ячейки заклинаний',
+  'Подготовленные заклинания 1+ уровня',
+  'Изменение подготовленных заклинаний',
+  'Заклинательная характеристика',
+  'Заклинательная фокусировка',
+  'Божественная искра',
+  'Изгнание нежити',
+  'Божественный удар',
+  'Мощный заговор',
   'Известные заклинания 1-го и более высоких уровней',
   'Базовая характеристика заклинаний',
   'Исполнение ритуалов',
@@ -603,8 +624,12 @@ onBeforeUnmount(() => {
 })
 
 function splitFeatureLead(text) {
-  const match = String(text || '').match(/^([^.!?…]{2,80}[.!?…])\s*(.*)$/u)
-  if (!match) return { lead: '', rest: String(text || '') }
+  const value = String(text || '')
+  const markdownLead = value.match(/^\*\*([^*\n]{2,80}[.!?…])\*\*\s*(.*)$/u)
+  if (markdownLead) return { lead: markdownLead[1], rest: markdownLead[2] }
+
+  const match = value.match(/^([^.!?…]{2,80}[.!?…])\s*(.*)$/u)
+  if (!match) return { lead: '', rest: value }
   return { lead: match[1], rest: match[2] }
 }
 
@@ -693,7 +718,15 @@ function highlightsListLead(featureName) {
     'Тысячи глаз Галантара',
     'Догматы клятвы',
     'Божественный канал',
-    'Воплощение Эсхи'
+    'Воплощение Эсхи',
+    'Божественный порядок',
+    'Благословлённые удары',
+    'Улучшенные Благословлённые удары',
+    'Первобытный порядок',
+    'Дикая форма',
+    'Стихийная ярость',
+    'Улучшенная стихийная ярость',
+    'Архидруид'
   ].includes(featureName)
 }
 
@@ -819,7 +852,11 @@ function featureBlocks(text) {
 }
 
 function sourceRoute(source) {
-  return SOURCE_URLS[source] || `/dnd5e/class-features?source=${encodeURIComponent(source || '')}`
+  const externalUrl = SOURCE_URLS[source]
+  if (source === 'PHB 2024' && externalUrl && props.vm.classEn) {
+    return `${externalUrl}#${encodeURIComponent(props.vm.classEn)}`
+  }
+  return externalUrl || `/dnd5e/class-features?source=${encodeURIComponent(source || '')}`
 }
 
 function openClassFeatureAnchor(href) {
@@ -846,7 +883,7 @@ const activeClassTab = computed(() => ['skills', 'description', 'spells'].includ
   : 'skills'
 )
 const classSpellList = computed(() => {
-  if (props.vm.is2024) return []
+  if (props.vm.is2024) return DND55E_SPELLS.filter(spell => spell.classes?.includes(props.vm.className))
   const className = props.vm.className
   const direct = SPELLS_5E.filter(spell => spell.classes?.includes(className))
   if (direct.length) return direct
@@ -903,7 +940,12 @@ const classSources = computed(() => {
   return [...new Set(props.vm.classFeatures.map(f => f.src).filter(Boolean))]
 })
 const CLASS_BASE_SUMMARIES = {
-  'Бард': 'Бард соединяет магию слова, музыку, знание и вдохновение. Он поддерживает союзников, влияет на ход сцены и гибко закрывает пробелы группы за счёт навыков и заклинаний.'
+  'Варвар': 'Свирепый защитник передней линии, который сочетает Ярость, физическую стойкость, преимущество на силовых атаках и контроль поля боя оружейными приёмами.',
+  'Бард': 'Бард соединяет магию слова, музыку, знание и вдохновение. Он поддерживает союзников, влияет на ход сцены и гибко закрывает пробелы группы за счёт навыков и заклинаний.',
+  'Жрец': 'Проводник божественной силы, способный менять подготовленные заклинания после отдыха, исцелять и усиливать союзников, изгонять нежить и обрушивать на врагов священную кару.',
+  'Друид': 'Проводник первобытной магии, который меняет подготовленные заклинания после отдыха, управляет стихиями, исцеляет и принимает звериные формы.',
+  'Волшебник': 'Учёный арканной магии с постоянно растущей книгой заклинаний, широким выбором подготовленной магии и сильными инструментами исследования.',
+  'Воин': 'Универсальный мастер оружия и доспехов, который управляет темпом боя, восстанавливает силы и проводит больше атак, чем любой другой базовый класс.'
 }
 const activeBuildTitle = computed(() => props.vm.classHasSelectedArchetype
   ? props.vm.classSelectedArchetype.name
@@ -947,8 +989,29 @@ const classDescription = computed(() => props.vm.classDescription || {
   intro: [activeBuildSummary.value],
   sections: []
 })
+const classSpellSearch = ref('')
+const classSpellLevel = ref('all')
+const CLASS_SPELL_OWNERS = {
+  'Бард': 'барда',
+  'Жрец': 'жреца',
+  'Друид': 'друида',
+  'Волшебник': 'волшебника'
+}
+const classSpellOwner = computed(() => CLASS_SPELL_OWNERS[props.vm.className] || props.vm.className.toLocaleLowerCase('ru'))
+const classSpellLevels = computed(() => [...new Set(classSpellList.value.map(spell => Number(spell.level)))].sort((a, b) => a - b))
 const visibleClassSpells = computed(() => classSpellList.value.filter(spell => {
-  if (props.state.classFilterTouched && props.state.classFeatureSource !== 'all' && spell.source !== props.state.classFeatureSource) return false
+  if (!props.vm.is2024 && props.state.classFilterTouched && props.state.classFeatureSource !== 'all' && spell.source !== props.state.classFeatureSource) return false
+  if (classSpellLevel.value !== 'all' && Number(spell.level) !== Number(classSpellLevel.value)) return false
+  const query = classSpellSearch.value.trim().toLocaleLowerCase('ru')
+  if (query && ![
+    spell.title,
+    spell.originalName,
+    spell.summary,
+    spell.description,
+    spell.upgrade,
+    spellSchoolName(spell.school),
+    ...(spell.tags || [])
+  ].filter(Boolean).join(' ').toLocaleLowerCase('ru').includes(query)) return false
   return true
 }))
 const itemRolls = reactive({})
@@ -1185,7 +1248,7 @@ function scrollToClassFeature(featureId) {
 </script>
 
 <template>
-  <div ref="classPageRef" class="cls-page">
+  <div ref="classPageRef" class="cls-page" :class="{ 'is-cleric': vm.className === 'Жрец' }">
     <div v-once class="cls-page-surface" aria-hidden="true" />
     <div
       ref="scrubTrackRef"
@@ -1735,7 +1798,7 @@ function scrollToClassFeature(featureId) {
                       </details>
                     </div>
                   </template>
-                  <details v-else-if="f.hasItems && f.itemsTitle" class="cls-arch-items-group" :open="!f.itemsCollapsed">
+                  <details v-else-if="f.hasItems && f.itemsTitle" class="cls-arch-items-group" :class="{ 'cls-arch-items-group-reference': f.itemsStyle === 'reference-cards' }" :open="!f.itemsCollapsed">
                     <summary>
                       <span>{{ f.itemsTitle }}</span>
                       <small>{{ f.items.length }} в списке</small>
@@ -1767,8 +1830,14 @@ function scrollToClassFeature(featureId) {
                       </div>
                     </div>
                     <div class="cls-arch-items roomy">
-                      <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :open="f.itemsExpanded || !f.itemsCollapsed">
-                        <summary>{{ item.name }}</summary>
+                      <details v-for="item in f.items" :key="item.name" class="cls-arch-item" :class="{ 'cls-arch-item-reference': f.itemsStyle === 'reference-cards' }" :open="f.itemsExpanded || !f.itemsCollapsed">
+                        <summary>
+                          <template v-if="f.itemsStyle === 'reference-cards'">
+                            <span class="cls-reference-item-title">{{ item.name }}</span>
+                            <span v-if="item.originalName" class="cls-reference-item-original">{{ item.originalName }}</span>
+                          </template>
+                          <template v-else>{{ item.name }}</template>
+                        </summary>
                         <div v-if="f.itemsRollMode === 'implants-4d4'" class="cls-implant-body">
                           <div class="cls-implant-bones">
                             <span v-for="bone in implantActiveBones(item)" :key="bone.key" :class="`bone-${bone.key}`">{{ bone.label }} × {{ implantBoneCount(item, bone) }}</span>
@@ -1868,40 +1937,66 @@ function scrollToClassFeature(featureId) {
           <div class="cls-spell-tab-head">
             <div>
               <div class="cls-eyebrow">Список заклинаний</div>
-              <h3>Заклинания {{ vm.className }}</h3>
+              <h3>Заклинания {{ classSpellOwner }}</h3>
             </div>
             <NuxtLink class="cls-open-arch ghost" :to="vm.is2024 ? '/dnd55e/spells' : '/dnd5e/spells'">Открыть раздел заклинаний</NuxtLink>
+          </div>
+          <div class="cls-spell-browser">
+            <label class="cls-spell-search">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+              <input v-model="classSpellSearch" type="search" :placeholder="`Найти заклинание ${classSpellOwner}…`">
+              <span>{{ visibleClassSpells.length }} / {{ classSpellList.length }}</span>
+            </label>
+            <div class="cls-spell-levels" aria-label="Фильтр заклинаний по уровню">
+              <button type="button" :class="{ active: classSpellLevel === 'all' }" @click="classSpellLevel = 'all'">Все</button>
+              <button
+                v-for="level in classSpellLevels"
+                :key="level"
+                type="button"
+                :class="{ active: Number(classSpellLevel) === level }"
+                @click="classSpellLevel = level"
+              >
+                {{ level === 0 ? 'Заговоры' : level }}
+              </button>
+            </div>
           </div>
           <div v-if="!visibleClassSpells.length" class="cls-stub">По выбранным фильтрам заклинания не найдены.</div>
           <div v-else class="cls-class-spell-list">
             <details v-for="spell in visibleClassSpells" :key="spell.id" class="cls-card cls-feature-card">
               <summary class="cls-feature-summary">
-                <span class="cls-feature-mark" aria-hidden="true"></span>
                 <span class="cls-feature-summary-main">
                   <span class="cls-feature-name">{{ spell.title }}</span>
+                  <span v-if="spell.originalName" class="cls-spell-original">{{ spell.originalName }}</span>
                   <span class="cls-feature-meta-row">
                     <span class="cls-badge" :title="spellSourceTitle(spell.source)">{{ spell.source }}</span>
                     <span class="cls-feature-lvl">{{ spellLevelName(spell.level) }} · {{ spellSchoolName(spell.school) }}</span>
+                    <span v-if="spell.concentration" class="cls-spell-property">Концентрация</span>
+                    <span v-if="spell.ritual" class="cls-spell-property">Ритуал</span>
                   </span>
                 </span>
+                <span class="cls-feature-mark" aria-hidden="true"></span>
               </summary>
               <div class="cls-feature-content">
                 <div class="cls-spell-meta">
                   <span>Сотворение: {{ spell.castingTime }}</span>
                   <span>Дистанция: {{ spell.range }}</span>
-                  <span>Компоненты: {{ spell.components }}</span>
+                  <span>Компоненты: {{ spellComponents(spell) }}</span>
                   <span>Длительность: {{ spell.duration }}</span>
+                  <span v-if="spell.material" class="wide">Материал: {{ spell.material }}</span>
                 </div>
                 <div v-if="spellTagNames(spell.tags).length" class="cls-spell-tags">
                   <span v-for="tag in spellTagNames(spell.tags)" :key="tag">{{ tag }}</span>
                 </div>
                 <div class="cls-feature-prose compact">
+                  <p v-if="spell.summary" class="cls-spell-summary">{{ spell.summary }}</p>
                   <p><RuleRichText :text="spell.description" /></p>
                   <section v-for="section in spell.sections" :key="section.title" class="cls-feature-section">
                     <h4>{{ section.title }}</h4>
                     <p><RuleRichText :text="section.text" /></p>
                   </section>
+                  <aside v-if="spell.upgrade" class="cls-feature-example"><strong>На больших уровнях.</strong> <RuleRichText :text="spell.upgrade" /></aside>
                 </div>
+                <NuxtLink v-if="vm.is2024" class="cls-spell-open" :to="`/dnd55e/spells?spell=${spell.id}`">Открыть полную карточку →</NuxtLink>
               </div>
             </details>
           </div>
@@ -2122,7 +2217,7 @@ function scrollToClassFeature(featureId) {
                       </details>
                     </div>
                   </template>
-                  <details v-else-if="feature.hasItems && feature.itemsTitle" class="cls-arch-items-group" :open="!feature.itemsCollapsed">
+                  <details v-else-if="feature.hasItems && feature.itemsTitle" class="cls-arch-items-group" :class="{ 'cls-arch-items-group-reference': feature.itemsStyle === 'reference-cards' }" :open="!feature.itemsCollapsed">
                     <summary>
                       <span>{{ feature.itemsTitle }}</span>
                       <small>{{ feature.items.length }} в списке</small>
@@ -2154,8 +2249,14 @@ function scrollToClassFeature(featureId) {
                       </div>
                     </div>
                     <div class="cls-arch-items roomy">
-                      <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :open="feature.itemsExpanded || !feature.itemsCollapsed">
-                        <summary>{{ item.name }}</summary>
+                      <details v-for="item in feature.items" :key="item.name" class="cls-arch-item" :class="{ 'cls-arch-item-reference': feature.itemsStyle === 'reference-cards' }" :open="feature.itemsExpanded || !feature.itemsCollapsed">
+                        <summary>
+                          <template v-if="feature.itemsStyle === 'reference-cards'">
+                            <span class="cls-reference-item-title">{{ item.name }}</span>
+                            <span v-if="item.originalName" class="cls-reference-item-original">{{ item.originalName }}</span>
+                          </template>
+                          <template v-else>{{ item.name }}</template>
+                        </summary>
                         <div v-if="feature.itemsRollMode === 'implants-4d4'" class="cls-implant-body">
                           <div class="cls-implant-bones">
                             <span v-for="bone in implantActiveBones(item)" :key="bone.key" :class="`bone-${bone.key}`">{{ bone.label }} × {{ implantBoneCount(item, bone) }}</span>
@@ -2435,15 +2536,34 @@ function scrollToClassFeature(featureId) {
 .cls-description-table span+span{border-left:1px solid rgba(var(--theme-contrast-rgb),.055)}
 .cls-description-table-row span:first-child{display:flex;align-items:center;justify-content:center;font-family:'Hanken Grotesk',sans-serif;font-size:12px;font-weight:800;color:rgba(var(--theme-accent-strong-rgb),.9)}
 .cls-description-table-row span:last-child{font-family:'Hanken Grotesk',sans-serif;font-size:14px;line-height:1.5;color:rgba(var(--theme-text-rgb),.8)}
+.cls-page.is-cleric .cls-description-panel.accent{border:1px solid rgba(var(--theme-accent-rgb),.22);border-radius:12px;background:radial-gradient(circle at 88% 0,rgba(var(--theme-accent-rgb),.12),transparent 36%),linear-gradient(145deg,rgba(var(--theme-accent-rgb),.055),rgba(var(--theme-surface-rgb),.18));padding:22px}
+.cls-page.is-cleric .cls-description-panel.accent h3{max-width:680px;font-size:30px}
 .cls-class-spell-list{display:flex;flex-direction:column;gap:10px}
 .cls-spell-tags{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 12px}
 .cls-spell-tags span{border:1px solid rgba(var(--theme-accent-rgb),.18);border-radius:999px;background:rgba(var(--theme-accent-rgb),.08);padding:4px 9px;font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.82)}
+.cls-spell-browser{position:sticky;z-index:4;top:8px;display:flex;flex-direction:column;gap:10px;border:1px solid rgba(var(--theme-accent-rgb),.18);border-radius:12px;background:rgba(var(--theme-surface-rgb),.88);box-shadow:0 14px 30px rgba(0,0,0,.18);padding:12px;backdrop-filter:blur(18px)}
+.cls-spell-search{display:grid;grid-template-columns:22px minmax(0,1fr) auto;align-items:center;gap:10px;border:1px solid rgba(var(--theme-contrast-rgb),.1);border-radius:9px;background:rgba(var(--theme-contrast-rgb),.025);padding:0 12px;color:rgba(var(--theme-text-rgb),.48)}
+.cls-spell-search:focus-within{border-color:rgba(var(--theme-accent-rgb),.5);box-shadow:0 0 0 3px rgba(var(--theme-accent-rgb),.07)}
+.cls-spell-search svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7}
+.cls-spell-search input{min-width:0;height:42px;border:0;outline:0;background:transparent;font-family:'Hanken Grotesk',sans-serif;font-size:13px;color:rgba(var(--theme-heading-rgb),.94)}
+.cls-spell-search input::placeholder{color:rgba(var(--theme-text-rgb),.38)}
+.cls-spell-search>span{font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(var(--theme-accent-strong-rgb),.78)}
+.cls-spell-levels{display:flex;gap:6px;overflow-x:auto;padding:1px 1px 3px;scrollbar-width:thin}
+.cls-spell-levels button{flex:0 0 auto;min-height:30px;border:1px solid rgba(var(--theme-contrast-rgb),.08);border-radius:999px;background:rgba(var(--theme-contrast-rgb),.02);padding:0 11px;font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.55);cursor:pointer}
+.cls-spell-levels button:hover,.cls-spell-levels button.active{border-color:rgba(var(--theme-accent-rgb),.46);background:rgba(var(--theme-accent-rgb),.12);color:rgba(var(--theme-accent-strong-rgb),.96)}
+.cls-spell-original{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;letter-spacing:.025em;color:rgba(var(--theme-text-rgb),.45)}
+.cls-spell-property{border:1px solid rgba(130,199,190,.2);border-radius:999px;background:rgba(70,139,132,.07);padding:3px 7px;font-family:'Hanken Grotesk',sans-serif;font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(164,220,211,.78)}
+.cls-spell-meta .wide{grid-column:1/-1}
+.cls-spell-summary{border-left:2px solid rgba(var(--theme-accent-rgb),.48);padding-left:12px;font-style:italic;color:rgba(var(--theme-text-rgb),.64)}
+.cls-spell-open{display:inline-flex;margin-top:14px;border-bottom:1px solid rgba(var(--theme-accent-rgb),.28);padding-bottom:2px;font-family:'Hanken Grotesk',sans-serif;font-size:9px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.86);text-decoration:none}
+.cls-spell-open:hover{border-color:rgba(var(--theme-accent-rgb),.72);color:rgba(var(--theme-accent-strong-rgb),1)}
 .cls-tab-content .cls-stub{margin-top:0}
 .cls-build-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .cls-summary-pill{display:flex;min-height:64px;flex-direction:column;justify-content:center;gap:6px;border:1px solid rgba(var(--theme-contrast-rgb),.08);border-radius:10px;background:rgba(var(--theme-surface-rgb),.34);padding:12px 14px;text-align:left;cursor:pointer}
 .cls-summary-pill:hover{border-color:rgba(var(--theme-accent-rgb),.32)}
 .cls-summary-pill:hover{background:rgba(var(--theme-accent-rgb),.08)}
 .cls-summary-pill strong{font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.1;color:rgba(var(--theme-accent-strong-rgb),.92);font-weight:600}
+.cls-page.is-cleric .cls-build-summary{display:grid}
 .cls-rule-panels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .cls-rule-panel{overflow:hidden;border:1px solid rgba(var(--theme-contrast-rgb),.08);border-radius:12px;background:rgba(var(--theme-surface-rgb),.24)}
 .cls-rule-panel.balanced{display:flex;flex-direction:column;align-self:stretch}
@@ -2716,6 +2836,21 @@ function scrollToClassFeature(featureId) {
 .cls-arch-item-text{margin-top:8px;font-family:'Cormorant Garamond',serif;font-size:16.5px;line-height:1.58;color:rgba(var(--theme-text-rgb),.78);white-space:pre-line}
 .cls-arch-item .cls-arch-item-text span{display:inline;margin:0;font:inherit;line-height:inherit;color:inherit;white-space:inherit}
 .cls-arch-item-text strong{font-weight:700;color:rgba(var(--theme-accent-strong-rgb),.96)}
+.cls-arch-items-group-reference{border-color:rgba(var(--theme-accent-rgb),.18);border-radius:7px;background:rgba(var(--theme-surface-rgb),.24)}
+.cls-arch-items-group-reference>summary{font-family:'Hanken Grotesk',sans-serif;font-size:16px;font-weight:700;color:rgba(var(--theme-accent-strong-rgb),.96)}
+.cls-arch-items-group-reference .cls-arch-items{gap:8px;padding:10px;background:rgba(var(--theme-surface-rgb),.12)}
+.cls-arch-item-reference{border-color:rgba(var(--theme-accent-rgb),.14);border-radius:6px;background:rgba(var(--theme-surface-rgb),.2);padding:0;transition:border-color .18s ease,background .18s ease}
+.cls-arch-items.roomy .cls-arch-item-reference{padding:0}
+.cls-arch-item-reference:hover{border-color:rgba(var(--theme-accent-rgb),.28);background:rgba(var(--theme-surface-rgb),.3)}
+.cls-arch-item-reference[open]{background:rgba(var(--theme-surface-rgb),.32)}
+.cls-arch-item-reference>summary{position:relative;display:flex;flex-direction:column;align-items:flex-start;min-height:48px;padding:11px 44px 10px 12px;list-style:none;font-family:'Hanken Grotesk',sans-serif;line-height:1.2;color:rgba(var(--theme-accent-strong-rgb),.95)}
+.cls-arch-item-reference>summary::-webkit-details-marker{display:none}
+.cls-arch-item-reference>summary::after{content:'⌄';position:absolute;right:15px;top:50%;translate:0 -54%;font-size:17px;font-weight:500;color:rgba(var(--theme-accent-rgb),.5);transition:rotate .18s ease,color .18s ease}
+.cls-arch-item-reference[open]>summary::after{rotate:180deg;color:rgba(var(--theme-accent-strong-rgb),.8)}
+.cls-arch-item-reference>summary>.cls-reference-item-title{display:block;margin:0;font-family:'Hanken Grotesk',sans-serif;font-size:16px;font-weight:700;line-height:1.18;color:rgba(var(--theme-accent-strong-rgb),.95);white-space:normal}
+.cls-arch-item-reference>summary>.cls-reference-item-original{display:block;margin:2px 0 0;font-family:'Hanken Grotesk',sans-serif;font-size:14px;font-weight:400;line-height:1.15;color:rgba(var(--theme-text-rgb),.48);white-space:normal}
+.cls-arch-item-reference .cls-arch-item-text{margin:0;padding:4px 12px 13px;font-family:'Hanken Grotesk',sans-serif;font-size:15px;line-height:1.42;color:rgba(var(--theme-text-rgb),.78);white-space:normal}
+.cls-arch-item-reference .cls-arch-item-text :deep(p){margin:0}
 .cls-shaman-chant,.cls-shaman-spirit{margin-top:14px;border-top:1px solid rgba(var(--theme-accent-rgb),.14);padding-top:16px;font-family:'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.82)}
 .cls-arch-item .cls-shaman-chant span,.cls-arch-item .cls-shaman-spirit span{display:inline;margin:0;font:inherit;line-height:inherit;white-space:normal}
 .cls-shaman-chant-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px}

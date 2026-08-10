@@ -652,7 +652,7 @@ const vm = computed(() => {
   }
   const classFeatureItems = items => (items || []).map(item => {
     if (Array.isArray(item)) return { name: item[0], text: item[1] }
-    return { name: item.name, text: item.text, roll: item.roll || null }
+    return { ...item, name: item.name, text: item.text, roll: item.roll || null }
   }).filter(item => item.name)
   const classArchetypes = (cd.archetypes || []).map(a => ({
     ...a,
