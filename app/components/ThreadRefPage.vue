@@ -582,6 +582,7 @@ onBeforeUnmount(() => {
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
             <span v-if="activeFilterCount" class="screens-filter-count">{{ activeFilterCount }}</span>
           </button>
+          <slot name="controls" />
           <span class="screens-count">{{ visible }} / {{ total }}</span>
         </div>
 
@@ -609,6 +610,7 @@ onBeforeUnmount(() => {
             </button>
           </div>
         </Transition>
+        <slot name="control-panels" />
       </header>
 
       <main class="screens-main">
