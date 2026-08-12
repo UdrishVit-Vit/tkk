@@ -4,7 +4,7 @@ const { theme } = useKnotTheme()
 
 const hubRoute = computed(() => {
   if (route.path === '/' || route.path === '/dnd5e' || route.path === '/dnd55e') return true
-  return /^\/dnd5e\/classes\/[^/]+\/?$/.test(route.path)
+  return /^\/dnd(?:5e|55e)\/classes(?:\/[^/]+)?\/?$/.test(route.path)
 })
 const embeddedThemeRoute = computed(() => (
   /^\/dnd5e\/races(?:\/|$)/.test(route.path)

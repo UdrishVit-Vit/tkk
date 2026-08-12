@@ -26,6 +26,13 @@ const state = reactive({
   classFeatureLevel: 'all', classFeatureSubclass: 'base', subclassesOpen: false, openSubclass: null
 })
 
+const mobileMoreOpen = ref(false)
+
+function openMobileOverlay(name) {
+  mobileMoreOpen.value = false
+  toggleOverlay(name)
+}
+
 watch(() => state.theme, value => { selectedTheme.value = value })
 watch(selectedTheme, value => { state.theme = value })
 
@@ -918,6 +925,19 @@ const vm = computed(() => {
   }
 })
 
+const mobileGroups = computed(() => {
+  const system = vm.value.sysObj
+  if (!system) return []
+  if (system.groups) return system.groups
+  return [{ name: 'Разделы', sections: system.sections || [] }]
+})
+
+const mobileClassEntries = computed(() => {
+  if (!state.active || state.section !== 'Классы') return []
+  return entriesFor(state.active, state.section)
+    .map(entry => String(entry).split('|')[0].split(' · ')[0])
+})
+
 function addBookmark() {
   if (vm.value.sectionTitle && !state.bookmarks.includes(vm.value.sectionTitle)) state.bookmarks.push(vm.value.sectionTitle)
 }
@@ -934,6 +954,83 @@ if (initialClass) await loadClassData()
 <template>
   <div class="tkk" :class="`theme-${state.theme}`" :style="{ background: vm.th.bg }">
     <canvas ref="canvasEl" class="tkk-canvas" />
+
+    <main v-if="!vm.showClassPage && !vm.showCards" class="tkk-mobile" aria-label="Мобильная навигация">
+      <header class="tkk-mobile-head">
+        <button class="tkk-mobile-back" :class="{ placeholder: !vm.isSystem }" type="button" :aria-label="vm.isSystem ? 'Назад к системам' : undefined" :tabindex="vm.isSystem ? 0 : -1" @click="vm.isSystem && goUp()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
+        </button>
+        <div class="tkk-mobile-brand">
+          <span>Threads of the Knot of Knots</span>
+          <b>TKK<em>.club</em></b>
+        </div>
+        <button class="tkk-mobile-search" type="button" aria-label="Открыть поиск" @click="openMobileOverlay('search')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg>
+        </button>
+      </header>
+
+      <section v-if="!vm.isSystem" class="tkk-mobile-home">
+        <div class="tkk-mobile-intro">
+          <span class="tkk-mobile-kicker">Библиотека миров и правил</span>
+          <img :src="IMG.main" width="116" height="116" alt="Узел узлов">
+          <h1>Выберите нить</h1>
+          <p>Все системы и разделы теперь перед глазами — без масштабирования карты.</p>
+        </div>
+        <div class="tkk-mobile-system-list">
+          <button v-for="system in SYSTEMS" :key="system.id" type="button" class="tkk-mobile-system" @click="selectSystem(system.id)">
+            <span class="tkk-mobile-system-knot"><img :src="IMG[system.id]" alt=""></span>
+            <span class="tkk-mobile-system-copy"><b>{{ system.name }}</b><small>{{ system.tag }} · открыть систему</small></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+          </button>
+        </div>
+      </section>
+
+      <template v-else>
+        <section class="tkk-mobile-system-hero">
+          <div class="tkk-mobile-system-orbit" aria-hidden="true">
+            <span /><span />
+            <img :src="IMG[state.active]" alt="">
+          </div>
+          <div>
+            <span class="tkk-mobile-kicker">Активная система</span>
+            <h1>{{ vm.activeName }}</h1>
+            <p>{{ vm.sysObj?.tag }} · {{ mobileGroups.reduce((sum, group) => sum + group.sections.length, 0) }} разделов</p>
+          </div>
+        </section>
+
+        <section v-if="state.section === 'Классы'" class="tkk-mobile-catalogue">
+          <div class="tkk-mobile-section-title">
+            <button type="button" @click="state.section = null">← Все разделы</button>
+            <span>{{ mobileClassEntries.length }} вариантов</span>
+          </div>
+          <h2>Классы</h2>
+          <div class="tkk-mobile-class-grid">
+            <button v-for="className in mobileClassEntries" :key="className" type="button" @click="openClass(className)">
+              <span><img :src="classImg(className) || emblem(mobileClassEntries.indexOf(className))" alt=""></span>
+              <b>{{ className }}</b>
+              <small>Открыть класс</small>
+            </button>
+          </div>
+        </section>
+
+        <section v-else class="tkk-mobile-catalogue">
+          <div class="tkk-mobile-section-title">
+            <h2>Путеводитель</h2>
+            <span>{{ mobileGroups.length }} группы</span>
+          </div>
+          <div class="tkk-mobile-groups">
+            <section v-for="(group, groupIndex) in mobileGroups" :key="group.name" class="tkk-mobile-group">
+              <header><span>0{{ groupIndex + 1 }}</span><h3>{{ group.name }}</h3></header>
+              <button v-for="section in group.sections" :key="section" type="button" @click="openSection(section)">
+                <span class="tkk-mobile-section-knot"><img v-if="nodeImg(section)" :src="nodeImg(section)" alt=""></span>
+                <b>{{ section }}</b>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+              </button>
+            </section>
+          </div>
+        </section>
+      </template>
+    </main>
 
     <svg class="tkk-rings" :style="{ color: vm.th.ring }">
       <g :transform="`translate(${center.x},${center.y})`">
@@ -1064,6 +1161,33 @@ if (initialClass) await loadClassData()
       </div>
     </div>
 
+    <nav class="tkk-mobile-nav" aria-label="Основная навигация">
+      <button type="button" :class="{ active: !state.overlay && !mobileMoreOpen }" @click="mobileMoreOpen = false; recenter()">
+        <img src="/assets/knot-main.png" alt=""><span>Главная</span>
+      </button>
+      <button type="button" :class="{ active: state.overlay === 'search' }" @click="openMobileOverlay('search')">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg><span>Поиск</span>
+      </button>
+      <button type="button" :class="{ active: state.overlay === 'bookmarks' }" @click="openMobileOverlay('bookmarks')">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h12v17l-6-4.2-6 4.2z"/></svg><span>Закладки</span>
+      </button>
+      <button type="button" :class="{ active: state.overlay === 'systems' }" @click="openMobileOverlay('systems')">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg><span>Системы</span>
+      </button>
+      <button type="button" :class="{ active: mobileMoreOpen }" @click="state.overlay = null; mobileMoreOpen = !mobileMoreOpen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span>Ещё</span>
+      </button>
+    </nav>
+
+    <div v-if="mobileMoreOpen" class="tkk-mobile-more-backdrop" @click="mobileMoreOpen = false">
+      <section class="tkk-mobile-more" aria-label="Дополнительные действия" @click.stop>
+        <header><span>Ещё</span><button type="button" aria-label="Закрыть" @click="mobileMoreOpen = false">×</button></header>
+        <button type="button" @click="openMobileOverlay('social')"><span class="tkk-mobile-more-icon">⌘</span><b>Сообщество</b><small>Наши площадки и соцсети</small></button>
+        <button type="button" @click="openMobileOverlay('theme')"><span class="tkk-mobile-more-icon">◐</span><b>Оформление</b><small>Выбрать тему сайта</small></button>
+        <button type="button" @click="openMobileOverlay('auth')"><span class="tkk-mobile-more-icon">♙</span><b>Профиль</b><small>Войти или создать аккаунт</small></button>
+      </section>
+    </div>
+
     <LazyClassPage v-if="vm.showClassPage" :vm="vm" :state="state" @up="closeClass" />
     <SectionCards v-if="vm.showCards" :vm="vm" @up="goUp" @add-bookmark="addBookmark" v-model:query="state.cardQuery" />
 
@@ -1153,5 +1277,80 @@ if (initialClass) await loadClassData()
 .tkk-sidebar-btn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:rgba(var(--theme-text-rgb),.55);cursor:pointer;border-radius:11px;transition:all .25s}
 .tkk-sidebar-btn:hover{color:rgba(var(--theme-heading-rgb),.95);background:rgba(var(--theme-contrast-rgb),.05)}
 .tkk-sidebar-main{margin-bottom:6px;color:rgba(var(--theme-heading-rgb),.85)}
+.tkk-mobile,.tkk-mobile-nav,.tkk-mobile-more-backdrop{display:none}
+
+@media (max-width:760px){
+  .tkk{overflow:hidden}
+  .tkk-canvas,.tkk-rings,.tkk-conn,.tkk-nodes,.tkk-wordmark,.tkk-crumb,.tkk-ornate-frame,.tkk-sidebar{display:none}
+  .tkk-mobile{position:absolute;inset:0;z-index:20;display:block;overflow-x:hidden;overflow-y:auto;padding:0 16px calc(92px + env(safe-area-inset-bottom));scrollbar-width:none;background:linear-gradient(180deg,rgba(var(--theme-surface-rgb),.08),transparent 28%)}
+  .tkk-mobile::-webkit-scrollbar{display:none}
+  .tkk-mobile::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(var(--theme-accent-rgb),.1),transparent 34%)}
+  .tkk-mobile button{font:inherit;color:inherit}
+  .tkk-mobile-head{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;min-height:68px;margin:0 -16px;padding:env(safe-area-inset-top) 12px 0;background:linear-gradient(180deg,rgba(var(--theme-surface-rgb),.96) 65%,rgba(var(--theme-surface-rgb),0));backdrop-filter:blur(14px)}
+  .tkk-mobile-back,.tkk-mobile-search{display:grid;width:42px;height:42px;place-items:center;border:1px solid rgba(var(--theme-contrast-rgb),.08);border-radius:50%;background:rgba(var(--theme-contrast-rgb),.025)}
+  .tkk-mobile-back.placeholder{visibility:hidden;pointer-events:none}
+  .tkk-mobile-back svg,.tkk-mobile-search svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .tkk-mobile-brand{display:flex;min-width:0;flex-direction:column;align-items:center;gap:1px}
+  .tkk-mobile-brand span,.tkk-mobile-kicker{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.46)}
+  .tkk-mobile-brand b{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500;letter-spacing:.22em;color:rgba(var(--theme-heading-rgb),.94)}
+  .tkk-mobile-brand em{font-style:normal;opacity:.46}
+  .tkk-mobile-home{padding:18px 0 8px}
+  .tkk-mobile-intro{display:flex;flex-direction:column;align-items:center;text-align:center}
+  .tkk-mobile-intro img{width:106px;height:106px;margin:18px 0 4px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(var(--theme-accent-rgb),.18))}
+  .tkk-mobile-intro h1,.tkk-mobile-system-hero h1{margin:0;font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:500;letter-spacing:.05em;color:rgba(var(--theme-heading-rgb),.97)}
+  .tkk-mobile-intro p{max-width:310px;margin:7px 0 24px;font-size:13px;line-height:1.55;color:rgba(var(--theme-text-rgb),.52)}
+  .tkk-mobile-system-list{display:grid;gap:10px}
+  .tkk-mobile-system{display:grid;grid-template-columns:62px 1fr 22px;align-items:center;width:100%;min-height:76px;padding:7px 14px 7px 8px;text-align:left;border:1px solid rgba(var(--theme-contrast-rgb),.085);border-radius:16px;background:linear-gradient(110deg,rgba(var(--theme-contrast-rgb),.048),rgba(var(--theme-contrast-rgb),.015));box-shadow:inset 0 1px rgba(var(--theme-contrast-rgb),.035)}
+  .tkk-mobile-system:active,.tkk-mobile-group>button:active,.tkk-mobile-class-grid button:active{transform:scale(.985);background:rgba(var(--theme-accent-rgb),.09)}
+  .tkk-mobile-system-knot{display:grid;width:58px;height:58px;place-items:center;background:radial-gradient(circle,rgba(var(--theme-accent-rgb),.08),transparent 70%)}
+  .tkk-mobile-system-knot img{width:52px;height:52px;object-fit:contain}
+  .tkk-mobile-system-copy{display:flex;min-width:0;flex-direction:column;gap:3px;padding-left:5px}
+  .tkk-mobile-system-copy b{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:500;letter-spacing:.06em;color:rgba(var(--theme-heading-rgb),.95)}
+  .tkk-mobile-system-copy small{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.38)}
+  .tkk-mobile-system>svg,.tkk-mobile-group>button>svg{width:18px;height:18px;fill:none;stroke:rgba(var(--theme-text-rgb),.45);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+  .tkk-mobile-system-hero{position:relative;display:grid;grid-template-columns:112px 1fr;align-items:center;min-height:150px;margin:6px 0 16px;padding:10px 7px 10px 1px;border-bottom:1px solid rgba(var(--theme-contrast-rgb),.07)}
+  .tkk-mobile-system-orbit{position:relative;display:grid;width:102px;height:102px;place-items:center}
+  .tkk-mobile-system-orbit span{position:absolute;inset:8px;border:1px solid rgba(var(--theme-accent-rgb),.18);transform:rotate(45deg)}
+  .tkk-mobile-system-orbit span:nth-child(2){inset:18px;border-style:dotted;transform:rotate(18deg)}
+  .tkk-mobile-system-orbit img{width:76px;height:76px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(var(--theme-accent-rgb),.22))}
+  .tkk-mobile-system-hero h1{font-size:31px;margin-top:4px}
+  .tkk-mobile-system-hero p{margin:4px 0 0;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.4)}
+  .tkk-mobile-catalogue{padding-bottom:12px}
+  .tkk-mobile-section-title{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px}
+  .tkk-mobile-section-title h2,.tkk-mobile-catalogue>h2{margin:0;font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:500;letter-spacing:.05em;color:rgba(var(--theme-heading-rgb),.94)}
+  .tkk-mobile-section-title>span{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.36)}
+  .tkk-mobile-section-title>button{padding:8px 0;border:0;background:none;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.55)}
+  .tkk-mobile-catalogue>h2{margin:0 2px 12px;font-size:30px}
+  .tkk-mobile-groups{display:grid;gap:12px}
+  .tkk-mobile-group{overflow:hidden;border:1px solid rgba(var(--theme-contrast-rgb),.08);border-radius:16px;background:rgba(var(--theme-surface-rgb),.22)}
+  .tkk-mobile-group>header{display:flex;align-items:center;gap:10px;padding:13px 15px 9px}
+  .tkk-mobile-group>header span{font-family:'Cormorant Garamond',serif;font-size:12px;color:rgba(var(--theme-accent-strong-rgb),.68)}
+  .tkk-mobile-group h3{margin:0;font-size:9px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.46)}
+  .tkk-mobile-group>button{display:grid;grid-template-columns:40px 1fr 20px;align-items:center;width:100%;min-height:58px;padding:6px 14px 6px 10px;text-align:left;border:0;border-top:1px solid rgba(var(--theme-contrast-rgb),.055);background:transparent;transition:transform .15s,background .15s}
+  .tkk-mobile-section-knot{display:grid;width:38px;height:38px;place-items:center;background:radial-gradient(circle,rgba(var(--theme-accent-rgb),.08),transparent 72%)}
+  .tkk-mobile-section-knot::before{content:'◇';font-family:'Cormorant Garamond',serif;font-size:18px;color:rgba(var(--theme-accent-rgb),.45)}
+  .tkk-mobile-section-knot:has(img)::before{display:none}
+  .tkk-mobile-section-knot img{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 0 7px rgba(var(--theme-accent-rgb),.12))}
+  .tkk-mobile-group>button b{padding:0 9px;font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:500;line-height:1.08;color:rgba(var(--theme-heading-rgb),.86)}
+  .tkk-mobile-class-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .tkk-mobile-class-grid button{display:flex;min-height:156px;flex-direction:column;align-items:center;justify-content:center;padding:10px 6px;border:1px solid rgba(var(--theme-contrast-rgb),.08);border-radius:15px;background:linear-gradient(145deg,rgba(var(--theme-contrast-rgb),.045),rgba(var(--theme-contrast-rgb),.012));transition:transform .15s,background .15s}
+  .tkk-mobile-class-grid button>span{display:grid;width:82px;height:82px;place-items:center;background:radial-gradient(circle,rgba(var(--theme-accent-rgb),.1),transparent 70%)}
+  .tkk-mobile-class-grid img{width:76px;height:76px;object-fit:contain}
+  .tkk-mobile-class-grid b{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:rgba(var(--theme-heading-rgb),.92)}
+  .tkk-mobile-class-grid small{margin-top:3px;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.36)}
+  .tkk-mobile-nav{position:fixed;right:10px;bottom:max(10px,env(safe-area-inset-bottom));left:10px;z-index:120;display:grid;grid-template-columns:repeat(5,1fr);height:66px;padding:5px;border:1px solid rgba(var(--theme-contrast-rgb),.1);border-radius:20px;background:rgba(var(--theme-surface-rgb),.9);box-shadow:0 14px 42px rgba(0,0,0,.42),inset 0 1px rgba(var(--theme-contrast-rgb),.06);backdrop-filter:blur(22px)}
+  .tkk-mobile-nav button{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;border-radius:15px;background:transparent;color:rgba(var(--theme-text-rgb),.43)}
+  .tkk-mobile-nav button.active{color:rgba(var(--theme-heading-rgb),.95);background:rgba(var(--theme-accent-rgb),.095)}
+  .tkk-mobile-nav svg,.tkk-mobile-nav img{width:21px;height:21px;object-fit:contain;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .tkk-mobile-nav span{overflow:hidden;max-width:100%;font-family:'Hanken Grotesk',sans-serif;font-size:7.5px;letter-spacing:.03em;text-overflow:ellipsis;white-space:nowrap}
+  .tkk-mobile-more-backdrop{position:fixed;inset:0;z-index:130;display:flex;align-items:flex-end;padding:12px 12px calc(86px + env(safe-area-inset-bottom));background:rgba(0,0,0,.46);backdrop-filter:blur(5px)}
+  .tkk-mobile-more{width:100%;padding:8px;border:1px solid rgba(var(--theme-contrast-rgb),.1);border-radius:21px;background:rgba(var(--theme-surface-rgb),.97);box-shadow:0 20px 60px rgba(0,0,0,.5);animation:popIn .2s ease both}
+  .tkk-mobile-more header{display:flex;align-items:center;justify-content:space-between;padding:4px 8px 8px 12px;font-family:'Cormorant Garamond',serif;font-size:22px;color:rgba(var(--theme-heading-rgb),.95)}
+  .tkk-mobile-more header button{width:34px;height:34px;border:0;border-radius:50%;background:rgba(var(--theme-contrast-rgb),.055);font-size:21px;color:rgba(var(--theme-text-rgb),.56)}
+  .tkk-mobile-more>button{display:grid;grid-template-columns:44px 1fr;grid-template-rows:auto auto;width:100%;min-height:61px;padding:8px 11px;text-align:left;border:0;border-top:1px solid rgba(var(--theme-contrast-rgb),.055);background:none}
+  .tkk-mobile-more-icon{grid-row:1/3;align-self:center;font-size:22px;color:rgba(var(--theme-accent-strong-rgb),.72)}
+  .tkk-mobile-more b{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:500;color:rgba(var(--theme-heading-rgb),.9)}
+  .tkk-mobile-more small{font-size:9px;color:rgba(var(--theme-text-rgb),.4)}
+}
 @media (prefers-reduced-motion:reduce){.tkk.theme-madness::before{animation:none}}
 </style>
