@@ -1,11 +1,13 @@
 <script setup>
 import { HISTORY_THREAD } from '~/data/loreHistory.js'
+import historyContent from '~/data/loreHistoryContent.generated.json'
 
 const route = useRoute()
 const sectionIndex = computed(() => HISTORY_THREAD.sections.findIndex(item => item.slug === route.params.slug))
 const section = computed(() => HISTORY_THREAD.sections[sectionIndex.value])
+const content = computed(() => historyContent.eras.find(item => item.slug === route.params.slug))
 
-if (!section.value) {
+if (!section.value || !content.value) {
   throw createError({ statusCode: 404, statusMessage: 'Эпоха не найдена' })
 }
 
@@ -16,5 +18,5 @@ useHead(() => ({
 </script>
 
 <template>
-  <LoreHistoryEraPage :section="section" :index="sectionIndex" />
+  <LoreHistoryEraPage :section="section" :content="content" :index="sectionIndex" />
 </template>

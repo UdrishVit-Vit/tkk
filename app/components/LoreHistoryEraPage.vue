@@ -3,17 +3,22 @@ import { HISTORY_THREAD } from '~/data/loreHistory.js'
 
 const props = defineProps({
   section: { type: Object, required: true },
+  content: { type: Object, required: true },
   index: { type: Number, required: true },
 })
 
+const entries = computed(() => props.content?.entries || [])
 const previous = computed(() => HISTORY_THREAD.sections[props.index - 1] || null)
 const next = computed(() => HISTORY_THREAD.sections[props.index + 1] || null)
+const entryLabel = computed(() => {
+  const count = entries.value.length
+  return `${count} ${count === 1 ? 'читательская глава' : count < 5 ? 'читательские главы' : 'читательских глав'}`
+})
 </script>
 
 <template>
   <main class="era-page">
     <div class="era-page__texture" aria-hidden="true" />
-
     <header class="era-page__header">
       <NuxtLink to="/lore/history"><span aria-hidden="true">←</span> все эпохи</NuxtLink>
       <span>Башня Мафраш · запись {{ String(index).padStart(2, '0') }}</span>
@@ -25,38 +30,36 @@ const next = computed(() => HISTORY_THREAD.sections[props.index + 1] || null)
       <div class="era-hero__copy">
         <p>{{ section.label }}</p>
         <h1>{{ section.title }}</h1>
-        <div class="era-hero__rule"><i /><span>{{ section.chapters.length || '∞' }}</span><i /></div>
+        <div class="era-hero__rule"><i /><span>{{ entries.length }}</span><i /></div>
         <p class="era-hero__summary">{{ section.summary }}</p>
       </div>
       <div class="era-hero__seal" aria-hidden="true"><span /><span /><i /></div>
     </section>
 
-    <section class="era-chronicle" :class="{ 'era-chronicle--empty': !section.chapters.length }">
+    <section class="era-chronicle">
       <header>
-        <div>
-          <span>Внутреннее полотно эпохи</span>
-          <h2>{{ section.chapters.length ? 'Нити событий' : 'Первая запись' }}</h2>
-        </div>
-        <p>{{ section.chapters.length ? `${section.chapters.length} связанных фрагментов` : 'Исток, из которого начинается следующая нить' }}</p>
+        <div><span>Внутреннее полотно эпохи</span><h2>Нити событий</h2></div>
+        <p>{{ entryLabel }}</p>
       </header>
 
-      <div v-if="section.chapters.length" class="era-chapters" role="list">
-        <article v-for="(chapter, chapterIndex) in section.chapters" :key="chapter" role="listitem">
-          <span>{{ index }}.{{ chapterIndex + 1 }}</span>
-          <strong>{{ chapter }}</strong>
+      <div class="era-chapters" role="list">
+        <NuxtLink
+          v-for="(entry, entryIndex) in entries"
+          :key="entry.slug"
+          :to="`/lore/history/${section.slug}/${entry.slug}`"
+          role="listitem"
+        >
+          <span>{{ index }}.{{ entryIndex + 1 }}</span>
+          <small>{{ entry.kind === 'opening' ? 'Вступление эпохи' : 'Глава летописи' }}</small>
+          <strong>{{ entry.title }}</strong>
+          <em>{{ entry.readingMinutes }} мин. чтения</em>
           <i aria-hidden="true" />
-        </article>
+        </NuxtLink>
       </div>
-
-      <article v-else class="era-origin">
-        <span>Основная запись</span>
-        <strong>{{ section.title }}</strong>
-        <p>{{ section.summary }}</p>
-      </article>
     </section>
 
     <nav class="era-pagination" aria-label="Навигация между эпохами">
-      <NuxtLink v-if="previous" :to="`/lore/history/${previous.slug}`" class="era-pagination__previous">
+      <NuxtLink v-if="previous" :to="`/lore/history/${previous.slug}`">
         <span>← предыдущая эпоха</span><strong>{{ previous.title }}</strong>
       </NuxtLink>
       <span v-else />
@@ -79,8 +82,7 @@ const next = computed(() => HISTORY_THREAD.sections[props.index + 1] || null)
 .era-hero__copy{position:relative;z-index:1;text-align:center}.era-hero__copy>p:first-child{margin:0;font:500 9px/1 'Hanken Grotesk',sans-serif;letter-spacing:.31em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.82)}.era-hero h1{margin:12px 0 0;font:600 clamp(43px,6vw,70px)/.9 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.98);text-wrap:balance}.era-hero__summary{max-width:600px;margin:18px auto 0;font:400 18px/1.45 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.65)}.era-hero__rule{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px}.era-hero__rule i{width:42px;height:1px;background:rgba(var(--theme-accent-rgb),.3)}.era-hero__rule span{font:500 8px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-accent-strong-rgb),.7)}
 .era-hero__seal{position:relative;width:96px;height:96px;margin-left:auto}.era-hero__seal span{position:absolute;inset:8px;border:1px solid rgba(var(--theme-accent-rgb),.24);transform:rotate(45deg)}.era-hero__seal span:nth-child(2){inset:24px}.era-hero__seal i{position:absolute;inset:40px;border:1px solid rgba(var(--theme-accent-rgb),.55);border-radius:50%}
 .era-chronicle{max-width:1080px;margin:42px auto 0;padding:0 42px 48px}.era-chronicle>header{display:flex;align-items:end;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid rgba(var(--theme-accent-rgb),.18)}.era-chronicle>header span{font:500 8px/1 'Hanken Grotesk',sans-serif;letter-spacing:.25em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.68)}.era-chronicle h2{margin:8px 0 0;font:600 34px/1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.94)}.era-chronicle>header p{margin:0;font:500 8px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.28)}
-.era-chapters{position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:25px}.era-chapters::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(var(--theme-accent-rgb),.18)}.era-chapters article{position:relative;display:flex;min-height:142px;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(var(--theme-accent-rgb),.22);background:repeating-linear-gradient(45deg,rgba(var(--theme-accent-rgb),.012) 0 1px,transparent 1px 7px),rgb(var(--theme-surface-rgb));padding:26px 20px;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.14)}.era-chapters article::before{content:'';position:absolute;inset:7px;border:1px dashed rgba(var(--theme-accent-rgb),.11)}.era-chapters article span{position:absolute;top:14px;right:15px;font:500 7px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-accent-strong-rgb),.5)}.era-chapters article strong{position:relative;z-index:1;font:600 20px/1.05 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.9);text-wrap:balance}.era-chapters article i{position:absolute;left:50%;bottom:-7px;width:13px;height:13px;border:1px solid rgba(var(--theme-accent-rgb),.45);background:rgb(var(--theme-surface-rgb));transform:translateX(-50%) rotate(45deg)}
-.era-origin{max-width:680px;margin:26px auto 0;padding:34px 42px;border:1px solid rgba(var(--theme-accent-rgb),.22);background:linear-gradient(90deg,transparent,rgba(var(--theme-accent-rgb),.035),transparent);text-align:center}.era-origin span{font:500 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.24em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.68)}.era-origin strong{display:block;margin-top:10px;font:600 28px/1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.94)}.era-origin p{margin:12px 0 0;font:400 16px/1.45 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.58)}
+.era-chapters{position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:25px}.era-chapters::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(var(--theme-accent-rgb),.18)}.era-chapters a{position:relative;display:flex;min-height:166px;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(var(--theme-accent-rgb),.22);background:repeating-linear-gradient(45deg,rgba(var(--theme-accent-rgb),.012) 0 1px,transparent 1px 7px),rgb(var(--theme-surface-rgb));padding:30px 20px 27px;text-align:center;text-decoration:none;color:inherit;box-shadow:0 12px 30px rgba(0,0,0,.14);transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease}.era-chapters a::before{content:'';position:absolute;inset:7px;border:1px dashed rgba(var(--theme-accent-rgb),.11)}.era-chapters a:hover,.era-chapters a:focus-visible{transform:translateY(-4px);border-color:rgba(var(--theme-accent-rgb),.5);box-shadow:0 17px 38px rgba(0,0,0,.2),0 0 24px rgba(var(--theme-accent-rgb),.07);outline:none}.era-chapters a>span{position:absolute;top:14px;right:15px;font:500 7px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-accent-strong-rgb),.5)}.era-chapters a small{font:500 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.56)}.era-chapters a strong{position:relative;z-index:1;margin-top:10px;font:600 20px/1.05 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.9);text-wrap:balance}.era-chapters a em{margin-top:13px;font:500 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.16em;text-transform:uppercase;font-style:normal;color:rgba(var(--theme-text-rgb),.28)}.era-chapters a>i{position:absolute;left:50%;bottom:-7px;width:13px;height:13px;border:1px solid rgba(var(--theme-accent-rgb),.45);background:rgb(var(--theme-surface-rgb));transform:translateX(-50%) rotate(45deg)}
 .era-pagination{display:grid;max-width:996px;margin:0 auto 54px;padding-top:25px;grid-template-columns:1fr 1fr;border-top:1px solid rgba(var(--theme-accent-rgb),.12)}.era-pagination a{display:flex;flex-direction:column;text-decoration:none;color:inherit}.era-pagination__next{align-items:flex-end;text-align:right}.era-pagination a span{font:500 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.21em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.62)}.era-pagination a strong{margin-top:8px;font:600 21px/1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.76);transition:color .2s}.era-pagination a:hover strong{color:rgba(var(--theme-heading-rgb),1)}
-@media(max-width:760px){.era-page{padding-bottom:56px}.era-page__header{padding:20px 20px}.era-page__header>span{display:none}.era-hero{margin-top:6px;padding:38px 23px 38px;grid-template-columns:1fr;text-align:center}.era-hero__number{width:54px;height:54px;margin:0 auto 28px}.era-hero__seal{display:none}.era-hero h1{font-size:43px}.era-hero__summary{font-size:16px}.era-chronicle{margin-top:30px;padding:0 20px 38px}.era-chronicle>header{display:block}.era-chronicle>header p{margin-top:10px}.era-chapters{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.era-chapters article{min-height:132px;padding:22px 12px}.era-chapters article strong{font-size:17px}.era-origin{padding:28px 22px}.era-pagination{margin:0 20px 36px;gap:18px}.era-pagination a strong{font-size:17px}}
+@media(max-width:760px){.era-page{padding-bottom:56px}.era-page__header{padding:20px}.era-page__header>span{display:none}.era-hero{margin-top:6px;padding:38px 23px;grid-template-columns:1fr;text-align:center}.era-hero__number{width:54px;height:54px;margin:0 auto 28px}.era-hero__seal{display:none}.era-hero h1{font-size:43px}.era-hero__summary{font-size:16px}.era-chronicle{margin-top:30px;padding:0 20px 38px}.era-chronicle>header{display:block}.era-chronicle>header p{margin-top:10px}.era-chapters{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.era-chapters a{min-height:150px;padding:25px 11px 23px}.era-chapters a strong{font-size:17px}.era-pagination{margin:0 20px 36px;gap:18px}.era-pagination a strong{font-size:17px}}
 </style>
