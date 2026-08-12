@@ -33,6 +33,33 @@ function openMobileOverlay(name) {
   toggleOverlay(name)
 }
 
+function mobileCentralBack() {
+  if (state.cls) {
+    closeClass()
+    return
+  }
+  if (state.section) {
+    if (props.initialSection) {
+      navigateTo(state.active === '2024' ? '/dnd55e' : '/dnd5e')
+    } else {
+      state.section = null
+    }
+    return
+  }
+  if (props.initialSystem) {
+    navigateTo('/')
+    return
+  }
+  recenter()
+}
+
+function mobileHome() {
+  mobileMoreOpen.value = false
+  state.overlay = null
+  if (props.initialSystem || route.path !== '/') navigateTo('/')
+  else recenter()
+}
+
 watch(() => state.theme, value => { selectedTheme.value = value })
 watch(selectedTheme, value => { state.theme = value })
 
@@ -971,10 +998,8 @@ if (initialClass) await loadClassData()
 
       <section v-if="!vm.isSystem" class="tkk-mobile-home">
         <div class="tkk-mobile-intro">
-          <span class="tkk-mobile-kicker">Библиотека миров и правил</span>
           <img :src="IMG.main" width="116" height="116" alt="Узел узлов">
           <h1>Выберите нить</h1>
-          <p>Все системы и разделы теперь перед глазами — без масштабирования карты.</p>
         </div>
         <div class="tkk-mobile-system-list">
           <button v-for="system in SYSTEMS" :key="system.id" type="button" class="tkk-mobile-system" @click="selectSystem(system.id)">
@@ -987,10 +1012,10 @@ if (initialClass) await loadClassData()
 
       <template v-else>
         <section class="tkk-mobile-system-hero">
-          <div class="tkk-mobile-system-orbit" aria-hidden="true">
+          <button class="tkk-mobile-system-orbit" type="button" aria-label="Вернуться назад" @click="mobileCentralBack">
             <span /><span />
             <img :src="IMG[state.active]" alt="">
-          </div>
+          </button>
           <div>
             <span class="tkk-mobile-kicker">Активная система</span>
             <h1>{{ vm.activeName }}</h1>
@@ -1162,7 +1187,7 @@ if (initialClass) await loadClassData()
     </div>
 
     <nav class="tkk-mobile-nav" aria-label="Основная навигация">
-      <button type="button" :class="{ active: !state.overlay && !mobileMoreOpen }" @click="mobileMoreOpen = false; recenter()">
+      <button type="button" :class="{ active: !vm.isSystem && !state.overlay && !mobileMoreOpen }" @click="mobileHome">
         <img src="/assets/knot-main.png" alt=""><span>Главная</span>
       </button>
       <button type="button" :class="{ active: state.overlay === 'search' }" @click="openMobileOverlay('search')">
@@ -1294,12 +1319,11 @@ if (initialClass) await loadClassData()
   .tkk-mobile-brand span,.tkk-mobile-kicker{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.46)}
   .tkk-mobile-brand b{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500;letter-spacing:.22em;color:rgba(var(--theme-heading-rgb),.94)}
   .tkk-mobile-brand em{font-style:normal;opacity:.46}
-  .tkk-mobile-home{padding:18px 0 8px}
+  .tkk-mobile-home{padding:24px 0 8px}
   .tkk-mobile-intro{display:flex;flex-direction:column;align-items:center;text-align:center}
-  .tkk-mobile-intro img{width:106px;height:106px;margin:18px 0 4px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(var(--theme-accent-rgb),.18))}
+  .tkk-mobile-intro img{width:106px;height:106px;margin:4px 0 8px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(var(--theme-accent-rgb),.18))}
   .tkk-mobile-intro h1,.tkk-mobile-system-hero h1{margin:0;font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:500;letter-spacing:.05em;color:rgba(var(--theme-heading-rgb),.97)}
-  .tkk-mobile-intro p{max-width:310px;margin:7px 0 24px;font-size:13px;line-height:1.55;color:rgba(var(--theme-text-rgb),.52)}
-  .tkk-mobile-system-list{display:grid;gap:10px}
+  .tkk-mobile-system-list{display:grid;gap:10px;margin-top:24px}
   .tkk-mobile-system{display:grid;grid-template-columns:62px 1fr 22px;align-items:center;width:100%;min-height:76px;padding:7px 14px 7px 8px;text-align:left;border:1px solid rgba(var(--theme-contrast-rgb),.085);border-radius:16px;background:linear-gradient(110deg,rgba(var(--theme-contrast-rgb),.048),rgba(var(--theme-contrast-rgb),.015));box-shadow:inset 0 1px rgba(var(--theme-contrast-rgb),.035)}
   .tkk-mobile-system:active,.tkk-mobile-group>button:active,.tkk-mobile-class-grid button:active{transform:scale(.985);background:rgba(var(--theme-accent-rgb),.09)}
   .tkk-mobile-system-knot{display:grid;width:58px;height:58px;place-items:center;background:radial-gradient(circle,rgba(var(--theme-accent-rgb),.08),transparent 70%)}
@@ -1309,7 +1333,8 @@ if (initialClass) await loadClassData()
   .tkk-mobile-system-copy small{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.38)}
   .tkk-mobile-system>svg,.tkk-mobile-group>button>svg{width:18px;height:18px;fill:none;stroke:rgba(var(--theme-text-rgb),.45);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
   .tkk-mobile-system-hero{position:relative;display:grid;grid-template-columns:112px 1fr;align-items:center;min-height:150px;margin:6px 0 16px;padding:10px 7px 10px 1px;border-bottom:1px solid rgba(var(--theme-contrast-rgb),.07)}
-  .tkk-mobile-system-orbit{position:relative;display:grid;width:102px;height:102px;place-items:center}
+  .tkk-mobile-system-orbit{position:relative;display:grid;width:102px;height:102px;place-items:center;border:0;border-radius:18px;background:transparent;color:inherit;cursor:pointer;transition:transform .18s ease,background .18s ease}
+  .tkk-mobile-system-orbit:active{transform:scale(.94);background:rgba(var(--theme-accent-rgb),.07)}
   .tkk-mobile-system-orbit span{position:absolute;inset:8px;border:1px solid rgba(var(--theme-accent-rgb),.18);transform:rotate(45deg)}
   .tkk-mobile-system-orbit span:nth-child(2){inset:18px;border-style:dotted;transform:rotate(18deg)}
   .tkk-mobile-system-orbit img{width:76px;height:76px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(var(--theme-accent-rgb),.22))}
