@@ -10,6 +10,7 @@ const CR_GROUPS = [...new Set(CREATURES.map(creature => creature.cr))].map(value
 }))
 
 const TYPE_LABELS = {
+  giant: 'Великан',
   aberration: 'Аберрация', beast: 'Зверь', celestial: 'Небожитель', construct: 'Конструкт',
   dragon: 'Дракон', elemental: 'Элементаль', fey: 'Фея', fiend: 'Исчадие', humanoid: 'Гуманоид',
   monstrosity: 'Монстр', ooze: 'Слизь', plant: 'Растение', undead: 'Нежить'

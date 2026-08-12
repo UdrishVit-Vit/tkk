@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const OUTPUT = resolve(ROOT, 'app/data/dnd55e/bestiary2024.json')
+const CATALOG = resolve(ROOT, 'app/data/dnd55e/bestiary-catalog-2024.json')
 const DATA_REVISION = 'e5f3e77b303a92df10487207857200245e71957c'
 const DATA_ROOT = `https://raw.githubusercontent.com/5etools-mirror-3/5etools-src/${DATA_REVISION}/data/bestiary`
 const RUSSIAN_DATA_ROOT = 'https://new.ttg.club/api/v2/bestiary'
@@ -20,7 +21,7 @@ const SOURCE_TITLES = {
   DMG: 'Руководство Мастера'
 }
 
-const CREATURES = [
+const LEGACY_CREATURES = [
   ['Avatar of Death', 'Аватар смерти', 'DMG'],
   ['Giant Insect', 'Гигантское насекомое', 'PHB'],
   ['Aberrant Spirit', 'Дух аберрации', 'PHB'],
@@ -116,7 +117,20 @@ const CREATURES = [
   ['Tarrasque', 'Тарраск', 'MM']
 ]
 
+const catalogPayload = JSON.parse(await readFile(CATALOG, 'utf8'))
+const CREATURES = catalogPayload.creatures.map(creature => [
+  creature.englishName,
+  creature.title,
+  creature.source,
+  creature.typeLabel,
+  creature.documentedCr
+])
+
+if (!CREATURES.length) throw new Error('Каталог бестиария пуст')
+void LEGACY_CREATURES
+
 const TYPE_LABELS = {
+  giant: 'Великан',
   aberration: 'Аберрация', beast: 'Зверь', celestial: 'Небожитель', construct: 'Конструкт',
   dragon: 'Дракон', elemental: 'Элементаль', fey: 'Фея', fiend: 'Исчадие',
   humanoid: 'Гуманоид', monstrosity: 'Монстр', ooze: 'Слизь', plant: 'Растение', undead: 'Нежить'
@@ -153,6 +167,11 @@ const DAMAGE_DEALT_LABELS = {
 }
 
 const NAME_TRANSLATIONS = {
+  Swarm: 'Рой',
+  Beaks: 'Клювы', Drop: 'Падение', 'Redirect Attack': 'Перенаправить атаку', Ephemeral: 'Эфемерность', Shock: 'Электрический разряд',
+  'Consume Life': 'Поглощение жизни', Vanish: 'Исчезновение', Split: 'Разделение', 'Burning Hammer': 'Огненный молот', Jinx: 'Сглаз',
+  'Watery Rebuke': 'Водный отпор', 'Heated Blade': 'Раскалённый клинок', 'Hurl Flame': 'Бросок пламени', 'Psionic Defense': 'Псионическая защита',
+  'Misty Escape': 'Туманный побег', 'Vampire Weakness': 'Слабости вампира', 'Veil of Shadow': 'Покров тени',
   Agile: 'Проворный', Amphibious: 'Амфибия', Compression: 'Сжатие', Flyby: 'Облёт', Illumination: 'Свечение',
   Jumper: 'Прыгун', 'Magic Resistance': 'Сопротивление магии', Mimicry: 'Подражание',
   'Pack Tactics': 'Тактика стаи', 'Spider Climb': 'Паучье лазание', 'Standing Leap': 'Прыжок с места',
@@ -531,9 +550,9 @@ const RUSSIAN_DISPLAY_ABILITY_NAMES = {
 }
 
 function abilityName(rawName, monsterName = '') {
-  const recharge = rawName.match(/\{@recharge (\d+)\}/)?.[1]
+  const recharge = rawName.match(/\{@recharge(?: (\d+))?\}/)?.[1] || (rawName.includes('{@recharge}') ? '5' : '')
   const daily = rawName.match(/\((\d+)\/Day\)/i)?.[1]
-  const base = rawName.replace(/\s*\{@recharge \d+\}/g, '').replace(/\s*\(\d+\/Day\)$/i, '')
+  const base = rawName.replace(/\s*\{@recharge(?: \d+)?\}/g, '').replace(/\s*\(\d+\/Day\)$/i, '')
 
   if (/^Legendary Resistance/.test(rawName)) {
     return rawName
@@ -575,19 +594,31 @@ const RUSSIAN_ABILITY_ALIASES = {
   'Tarrasque::Claw': 'Когти'
 }
 
-const SPELL_LINK_ALIASES = { 'melf-s-acid-arrow-phb': 'melfs-acid-arrow-phb' }
+const SPELL_LINK_ALIASES = {
+  'melf-s-acid-arrow-phb': 'melfs-acid-arrow-phb',
+  'tasha-s-hideous-laughter-phb': 'tashas-hideous-laughter-phb',
+  'jallarzi-s-storm-of-radiance-phb': 'jallarzis-storm-of-radiance-phb'
+}
 const GLOSSARY_LINK_ALIASES = { advantage: 'advantage-phb', 'move-phb': 'speed-phb', 'fear-phb': 'frightened-phb' }
+const UNLINKED_GLOSSARY_IDS = new Set(['aura-phb', 'turn-phb', 'spellcasting-phb'])
 const spellLink = slug => SPELL_LINK_ALIASES[slug] || slug
 const glossaryLink = slug => GLOSSARY_LINK_ALIASES[slug] || slug
+const glossaryMarkdown = (label, slug) => UNLINKED_GLOSSARY_IDS.has(glossaryLink(slug))
+  ? label
+  : `[${label}](/dnd55e/glossary?rule=${glossaryLink(slug)})`
 
 function cleanTtgTokens(value) {
   return value
-    .replace(/\{@glossary\s+([^}|]+)\s*\|\s*url:([^}]+)\}/giu, (_, label, url) => `[${label.trim()}](/dnd55e/glossary?rule=${glossaryLink(url.trim())})`)
+    .replace(/\{@glossary\s+([^}|]+)\s*\|\s*url:([^}]+)\}/giu, (_, label, url) => glossaryMarkdown(label.trim(), url.trim()))
     .replace(/\{@spell\s+([^}|]+)\s*\|\s*url:([^}]+)\}/giu, (_, label, url) => `[${label.trim()}](/dnd55e/spells?spell=${spellLink(url.trim())})`)
+    .replace(/\{@bestiary\s+([^}|]+)\s*\|\s*url:([^}]+)\}/giu, (_, label, url) => `[${label.trim()}](/dnd55e/bestiary?creature=${url.trim()})`)
     .replace(/\{@link\s+([^}|]+)(?:\s*\|[^}]*)?\}/giu, (_, label) => label.trim())
     .replace(/\{@(?:roll|dice)\s+([^}|]+)(?:\|[^}]*)?\}/giu, (_, label) => `**${label.trim()}**`)
     .replace(/\{@i\s+([^}]+)\}/giu, (_, label) => `*${label.trim()}*`)
     .replace(/\{@b\s+([^}]+)\}/giu, (_, label) => `**${label.trim()}**`)
+    .replace(/\{@i\s+([^})]+)\)/giu, (_, label) => `*${label.trim()}*`)
+    .replace(/\{@b\s+([^})]+)\)/giu, (_, label) => `**${label.trim()}**`)
+    .replace(/\{@br\}/giu, ' ')
 }
 
 function renderTtgNode(node) {
@@ -598,7 +629,7 @@ function renderTtgNode(node) {
   if (node.type === 'bold') return `**${content}**`
   if (node.type === 'italic') return `*${content}*`
   if (node.type === 'roll' || node.type === 'dice') return `**${content}**`
-  if (node.type === 'glossary') return `[${content}](/dnd55e/glossary?rule=${glossaryLink(node.attrs?.url)})`
+  if (node.type === 'glossary') return glossaryMarkdown(content, node.attrs?.url)
   if (node.type === 'spell') return `[${content}](/dnd55e/spells?spell=${spellLink(node.attrs?.url)})`
   if (node.type === 'link') return content
   if (node.type === 'li') return content.trim()
@@ -624,12 +655,16 @@ function normalizeGeneratedText(value) {
     .replace('/dnd55e/glossary?rule=move-phb)', '/dnd55e/glossary?rule=speed-phb)')
     .replace('/dnd55e/glossary?rule=fear-phb)', '/dnd55e/glossary?rule=frightened-phb)')
     .replace('/dnd55e/spells?spell=melf-s-acid-arrow-phb)', '/dnd55e/spells?spell=melfs-acid-arrow-phb)')
+    .replace('/dnd55e/spells?spell=tasha-s-hideous-laughter-phb)', '/dnd55e/spells?spell=tashas-hideous-laughter-phb)')
+    .replace('/dnd55e/spells?spell=jallarzi-s-storm-of-radiance-phb)', '/dnd55e/spells?spell=jallarzis-storm-of-radiance-phb)')
 }
 
 function rawAbilityBlock(monster, key) {
   const displayAs = { trait: 'trait', action: 'action', bonus: 'bonus', reaction: 'reaction', legendary: 'legendary' }[key]
   const spellcasting = (monster.spellcasting || []).filter(entry => (entry.displayAs || 'trait') === displayAs)
-  return [...(monster[key] || []), ...spellcasting]
+  return key === 'trait'
+    ? [...spellcasting, ...(monster[key] || [])]
+    : [...(monster[key] || []), ...spellcasting]
 }
 
 function russianAbilityBlock(russianMonster, key) {
@@ -645,7 +680,7 @@ function formatAbilityBlock(monster, key, russianMonster) {
   const russianAbilities = russianAbilityBlock(russianMonster, key)
   const unused = new Set(russianAbilities.map((_, index) => index))
 
-  return abilities.map((ability) => {
+  return abilities.map((ability, abilityIndex) => {
     const name = abilityName(ability.name, monster.name)
     const expected = normalizedAbilityName(name)
     const alias = normalizedAbilityName(RUSSIAN_ABILITY_ALIASES[`${monster.name}::${ability.name.replace(/\s*\{@recharge \d+\}/g, '')}`] || '')
@@ -653,6 +688,10 @@ function formatAbilityBlock(monster, key, russianMonster) {
       const candidate = normalizedAbilityName(russianAbilities[index].name?.rus || '')
       return candidate === expected || (alias && candidate === alias)
     })
+
+    if (russianIndex === undefined && russianAbilities.length === abilities.length && unused.has(abilityIndex)) {
+      russianIndex = abilityIndex
+    }
 
     const russianAbility = russianIndex === undefined ? null : russianAbilities[russianIndex]
     if (russianIndex !== undefined) unused.delete(russianIndex)
@@ -663,8 +702,8 @@ function formatAbilityBlock(monster, key, russianMonster) {
     }
 
     return {
-      name,
-      englishName: ability.name.replace(/\s*\{@recharge (\d+)\}/g, ' (Recharge $1–6)'),
+      name: russianAbility?.name?.rus || name,
+      englishName: ability.name.replace(/\s*\{@recharge(?: (\d+))?\}/g, (_, value) => ` (Recharge ${value || 5}–6)`),
       text: normalizeGeneratedText(russianText || abilitySummary(monster, ability))
     }
   })
@@ -707,8 +746,9 @@ async function loadSources() {
 
 async function loadRussianSources() {
   const results = new Map()
-  for (let offset = 0; offset < CREATURES.length; offset += 6) {
-    const batch = CREATURES.slice(offset, offset + 6)
+  const batchSize = 2
+  for (let offset = 0; offset < CREATURES.length; offset += batchSize) {
+    const batch = CREATURES.slice(offset, offset + batchSize)
     const entries = await Promise.all(batch.map(async ([englishName, , source]) => {
       const id = `${slugify(englishName)}-${source.toLowerCase()}`
       let response
@@ -730,6 +770,7 @@ async function loadRussianSources() {
       return [id, await response.json()]
     }))
     entries.forEach(([id, data]) => results.set(id, data))
+    if (offset + batchSize < CREATURES.length) await new Promise(resolve => setTimeout(resolve, 1000))
   }
   return results
 }
@@ -745,7 +786,7 @@ try {
 const sourceEntries = await loadSources()
 const russianSources = await loadRussianSources()
 
-const creatures = CREATURES.map(([englishName, title, source]) => {
+const creatures = CREATURES.map(([englishName, title, source, catalogTypeLabel]) => {
   const found = sourceEntries.find(entry => entry.source === source && entry.monster.name === englishName)
   if (!found) throw new Error(`Не найден статблок ${englishName} (${source})`)
   const monster = found.monster
@@ -768,7 +809,7 @@ const creatures = CREATURES.map(([englishName, title, source]) => {
     cr,
     type: type.type,
     types: type.types,
-    typeLabel: type.typeLabel,
+    typeLabel: catalogTypeLabel || type.typeLabel,
     typeTags: type.tags,
     sizes: (monster.size || []).map(size => SIZE_LABELS[size] || size),
     armorClass: formatArmorClass(monster.ac),

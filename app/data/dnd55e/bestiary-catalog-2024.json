@@ -1,0 +1,3624 @@
+{
+  "edition": "2024",
+  "creatures": [
+    {
+      "title": "Аватар смерти",
+      "englishName": "Avatar of Death",
+      "source": "DMG",
+      "typeLabel": "Нежить",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Гигантское насекомое",
+      "englishName": "Giant Insect",
+      "source": "PHB",
+      "typeLabel": "Зверь",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Дух аберрации",
+      "englishName": "Aberrant Spirit",
+      "source": "PHB",
+      "typeLabel": "Аберрация",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Дух дракона",
+      "englishName": "Draconic Spirit",
+      "source": "PHB",
+      "typeLabel": "Дракон",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Дух зверя",
+      "englishName": "Bestial Spirit",
+      "source": "PHB",
+      "typeLabel": "Зверь",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Дух исчадия",
+      "englishName": "Fiendish Spirit",
+      "source": "PHB",
+      "typeLabel": "Исчадие",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Дух конструкта",
+      "englishName": "Construct Spirit",
+      "source": "PHB",
+      "typeLabel": "Конструкт",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Дух небожителя",
+      "englishName": "Celestial Spirit",
+      "source": "PHB",
+      "typeLabel": "Небожитель",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Дух нежити",
+      "englishName": "Undead Spirit",
+      "source": "PHB",
+      "typeLabel": "Нежить",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Дух феи",
+      "englishName": "Fey Spirit",
+      "source": "PHB",
+      "typeLabel": "Фея",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Дух элементаля",
+      "englishName": "Elemental Spirit",
+      "source": "PHB",
+      "typeLabel": "Элементаль",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Морской зверь",
+      "englishName": "Beast of the Sea",
+      "source": "PHB",
+      "typeLabel": "Зверь",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Наземный зверь",
+      "englishName": "Beast of the Land",
+      "source": "PHB",
+      "typeLabel": "Зверь",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Небесный зверь",
+      "englishName": "Beast of the Sky",
+      "source": "PHB",
+      "typeLabel": "Зверь",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Оживлённый предмет",
+      "englishName": "Animated Object",
+      "source": "PHB",
+      "typeLabel": "Конструкт",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Потусторонний скакун",
+      "englishName": "Otherworldly Steed",
+      "source": "PHB",
+      "typeLabel": "Небожитель, Фея, Исчадие",
+      "documentedCr": "—"
+    },
+    {
+      "title": "Бабуин",
+      "englishName": "Baboon",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Барсук",
+      "englishName": "Badger",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Визгун",
+      "englishName": "Shrieker Fungus",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Ворон",
+      "englishName": "Raven",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Гигантская муха",
+      "englishName": "Giant Fly",
+      "source": "DMG",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Гигантский огненный жук",
+      "englishName": "Giant Fire Beetle",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Гиена",
+      "englishName": "Hyena",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Гомункул",
+      "englishName": "Homunculus",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Гриф",
+      "englishName": "Vulture",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Козёл",
+      "englishName": "Goat",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Кошка",
+      "englishName": "Cat",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Краб",
+      "englishName": "Crab",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Крыса",
+      "englishName": "Rat",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Куница",
+      "englishName": "Weasel",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Ларва",
+      "englishName": "Larva",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Лемур",
+      "englishName": "Lemure",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Летучая мышь",
+      "englishName": "Bat",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Лягушка",
+      "englishName": "Frog",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Морской конёк",
+      "englishName": "Seahorse",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Обыватель",
+      "englishName": "Commoner",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Олень",
+      "englishName": "Deer",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Орёл",
+      "englishName": "Eagle",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Осьминог",
+      "englishName": "Octopus",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Паук",
+      "englishName": "Spider",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Пиранья",
+      "englishName": "Piranha",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Ползающая рука",
+      "englishName": "Crawling Claw",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Пробуждённый куст",
+      "englishName": "Awakened Shrub",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Росток миконида",
+      "englishName": "Myconid Sprout",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Скорпион",
+      "englishName": "Scorpion",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Шакал",
+      "englishName": "Jackal",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Ястреб",
+      "englishName": "Hawk",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Ящерица",
+      "englishName": "Lizard",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "0"
+    },
+    {
+      "title": "Бандит",
+      "englishName": "Bandit",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Благородный",
+      "englishName": "Noble",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Верблюд",
+      "englishName": "Camel",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Ветвистая зараза",
+      "englishName": "Twig Blight",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Воин пехотинец",
+      "englishName": "Warrior Infantry",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Гигантская крыса",
+      "englishName": "Giant Rat",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Гигантская куница",
+      "englishName": "Giant Weasel",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Гигантская сова",
+      "englishName": "Giant Owl",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Гигантский краб",
+      "englishName": "Giant Crab",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Гоблин прислужник",
+      "englishName": "Goblin Minion",
+      "source": "MM",
+      "typeLabel": "Фея (гоблиноид)",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Кобольд воин",
+      "englishName": "Kobold Warrior",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Кровавый ястреб",
+      "englishName": "Blood Hawk",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Кровопийца",
+      "englishName": "Stirge",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Культист",
+      "englishName": "Cultist",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Летающая змея",
+      "englishName": "Flying Snake",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Мастифф",
+      "englishName": "Mastiff",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Мерфолк застрельщик",
+      "englishName": "Merfolk Skirmisher",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Модрон монодрон",
+      "englishName": "Modron Monodrone",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Мул",
+      "englishName": "Mule",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Мэйн",
+      "englishName": "Manes",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Пони",
+      "englishName": "Pony",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Слаад головастик",
+      "englishName": "Slaad Tadpole",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Стражник",
+      "englishName": "Guard",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Фламф",
+      "englishName": "Flumph",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Ядовитая змея",
+      "englishName": "Venomous Snake",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/8"
+    },
+    {
+      "title": "Гигантская лягушка",
+      "englishName": "Giant Frog",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Гигантская многоножка",
+      "englishName": "Giant Centipede",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Гигантская ядовитая змея",
+      "englishName": "Giant Venomous Snake",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Гигантская ящерица",
+      "englishName": "Giant Lizard",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Гигантский барсук",
+      "englishName": "Giant Badger",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Гигантский паук-волк",
+      "englishName": "Giant Wolf Spider",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Гоблин воин",
+      "englishName": "Goblin Warrior",
+      "source": "MM",
+      "typeLabel": "Фея (гоблиноид)",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Гримлок",
+      "englishName": "Grimlock",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Грязевой мефит",
+      "englishName": "Mud Mephit",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Дретч",
+      "englishName": "Dretch",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Дымовой мефит",
+      "englishName": "Smoke Mephit",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Ездовая лошадь",
+      "englishName": "Riding Horse",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Жаболюд воин",
+      "englishName": "Bullywug Warrior",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Зомби",
+      "englishName": "Zombie",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Игольчатая зараза",
+      "englishName": "Needle Blight",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Кабан",
+      "englishName": "Boar",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Кенку",
+      "englishName": "Kenku",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Крылатый кобольд",
+      "englishName": "Winged Kobold",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Куо-тоа",
+      "englishName": "Kuo-toa",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Лиловый гриб",
+      "englishName": "Violet Fungus",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Лось",
+      "englishName": "Elk",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Мерцающий пёс",
+      "englishName": "Blink Dog",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Модрон дуодрон",
+      "englishName": "Modron Duodrone",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Оживлённая метла",
+      "englishName": "Animated Broom",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Оживлённый меч",
+      "englishName": "Animated Flying Sword",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Пантера",
+      "englishName": "Panther",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Паровой мефит",
+      "englishName": "Steam Mephit",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Пикси",
+      "englishName": "Pixie",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Псевдодракон",
+      "englishName": "Pseudodragon",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Птеранодон",
+      "englishName": "Pteranodon",
+      "source": "MM",
+      "typeLabel": "Зверь (динозавр)",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Рой воронов",
+      "englishName": "Swarm of Ravens",
+      "source": "MM",
+      "typeLabel": "Рой крошечных зверей",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Рой крыс",
+      "englishName": "Swarm of Rats",
+      "source": "MM",
+      "typeLabel": "Рой крошечных зверей",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Рой летучих мышей",
+      "englishName": "Swarm of Bats",
+      "source": "MM",
+      "typeLabel": "Рой крошечных зверей",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Священник послушник",
+      "englishName": "Priest Acolyte",
+      "source": "MM",
+      "typeLabel": "Гуманоид (жрец)",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Скелет",
+      "englishName": "Skeleton",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Сова",
+      "englishName": "Owl",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Спрайт",
+      "englishName": "Sprite",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Топороклюв",
+      "englishName": "Axe Beak",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Троглодит",
+      "englishName": "Troglodyte",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Удав",
+      "englishName": "Constrictor Snake",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Упряжная лошадь",
+      "englishName": "Draft Horse",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/4"
+    },
+    {
+      "title": "Боевая лошадь",
+      "englishName": "Warhorse",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Бугай",
+      "englishName": "Tough",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Взрослый миконид",
+      "englishName": "Myconid Adult",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Ворг",
+      "englishName": "Worg",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Вьющаяся зараза",
+      "englishName": "Vine Blight",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Газовая спора",
+      "englishName": "Gas Spore Fungus",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Гигантская оса",
+      "englishName": "Giant Wasp",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Гигантский козёл",
+      "englishName": "Giant Goat",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Гигантский морской конек",
+      "englishName": "Giant Seahorse",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Гнолл воин",
+      "englishName": "Gnoll Warrior",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Исполнитель",
+      "englishName": "Performer",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Конечность тролля",
+      "englishName": "Troll Limb",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Крокодил",
+      "englishName": "Crocodile",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Куролиск",
+      "englishName": "Cockatrice",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Ледяной мефит",
+      "englishName": "Ice Mephit",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Магмин",
+      "englishName": "Magmin",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Магмовый мефит",
+      "englishName": "Magma Mephit",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Модрон тридрон",
+      "englishName": "Modron Tridrone",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Обезьяна",
+      "englishName": "Ape",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Пронзатель",
+      "englishName": "Piercer",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Пылевой мефит",
+      "englishName": "Dust Mephit",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Разведчик",
+      "englishName": "Scout",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Ржавник",
+      "englishName": "Rust Monster",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Рифовая акула",
+      "englishName": "Reef Shark",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Рой насекомых",
+      "englishName": "Swarm of Insects",
+      "source": "MM",
+      "typeLabel": "Рой крошечных зверей",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Сатир",
+      "englishName": "Satyr",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Сахуагин воин",
+      "englishName": "Sahuagin Warrior",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Серая слизь",
+      "englishName": "Gray Ooze",
+      "source": "MM",
+      "typeLabel": "Слизь",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Скелет боевого коня",
+      "englishName": "Warhorse Skeleton",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Тёмная мантия",
+      "englishName": "Darkmantle",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Тень",
+      "englishName": "Shadow",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Хобгоблин воин",
+      "englishName": "Hobgoblin Warrior",
+      "source": "MM",
+      "typeLabel": "Фея (гоблиноид)",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Чёрный медведь",
+      "englishName": "Black Bear",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Шакалвер",
+      "englishName": "Jackalwere",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "1/2"
+    },
+    {
+      "title": "Багбир воин",
+      "englishName": "Bugbear Warrior",
+      "source": "MM",
+      "typeLabel": "Фея (гоблиноид)",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Бес",
+      "englishName": "Imp",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Бурый медведь",
+      "englishName": "Brown Bear",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Вирмлинг латунный дракон",
+      "englishName": "Brass Dragon Wyrmling",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Вирмлинг медный дракон",
+      "englishName": "Copper Dragon Wyrmling",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Гарпия",
+      "englishName": "Harpy",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Гигантская гиена",
+      "englishName": "Giant Hyena",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Гигантская жаба",
+      "englishName": "Giant Toad",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Гигантский гриф",
+      "englishName": "Giant Vulture",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Гигантский орёл",
+      "englishName": "Giant Eagle",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Гигантский осьминог",
+      "englishName": "Giant Octopus",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Гигантский паук",
+      "englishName": "Giant Spider",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Гиппогриф",
+      "englishName": "Hippogriff",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Гоблин босс",
+      "englishName": "Goblin Boss",
+      "source": "MM",
+      "typeLabel": "Фея (гоблиноид)",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Дриада",
+      "englishName": "Dryad",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Квазит",
+      "englishName": "Quasit",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Куо-тоа кнут",
+      "englishName": "Kuo-toa Whip",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Лев",
+      "englishName": "Lion",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Лютый волк",
+      "englishName": "Dire Wolf",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Модрон квадрон",
+      "englishName": "Modron Quadrone",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Молодой волшебный дракончик",
+      "englishName": "Faerie Dragon Youth",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Огриллон",
+      "englishName": "Ogrillon Ogre",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Оживлённый доспех",
+      "englishName": "Animated Armor",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Пёс смерти",
+      "englishName": "Death Dog",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Пират",
+      "englishName": "Pirate",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Психическая серая слизь",
+      "englishName": "Psychic Gray Ooze",
+      "source": "MM",
+      "typeLabel": "Слизь",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Пугало",
+      "englishName": "Scarecrow",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Рой ларв",
+      "englishName": "Swarm of Larvae",
+      "source": "MM",
+      "typeLabel": "Рой средних исчадий",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Рой пираний",
+      "englishName": "Swarm of Piranhas",
+      "source": "MM",
+      "typeLabel": "Рой крошечных зверей",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Саламандра огненная змея",
+      "englishName": "Salamander Fire Snake",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Спектр",
+      "englishName": "Specter",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Споровой слуга миконидов",
+      "englishName": "Myconid Spore Servant",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Сфинкс чудес",
+      "englishName": "Sphinx of Wonder",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Тигр",
+      "englishName": "Tiger",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Тошнотворный мэйн",
+      "englishName": "Manes Vaporspawn",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Три-крин мародёр",
+      "englishName": "Thri-kreen Marauder",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Упырь",
+      "englishName": "Ghoul",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Упырь утопец",
+      "englishName": "Lacedon Ghoul",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Шпион",
+      "englishName": "Spy",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Эмпирей йота",
+      "englishName": "Empyrean Iota",
+      "source": "MM",
+      "typeLabel": "Небожитель, Исчадие (титан)",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Юань-ти лазутчик",
+      "englishName": "Yuan-ti Infiltrator",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "1"
+    },
+    {
+      "title": "Аллозавр",
+      "englishName": "Allosaurus",
+      "source": "MM",
+      "typeLabel": "Зверь (динозавр)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Анхег",
+      "englishName": "Ankheg",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Бандит капитан",
+      "englishName": "Bandit Captain",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Белый медведь",
+      "englishName": "Polar Bear",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Берсерк",
+      "englishName": "Berserker",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Блуждающий огонёк",
+      "englishName": "Will-o'-Wisp",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Бормочущий ротовик",
+      "englishName": "Gibbering Mouther",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Веркрыса",
+      "englishName": "Wererat",
+      "source": "MM",
+      "typeLabel": "Монстр (оборотень)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Верховный миконид",
+      "englishName": "Myconid Sovereign",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Взрослый волшебный дракончик",
+      "englishName": "Faerie Dragon Adult",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Вирмлинг белый дракон",
+      "englishName": "White Dragon Wyrmling",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Вирмлинг бронзовый дракон",
+      "englishName": "Bronze Dragon Wyrmling",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Вирмлинг зелёный дракон",
+      "englishName": "Green Dragon Wyrmling",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Вирмлинг серебряный дракон",
+      "englishName": "Silver Dragon Wyrmling",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Вирмлинг чёрный дракон",
+      "englishName": "Black Dragon Wyrmling",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Водянник",
+      "englishName": "Merrow",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Вурдалак",
+      "englishName": "Ghast",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Гаргулья",
+      "englishName": "Gargoyle",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Гигантский кабан",
+      "englishName": "Giant Boar",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Гигантский лось",
+      "englishName": "Giant Elk",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Гигантский удав",
+      "englishName": "Giant Constrictor Snake",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Гитцерай монах",
+      "englishName": "Githzerai Monk",
+      "source": "MM",
+      "typeLabel": "Аберрация (гит)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Гнолл вождь стаи",
+      "englishName": "Gnoll Pack Lord",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Грик",
+      "englishName": "Grick",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Грифон",
+      "englishName": "Griffon",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Друид",
+      "englishName": "Druid",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Желатиновый куб",
+      "englishName": "Gelatinous Cube",
+      "source": "MM",
+      "typeLabel": "Слизь",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Золотистое желе",
+      "englishName": "Ochre Jelly",
+      "source": "MM",
+      "typeLabel": "Слизь",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Зомби огр",
+      "englishName": "Ogre Zombie",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Игольчатый дьявол",
+      "englishName": "Spined Devil",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Кваггот",
+      "englishName": "Quaggoth",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Кентавр воин",
+      "englishName": "Centaur Trooper",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Культист фанатик",
+      "englishName": "Cultist Fanatic",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Людоящер геомант",
+      "englishName": "Lizardfolk Geomancer",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Маг ученик",
+      "englishName": "Mage Apprentice",
+      "source": "MM",
+      "typeLabel": "Гуманоид (волшебник)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Мимик",
+      "englishName": "Mimic",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Модрон пентадрон",
+      "englishName": "Modron Pentadrone",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Морская карга",
+      "englishName": "Sea Hag",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Носорог",
+      "englishName": "Rhinoceros",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Нотик",
+      "englishName": "Nothic",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Огр",
+      "englishName": "Ogre",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Оживлённый ковёр",
+      "englishName": "Animated Rug of Smothering",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Охотничья акула",
+      "englishName": "Hunter Shark",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Пегас",
+      "englishName": "Pegasus",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Перитон",
+      "englishName": "Peryton",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Плезиозавр",
+      "englishName": "Plesiosaurus",
+      "source": "MM",
+      "typeLabel": "Зверь (динозавр)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Пожиратель интеллекта",
+      "englishName": "Intellect Devourer",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Ползающий падальщик",
+      "englishName": "Carrion Crawler",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Полтергейст",
+      "englishName": "Poltergeist",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Пробуждённое дерево",
+      "englishName": "Awakened Tree",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Рой кровопийц",
+      "englishName": "Swarm of Stirges",
+      "source": "MM",
+      "typeLabel": "Рой крошечных монстров",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Рой ядовитых змей",
+      "englishName": "Swarm of Venomous Snakes",
+      "source": "MM",
+      "typeLabel": "Рой крошечных зверей",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Саблезубый тигр",
+      "englishName": "Saber-Toothed Tiger",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Сахуагин жрец",
+      "englishName": "Sahuagin Priest",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Священник",
+      "englishName": "Priest",
+      "source": "MM",
+      "typeLabel": "Гуманоид (жрец)",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Скелет минотавра",
+      "englishName": "Minotaur Skeleton",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Щенок панцирницы",
+      "englishName": "Bulette Pup",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Эйзер защитник",
+      "englishName": "Azer Sentinel",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Эттеркап",
+      "englishName": "Ettercap",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "2"
+    },
+    {
+      "title": "Адская гончая",
+      "englishName": "Hell Hound",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Анкилозавр",
+      "englishName": "Ankylosaurus",
+      "source": "MM",
+      "typeLabel": "Зверь (динозавр)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Багбир охотник",
+      "englishName": "Bugbear Stalker",
+      "source": "MM",
+      "typeLabel": "Фея (гоблиноид)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Бородатый дьявол",
+      "englishName": "Bearded Devil",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Василиск",
+      "englishName": "Basilisk",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Верволк",
+      "englishName": "Werewolf",
+      "source": "MM",
+      "typeLabel": "Монстр (оборотень)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Вирмлинг золотой дракон",
+      "englishName": "Gold Dragon Wyrmling",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Вирмлинг синий дракон",
+      "englishName": "Blue Dragon Wyrmling",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Водная аномалия",
+      "englishName": "Water Weird",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Воин ветеран",
+      "englishName": "Warrior Veteran",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Гигантский скорпион",
+      "englishName": "Giant Scorpion",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Гитьянки воин",
+      "englishName": "Githyanki Warrior",
+      "source": "MM",
+      "typeLabel": "Аберрация (гит)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Гоблин буяг",
+      "englishName": "Goblin Hexer",
+      "source": "MM",
+      "typeLabel": "Фея (гоблиноид)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Грелл",
+      "englishName": "Grell",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Доппельгангер",
+      "englishName": "Doppelganger",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Зелёная карга",
+      "englishName": "Green Hag",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Зимний волк",
+      "englishName": "Winter Wolf",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Йети",
+      "englishName": "Yeti",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Кваггот тонот",
+      "englishName": "Quaggoth Thonot",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Косатка",
+      "englishName": "Killer Whale",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Кошмар",
+      "englishName": "Nightmare",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Крюкастый ужас",
+      "englishName": "Hook Horror",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Куо-тоа наставник",
+      "englishName": "Kuo-toa Monitor",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Мантикора",
+      "englishName": "Manticore",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Минотавр Бафомета",
+      "englishName": "Minotaur of Baphomet",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Мумия",
+      "englishName": "Mummy",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Наблюдатель",
+      "englishName": "Spectator",
+      "source": "MM",
+      "typeLabel": "Аберрация (бехолдер)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Пылающий скелет",
+      "englishName": "Flaming Skeleton",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Разведчик капитан",
+      "englishName": "Scout Captain",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Рой лемуров",
+      "englishName": "Swarm of Lemures",
+      "source": "MM",
+      "typeLabel": "Рой средних исчадий (дьявол)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Рой ползающих рук",
+      "englishName": "Swarm of Crawling Claws",
+      "source": "MM",
+      "typeLabel": "Рой крошечной нежити",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Рыцарь",
+      "englishName": "Knight",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Совомед",
+      "englishName": "Owlbear",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Умертвие",
+      "englishName": "Wight",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Ускользающий зверь",
+      "englishName": "Displacer Beast",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Фазовый паук",
+      "englishName": "Phase Spider",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Фамильяр вампира",
+      "englishName": "Vampire Familiar",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Хобгоблин капитан",
+      "englishName": "Hobgoblin Captain",
+      "source": "MM",
+      "typeLabel": "Фея (гоблиноид)",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Юань-ти проклинатель (тип 1)",
+      "englishName": "Yuan-ti Malison (Type 1)",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Юань-ти проклинатель (тип 2)",
+      "englishName": "Yuan-ti Malison (Type 2)",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Юань-ти проклинатель (тип 3)",
+      "englishName": "Yuan-ti Malison (Type 3)",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "3"
+    },
+    {
+      "title": "Ааракокра аэромант",
+      "englishName": "Aarakocra Aeromancer",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Архелон",
+      "englishName": "Archelon",
+      "source": "MM",
+      "typeLabel": "Зверь (динозавр)",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Банши",
+      "englishName": "Banshee",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Бегемот",
+      "englishName": "Hippopotamus",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Бугай босс",
+      "englishName": "Tough Boss",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Веркабан",
+      "englishName": "Wereboar",
+      "source": "MM",
+      "typeLabel": "Монстр (оборотень)",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Вертигр",
+      "englishName": "Weretiger",
+      "source": "MM",
+      "typeLabel": "Монстр (оборотень)",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Вирмлинг красный дракон",
+      "englishName": "Red Dragon Wyrmling",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Гнолл клык Йеногу",
+      "englishName": "Gnoll Fang of Yeenoghu",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Жаболюд болотный мудрец",
+      "englishName": "Bullywug Bog Sage",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Инкуб",
+      "englishName": "Incubus",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Коатль",
+      "englishName": "Couatl",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Костяная нага",
+      "englishName": "Bone Naga",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Ламия",
+      "englishName": "Lamia",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Людоящер вождь",
+      "englishName": "Lizardfolk Sovereign",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Молодой теневой дракон",
+      "englishName": "Juvenile Shadow Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Привидение",
+      "englishName": "Ghost",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Пылающий череп",
+      "englishName": "Flameskull",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Рой дретчей",
+      "englishName": "Swarm of Dretches",
+      "source": "MM",
+      "typeLabel": "Рой маленьких исчадий (демон)",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Слон",
+      "englishName": "Elephant",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Стражник капитан",
+      "englishName": "Guard Captain",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Суккуб",
+      "englishName": "Succubus",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Теневой демон",
+      "englishName": "Shadow Demon",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Чёрная слизь",
+      "englishName": "Black Pudding",
+      "source": "MM",
+      "typeLabel": "Слизь",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Чуул",
+      "englishName": "Chuul",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Шлемоносный ужас",
+      "englishName": "Helmed Horror",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Эттин",
+      "englishName": "Ettin",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "4"
+    },
+    {
+      "title": "Барлгура",
+      "englishName": "Barlgura",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Бурый громила",
+      "englishName": "Umber Hulk",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Верёвочник",
+      "englishName": "Roper",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Вермедведь",
+      "englishName": "Werebear",
+      "source": "MM",
+      "typeLabel": "Монстр (оборотень)",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Гигантская акула",
+      "englishName": "Giant Shark",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Гигантский крокодил",
+      "englishName": "Giant Crocodile",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Гигантский топороклюв",
+      "englishName": "Giant Axe Beak",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Гладиатор",
+      "englishName": "Gladiator",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Горгона",
+      "englishName": "Gorgon",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Единорог",
+      "englishName": "Unicorn",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Зомби бехолдер",
+      "englishName": "Beholder Zombie",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Зорн",
+      "englishName": "Xorn",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Камбион",
+      "englishName": "Cambion",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Красный слаад",
+      "englishName": "Red Slaad",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Меззолот",
+      "englishName": "Mezzoloth",
+      "source": "MM",
+      "typeLabel": "Исчадие (юголот)",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Молодой ремораз",
+      "englishName": "Young Remorhaz",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Мясной голем",
+      "englishName": "Flesh Golem",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Ночная карга",
+      "englishName": "Night Hag",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Отидж",
+      "englishName": "Otyugh",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Панцирница",
+      "englishName": "Bulette",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Пикси чудотворец",
+      "englishName": "Pixie Wonderbringer",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Ползающая насыпь",
+      "englishName": "Shambling Mound",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Полудракон",
+      "englishName": "Half-Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Порождение вампира",
+      "englishName": "Vampire Spawn",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Призрак",
+      "englishName": "Wraith",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Ревенант",
+      "englishName": "Revenant",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Саламандра",
+      "englishName": "Salamander",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Сахуагин барон",
+      "englishName": "Sahuagin Baron",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Трицератопс",
+      "englishName": "Triceratops",
+      "source": "MM",
+      "typeLabel": "Зверь (динозавр)",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Тролль",
+      "englishName": "Troll",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Холмовой великан",
+      "englishName": "Hill Giant",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Шипастый дьявол",
+      "englishName": "Barbed Devil",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Элементаль воды",
+      "englishName": "Water Elemental",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Элементаль воздуха",
+      "englishName": "Air Elemental",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Элементаль земли",
+      "englishName": "Earth Elemental",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Элементаль огня",
+      "englishName": "Fire Elemental",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "5"
+    },
+    {
+      "title": "Виверна",
+      "englishName": "Wyvern",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Врок",
+      "englishName": "Vrock",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Вурдалак могильщик",
+      "englishName": "Ghast Gravecaller",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Галеб дур",
+      "englishName": "Galeb Duhr",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Гигантский кальмар",
+      "englishName": "Giant Squid",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Гитцерай зерт",
+      "englishName": "Githzerai Zerth",
+      "source": "MM",
+      "typeLabel": "Аберрация (гит)",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Драук",
+      "englishName": "Drider",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Исполнитель маэстро",
+      "englishName": "Performer Maestro",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Куо-тоа архисвященник",
+      "englishName": "Kuo-toa Archpriest",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Маг",
+      "englishName": "Mage",
+      "source": "MM",
+      "typeLabel": "Гуманоид (волшебник)",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Мамонт",
+      "englishName": "Mammoth",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Медуза",
+      "englishName": "Medusa",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Мерфолк волновод",
+      "englishName": "Merfolk Wavebender",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Молодой белый дракон",
+      "englishName": "Young White Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Молодой латунный дракон",
+      "englishName": "Young Brass Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Невидимый охотник",
+      "englishName": "Invisible Stalker",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Пират капитан",
+      "englishName": "Pirate Captain",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Сатир мастер кутежа",
+      "englishName": "Satyr Revelmaster",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Химера",
+      "englishName": "Chimera",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Хобгоблин полководец",
+      "englishName": "Hobgoblin Warlord",
+      "source": "MM",
+      "typeLabel": "Фея (гоблиноид)",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Циклоп часовой",
+      "englishName": "Cyclops Sentry",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Чазм",
+      "englishName": "Chasme",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Эйзер пиромант",
+      "englishName": "Azer Pyromancer",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "6"
+    },
+    {
+      "title": "Бандит обманщик",
+      "englishName": "Bandit Deceiver",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Гигантская обезьяна",
+      "englishName": "Giant Ape",
+      "source": "MM",
+      "typeLabel": "Зверь",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Древесная зараза",
+      "englishName": "Tree Blight",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Древний грик",
+      "englishName": "Grick Ancient",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Иллитид",
+      "englishName": "Mind Flayer",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Каменный великан",
+      "englishName": "Stone Giant",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Кентавр хранитель",
+      "englishName": "Centaur Warden",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Лиловый некрогромила",
+      "englishName": "Violet Fungus Necrohulk",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Молодой медный дракон",
+      "englishName": "Young Copper Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Молодой чёрный дракон",
+      "englishName": "Young Black Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Они",
+      "englishName": "Oni",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Первобытный совомед",
+      "englishName": "Primeval Owlbear",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Ревенант кладбище",
+      "englishName": "Graveyard Revenant",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Синий слаад",
+      "englishName": "Blue Slaad",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Щитостраж",
+      "englishName": "Shield Guardian",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Юань-ти абоминация",
+      "englishName": "Yuan-ti Abomination",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "7"
+    },
+    {
+      "title": "Ассасин",
+      "englishName": "Assassin",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Берсерк командир",
+      "englishName": "Berserker Commander",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Вампир вестник ночи",
+      "englishName": "Vampire Nightbringer",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Гидра",
+      "englishName": "Hydra",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Гитьянки рыцарь",
+      "englishName": "Githyanki Knight",
+      "source": "MM",
+      "typeLabel": "Аберрация (гит)",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Гнолл демоньяк",
+      "englishName": "Gnoll Demoniac",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Духовная нага",
+      "englishName": "Spirit Naga",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Дьявол цепей",
+      "englishName": "Chain Devil",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Зелёный слаад",
+      "englishName": "Green Slaad",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Культист аберрации",
+      "englishName": "Aberrant Cultist",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Культист исчадия",
+      "englishName": "Fiend Cultist",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Культист смерти",
+      "englishName": "Death Cultist",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Культист стихии",
+      "englishName": "Elemental Cultist",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Куролиск регент",
+      "englishName": "Cockatrice Regent",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Молодой бронзовый дракон",
+      "englishName": "Young Bronze Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Молодой зелёный дракон",
+      "englishName": "Young Green Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Морозный великан",
+      "englishName": "Frost Giant",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Плащевик",
+      "englishName": "Cloaker",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Сфинкс тайн",
+      "englishName": "Sphinx of Secrets",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Тираннозавр Рекс",
+      "englishName": "Tyrannosaurus Rex",
+      "source": "MM",
+      "typeLabel": "Зверь (динозавр)",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Три-крин псионик",
+      "englishName": "Thri-kreen Psion",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Фомор",
+      "englishName": "Fomorian",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Хезроу",
+      "englishName": "Hezrou",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "8"
+    },
+    {
+      "title": "Глабрезу",
+      "englishName": "Glabrezu",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Глиняный голем",
+      "englishName": "Clay Golem",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Костяной дьявол",
+      "englishName": "Bone Devil",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Медная горгона",
+      "englishName": "Brazen Gorgon",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Молодой серебряный дракон",
+      "englishName": "Young Silver Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Молодой синий дракон",
+      "englishName": "Young Blue Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Никалот",
+      "englishName": "Nycaloth",
+      "source": "MM",
+      "typeLabel": "Исчадие (юголот)",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Облачный великан",
+      "englishName": "Cloud Giant",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Огненный великан",
+      "englishName": "Fire Giant",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Отвратительный йети",
+      "englishName": "Abominable Yeti",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Серый слаад",
+      "englishName": "Gray Slaad",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Трент",
+      "englishName": "Treant",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "9"
+    },
+    {
+      "title": "Аболет",
+      "englishName": "Aboleth",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Воин командир",
+      "englishName": "Warrior Commander",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Дэв",
+      "englishName": "Deva",
+      "source": "MM",
+      "typeLabel": "Небожитель (ангел)",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Исполнитель легенда",
+      "englishName": "Performer Legend",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Йоклол",
+      "englishName": "Yochlol",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Каменный голем",
+      "englishName": "Stone Golem",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Культист иерофант",
+      "englishName": "Cultist Hierophant",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Лютый ворг",
+      "englishName": "Dire Worg",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Молодой золотой дракон",
+      "englishName": "Young Gold Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Молодой красный дракон",
+      "englishName": "Young Red Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Нага стражник",
+      "englishName": "Guardian Naga",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Одарённый благородный",
+      "englishName": "Noble Prodigy",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Ревенант-обитель",
+      "englishName": "Haunting Revenant",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Слаад смерти",
+      "englishName": "Death Slaad",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Циклоп оракул",
+      "englishName": "Cyclops Oracle",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Шпион мастер",
+      "englishName": "Spy Master",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "10"
+    },
+    {
+      "title": "Бандит криминальный лорд",
+      "englishName": "Bandit Crime Lord",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Бехир",
+      "englishName": "Behir",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Дао",
+      "englishName": "Dao",
+      "source": "MM",
+      "typeLabel": "Элементаль (гений)",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Джинн",
+      "englishName": "Djinni",
+      "source": "MM",
+      "typeLabel": "Элементаль (гений)",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Иллитид арканист",
+      "englishName": "Mind Flayer Arcanist",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Ифрит",
+      "englishName": "Efreeti",
+      "source": "MM",
+      "typeLabel": "Элементаль (гений)",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Марид",
+      "englishName": "Marid",
+      "source": "MM",
+      "typeLabel": "Элементаль (гений)",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Ремораз",
+      "englishName": "Remorhaz",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Рогатый дьявол",
+      "englishName": "Horned Devil",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Рух",
+      "englishName": "Roc",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Рыцарь смерти претендент",
+      "englishName": "Death Knight Aspirant",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Сфинкс знаний",
+      "englishName": "Sphinx of Lore",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "11"
+    },
+    {
+      "title": "Арканалот",
+      "englishName": "Arcanaloth",
+      "source": "MM",
+      "typeLabel": "Исчадие (юголот)",
+      "documentedCr": "12"
+    },
+    {
+      "title": "Архимаг",
+      "englishName": "Archmage",
+      "source": "MM",
+      "typeLabel": "Гуманоид (волшебник)",
+      "documentedCr": "12"
+    },
+    {
+      "title": "Архисвященник",
+      "englishName": "Archpriest",
+      "source": "MM",
+      "typeLabel": "Гуманоид (жрец)",
+      "documentedCr": "12"
+    },
+    {
+      "title": "Гитцерай псионик",
+      "englishName": "Githzerai Psion",
+      "source": "MM",
+      "typeLabel": "Аберрация (гит)",
+      "documentedCr": "12"
+    },
+    {
+      "title": "Пират адмирал",
+      "englishName": "Pirate Admiral",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "12"
+    },
+    {
+      "title": "Странствующий рыцарь",
+      "englishName": "Questing Knight",
+      "source": "MM",
+      "typeLabel": "Гуманоид",
+      "documentedCr": "12"
+    },
+    {
+      "title": "Эриния",
+      "englishName": "Erinyes",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "12"
+    },
+    {
+      "title": "Бехолдер",
+      "englishName": "Beholder",
+      "source": "MM",
+      "typeLabel": "Аберрация",
+      "documentedCr": "13"
+    },
+    {
+      "title": "Вампир",
+      "englishName": "Vampire",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "13"
+    },
+    {
+      "title": "Взрослый белый дракон",
+      "englishName": "Adult White Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "13"
+    },
+    {
+      "title": "Взрослый латунный дракон",
+      "englishName": "Adult Brass Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "13"
+    },
+    {
+      "title": "Нальфешни",
+      "englishName": "Nalfeshnee",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "13"
+    },
+    {
+      "title": "Ракшаса",
+      "englishName": "Rakshasa",
+      "source": "MM",
+      "typeLabel": "Исчадие",
+      "documentedCr": "13"
+    },
+    {
+      "title": "Теневой дракон",
+      "englishName": "Shadow Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "13"
+    },
+    {
+      "title": "Ультролот",
+      "englishName": "Ultroloth",
+      "source": "MM",
+      "typeLabel": "Исчадие (юголот)",
+      "documentedCr": "13"
+    },
+    {
+      "title": "Штормовой великан",
+      "englishName": "Storm Giant",
+      "source": "MM",
+      "typeLabel": "Великан",
+      "documentedCr": "13"
+    },
+    {
+      "title": "Взрослый медный дракон",
+      "englishName": "Adult Copper Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "14"
+    },
+    {
+      "title": "Взрослый чёрный дракон",
+      "englishName": "Adult Black Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "14"
+    },
+    {
+      "title": "Ледяной дьявол",
+      "englishName": "Ice Devil",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "14"
+    },
+    {
+      "title": "Тиран смерти",
+      "englishName": "Death Tyrant",
+      "source": "MM",
+      "typeLabel": "Нежить (бехолдер)",
+      "documentedCr": "14"
+    },
+    {
+      "title": "Вампир повелитель тени",
+      "englishName": "Vampire Umbral Lord",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "15"
+    },
+    {
+      "title": "Взрослый бронзовый дракон",
+      "englishName": "Adult Bronze Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "15"
+    },
+    {
+      "title": "Взрослый зелёный дракон",
+      "englishName": "Adult Green Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "15"
+    },
+    {
+      "title": "Лорд мумия",
+      "englishName": "Mummy Lord",
+      "source": "MM",
+      "typeLabel": "Нежить (жрец)",
+      "documentedCr": "15"
+    },
+    {
+      "title": "Пурпурный червь",
+      "englishName": "Purple Worm",
+      "source": "MM",
+      "typeLabel": "Монстр",
+      "documentedCr": "15"
+    },
+    {
+      "title": "Саламандра мастер инферно",
+      "englishName": "Salamander Inferno Master",
+      "source": "MM",
+      "typeLabel": "Элементаль",
+      "documentedCr": "15"
+    },
+    {
+      "title": "Взрослый серебряный дракон",
+      "englishName": "Adult Silver Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "16"
+    },
+    {
+      "title": "Взрослый синий дракон",
+      "englishName": "Adult Blue Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "16"
+    },
+    {
+      "title": "Гитьянки дракомант",
+      "englishName": "Githyanki Dracomancer",
+      "source": "MM",
+      "typeLabel": "Аберрация (гит)",
+      "documentedCr": "16"
+    },
+    {
+      "title": "Железный голем",
+      "englishName": "Iron Golem",
+      "source": "MM",
+      "typeLabel": "Конструкт",
+      "documentedCr": "16"
+    },
+    {
+      "title": "Зараза Галтиас",
+      "englishName": "Gulthias Blight",
+      "source": "MM",
+      "typeLabel": "Растение",
+      "documentedCr": "16"
+    },
+    {
+      "title": "Марилит",
+      "englishName": "Marilith",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "16"
+    },
+    {
+      "title": "Планетар",
+      "englishName": "Planetar",
+      "source": "MM",
+      "typeLabel": "Небожитель (ангел)",
+      "documentedCr": "16"
+    },
+    {
+      "title": "Взрослый золотой дракон",
+      "englishName": "Adult Gold Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "17"
+    },
+    {
+      "title": "Взрослый красный дракон",
+      "englishName": "Adult Red Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "17"
+    },
+    {
+      "title": "Гористо",
+      "englishName": "Goristro",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "17"
+    },
+    {
+      "title": "Драколич",
+      "englishName": "Dracolich",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "17"
+    },
+    {
+      "title": "Дракочерепаха",
+      "englishName": "Dragon Turtle",
+      "source": "MM",
+      "typeLabel": "Дракон",
+      "documentedCr": "17"
+    },
+    {
+      "title": "Рыцарь смерти",
+      "englishName": "Death Knight",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "17"
+    },
+    {
+      "title": "Сфинкс доблести",
+      "englishName": "Sphinx of Valor",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "17"
+    },
+    {
+      "title": "Балор",
+      "englishName": "Balor",
+      "source": "MM",
+      "typeLabel": "Исчадие (демон)",
+      "documentedCr": "19"
+    },
+    {
+      "title": "Владыка зверей",
+      "englishName": "Animal Lord",
+      "source": "MM",
+      "typeLabel": "Небожитель",
+      "documentedCr": "20"
+    },
+    {
+      "title": "Древний белый дракон",
+      "englishName": "Ancient White Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "20"
+    },
+    {
+      "title": "Древний латунный дракон",
+      "englishName": "Ancient Brass Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "20"
+    },
+    {
+      "title": "Исчадие пропасти",
+      "englishName": "Pit Fiend",
+      "source": "MM",
+      "typeLabel": "Исчадие (дьявол)",
+      "documentedCr": "20"
+    },
+    {
+      "title": "Архикарга",
+      "englishName": "Arch-hag",
+      "source": "MM",
+      "typeLabel": "Фея",
+      "documentedCr": "21"
+    },
+    {
+      "title": "Древний медный дракон",
+      "englishName": "Ancient Copper Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "21"
+    },
+    {
+      "title": "Древний чёрный дракон",
+      "englishName": "Ancient Black Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "21"
+    },
+    {
+      "title": "Лич",
+      "englishName": "Lich",
+      "source": "MM",
+      "typeLabel": "Нежить (волшебник)",
+      "documentedCr": "21"
+    },
+    {
+      "title": "Солар",
+      "englishName": "Solar",
+      "source": "MM",
+      "typeLabel": "Небожитель (ангел)",
+      "documentedCr": "21"
+    },
+    {
+      "title": "Древний бронзовый дракон",
+      "englishName": "Ancient Bronze Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "22"
+    },
+    {
+      "title": "Древний зелёный дракон",
+      "englishName": "Ancient Green Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "22"
+    },
+    {
+      "title": "Стихийный катаклизм",
+      "englishName": "Elemental Cataclysm",
+      "source": "MM",
+      "typeLabel": "Элементаль (титан)",
+      "documentedCr": "22"
+    },
+    {
+      "title": "Древний серебряный дракон",
+      "englishName": "Ancient Silver Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "23"
+    },
+    {
+      "title": "Древний синий дракон",
+      "englishName": "Ancient Blue Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "23"
+    },
+    {
+      "title": "Капля аннигиляции",
+      "englishName": "Blob of Annihilation",
+      "source": "MM",
+      "typeLabel": "Слизь (титан)",
+      "documentedCr": "23"
+    },
+    {
+      "title": "Кракен",
+      "englishName": "Kraken",
+      "source": "MM",
+      "typeLabel": "Монстр (титан)",
+      "documentedCr": "23"
+    },
+    {
+      "title": "Эмпирей",
+      "englishName": "Empyrean",
+      "source": "MM",
+      "typeLabel": "Небожитель, Исчадие (титан)",
+      "documentedCr": "23"
+    },
+    {
+      "title": "Древний золотой дракон",
+      "englishName": "Ancient Gold Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (металлический)",
+      "documentedCr": "24"
+    },
+    {
+      "title": "Древний красный дракон",
+      "englishName": "Ancient Red Dragon",
+      "source": "MM",
+      "typeLabel": "Дракон (цветной)",
+      "documentedCr": "24"
+    },
+    {
+      "title": "Колосс",
+      "englishName": "Colossus",
+      "source": "MM",
+      "typeLabel": "Конструкт (титан)",
+      "documentedCr": "25"
+    },
+    {
+      "title": "Тарраск",
+      "englishName": "Tarrasque",
+      "source": "MM",
+      "typeLabel": "Монстр (титан)",
+      "documentedCr": "30"
+    },
+    {
+      "title": "Демилич",
+      "englishName": "Demilich",
+      "source": "MM",
+      "typeLabel": "Нежить",
+      "documentedCr": "18"
+    }
+  ]
+}
