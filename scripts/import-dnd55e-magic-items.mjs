@@ -105,12 +105,37 @@ function firstText(nodes) {
   return ''
 }
 
+const SPELL_LINK_ALIASES = {
+  'wall-of-wind-phb': 'wind-wall-phb',
+  'leomund-s-tiny-hut-phb': 'leomunds-tiny-hut-phb',
+  'mordenkainen-s-private-sanctum-phb': 'mordenkainens-private-sanctum-phb',
+  'otiluke-s-resilient-sphere-phb': 'otilukes-resilient-sphere-phb',
+  'tasha-s-hideous-laughter-phb': 'tashas-hideous-laughter-phb'
+}
+
+const GLOSSARY_LINK_ALIASES = {
+  'magic-action-phb': 'magic-phb',
+  advantage: 'advantage-phb',
+  'melee-attack-phb': 'attack-phb',
+  'hit-phb': 'attack-roll-phb',
+  'ring-phb': 'magic-items-phb',
+  'spells-phb': 'spell-phb',
+  'destroyed-phb': 'object-phb',
+  'auran-phb': 'languages-phb',
+  'terran-phb': 'languages-phb',
+  'ignan-phb': 'languages-phb',
+  'aquan-phb': 'languages-phb',
+  'abyss-phb': 'planar-effects-dmg',
+  'fiend-phb': 'creature-type-phb',
+  'undead-phb': 'creature-type-phb'
+}
+
 function cleanRuleText(value) {
   return String(value || '')
     .replace(/\{@br\}/gu, ' ')
-    .replace(/\{@(spell)\s+([^}|]+)\|url:([^}]+)\}/gu, (_, type, label, url) => `[${label}](/dnd55e/spells?spell=${url})`)
+    .replace(/\{@(spell)\s+([^}|]+)\|url:([^}]+)\}/gu, (_, type, label, url) => `[${label}](/dnd55e/spells?spell=${SPELL_LINK_ALIASES[url] || url})`)
     .replace(/\{@(magicItem)\s+([^}|]+)\|url:([^}]+)\}/gu, (_, type, label, url) => `[${label}](/dnd55e/magic-items?item=${url})`)
-    .replace(/\{@(glossary)\s+([^}|]+)\|url:([^}]+)\}/gu, (_, type, label, url) => `[${label}](/dnd55e/glossary?rule=${url})`)
+    .replace(/\{@(glossary)\s+([^}|]+)\|url:([^}]+)\}/gu, (_, type, label, url) => `[${label}](/dnd55e/glossary?rule=${GLOSSARY_LINK_ALIASES[url] || url})`)
     .replace(/\{@(?:bold|b)\s+([^}]+)\}/gu, '**$1**')
     .replace(/\{@(?:roll|dice)\s+([^}]+)\}/gu, '$1')
     .replace(/\{@\w+\s+([^}|]+)(?:\|[^}]*)?\}/gu, '$1')

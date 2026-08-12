@@ -12,12 +12,17 @@ const props = defineProps({
 const route = useRoute()
 const activeEdition = computed(() => props.edition || (route.path.startsWith('/dnd55e') ? '2024' : '2014'))
 
+// Explicit rule links can include an English name in a nested bracket pair:
+// [Увеличение/уменьшение [Enlarge/Reduce]](/dnd55e/spells?spell=enlarge-reduce-phb)
+const explicitLinkPattern = /(\[(?:[^\[\]\n]+|\[[^\]\n]*\])+\]\([^)\s]+\))/g
+const exactExplicitLinkPattern = /^\[((?:[^\[\]\n]+|\[[^\]\n]*\])+)\]\(([^)\s]+)\)$/
+
 const tokens = computed(() => String(props.text || '')
   // Явные ссылки в формате [текст](/путь) — на страницы черт, заклинаний и т. п.
-  .split(/(\[[^\]\n]+\]\([^)\s]+\))/g)
+  .split(explicitLinkPattern)
   .filter(Boolean)
   .flatMap((chunk) => {
-    const link = chunk.match(/^\[([^\]\n]+)\]\(([^)\s]+)\)$/)
+    const link = chunk.match(exactExplicitLinkPattern)
     if (link) return [{ type: 'extlink', text: link[1], path: link[2], bold: false }]
     return chunk
       .split(/(\*\*[^*\n]+\*\*)/g)

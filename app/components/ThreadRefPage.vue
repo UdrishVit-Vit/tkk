@@ -438,7 +438,12 @@ onMounted(() => {
   if (props.cardActions.includes('bookmark')) loadBookmarks()
   window.addEventListener('keydown', onKeydown)
 
-  const initial = String(route.query[props.queryKey] || '')
+  const requestedInitial = String(route.query[props.queryKey] || '')
+  const hasItem = id => props.groups.some(group => group.items?.some(item => item.id === id))
+  const sourceNeutralInitial = requestedInitial.replace(/-(?:phb|dmg|mm)$/i, '')
+  const initial = hasItem(requestedInitial) || !hasItem(sourceNeutralInitial)
+    ? requestedInitial
+    : sourceNeutralInitial
   if (initial) {
     open.value = initial
     // Прокручиваем к нужному правилу только ПОСЛЕ того, как карточка

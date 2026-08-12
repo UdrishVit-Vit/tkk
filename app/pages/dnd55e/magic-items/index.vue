@@ -42,19 +42,6 @@ const TYPE_LABELS = {
   other: 'Другой предмет'
 }
 
-const TYPE_GLYPHS = {
-  armor: '◈',
-  weapon: '†',
-  potion: '⚗',
-  ring: '○',
-  rod: '╎',
-  staff: 'Ψ',
-  wand: '✦',
-  scroll: '≋',
-  wondrous: '◇',
-  other: '◆'
-}
-
 const search = ref('')
 const open = ref(null)
 const showFilter = ref(false)
@@ -196,7 +183,6 @@ useSeoMeta({
 
     <template #item="{ item }">
       <span class="magic-item-list-card">
-        <span class="magic-item-glyph" aria-hidden="true">{{ TYPE_GLYPHS[item.raw.type] }}</span>
         <span class="magic-item-list-copy">
           <span class="magic-item-list-name">{{ item.raw.title }}</span>
           <span class="magic-item-list-original">{{ item.raw.englishName }}</span>
@@ -213,7 +199,6 @@ useSeoMeta({
       </div>
 
       <header class="magic-item-heading">
-        <span class="magic-item-heading-glyph" aria-hidden="true">{{ TYPE_GLYPHS[item.raw.type] }}</span>
         <span>
           <span class="magic-item-title">{{ item.raw.title }}</span>
           <span class="magic-item-original">{{ item.raw.englishName }}</span>
@@ -266,14 +251,11 @@ useSeoMeta({
 .magic-items-note b{color:var(--theme-heading)}
 .magic-items-note p{margin:5px 0 0;font-size:12px;line-height:1.55}
 .magic-item-list-card{display:flex;align-items:center;gap:10px;width:100%;min-width:0}
-.magic-item-glyph,.magic-item-heading-glyph{display:grid;place-items:center;border:1px solid rgba(var(--theme-accent-rgb),.2);background:rgba(var(--theme-accent-rgb),.055);color:var(--theme-accent-strong)}
-.magic-item-glyph{width:34px;height:34px;flex:0 0 auto;border-radius:8px;font:18px/1 Georgia,serif}
 .magic-item-list-copy{display:flex;min-width:0;flex-direction:column;gap:2px;text-align:left}
 .magic-item-list-name,.magic-item-list-original{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .magic-item-list-name{color:rgba(var(--theme-heading-rgb),.94);font-size:13px;font-weight:700}
 .magic-item-list-original{color:rgba(var(--theme-text-rgb),.47);font-size:10px;letter-spacing:.02em}
-.magic-item-heading{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:17px;margin:14px 0 19px}
-.magic-item-heading-glyph{width:68px;height:68px;border-radius:11px;font:34px/1 Georgia,serif;box-shadow:inset 0 0 24px rgba(var(--theme-accent-rgb),.04)}
+.magic-item-heading{margin:14px 0 19px}
 .magic-item-title,.magic-item-original,.magic-item-subtitle{display:block}
 .magic-item-title{font:700 27px/1.1 Georgia,serif;color:var(--theme-heading)}
 .magic-item-original{margin-top:4px;color:rgba(var(--theme-accent-strong-rgb),.72);font-size:13px}
@@ -292,5 +274,5 @@ useSeoMeta({
 .magic-item-table-wrap th{background:rgba(var(--theme-accent-rgb),.055);color:rgba(var(--theme-accent-strong-rgb),.82);font-size:10px;letter-spacing:.05em;text-transform:uppercase}
 .magic-item-table-wrap td{min-width:88px;color:rgba(var(--theme-text-rgb),.76);line-height:1.5}
 .magic-item-table-wrap tr:last-child td{border-bottom:0}
-@media (max-width:760px){.magic-item-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.magic-item-heading{grid-template-columns:1fr}.magic-item-heading-glyph{width:52px;height:52px;font-size:26px}.magic-item-title{font-size:23px}}
+@media (max-width:760px){.magic-item-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.magic-item-title{font-size:23px}}
 </style>
