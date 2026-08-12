@@ -1457,6 +1457,10 @@ function printRace() {
             <!-- VARIETY-DRIVEN DOSSIER: tabs → description → summary → features -->
             <section v-if="varietyItemSections.length" class="rd-variety-section">
             <div class="rd-variety-tabs rd-thread-node">
+              <div class="rd-variety-selector-head">
+                <span>Выберите разновидность</span>
+                <small>{{ varietyItemSections.length }} {{ varietyItemSections.length === 2 ? 'варианта' : 'вариантов' }}</small>
+              </div>
               <button
                 v-for="section in varietyItemSections"
                 :key="section.id"
@@ -1631,8 +1635,14 @@ function printRace() {
                       <div v-if="varietyItemsHaveImages" class="rd-item-img">
                         <img v-if="item.image" :src="item.image" :alt="item.title">
                       </div>
-                      <strong>{{ item.title }}</strong>
-                      <p>{{ item.text }}</p>
+                      <div class="rd-item-name">
+                        <span class="rd-item-mobile-label">{{ sectionItemsNameLabel(activeVariety) }}</span>
+                        <strong>{{ item.title }}</strong>
+                      </div>
+                      <div class="rd-item-copy">
+                        <span class="rd-item-mobile-label">{{ sectionItemsColumnLabel(activeVariety) }}</span>
+                        <p>{{ item.text }}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1854,6 +1864,37 @@ function printRace() {
                   </article>
                 </div>
               </div>
+              <div class="rd-wind-mobile" :aria-label="activeWindTattooTable.title">
+                <p class="rd-wind-mobile-hint">Нажмите на пару Ветров, чтобы прочитать её полностью.</p>
+                <details
+                  v-for="(entry, index) in activeWindTattooTable.entries"
+                  :key="`mobile-${entry.whiteTitle}`"
+                  class="rd-wind-mobile-entry"
+                  :open="index === 0"
+                >
+                  <summary>
+                    <span><small>Белый Ветер</small><b>{{ entry.whiteTitle }}</b></span>
+                    <span><small>Чёрный Ветер</small><b>{{ entry.blackTitle }}</b></span>
+                    <i aria-hidden="true" />
+                  </summary>
+                  <div class="rd-wind-mobile-pair">
+                    <article class="rd-wind-cell rd-wind-cell--white">
+                      <span class="rd-wind-cell-label">Белый Ветер</span>
+                      <h3>{{ entry.whiteTitle }}</h3>
+                      <p>{{ entry.whiteText }}</p>
+                    </article>
+                    <article class="rd-wind-cell rd-wind-cell--black">
+                      <span class="rd-wind-cell-label">Чёрный Ветер</span>
+                      <h3>{{ entry.blackTitle }}</h3>
+                      <p>{{ entry.blackText }}</p>
+                      <p class="rd-wind-darkness">
+                        Вы получаете <strong>{{ entry.darknessPoints }}</strong>
+                        {{ entry.darknessPoints === 1 ? 'Пункт Тьмы' : 'Пункта Тьмы' }}.
+                      </p>
+                    </article>
+                  </div>
+                </details>
+              </div>
             </div>
 
             <!-- race-specific titled tables, e.g. "Татуировки ветров" (Аджаид) or "Стигматы" (Ойрдуг) -->
@@ -1878,8 +1919,14 @@ function printRace() {
                   <div v-if="sectionItems(section).some(i => i.image)" class="rd-item-img">
                     <img v-if="item.image" :src="item.image" :alt="item.title">
                   </div>
-                  <strong>{{ item.title }}</strong>
-                  <p>{{ item.text }}</p>
+                  <div class="rd-item-name">
+                    <span class="rd-item-mobile-label">{{ sectionItemsNameLabel(section) }}</span>
+                    <strong>{{ item.title }}</strong>
+                  </div>
+                  <div class="rd-item-copy">
+                    <span class="rd-item-mobile-label">{{ sectionItemsColumnLabel(section) }}</span>
+                    <p>{{ item.text }}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2190,6 +2237,7 @@ function printRace() {
 /* ---- variety-driven dossier ---- */
 .rd-variety-section{display:grid;gap:16px}
 .rd-variety-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:5px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid rgba(var(--theme-contrast-rgb),.06);overflow-x:auto}
+.rd-variety-selector-head{display:none}
 .rd-vtab{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;border:0;border-radius:10px;padding:8px 18px;background:transparent;color:rgba(var(--theme-text-rgb),.7);cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:19px;letter-spacing:.04em;transition:all .2s;white-space:nowrap}
 .rd-vtab:hover{color:rgba(var(--theme-accent-strong-rgb),.95)}
 .rd-vtab.active{background:rgba(var(--theme-accent-rgb),.18);color:rgba(var(--theme-accent-strong-rgb),.98);box-shadow:inset 0 0 0 1px rgba(var(--theme-accent-rgb),.4)}
@@ -2253,6 +2301,7 @@ function printRace() {
 .rd-wind-darkness strong{font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1;color:rgba(var(--theme-accent-strong-rgb),1)}
 .rd-wind-cell.is-spark-kindled{background:rgba(var(--theme-accent-rgb),.11)}
 .rd-wind-cell.is-spark-kindled h3{color:rgba(var(--theme-accent-strong-rgb),1)}
+.rd-wind-mobile{display:none}
 
 .rd-items{display:grid;margin-top:14px;overflow:hidden;border:1px solid rgba(var(--theme-contrast-rgb),.08);border-radius:12px;background:rgba(var(--theme-contrast-rgb),.012)}
 .rd-items-head,.rd-item-row{display:grid;grid-template-columns:84px 160px minmax(0,1fr);gap:14px;align-items:start}
@@ -2263,6 +2312,8 @@ function printRace() {
 .rd-item-img img{width:min(66px,100%);max-height:80px;object-fit:contain}
 .rd-item-row strong{display:block;margin-bottom:3px;color:rgba(var(--theme-heading-rgb),.92);font-size:14px}
 .rd-item-row p{margin:0;font-size:13px;line-height:1.55;color:rgba(var(--theme-text-rgb),.74)}
+.rd-item-name,.rd-item-copy{min-width:0}
+.rd-item-mobile-label{display:none}
 
 /* ---- Кровь Змей — inline blood feature card ---- */
 .rd-feat--blood{flex-direction:column;align-items:flex-start;gap:10px}
@@ -2346,9 +2397,9 @@ function printRace() {
   .rd-thread-node::before,.rd-thread .rd-block::before,.rd-thread-node::after,.rd-thread .rd-block::after{display:none}
   .rd-presentation{width:100%;min-width:0;border-radius:14px}
   .rd-source-panel{border-radius:13px 13px 0 0}
-  .rd-source-choices.has-variants{display:flex;max-width:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
-  .rd-source-choices.has-variants::-webkit-scrollbar{display:none}
-  .rd-source-choices.has-variants .rd-source-choice{flex:0 0 min(270px,82vw);border-top:0;border-left:1px solid rgba(var(--theme-contrast-rgb),.07);scroll-snap-align:start}
+  .rd-source-choices.has-variants{display:grid;grid-template-columns:1fr;max-width:100%;overflow:visible}
+  .rd-source-choices.has-variants .rd-source-choice{width:100%;border-top:1px solid rgba(var(--theme-contrast-rgb),.07);border-left:0}
+  .rd-source-choices.has-variants .rd-source-choice:first-child{border-top:0}
   .rd-source-choice{min-width:0;padding:11px 14px}
   .rd-source-line{gap:6px;flex-wrap:wrap;white-space:normal}
   .rd-source-line strong{flex:1 1 100%;font-size:11px;white-space:normal}
@@ -2360,9 +2411,11 @@ function printRace() {
   .rd-desc-inner{font-size:14px;line-height:1.65}
   .rd-overview-paragraph{padding:10px 12px;overflow-wrap:break-word}
   .rd-variety-section,.rd-variety-body,.rd-block{width:100%;min-width:0}
-  .rd-variety-tabs{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
-  .rd-variety-tabs::-webkit-scrollbar{display:none}
-  .rd-vtab{flex:0 0 auto;min-width:145px;padding:8px 13px;scroll-snap-align:start}
+  .rd-variety-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;overflow:visible;padding:7px}
+  .rd-variety-selector-head{display:flex;grid-column:1/-1;align-items:center;justify-content:space-between;gap:10px;padding:4px 6px 7px;color:rgba(var(--theme-text-rgb),.55);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  .rd-variety-selector-head small{font-size:8px;font-weight:500;letter-spacing:.08em;color:rgba(var(--theme-text-rgb),.38)}
+  .rd-vtab{width:100%;min-width:0;padding:9px 8px;white-space:normal;text-align:center;line-height:1.05}
+  .rd-vtab:last-child:nth-child(even){grid-column:1/-1}
   .rd-block{border-radius:14px;padding:17px 16px}
   .rd-h2{font-size:11px;line-height:1.35;letter-spacing:.15em}
   .rd-variety-desc,.rd-names{font-size:16px;line-height:1.65;overflow-wrap:break-word}
@@ -2372,17 +2425,36 @@ function printRace() {
   .rd-features{grid-template-columns:1fr}
   .rd-feat{min-width:0;padding:14px 15px}
   .rd-feat-text{white-space:normal;overflow-wrap:break-word}
-  .rd-wind-head{display:none}
-  .rd-wind-row{grid-template-columns:1fr}
-  .rd-wind-row + .rd-wind-row{border-top-color:rgba(var(--theme-accent-rgb),.22)}
+  .rd-wind-table{display:none}
+  .rd-wind-mobile{display:grid;gap:8px}
+  .rd-wind-mobile-hint{margin:0 0 3px;color:rgba(var(--theme-text-rgb),.54);font-size:12px;line-height:1.45}
+  .rd-wind-mobile-entry{overflow:hidden;border:1px solid rgba(var(--theme-contrast-rgb),.1);border-radius:12px;background:rgba(var(--theme-contrast-rgb),.016)}
+  .rd-wind-mobile-entry summary{position:relative;display:grid;gap:8px;padding:13px 38px 13px 14px;cursor:pointer;list-style:none;touch-action:manipulation}
+  .rd-wind-mobile-entry summary::-webkit-details-marker{display:none}
+  .rd-wind-mobile-entry summary>span{display:grid;gap:2px;min-width:0}
+  .rd-wind-mobile-entry summary small{color:rgba(var(--theme-accent-rgb),.62);font-size:7.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  .rd-wind-mobile-entry summary b{color:rgba(var(--theme-heading-rgb),.9);font-size:12px;line-height:1.25;text-transform:uppercase;overflow-wrap:break-word}
+  .rd-wind-mobile-entry summary i{position:absolute;top:50%;right:14px;width:17px;height:17px;border:1px solid rgba(var(--theme-accent-rgb),.32);border-radius:50%;transform:translateY(-50%)}
+  .rd-wind-mobile-entry summary i::before,.rd-wind-mobile-entry summary i::after{content:"";position:absolute;top:50%;left:50%;width:7px;height:1px;background:rgba(var(--theme-accent-rgb),.8);transform:translate(-50%,-50%)}
+  .rd-wind-mobile-entry summary i::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .18s}
+  .rd-wind-mobile-entry[open] summary{background:rgba(var(--theme-accent-rgb),.065)}
+  .rd-wind-mobile-entry[open] summary i::after{transform:translate(-50%,-50%) rotate(0)}
+  .rd-wind-mobile-pair{border-top:1px solid rgba(var(--theme-accent-rgb),.14)}
   .rd-wind-cell-label{display:block}
   .rd-wind-cell--black{border-top:1px solid rgba(var(--theme-accent-rgb),.16);border-left:0}
   .rd-foot{grid-template-columns:1fr}
-  .rd-items,.rd-wind-table,.rd-nb-table{width:100%;max-width:100%;overflow-x:auto}
-  .rd-items-head,.rd-item-row{grid-template-columns:58px minmax(110px,.7fr) minmax(180px,1fr);min-width:420px}
-  .rd-items.compact .rd-items-head,.rd-items.compact .rd-item-row{grid-template-columns:140px minmax(220px,1fr);min-width:390px}
-  .rd-item-img img{max-width:52px}
-  .rd-nb-thead,.rd-nb-row{min-width:410px;padding-right:12px;padding-left:12px}
+  .rd-items,.rd-wind-table,.rd-nb-table{width:100%;max-width:100%;overflow:hidden}
+  .rd-items{gap:8px;border:0;background:transparent}
+  .rd-items-head{display:none}
+  .rd-item-row,.rd-items.compact .rd-item-row{display:grid;grid-template-columns:72px minmax(0,1fr);grid-template-areas:"image name" "image copy";gap:8px 12px;min-width:0;padding:13px;border:1px solid rgba(var(--theme-contrast-rgb),.09);border-radius:12px;background:rgba(var(--theme-contrast-rgb),.018)}
+  .rd-items.compact .rd-item-row{grid-template-columns:1fr;grid-template-areas:"name" "copy"}
+  .rd-item-img{grid-area:image;align-self:start;width:72px;min-height:72px}
+  .rd-item-img img{width:100%;max-width:68px;max-height:82px}
+  .rd-item-name{grid-area:name;align-self:end}
+  .rd-item-copy{grid-area:copy;min-width:0}
+  .rd-item-mobile-label{display:block;margin-bottom:4px;color:rgba(var(--theme-accent-rgb),.65);font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  .rd-item-row strong{font-size:16px;line-height:1.2;overflow-wrap:anywhere}
+  .rd-item-row p{font-size:14px;line-height:1.58;overflow-wrap:anywhere}
   .rd-nb-d4-grid{grid-template-columns:1fr}
   .rd-blood-result{grid-template-columns:1fr}
   .rd-blood-result-divider{width:auto;height:1px;margin:0 12px}
@@ -2466,7 +2538,17 @@ function printRace() {
 .rd-nb-collapse-enter-from,.rd-nb-collapse-leave-to{opacity:0;max-height:0}
 .rd-nb-collapse-enter-to,.rd-nb-collapse-leave-from{opacity:1;max-height:2000px}
 
-@media (max-width: 760px){.rd-nb-d4-grid{grid-template-columns:1fr}}
+@media (max-width: 760px){
+  .rd-nb-d4-grid{grid-template-columns:1fr}
+  .rd-nb-thead,.rd-nb-row{grid-template-columns:30px minmax(0,1fr) 54px;min-width:0;gap:5px;padding-right:7px;padding-left:7px}
+  .rd-nb-d4-grid .rd-nb-thead,.rd-nb-d4-grid .rd-nb-row{grid-template-columns:64px minmax(0,1fr) 52px}
+  .rd-nb-thead--3col,.rd-nb-row--3col{grid-template-columns:34px 58px minmax(0,1fr)}
+  .rd-nb-thead{font-size:7.5px;letter-spacing:.04em}
+  .rd-nb-cell-desc{min-width:0;font-size:14px;overflow-wrap:break-word}
+  .rd-nb-cell-val{min-width:0;font-size:17px;overflow-wrap:break-word}
+  .rd-nb-cell-die{font-size:14px}
+  .rd-nb-acc-body{padding:12px 8px 14px}
+}
 
 @media print{
   .rd-nav,.rd-actions,.rd-wordmark{display:none}
