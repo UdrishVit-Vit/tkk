@@ -1407,6 +1407,13 @@ function scrollToClassFeature(featureId) {
       </Teleport>
 
       <div class="cls-mode-panel cls-thread-node">
+        <div v-if="vm.classHasArchetypes" class="cls-mode-mobile-head">
+          <div>
+            <span>Вариант развития</span>
+            <strong>Выберите архетип</strong>
+          </div>
+          <small>{{ sourceFilteredArchetypeCards.length }} {{ sourceFilteredArchetypeCards.length === 1 ? 'вариант' : sourceFilteredArchetypeCards.length >= 2 && sourceFilteredArchetypeCards.length <= 4 ? 'варианта' : 'вариантов' }}</small>
+        </div>
         <div class="cls-mode-top">
           <button
             type="button"
@@ -1417,6 +1424,7 @@ function scrollToClassFeature(featureId) {
           >
             <span class="cls-mode-name">Базовый класс</span>
             <span class="cls-mode-summary">Хиты, характеристики, спасброски</span>
+            <span class="cls-mode-card-meta">{{ vm.systemEditionLabel || 'D&D 5e 2014' }}</span>
           </button>
           <button
             v-for="arch in sourceFilteredArchetypeCards"
@@ -1429,6 +1437,7 @@ function scrollToClassFeature(featureId) {
           >
             <span class="cls-mode-name">{{ arch.name }}</span>
             <span class="cls-mode-summary">{{ arch.summary }}</span>
+            <span class="cls-mode-card-meta"><b>{{ arch.source }}</b><span>{{ arch.level }}</span></span>
           </button>
         </div>
         <div v-if="!vm.classHasArchetypes" class="cls-arch-empty">Подклассы для этого класса пока не добавлены.</div>
@@ -2956,6 +2965,7 @@ function scrollToClassFeature(featureId) {
 }
 
 .cls-mode-panel{margin-top:26px;padding:0;border-top:0}
+.cls-mode-mobile-head,.cls-mode-card-meta{display:none}
 .cls-mode-top{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .cls-mode-btn{
   display:flex;
@@ -3272,11 +3282,21 @@ function scrollToClassFeature(featureId) {
   .cls-section-tools{display:grid;width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;overflow:visible}
   .cls-section-btn{width:100%;min-height:42px;padding:0 8px;border-radius:10px;font-size:9px;letter-spacing:.09em;white-space:normal}
   .cls-tool-message{display:block;width:100%;margin-top:8px}
-  .cls-mode-panel{margin-top:14px;padding:0}
-  .cls-mode-top{display:flex;gap:8px;max-width:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
-  .cls-mode-top::-webkit-scrollbar{display:none}
-  .cls-mode-btn{flex:0 0 min(270px,82vw);min-width:0;min-height:62px;padding:11px 14px;scroll-snap-align:start}
-  .cls-mode-name{font-size:16px}
+  .cls-mode-panel{margin-top:14px;padding:10px;border:1px solid rgba(var(--theme-contrast-rgb),.085);border-radius:14px;background:rgba(var(--theme-surface-rgb),.18)}
+  .cls-mode-mobile-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:2px 3px 10px}
+  .cls-mode-mobile-head>div{display:flex;min-width:0;flex-direction:column;gap:3px}
+  .cls-mode-mobile-head span{font-size:8px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.42)}
+  .cls-mode-mobile-head strong{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;line-height:1;color:rgba(var(--theme-heading-rgb),.94)}
+  .cls-mode-mobile-head small{flex:none;font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.42)}
+  .cls-mode-top{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;max-width:100%;overflow:visible}
+  .cls-mode-btn{position:relative;width:100%;min-width:0;min-height:78px;padding:11px 42px 11px 13px;border-radius:11px}
+  .cls-mode-btn::after{content:'›';position:absolute;top:50%;right:14px;translate:0 -50%;font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:400;color:rgba(var(--theme-text-rgb),.34)}
+  .cls-mode-btn.active::after{content:'✓';font-family:'Hanken Grotesk',sans-serif;font-size:13px;font-weight:800;color:rgba(var(--theme-accent-strong-rgb),.96)}
+  .cls-mode-name{overflow:visible;font-size:18px;line-height:1.1;text-overflow:clip;white-space:normal;overflow-wrap:break-word}
+  .cls-mode-summary{display:-webkit-box;overflow:hidden;font-size:10px;line-height:1.35;text-overflow:clip;white-space:normal;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+  .cls-mode-card-meta{display:flex;align-items:center;gap:8px;margin-top:2px;font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.38)}
+  .cls-mode-card-meta b{border-radius:5px;background:rgba(var(--theme-accent-rgb),.14);padding:2px 5px;color:rgba(var(--theme-accent-strong-rgb),.88)}
+  .cls-mode-card-meta span{overflow-wrap:anywhere}
   .cls-arch-empty{margin-top:10px;padding:17px 14px;font-size:15px;line-height:1.45}
   .cls-build-panel{gap:14px;margin-top:14px}
   .cls-build-top{gap:14px;padding:18px;border-radius:13px}
@@ -3285,6 +3305,16 @@ function scrollToClassFeature(featureId) {
   .cls-build-meta{font-size:8px;line-height:1.4}
   .cls-source-row{min-width:0;align-items:flex-start;border-top:1px solid rgba(var(--theme-accent-rgb),.14);padding:12px 0 0}
   .cls-source-row div{justify-content:flex-start}
+  .cls-author-thread.has-variants{display:grid;grid-template-columns:minmax(0,1fr)}
+  .cls-author-tab{width:100%;min-height:64px;padding:11px 14px;border-top:1px solid rgba(var(--theme-contrast-rgb),.07);border-left:0}
+  .cls-author-tab:first-child{border-top:0}
+  .cls-author-line{flex-wrap:wrap;gap:5px 7px;overflow:visible;white-space:normal}
+  .cls-author-caption,.cls-author-code,.cls-author-separator{flex:none}
+  .cls-author-name{flex:1 0 100%;overflow:visible;font-size:11px;line-height:1.35;text-overflow:clip;white-space:normal;overflow-wrap:break-word}
+  .cls-subclass-description-head{display:flex;align-items:flex-start;flex-direction:column;gap:9px}
+  .cls-subclass-description-head .cls-feature-lvl{align-self:flex-start}
+  .cls-subclass-description-title{max-width:100%;font-size:27px;line-height:1.04;overflow-wrap:break-word}
+  .cls-subclass-description-text{font-size:16px;line-height:1.58}
   .cls-rule-panels{grid-template-columns:minmax(0,1fr);gap:10px}
   .cls-rule-panel.wide{grid-column:auto}
   .cls-rule-head{grid-template-columns:minmax(0,1fr) 24px;padding:14px 15px}
@@ -3310,6 +3340,19 @@ function scrollToClassFeature(featureId) {
   .cls-description-prose,.cls-description-intro-panel .cls-description-prose{font-size:14px;line-height:1.62}
   .cls-description-notes{grid-template-columns:minmax(0,1fr)}
   .cls-feature-table-wrap,.cls-description-table{max-width:100%;overflow-x:auto}
+  .cls-subclass-toggle{grid-template-columns:30px minmax(0,1fr) auto;gap:9px;padding:13px 12px}
+  .cls-subclass-title{font-size:21px;line-height:1.08;overflow-wrap:break-word}
+  .cls-subclass-source{align-self:start}
+  .cls-open-arch.inline{grid-column:2/-1;justify-self:stretch;width:100%;margin-top:2px;border-radius:9px;text-align:center;white-space:normal}
+  .cls-subclass-body{padding:0 13px 16px}
+  .cls-subclass-rule{min-width:0}
+  .cls-subclass-rule .cls-feature-head{align-items:flex-start;flex-wrap:wrap;gap:7px}
+  .cls-subclass-rule .cls-feature-name{flex:1 0 100%}
+  .cls-arch-items,.cls-arch-items.roomy{grid-template-columns:minmax(0,1fr)}
+  .cls-arch-item,.cls-arch-items.roomy .cls-arch-item{min-width:0;padding:14px}
+  .cls-arch-items-group>summary{align-items:flex-start;flex-direction:column;font-size:19px}
+  .cls-arch-items-group>summary small{white-space:normal}
+  .cls-arch-roll-result span{overflow:visible;text-overflow:clip;white-space:normal}
   .cls-filter-modal{padding:12px}
   .cls-filter-window{max-height:calc(100dvh - 24px)}
 }
