@@ -58,6 +58,35 @@ function toggleItem(item) {
   open.value = open.value === item.id ? null : item.id
 }
 
+function hasItem(id) {
+  return props.groups.some(group => group.items?.some(item => item.id === id))
+}
+
+function resolveRequestedItemId(value) {
+  const requested = String(value || '')
+  const sourceNeutral = requested.replace(/-(?:phb|dmg|mm)$/i, '')
+  return hasItem(requested) || !hasItem(sourceNeutral) ? requested : sourceNeutral
+}
+
+function scrollToOpenedItem(id) {
+  if (!id || !import.meta.client) return
+  let tries = 0
+  const waitAndScroll = () => {
+    tries += 1
+    const target = renderedOpen.value === id
+      ? document.getElementById(`${props.nodePrefix}-${id}`)
+      : null
+    if (target) {
+      target.scrollIntoView({ block: 'center' })
+      setTimeout(() => target.scrollIntoView({ block: 'center' }), 240)
+      setTimeout(() => target.scrollIntoView({ block: 'center' }), 520)
+      return
+    }
+    if (tries < 40) setTimeout(waitAndScroll, 40)
+  }
+  nextTick(waitAndScroll)
+}
+
 watch(open, (nextOpen) => {
   router.replace({ query: open.value ? { [props.queryKey]: open.value } : {} })
   if (open.value !== expandedId.value) expandedId.value = null
@@ -86,6 +115,23 @@ watch(open, (nextOpen) => {
 
   switchingCards = false
   renderedOpen.value = nextOpen
+})
+
+// Nuxt keeps this page mounted when an inline rule link changes only its query.
+// Mirror that query back into the opened card so ordinary clicks behave like a new tab.
+watch(() => route.query[props.queryKey], async (routeValue) => {
+  if (!routeValue) return
+
+  let targetId = resolveRequestedItemId(routeValue)
+  if (!hasItem(targetId)) {
+    search.value = ''
+    emit('reset-filters')
+    await nextTick()
+    targetId = resolveRequestedItemId(routeValue)
+  }
+
+  if (targetId !== open.value) open.value = targetId
+  scrollToOpenedItem(targetId)
 })
 
 // ── Панель иконок карточки: ссылка · закладка · печать · разворот ──
@@ -438,35 +484,14 @@ onMounted(() => {
   if (props.cardActions.includes('bookmark')) loadBookmarks()
   window.addEventListener('keydown', onKeydown)
 
-  const requestedInitial = String(route.query[props.queryKey] || '')
-  const hasItem = id => props.groups.some(group => group.items?.some(item => item.id === id))
-  const sourceNeutralInitial = requestedInitial.replace(/-(?:phb|dmg|mm)$/i, '')
-  const initial = hasItem(requestedInitial) || !hasItem(sourceNeutralInitial)
-    ? requestedInitial
-    : sourceNeutralInitial
+  const initial = resolveRequestedItemId(route.query[props.queryKey])
   if (initial) {
     open.value = initial
     // Прокручиваем к нужному правилу только ПОСЛЕ того, как карточка
     // действительно раскрылась (renderedOpen лагает на ~80мс из-за таймера
     // переключения), и повторяем после анимации раскрытия и перерисовки нити,
     // иначе центрируем ещё свёрнутый узел и пользователь не видит правило.
-    const scrollToInitial = () => document
-      .getElementById(`${props.nodePrefix}-${initial}`)
-      ?.scrollIntoView({ block: 'center' })
-    let tries = 0
-    const waitAndScroll = () => {
-      tries += 1
-      const ready = renderedOpen.value === initial
-        && document.getElementById(`${props.nodePrefix}-${initial}`)
-      if (ready) {
-        scrollToInitial()
-        setTimeout(scrollToInitial, 240)
-        setTimeout(scrollToInitial, 520)
-        return
-      }
-      if (tries < 40) setTimeout(waitAndScroll, 40)
-    }
-    nextTick(waitAndScroll)
+    scrollToOpenedItem(initial)
   }
 
   const rail = railEl.value

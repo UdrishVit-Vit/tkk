@@ -18,6 +18,10 @@ const SOURCE_TITLES = {
   MM: 'Бестиарий'
 }
 
+const TITLE_CORRECTIONS = {
+  'Potion of Healing': 'Зелье лечения'
+}
+
 const RARITIES = [
   ['varies', 'Редкость варьируется', /редкость варьируется/i],
   ['very-rare', 'Очень редкий', /очень редкий/i],
@@ -67,11 +71,11 @@ function parseCatalogue(text) {
     const source = lines[index + 1]
     if (!SOURCE_TITLES[source]) return
     items.push({
-      title: match[1].trim(),
+      title: TITLE_CORRECTIONS[match[2].trim()] || match[1].trim(),
       englishName: match[2].trim(),
       source,
       sourceTitle: SOURCE_TITLES[source],
-      ...parseRarity(lines[index - 1] || '')
+      ...parseRarity(lines[index + 2] || '')
     })
   })
 
@@ -130,25 +134,58 @@ const GLOSSARY_LINK_ALIASES = {
   'undead-phb': 'creature-type-phb'
 }
 
+const MAGIC_ITEM_REFERENCE_ALIASES = {
+  'Зелье лечения [Potion of Healing]': 'potion-of-healing-dmg',
+  'Большое зелье лечения [Potion of Greater Healing]': 'potion-of-greater-healing-dmg',
+  'Отличное зелье лечения [Potion of Superior Healing]': 'potion-of-superior-healing-dmg',
+  'Превосходное зелье лечения [Potion of Supreme Healing]': 'potion-of-supreme-healing-dmg',
+  'Переносная дыра [Portable Hole]': 'portable-hole-dmg'
+}
+
 function cleanRuleText(value) {
   return String(value || '')
     .replace(/\{@br\}/gu, ' ')
-    .replace(/\{@(spell)\s+([^}|]+)\|url:([^}]+)\}/gu, (_, type, label, url) => `[${label}](/dnd55e/spells?spell=${SPELL_LINK_ALIASES[url] || url})`)
-    .replace(/\{@(magicItem)\s+([^}|]+)\|url:([^}]+)\}/gu, (_, type, label, url) => `[${label}](/dnd55e/magic-items?item=${url})`)
-    .replace(/\{@(glossary)\s+([^}|]+)\|url:([^}]+)\}/gu, (_, type, label, url) => `[${label}](/dnd55e/glossary?rule=${GLOSSARY_LINK_ALIASES[url] || url})`)
+    .replace(/\{@spell\s+([^}|]+)\s*\|\s*url\s*:\s*([^}\s]+)\s*\}/gu, (_, label, url) => `[${label.trim()}](/dnd55e/spells?spell=${SPELL_LINK_ALIASES[url] || url})`)
+    .replace(/\{@magicItem\s+([^}|]+)\s*\|\s*url\s*:\s*([^}\s]+)\s*\}/gu, (_, label, url) => `[${label.trim()}](/dnd55e/magic-items?item=${url})`)
+    .replace(/\{@glossary\s+([^}|]+)\s*\|\s*url\s*:\s*([^}\s]+)\s*\}/gu, (_, label, url) => `[${label.trim()}](/dnd55e/glossary?rule=${GLOSSARY_LINK_ALIASES[url] || url})`)
     .replace(/\{@(?:bold|b)\s+([^}]+)\}/gu, '**$1**')
+    .replace(/\{@(?:italic|i)\s+([^}]+)\}/gu, '*$1*')
     .replace(/\{@(?:roll|dice)\s+([^}]+)\}/gu, '$1')
     .replace(/\{@\w+\s+([^}|]+)(?:\|[^}]*)?\}/gu, '$1')
     .replace(/\s+/gu, ' ')
+    .replace(/\s+([,.;:!?])/gu, '$1')
+    .trim()
+}
+
+function inlineLink(type, label, url) {
+  if (!url) return label
+  if (type === 'spell') return `[${label}](/dnd55e/spells?spell=${SPELL_LINK_ALIASES[url] || url})`
+  if (type === 'magicItem') return `[${label}](/dnd55e/magic-items?item=${url})`
+  if (type === 'glossary') return `[${label}](/dnd55e/glossary?rule=${GLOSSARY_LINK_ALIASES[url] || url})`
+  return label
+}
+
+function joinInline(parts) {
+  return parts
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s+([,.;:!?])/gu, '$1')
+    .replace(/([([])\s+/gu, '$1')
     .trim()
 }
 
 function inlineText(node) {
   if (node == null) return ''
   if (typeof node === 'string' || typeof node === 'number') return cleanRuleText(node)
-  if (Array.isArray(node)) return node.map(inlineText).filter(Boolean).join(' ')
+  if (Array.isArray(node)) return joinInline(node.map(inlineText))
   if (node.text) return cleanRuleText(node.text)
-  return inlineText(node.content)
+  const content = inlineText(node.content)
+  if (node.type === 'bold' || node.type === 'b') return `**${content}**`
+  if (node.type === 'italic' || node.type === 'i') return `*${content}*`
+  if (node.type === 'spell' || node.type === 'magicItem' || node.type === 'glossary') {
+    return inlineLink(node.type, content, node.attrs?.url)
+  }
+  return content
 }
 
 function normalizeDescription(nodes) {
@@ -157,7 +194,7 @@ function normalizeDescription(nodes) {
     if (node?.type === 'table') {
       return {
         type: 'table',
-        caption: cleanRuleText(node.caption),
+        caption: inlineText(node.caption),
         columns: (node.colLabels || []).map(inlineText),
         rows: (node.rows || []).map(row => row.map(inlineText))
       }
@@ -170,6 +207,22 @@ function normalizeDescription(nodes) {
     }
     return { type: 'paragraph', text: inlineText(node) }
   }).filter(block => block.text || block.items?.length || block.rows?.length)
+}
+
+function enrichKnownItemReferences(value) {
+  if (typeof value === 'string') {
+    let enriched = value
+    for (const [label, id] of Object.entries(MAGIC_ITEM_REFERENCE_ALIASES)) {
+      if (enriched.includes(`[${label}](/dnd55e/magic-items?item=${id})`)) continue
+      enriched = enriched.split(label).join(`[${label}](/dnd55e/magic-items?item=${id})`)
+    }
+    return enriched
+  }
+  if (Array.isArray(value)) return value.map(enrichKnownItemReferences)
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, enrichKnownItemReferences(item)]))
+  }
+  return value
 }
 
 async function fetchText(url, attempts = 8) {
@@ -281,11 +334,12 @@ const items = catalogue.map((item) => {
   return {
     id: detail.url,
     ...item,
+    attunement: /требуется настройка/iu.test(detail.subtitle),
     type,
     typeLabel,
     subtitle: detail.subtitle,
     summary: cleanRuleText(firstText(detail.description)),
-    description: normalizeDescription(detail.description),
+    description: enrichKnownItemReferences(normalizeDescription(detail.description)),
     srdVersion: detail.srdVersion || null,
     sourcePage: detail.source?.page || null
   }

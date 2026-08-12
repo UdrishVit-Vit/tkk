@@ -25,13 +25,14 @@ const tokens = computed(() => String(props.text || '')
     const link = chunk.match(exactExplicitLinkPattern)
     if (link) return [{ type: 'extlink', text: link[1], path: link[2], bold: false }]
     return chunk
-      .split(/(\*\*[^*\n]+\*\*)/g)
+      .split(/(\*\*[^*\n]+\*\*|\*[^*\n]+\*)/g)
       .filter(Boolean)
       .flatMap((segment) => {
         const bold = segment.startsWith('**') && segment.endsWith('**')
-        const text = bold ? segment.slice(2, -2) : segment
+        const italic = !bold && segment.startsWith('*') && segment.endsWith('*')
+        const text = bold ? segment.slice(2, -2) : italic ? segment.slice(1, -1) : segment
         const tokenize = activeEdition.value === '2024' ? tokenizeRuleText55e : tokenizeRuleText
-        return tokenize(text, props.currentPath, props.excludePaths).map(token => ({ ...token, bold }))
+        return tokenize(text, props.currentPath, props.excludePaths).map(token => ({ ...token, bold, italic }))
       })
   }))
 
@@ -158,6 +159,7 @@ onBeforeUnmount(() => {
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>{{ token.text }}
       </button>
       <strong v-else-if="token.bold" class="rt-bold">{{ token.text }}</strong>
+      <em v-else-if="token.italic" class="rt-italic">{{ token.text }}</em>
       <template v-else>{{ token.text }}</template>
     </template>
 
@@ -242,6 +244,10 @@ onBeforeUnmount(() => {
 
 .rt-bold{
   font-weight:750;
+}
+
+.rt-italic{
+  font-style:italic;
 }
 
 .rt-dice{
