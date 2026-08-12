@@ -4,7 +4,8 @@ import { shagaiCombo } from '~/utils/shagai5e.js'
 
 const props = defineProps({
   tea: { type: Object, required: true },
-  framed: { type: Boolean, default: false }
+  framed: { type: Boolean, default: false },
+  edition: { type: String, default: '' }
 })
 
 const combo = computed(() => shagaiCombo(props.tea.sig || []))
@@ -43,7 +44,7 @@ function tableFor(slot) {
               :key="'c' + ri + '-' + ci"
               class="tea-td"
               :class="{ first: ci === 0 }"
-            ><RuleRichText :text="cell" /></span>
+            ><RuleRichText :text="cell" :edition="edition" /></span>
           </template>
         </div>
       </div>
@@ -52,17 +53,17 @@ function tableFor(slot) {
     <template v-else>
       <div class="tea-block tea-effect">
         <h3>Эффект</h3>
-        <p><RuleRichText :text="tea.effect" /></p>
+        <p><RuleRichText :text="tea.effect" :edition="edition" /></p>
       </div>
 
       <div class="tea-block tea-success">
         <h3>Успех</h3>
-        <p><RuleRichText :text="tea.success" /></p>
+        <p><RuleRichText :text="tea.success" :edition="edition" /></p>
       </div>
 
       <div class="tea-block tea-fail">
         <h3>Провал</h3>
-        <p><RuleRichText :text="tea.fail" /></p>
+        <p><RuleRichText :text="tea.fail" :edition="edition" /></p>
       </div>
     </template>
   </div>

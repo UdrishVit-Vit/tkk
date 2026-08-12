@@ -1,14 +1,24 @@
 <script setup>
 import { WRATHS_5E, WRATH_TIERS, WRATH_TIER_LABEL, WRATH_TIER_TABLE, WRATH_FACE_SKILLS, WRATH_LORE, WRATH_BY_SIG } from '~/data/wrath5e.js'
+import { WRATHS_2024, WRATH_FACE_SKILLS_2024, WRATH_LORE_2024, WRATH_2024_BY_SIG } from '~/data/dnd55e/tools2024.js'
 import { sigKey } from '~/utils/shagai5e.js'
 
+const props = defineProps({
+  edition: { type: String, default: '2014' }
+})
+
+const is2024 = computed(() => props.edition === '2024')
+const wraths = computed(() => is2024.value ? WRATHS_2024 : WRATHS_5E)
+const wrathLore = computed(() => is2024.value ? WRATH_LORE_2024 : WRATH_LORE)
+const wrathFaceSkills = computed(() => is2024.value ? WRATH_FACE_SKILLS_2024 : WRATH_FACE_SKILLS)
 const search = ref('')
 const open = ref(null)
 const showFilter = ref(false)
 const active = reactive({ tier: [] })
 
 function resolveWrath(roll) {
-  return WRATH_BY_SIG[sigKey(roll.sig)] || null
+  const index = is2024.value ? WRATH_2024_BY_SIG : WRATH_BY_SIG
+  return index[sigKey(roll.sig)] || null
 }
 
 const query = computed(() => search.value.trim().toLowerCase())
@@ -22,7 +32,7 @@ function matches(w) {
 const groups = computed(() => Object.entries(WRATH_TIERS).map(([id, title]) => ({
   id,
   title,
-  items: WRATHS_5E.filter(w => w.tier === id && matches(w)).map(w => ({
+  items: wraths.value.filter(w => w.tier === id && matches(w)).map(w => ({
     id: w.id,
     title: `${w.num}. ${w.title}`,
     badge: `СЛ ${Math.max(...w.checks.map(c => c.dc))}`,
@@ -48,13 +58,18 @@ function toggleFilter(key, value) {
 function resetFilters() { active.tier = [] }
 
 useSeoMeta({
-  title: 'Гнев Ильбеша — D&D 5e — TKK.club',
-  description: 'Гнев Ильбеша для D&D 5e: 35 кар хранителя Искры. Бросьте 4к4, узнайте тяжесть гнева и попробуйте отвести его проверкой навыка.'
+  title: () => is2024.value ? 'Гнев Ильбеша — D&D 5.5e 2024 — TKK.club' : 'Гнев Ильбеша — D&D 5e — TKK.club',
+  description: () => is2024.value
+    ? 'Гнев Ильбеша для D&D 5.5e 2024: 35 кар хранителя Искры, бросок 4к4, тяжесть гнева и проверки по правилам редакции 2024.'
+    : 'Гнев Ильбеша для D&D 5e: 35 кар хранителя Искры. Бросьте 4к4, узнайте тяжесть гнева и попробуйте отвести его проверкой навыка.'
 })
 </script>
 
 <template>
   <ThreadRefPage
+    :system-path="is2024 ? '/dnd55e' : '/dnd5e'"
+    :system-label="is2024 ? 'D&D 5.5e' : 'D&D 5e'"
+    :kicker="is2024 ? 'D&D 5.5e · редакция 2024' : 'D&D 5e'"
     emblem-img="/assets/nodes/gnev.png"
     emblem-alt="Гнев Ильбеша"
     title="Гнев Ильбеша"
@@ -66,7 +81,7 @@ useSeoMeta({
     collapsible
     collapse-label="Все гневы Ильбеша"
     :groups="groups"
-    :total="WRATHS_5E.length"
+    :total="wraths.length"
     :visible="totalVisible"
     :filters="filters"
     :is-active="isActive"
@@ -82,7 +97,8 @@ useSeoMeta({
         <details class="wrath-lore">
           <summary>Как работает Гнев Ильбеша</summary>
           <div class="wrath-lore-body">
-            <p v-for="(p, i) in WRATH_LORE" :key="i">{{ p }}</p>
+            <p v-if="is2024"><b>Версия для D&D 2024.</b> Навыки, действия, отдых и ссылки на заклинания приведены к редакции 2024; авторская механика броска 4к4 сохранена.</p>
+            <p v-for="(p, i) in wrathLore" :key="i">{{ p }}</p>
 
             <h4>Тяжесть гнева</h4>
             <p>Когда Мастер решает, что смертный зачерпнул из линий силы слишком жадно, бросается знаменная кость <b>4к4</b>. Комбинация выпавших граней определяет и конкретный гнев (по сигнатуре, как у знамений), и его ступень тяжести:</p>
@@ -100,7 +116,7 @@ useSeoMeta({
 
             <h4>Что показывает грань к4</h4>
             <p>Выпавшие грани задают навыки, которыми можно отвести или даже обернуть ярость Ильбеша себе на пользу. У каждого гнева указаны свои проверки и СЛ; последствия успеха и провала описаны в карточке.</p>
-            <div v-for="face in WRATH_FACE_SKILLS" :key="face.face" class="wrath-face">
+            <div v-for="face in wrathFaceSkills" :key="face.face" class="wrath-face">
               <b>{{ face.face }} — {{ face.skill }} ({{ face.skillEn }}).</b> {{ face.text }}
             </div>
           </div>
@@ -109,14 +125,14 @@ useSeoMeta({
         <ShagaiRoll :resolve="resolveWrath" label="Призвать гнев · 4к4" hint="кости Шагай: 1 Бунти · 2 Аюр · 3 Додор · 4 Тахар">
           <template #result="{ entry }">
             <div class="wrath-result-name">{{ entry.num }}. {{ entry.title }}</div>
-            <WrathCard :wrath="entry" framed />
+            <WrathCard :wrath="entry" :edition="is2024 ? '2024' : ''" framed />
           </template>
         </ShagaiRoll>
       </div>
     </template>
 
     <template #body="{ item }">
-      <WrathCard :wrath="item.raw" />
+      <WrathCard :wrath="item.raw" :edition="is2024 ? '2024' : ''" />
     </template>
   </ThreadRefPage>
 </template>

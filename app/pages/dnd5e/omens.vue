@@ -1,13 +1,21 @@
 <script setup>
 import { OMENS_5E, OMEN_TIERS, OMEN_TIER_LABEL, OMEN_BY_SIG } from '~/data/omens5e.js'
+import { OMENS_2024, OMEN_2024_BY_SIG } from '~/data/dnd55e/tools2024.js'
 
+const props = defineProps({
+  edition: { type: String, default: '2014' }
+})
+
+const is2024 = computed(() => props.edition === '2024')
+const omens = computed(() => is2024.value ? OMENS_2024 : OMENS_5E)
 const search = ref('')
 const open = ref(null)
 const showFilter = ref(false)
 const active = reactive({ tier: [] })
 
 function resolveOmen(roll) {
-  return OMEN_BY_SIG[roll.sig.join(',')] || null
+  const index = is2024.value ? OMEN_2024_BY_SIG : OMEN_BY_SIG
+  return index[roll.sig.join(',')] || null
 }
 
 const query = computed(() => search.value.trim().toLowerCase())
@@ -21,7 +29,7 @@ function matches(o) {
 const groups = computed(() => Object.entries(OMEN_TIERS).map(([id, title]) => ({
   id,
   title,
-  items: OMENS_5E.filter(o => o.tier === id && matches(o)).map(o => ({
+  items: omens.value.filter(o => o.tier === id && matches(o)).map(o => ({
     id: o.id,
     title: `${o.num}. ${o.title}`,
     badge: `СЛ ${o.dc}`,
@@ -47,13 +55,18 @@ function toggleFilter(key, value) {
 function resetFilters() { active.tier = [] }
 
 useSeoMeta({
-  title: 'Знамения — D&D 5e — TKK.club',
-  description: 'Знамения мира Эноа для D&D 5e: бросьте 4к4 и узнайте примету пустыни, её эффект и исход влияния.'
+  title: () => is2024.value ? 'Знамения — D&D 5.5e 2024 — TKK.club' : 'Знамения — D&D 5e — TKK.club',
+  description: () => is2024.value
+    ? 'Знамения мира Эноа для D&D 5.5e 2024: бросок 4к4, 35 примет, их эффекты и исходы влияния по правилам редакции 2024.'
+    : 'Знамения мира Эноа для D&D 5e: бросьте 4к4 и узнайте примету пустыни, её эффект и исход влияния.'
 })
 </script>
 
 <template>
   <ThreadRefPage
+    :system-path="is2024 ? '/dnd55e' : '/dnd5e'"
+    :system-label="is2024 ? 'D&D 5.5e' : 'D&D 5e'"
+    :kicker="is2024 ? 'D&D 5.5e · редакция 2024' : 'D&D 5e'"
     emblem-img="/assets/nodes/znameniya.png"
     emblem-alt="Знамения"
     title="Знамения"
@@ -65,7 +78,7 @@ useSeoMeta({
     collapsible
     collapse-label="Все знамения"
     :groups="groups"
-    :total="OMENS_5E.length"
+    :total="omens.length"
     :visible="totalVisible"
     :filters="filters"
     :is-active="isActive"
@@ -81,6 +94,7 @@ useSeoMeta({
         <details class="omens-lore">
           <summary>Как работают знамения</summary>
           <div class="omens-lore-body">
+            <p v-if="is2024"><b>Версия для D&D 2024.</b> Игровые термины, действия, состояния и отдых приведены к редакции 2024; авторская механика броска 4к4 сохранена.</p>
             <p>Многие жители Эноа забыли о древних знаках, но среди гор и степей до сих пор всматриваются в лучи Шамаса в поисках знаков от мироздания, следуя им фанатично и без вопросов.</p>
             <p>Знамение — это проявление окружающего мира и инструмент, помогающий ГМу задать настроение сессии. В начале сессии или в любой удобный момент кто-то из игроков делает бросок на знамение. Кинув <b>4к4</b>, игрок озвучивает результат на каждой кости, и у каждого знамения есть особый эффект, который действует сразу после объявления результата — пока не явится новое знамение.</p>
             <p>Грани знаменной кости: <b>1 — Бунти</b>, <b>2 — Аюр</b>, <b>3 — Додор</b>, <b>4 — Тахар</b>. По количеству выпавших граней определяется одно из 35 знамений. Например, 4, 1, 1, 2 (одна четвёрка, две единицы, одна двойка) — это «Сломанная клетка».</p>
@@ -92,14 +106,14 @@ useSeoMeta({
         <ShagaiRoll :resolve="resolveOmen" label="Бросить знамение · 4к4" hint="кости Шагай: 1 Бунти · 2 Аюр · 3 Додор · 4 Тахар">
           <template #result="{ entry }">
             <div class="omens-result-name">{{ entry.num }}. {{ entry.title }}</div>
-            <OmenCard :omen="entry" framed />
+            <OmenCard :omen="entry" :edition="is2024 ? '2024' : ''" framed />
           </template>
         </ShagaiRoll>
       </div>
     </template>
 
     <template #body="{ item }">
-      <OmenCard :omen="item.raw" />
+      <OmenCard :omen="item.raw" :edition="is2024 ? '2024' : ''" />
     </template>
   </ThreadRefPage>
 </template>

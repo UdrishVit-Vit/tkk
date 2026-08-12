@@ -3,7 +3,8 @@ import { OMEN_TIER_LABEL, OMEN_FACES } from '~/data/omens5e.js'
 
 const props = defineProps({
   omen: { type: Object, required: true },
-  framed: { type: Boolean, default: false }
+  framed: { type: Boolean, default: false },
+  edition: { type: String, default: '' }
 })
 
 // Компактная запись комбинации 4к4: «3× Бунти · 1× Аюр».
@@ -30,7 +31,7 @@ const combo = computed(() => (props.omen.sig || [])
 
     <div class="omen-block omen-effect">
       <h3>Эффект</h3>
-      <p><RuleRichText :text="omen.effect" /></p>
+      <p><RuleRichText :text="omen.effect" :edition="edition" /></p>
     </div>
 
     <div v-if="omen.table" class="omen-table">
@@ -38,19 +39,19 @@ const combo = computed(() => (props.omen.sig || [])
       <ol>
         <li v-for="row in omen.table.entries" :key="row.roll">
           <span class="omen-roll-num">{{ row.roll }}</span>
-          <span><RuleRichText :text="row.text" /></span>
+          <span><RuleRichText :text="row.text" :edition="edition" /></span>
         </li>
       </ol>
     </div>
 
     <div class="omen-block omen-success">
       <h3>Успех</h3>
-      <p><RuleRichText :text="omen.success" /></p>
+      <p><RuleRichText :text="omen.success" :edition="edition" /></p>
     </div>
 
     <div class="omen-block omen-fail">
       <h3>Провал</h3>
-      <p><RuleRichText :text="omen.fail" /></p>
+      <p><RuleRichText :text="omen.fail" :edition="edition" /></p>
     </div>
   </div>
 </template>
