@@ -8,7 +8,7 @@ defineProps({
 
 defineEmits(['up'])
 
-const entriesByEra = Object.fromEntries(historyContent.eras.map(era => [era.slug, era.entries]))
+const chaptersByEra = Object.fromEntries(historyContent.eras.map(era => [era.slug, era.chapters]))
 </script>
 
 <template>
@@ -60,9 +60,9 @@ const entriesByEra = Object.fromEntries(historyContent.eras.map(era => [era.slug
 
           <div class="history-era__entries" :aria-label="`Материалы раздела ${section.title}`">
             <NuxtLink
-              v-for="(entry, entryIndex) in entriesByEra[section.slug]"
+              v-for="(entry, entryIndex) in chaptersByEra[section.slug]"
               :key="entry.slug"
-              :to="`/lore/history/${section.slug}/${entry.slug}`"
+              :to="`/lore/history/${section.slug}?chapter=${entry.slug}`"
             >
               <span>{{ index }}.{{ entryIndex + 1 }}</span>
               <strong>{{ entry.title }}</strong>

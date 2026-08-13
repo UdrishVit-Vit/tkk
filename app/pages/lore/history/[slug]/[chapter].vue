@@ -1,31 +1,18 @@
 <script setup>
-import { HISTORY_THREAD } from '~/data/loreHistory.js'
 import historyContent from '~/data/loreHistoryContent.generated.json'
 
 const route = useRoute()
-const eraIndex = computed(() => HISTORY_THREAD.sections.findIndex(item => item.slug === route.params.slug))
-const section = computed(() => HISTORY_THREAD.sections[eraIndex.value])
-const content = computed(() => historyContent.eras.find(item => item.slug === route.params.slug))
-const entries = computed(() => content.value?.entries || [])
-const entryIndex = computed(() => entries.value.findIndex(item => item.slug === route.params.chapter))
-const entry = computed(() => entries.value[entryIndex.value])
+const era = historyContent.eras.find(item => item.slug === route.params.slug)
+const chapter = era?.chapters.find(item => item.slug === route.params.chapter)
 
-if (!section.value || !entry.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Запись летописи не найдена' })
+if (!era || !chapter) {
+  throw createError({ statusCode: 404, statusMessage: 'Раздел летописи не найден' })
 }
 
-useHead(() => ({
-  title: `${entry.value.title} · ${section.value.title} · История Эноа`,
-  meta: [{ name: 'description', content: entry.value.description || section.value.summary }],
-}))
+await navigateTo({
+  path: `/lore/history/${era.slug}`,
+  query: { chapter: chapter.slug },
+}, { redirectCode: 301, replace: true })
 </script>
 
-<template>
-  <LoreHistoryEntryPage
-    :section="section"
-    :entry="entry"
-    :entries="entries"
-    :era-index="eraIndex"
-    :entry-index="entryIndex"
-  />
-</template>
+<template><div /></template>
