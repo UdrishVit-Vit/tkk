@@ -1,5 +1,6 @@
 <script setup>
 import { HISTORY_THREAD } from '~/data/loreHistory.js'
+import historyContent from '~/data/loreHistoryContent.generated.json'
 
 defineProps({
   theme: { type: Object, required: true },
@@ -7,12 +8,7 @@ defineProps({
 
 defineEmits(['up'])
 
-const chapterWord = count => {
-  if (!count) return 'главная запись'
-  if (count === 1) return '1 событие'
-  if (count < 5) return `${count} события`
-  return `${count} событий`
-}
+const entriesByEra = Object.fromEntries(historyContent.eras.map(era => [era.slug, era.entries]))
 </script>
 
 <template>
@@ -55,17 +51,25 @@ const chapterWord = count => {
           <span>{{ String(index).padStart(2, '0') }}</span>
         </div>
 
-        <NuxtLink class="history-era__card" :to="`/lore/history/${section.slug}`">
-          <span class="history-era__index">{{ String(index).padStart(2, '0') }}</span>
-          <span class="history-era__label">{{ section.label }}</span>
-          <strong>{{ section.title }}</strong>
-          <p>{{ section.summary }}</p>
-          <span class="history-era__meta">
-            <i aria-hidden="true" /> {{ chapterWord(section.chapters.length) }}
-            <b>Открыть эпоху <span aria-hidden="true">→</span></b>
-          </span>
-          <span class="history-era__stitch" aria-hidden="true" />
-        </NuxtLink>
+        <div class="history-era__content">
+          <NuxtLink class="history-era__card" :to="`/lore/history/${section.slug}`">
+            <span class="history-era__index">{{ String(index).padStart(2, '0') }}</span>
+            <strong>{{ section.title }}</strong>
+            <span class="history-era__stitch" aria-hidden="true" />
+          </NuxtLink>
+
+          <div class="history-era__entries" :aria-label="`Материалы раздела ${section.title}`">
+            <NuxtLink
+              v-for="(entry, entryIndex) in entriesByEra[section.slug]"
+              :key="entry.slug"
+              :to="`/lore/history/${section.slug}/${entry.slug}`"
+            >
+              <span>{{ index }}.{{ entryIndex + 1 }}</span>
+              <strong>{{ entry.title }}</strong>
+              <i aria-hidden="true" />
+            </NuxtLink>
+          </div>
+        </div>
       </article>
 
       <div class="history-map__end" aria-hidden="true"><i /><span>нить продолжается</span></div>
@@ -96,14 +100,14 @@ const chapterWord = count => {
 .history-map{position:relative;display:flex;max-width:1080px;margin:46px auto 0;padding:26px 42px 92px;flex-direction:column;gap:18px;isolation:isolate}
 .history-map::before{content:'';position:absolute;inset:0 5px 50px;pointer-events:none;border:1px solid rgba(var(--theme-accent-rgb),.1);background:repeating-linear-gradient(45deg,transparent 0 13px,rgba(var(--theme-accent-rgb),.012) 13px 14px),linear-gradient(90deg,transparent,rgba(var(--theme-accent-rgb),.018) 48%,rgba(var(--theme-accent-rgb),.035) 50%,rgba(var(--theme-accent-rgb),.018) 52%,transparent);mask-image:linear-gradient(transparent,#000 4%,#000 94%,transparent)}
 .history-map__spine{position:absolute;z-index:1;top:0;bottom:47px;left:50%;width:12px;transform:translateX(-50%);pointer-events:none}.history-map__spine span{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(transparent,rgba(var(--theme-accent-rgb),.62) 4%,rgba(var(--theme-accent-strong-rgb),.78) 50%,rgba(var(--theme-accent-rgb),.55) 96%,transparent);filter:drop-shadow(0 0 5px rgba(var(--theme-accent-rgb),.3))}.history-map__spine span:nth-child(1){left:1px}.history-map__spine span:nth-child(2){left:6px;background:repeating-linear-gradient(to bottom,rgba(var(--theme-accent-strong-rgb),.86) 0 7px,transparent 7px 11px)}.history-map__spine span:nth-child(3){right:0}
-.history-era{position:relative;z-index:2;display:grid;min-height:164px;grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);align-items:center}.history-era__card{position:relative;z-index:4;display:flex;min-height:154px;flex-direction:column;justify-content:center;border:1px solid rgba(var(--theme-accent-rgb),.25);background:radial-gradient(circle at 20% 50%,rgba(var(--theme-accent-rgb),.05),transparent 48%),repeating-linear-gradient(90deg,rgba(var(--theme-contrast-rgb),.012) 0 1px,transparent 1px 5px),rgb(var(--theme-surface-rgb));padding:22px 29px;text-decoration:none;color:inherit;cursor:pointer;box-shadow:0 15px 38px rgba(0,0,0,.17),0 0 0 5px rgba(var(--theme-surface-rgb),.28);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}.history-era--left .history-era__card{grid-column:1}.history-era--right .history-era__card{grid-column:3}.history-era__card::before{content:'';position:absolute;inset:7px;pointer-events:none;border:1px dashed rgba(var(--theme-accent-rgb),.12)}.history-era__card:hover,.history-era__card:focus-visible{transform:translateY(-3px);border-color:rgba(var(--theme-accent-rgb),.52);box-shadow:0 18px 46px rgba(0,0,0,.2),0 0 25px rgba(var(--theme-accent-rgb),.08);outline:none}
-.history-era__index{position:absolute;right:22px;top:17px;font:500 8px/1 'Hanken Grotesk',sans-serif;letter-spacing:.15em;color:rgba(var(--theme-accent-strong-rgb),.58)}.history-era__label{font:500 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.27em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.78)}.history-era__card strong{display:block;margin-top:7px;font:600 27px/.98 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.96);text-wrap:balance}.history-era__card p{max-width:420px;margin:10px 0 0;font:400 14px/1.35 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.6)}
-.history-era__meta{display:flex;align-items:center;justify-content:space-between;margin-top:14px;font:500 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.32)}.history-era__meta i{width:17px;height:1px;margin-right:7px;background:rgba(var(--theme-accent-rgb),.5)}.history-era__meta b{margin-left:auto;color:rgba(var(--theme-accent-strong-rgb),.68);font-weight:500}.history-era__meta b span{display:inline-block;margin-left:5px;transition:transform .2s ease}.history-era__card:hover .history-era__meta b span{transform:translateX(4px)}
+.history-era{position:relative;z-index:2;display:grid;min-height:164px;grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);align-items:center}.history-era__content{position:relative;z-index:4;min-width:0}.history-era--left .history-era__content{grid-column:1}.history-era--right .history-era__content{grid-column:3}.history-era__card{position:relative;display:flex;min-height:112px;align-items:center;justify-content:center;border:1px solid rgba(var(--theme-accent-rgb),.25);background:radial-gradient(circle at 20% 50%,rgba(var(--theme-accent-rgb),.05),transparent 48%),repeating-linear-gradient(90deg,rgba(var(--theme-contrast-rgb),.012) 0 1px,transparent 1px 5px),rgb(var(--theme-surface-rgb));padding:25px 42px;text-decoration:none;color:inherit;text-align:center;cursor:pointer;box-shadow:0 15px 38px rgba(0,0,0,.17),0 0 0 5px rgba(var(--theme-surface-rgb),.28);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}.history-era__card::before{content:'';position:absolute;inset:7px;pointer-events:none;border:1px dashed rgba(var(--theme-accent-rgb),.12)}.history-era__card:hover,.history-era__card:focus-visible{transform:translateY(-3px);border-color:rgba(var(--theme-accent-rgb),.52);box-shadow:0 18px 46px rgba(0,0,0,.2),0 0 25px rgba(var(--theme-accent-rgb),.08);outline:none}
+.history-era__index{position:absolute;right:22px;top:17px;font:500 8px/1 'Hanken Grotesk',sans-serif;letter-spacing:.15em;color:rgba(var(--theme-accent-strong-rgb),.58)}.history-era__card>strong{font:600 29px/.98 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.96);text-wrap:balance}
+.history-era__entries{position:relative;display:grid;margin-top:12px;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.history-era__entries::before{content:'';position:absolute;left:50%;bottom:100%;width:1px;height:13px;background:rgba(var(--theme-accent-rgb),.38)}.history-era__entries a{position:relative;display:flex;min-height:66px;align-items:center;justify-content:center;border:1px solid rgba(var(--theme-accent-rgb),.17);background:linear-gradient(135deg,rgba(var(--theme-accent-rgb),.025),transparent 55%),rgba(var(--theme-surface-rgb),.82);padding:14px 22px;text-align:center;text-decoration:none;color:inherit;transition:border-color .2s ease,background .2s ease,transform .2s ease}.history-era__entries a:hover,.history-era__entries a:focus-visible{border-color:rgba(var(--theme-accent-rgb),.46);background:rgba(var(--theme-accent-rgb),.055);transform:translateY(-2px);outline:none}.history-era__entries a>span{position:absolute;top:8px;right:9px;font:500 6px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-accent-rgb),.42)}.history-era__entries a>strong{font:600 15px/1.05 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.78);text-wrap:balance}.history-era__entries a>i{position:absolute;bottom:-4px;left:50%;width:7px;height:7px;border:1px solid rgba(var(--theme-accent-rgb),.32);background:rgb(var(--theme-surface-rgb));transform:translateX(-50%) rotate(45deg)}
 .history-era__stitch{position:absolute;top:15px;bottom:15px;width:1px;background:repeating-linear-gradient(to bottom,rgba(var(--theme-accent-rgb),.28) 0 3px,transparent 3px 7px)}.history-era--left .history-era__stitch{right:13px}.history-era--right .history-era__stitch{left:13px}
 .history-era__branch{position:absolute;z-index:-1;left:50%;width:calc(50% - 16px);height:18px;border-block:1px solid rgba(var(--theme-accent-rgb),.22)}.history-era--left .history-era__branch{transform:translateX(-100%)}.history-era--right .history-era__branch{transform:none}.history-era__branch span{position:absolute;inset:5px 0;border-top:1px dashed rgba(var(--theme-accent-rgb),.22)}
 .history-era__knot{position:absolute;z-index:3;left:50%;display:grid;width:38px;height:38px;place-items:center;border:1px solid rgba(var(--theme-accent-rgb),.62);background:rgb(var(--theme-surface-rgb));box-shadow:0 0 0 5px rgba(var(--theme-surface-rgb),.64),0 0 22px rgba(var(--theme-accent-rgb),.2);transform:translateX(-50%) rotate(45deg)}.history-era__knot::before{content:'';position:absolute;inset:5px;border:1px solid rgba(var(--theme-accent-rgb),.17)}.history-era__knot span{transform:rotate(-45deg);font:500 7px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-accent-strong-rgb),.76)}
 .history-map__end{position:absolute;z-index:3;left:50%;bottom:16px;display:flex;flex-direction:column;align-items:center;gap:9px;transform:translateX(-50%);font:500 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.23em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.3)}.history-map__end i{width:12px;height:12px;border:1px solid rgba(var(--theme-accent-rgb),.5);background:rgb(var(--theme-surface-rgb));transform:rotate(45deg)}
 .lore-history__footer{display:flex;align-items:center;justify-content:space-between;max-width:1080px;margin:auto;padding:24px 42px 42px;border-top:1px solid rgba(var(--theme-contrast-rgb),.06);font:500 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.26em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.26)}
-@media(max-width:820px){.lore-history{left:0;padding-bottom:56px}.lore-history__texture{left:0}.lore-history__header{padding:20px 20px 0}.lore-history__index{display:none}.lore-history__intro{margin-top:28px;padding:0 22px;grid-template-columns:60px minmax(0,1fr);gap:20px}.lore-history__sigil{width:52px;height:52px}.lore-history__sigil span{inset:6px}.lore-history__sigil span:nth-child(2){inset:16px}.lore-history__sigil i{inset:22px}.lore-history h1{font-size:42px}.lore-history__lead{font-size:15px}.lore-history__note{display:none}.history-map{margin-top:30px;padding:18px 18px 78px 64px;gap:16px}.history-map__spine{left:39px}.history-map::before{inset:0 4px 44px}.history-era{display:block;min-height:0}.history-era__card{min-height:148px;padding:22px 23px}.history-era--left .history-era__card,.history-era--right .history-era__card{grid-column:auto}.history-era__card strong{font-size:25px}.history-era__card p{font-size:13px}.history-era__knot{left:-25px;width:31px;height:31px}.history-era__branch{left:-25px;width:25px;height:12px;transform:none!important}.history-era__meta b{font-size:0}.history-era__meta b span{font-size:12px}.history-map__end{left:39px;align-items:flex-start;white-space:nowrap}.lore-history__footer{padding:22px 20px 28px}.lore-history__footer>span{display:none}}
+@media(max-width:820px){.lore-history{left:0;padding-bottom:56px}.lore-history__texture{left:0}.lore-history__header{padding:20px 20px 0}.lore-history__index{display:none}.lore-history__intro{margin-top:28px;padding:0 22px;grid-template-columns:60px minmax(0,1fr);gap:20px}.lore-history__sigil{width:52px;height:52px}.lore-history__sigil span{inset:6px}.lore-history__sigil span:nth-child(2){inset:16px}.lore-history__sigil i{inset:22px}.lore-history h1{font-size:42px}.lore-history__lead{font-size:15px}.lore-history__note{display:none}.history-map{margin-top:30px;padding:18px 18px 78px 64px;gap:20px}.history-map__spine{left:39px}.history-map::before{inset:0 4px 44px}.history-era{display:block;min-height:0}.history-era--left .history-era__content,.history-era--right .history-era__content{grid-column:auto}.history-era__card{min-height:96px;padding:22px 30px}.history-era__card>strong{font-size:25px}.history-era__entries{gap:7px}.history-era__entries a{min-height:62px;padding:13px 11px}.history-era__entries a>strong{font-size:14px}.history-era__knot{left:-25px;width:31px;height:31px}.history-era__branch{left:-25px;width:25px;height:12px;transform:none!important}.history-map__end{left:39px;align-items:flex-start;white-space:nowrap}.lore-history__footer{padding:22px 20px 28px}.lore-history__footer>span{display:none}}
 @media(prefers-reduced-motion:reduce){.history-era__card{transition:none}}
 </style>
