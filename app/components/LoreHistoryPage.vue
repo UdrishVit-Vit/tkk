@@ -8,106 +8,244 @@ defineProps({
 
 defineEmits(['up'])
 
-const chaptersByEra = Object.fromEntries(historyContent.eras.map(era => [era.slug, era.chapters]))
+const scroller = ref(null)
+const introSection = ref(null)
+const eraSections = ref([])
+const searchQuery = ref('')
+const selectedEra = ref('all')
+const activeIndex = ref(0)
+const scrollProgress = ref(0)
+let scrollAnimation = 0
+
+const contentByEra = Object.fromEntries(historyContent.eras.map(era => [era.slug, era]))
+
+function setEraRef(element, index) {
+  if (element) eraSections.value[index] = element
+}
+
+function chapterPreview(chapter) {
+  const text = (chapter.blocks || [])
+    .flatMap(block => block.paragraphs || [])
+    .join(' ')
+    .trim()
+  if (text.length <= 145) return text
+  return `${text.slice(0, 142).trimEnd()}…`
+}
+
+function normalized(value) {
+  return String(value || '').toLocaleLowerCase('ru-RU')
+}
+
+function chapterMatches(chapter) {
+  const query = normalized(searchQuery.value).trim()
+  if (!query) return true
+  return normalized(`${chapter.title} ${chapterPreview(chapter)}`).includes(query)
+}
+
+function eraMatches(section) {
+  const query = normalized(searchQuery.value).trim()
+  if (!query) return true
+  const content = contentByEra[section.slug]
+  const searchable = [section.title, section.summary, ...(content?.chapters || []).flatMap(chapter => [chapter.title, chapterPreview(chapter)])]
+  return normalized(searchable.join(' ')).includes(query)
+}
+
+function easeOutCubic(value) {
+  return 1 - Math.pow(1 - value, 3)
+}
+
+function tweenScroll(target) {
+  const element = scroller.value
+  if (!element) return
+  cancelAnimationFrame(scrollAnimation)
+  const start = element.scrollTop
+  const distance = Math.max(0, target) - start
+  const startedAt = performance.now()
+  const duration = Math.min(820, Math.max(380, Math.abs(distance) * .42))
+
+  function frame(now) {
+    const elapsed = Math.min(1, (now - startedAt) / duration)
+    element.scrollTop = start + distance * easeOutCubic(elapsed)
+    if (elapsed < 1) scrollAnimation = requestAnimationFrame(frame)
+  }
+
+  scrollAnimation = requestAnimationFrame(frame)
+}
+
+function scrollToEra(index, filter = false) {
+  if (filter) selectedEra.value = index === null ? 'all' : HISTORY_THREAD.sections[index].slug
+  const target = index === null ? introSection.value : eraSections.value[index]
+  if (!target || !scroller.value) return
+  tweenScroll(target.offsetTop - 36)
+}
+
+function handleScroll() {
+  const element = scroller.value
+  if (!element) return
+  const max = Math.max(1, element.scrollHeight - element.clientHeight)
+  scrollProgress.value = Math.min(1, element.scrollTop / max)
+
+  const marker = element.scrollTop + element.clientHeight * .32
+  let closest = 0
+  eraSections.value.forEach((section, index) => {
+    if (section && section.offsetTop <= marker) closest = index
+  })
+  activeIndex.value = closest
+}
+
+function handleKeyboard(event) {
+  const tag = document.activeElement?.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+  if (event.key === 'PageDown') {
+    event.preventDefault()
+    scrollToEra(Math.min(HISTORY_THREAD.sections.length - 1, activeIndex.value + 1))
+  }
+  if (event.key === 'PageUp') {
+    event.preventDefault()
+    scrollToEra(Math.max(0, activeIndex.value - 1))
+  }
+  if (event.key === 'Home') {
+    event.preventDefault()
+    scrollToEra(null)
+  }
+}
+
+onMounted(() => {
+  handleScroll()
+  window.addEventListener('keydown', handleKeyboard)
+})
+
+onBeforeUnmount(() => {
+  cancelAnimationFrame(scrollAnimation)
+  window.removeEventListener('keydown', handleKeyboard)
+})
 </script>
 
 <template>
   <main class="lore-history" :style="{ background: theme.bg }">
-    <div class="lore-history__texture" aria-hidden="true" />
+    <header class="lore-toolbar">
+      <div class="lore-toolbar__brand">
+        <button type="button" class="lore-toolbar__back" @click="$emit('up')">← к карте Lore</button>
+        <span>Летопись Башни Мафраш</span>
+      </div>
 
-    <header class="lore-history__header">
-      <button type="button" class="lore-history__back" @click="$emit('up')">
-        <span aria-hidden="true">←</span> к карте Lore
-      </button>
-      <div class="lore-history__index">Летопись · семь эпох</div>
+      <div class="lore-toolbar__tools">
+        <label class="lore-search">
+          <i aria-hidden="true" />
+          <span class="sr-only">Поиск по летописи</span>
+          <input v-model="searchQuery" type="search" placeholder="Поиск по летописи">
+        </label>
+        <div class="lore-filters" aria-label="Фильтр эпох">
+          <button type="button" :class="{ 'is-selected': selectedEra === 'all' }" @click="selectedEra = 'all'; scrollToEra(null)">Все</button>
+          <button
+            v-for="(section, index) in HISTORY_THREAD.sections"
+            :key="section.slug"
+            type="button"
+            :class="{ 'is-selected': selectedEra === section.slug }"
+            :aria-label="section.title"
+            @click="scrollToEra(index, true)"
+          >{{ String(index).padStart(2, '0') }}</button>
+        </div>
+      </div>
     </header>
 
-    <section class="lore-history__intro" aria-labelledby="history-title">
-      <div class="lore-history__sigil" aria-hidden="true"><span /><span /><i /></div>
-      <div>
-        <p class="lore-history__eyebrow">{{ HISTORY_THREAD.eyebrow }}</p>
-        <h1 id="history-title">{{ HISTORY_THREAD.title }}</h1>
-        <p class="lore-history__lead">{{ HISTORY_THREAD.lead }}</p>
-      </div>
-      <aside class="lore-history__note">
-        <span>Архив Башни</span>
-        <p>{{ HISTORY_THREAD.archiveNote }}</p>
-      </aside>
-    </section>
+    <aside class="lore-rail" aria-label="Карта истории">
+      <p>Нить времени</p>
+      <nav>
+        <button type="button" class="lore-rail__map" @click="selectedEra = 'all'; scrollToEra(null)">
+          <i aria-hidden="true" /> <span>Карта</span>
+        </button>
+        <div class="lore-rail__line" aria-hidden="true"><i :style="{ height: `${scrollProgress * 100}%` }" /></div>
+        <button
+          v-for="(section, index) in HISTORY_THREAD.sections"
+          :key="section.slug"
+          type="button"
+          :class="{ 'is-active': activeIndex === index }"
+          @click="scrollToEra(index)"
+        >
+          <i aria-hidden="true" />
+          <small>{{ String(index).padStart(2, '0') }}</small>
+          <span>{{ section.title }}</span>
+        </button>
+      </nav>
+    </aside>
 
-    <section class="history-map" aria-label="Семь эпох истории Эноа">
-      <div class="history-map__spine" aria-hidden="true">
-        <span /><span /><span />
-      </div>
-
-      <article
-        v-for="(section, index) in HISTORY_THREAD.sections"
-        :key="section.slug"
-        class="history-era"
-        :class="index % 2 ? 'history-era--right' : 'history-era--left'"
-      >
-        <div class="history-era__branch" aria-hidden="true"><span /></div>
-        <div class="history-era__knot" aria-hidden="true">
-          <span>{{ String(index).padStart(2, '0') }}</span>
+    <section ref="scroller" class="lore-viewport" @scroll="handleScroll">
+      <div class="lore-history__texture" aria-hidden="true" />
+      <div class="history-canvas">
+        <div class="history-thread" aria-hidden="true">
+          <i /><i /><i /><i />
+          <b />
         </div>
 
-        <div class="history-era__content">
-          <NuxtLink class="history-era__card" :to="`/lore/history/${section.slug}`">
-            <span class="history-era__index">{{ String(index).padStart(2, '0') }}</span>
-            <strong>{{ section.title }}</strong>
-            <span class="history-era__stitch" aria-hidden="true" />
-          </NuxtLink>
+        <section ref="introSection" class="history-intro timeline-row" aria-labelledby="history-title">
+          <div class="history-intro__copy">
+            <p>{{ HISTORY_THREAD.eyebrow }}</p>
+            <h1 id="history-title">{{ HISTORY_THREAD.title }}</h1>
+            <aside>
+              <span>Архив Башни</span>
+              <p>{{ HISTORY_THREAD.archiveNote }}</p>
+            </aside>
+          </div>
+          <div class="history-intro__sigil" aria-hidden="true"><span /><i /></div>
+        </section>
 
-          <div class="history-era__entries" :aria-label="`Материалы раздела ${section.title}`">
-            <NuxtLink
-              v-for="(entry, entryIndex) in chaptersByEra[section.slug]"
-              :key="entry.slug"
-              :to="`/lore/history/${section.slug}?chapter=${entry.slug}`"
-            >
-              <span>{{ index }}.{{ entryIndex + 1 }}</span>
-              <strong>{{ entry.title }}</strong>
-              <i aria-hidden="true" />
+        <section
+          v-for="(section, index) in HISTORY_THREAD.sections"
+          :key="section.slug"
+          :ref="element => setEraRef(element, index)"
+          class="history-era"
+          :class="{ 'is-dimmed': selectedEra !== 'all' && selectedEra !== section.slug, 'is-search-dimmed': !eraMatches(section) }"
+        >
+          <div class="history-era__heading timeline-row">
+            <NuxtLink :to="`/lore/history/${section.slug}`" class="history-era__title">
+              <h2>{{ section.title }}</h2>
+              <p>{{ section.summary }}</p>
+            </NuxtLink>
+            <NuxtLink :to="`/lore/history/${section.slug}`" class="history-node history-node--era" :aria-label="`Открыть ${section.title}`">
+              <span>{{ String(index).padStart(2, '0') }}</span>
             </NuxtLink>
           </div>
+
+          <div v-if="contentByEra[section.slug]?.chapters.length" class="history-era__chapters">
+            <div
+              v-for="(chapter, chapterIndex) in contentByEra[section.slug].chapters"
+              :key="chapter.slug"
+              class="history-entry timeline-row"
+              :class="[chapterIndex % 2 ? 'history-entry--right' : 'history-entry--left', { 'is-search-dimmed': !chapterMatches(chapter) }]"
+            >
+              <NuxtLink
+                class="history-entry__card"
+                :to="`/lore/history/${section.slug}?chapter=${chapter.slug}`"
+              >
+                <small>{{ index }}.{{ chapterIndex + 1 }}</small>
+                <strong>{{ chapter.title }}</strong>
+                <p v-if="chapterPreview(chapter)">{{ chapterPreview(chapter) }}</p>
+              </NuxtLink>
+              <div class="history-entry__node" aria-hidden="true"><i /></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="history-end timeline-row" aria-hidden="true">
+          <i /><span>Нить продолжается</span>
         </div>
-      </article>
-
-      <div class="history-map__end" aria-hidden="true"><i /><span>нить продолжается</span></div>
+      </div>
     </section>
-
-    <footer class="lore-history__footer">
-      <span>Семь эпох · одно полотно</span>
-      <button type="button" @click="$emit('up')">Вернуться к карте Lore →</button>
-    </footer>
   </main>
 </template>
 
 <style scoped>
-.lore-history{position:absolute;inset:0 0 0 68px;z-index:58;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-gutter:stable;scrollbar-color:rgba(var(--theme-accent-rgb),.48) rgba(var(--theme-surface-rgb),.65);scrollbar-width:thin;touch-action:pan-y;color:rgba(var(--theme-text-rgb),.9);isolation:isolate}
-.lore-history::-webkit-scrollbar{width:10px}.lore-history::-webkit-scrollbar-track{background:rgba(var(--theme-surface-rgb),.7);border-left:1px solid rgba(var(--theme-accent-rgb),.08)}.lore-history::-webkit-scrollbar-thumb{border:2px solid rgba(var(--theme-surface-rgb),.7);border-radius:8px;background:linear-gradient(rgba(var(--theme-accent-rgb),.3),rgba(var(--theme-accent-strong-rgb),.58),rgba(var(--theme-accent-rgb),.3))}.lore-history::-webkit-scrollbar-thumb:hover{background:rgba(var(--theme-accent-strong-rgb),.7)}
-.lore-history__texture{position:fixed;inset:0 0 0 68px;z-index:-1;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(var(--theme-contrast-rgb),.018) 0 1px,transparent 1px 5px),repeating-linear-gradient(0deg,rgba(var(--theme-contrast-rgb),.014) 0 1px,transparent 1px 4px),radial-gradient(ellipse 60% 38% at 50% 5%,rgba(var(--theme-accent-rgb),.1),transparent 72%);opacity:.9}
-.lore-history__header{display:flex;align-items:center;justify-content:space-between;max-width:1180px;margin:auto;padding:28px 42px 0}
-.lore-history__back,.lore-history__footer button{border:0;background:none;padding:8px 0;color:rgba(var(--theme-text-rgb),.52);font:500 9px/1 'Hanken Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:color .2s ease}
-.lore-history__back:hover,.lore-history__footer button:hover{color:rgba(var(--theme-accent-strong-rgb),.95)}
-.lore-history__back span{margin-right:8px;color:rgba(var(--theme-accent-rgb),.8)}
-.lore-history__index{font:500 8px/1 'Hanken Grotesk',sans-serif;letter-spacing:.28em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.3)}
-.lore-history__intro{display:grid;max-width:1120px;margin:34px auto 0;padding:0 42px;grid-template-columns:112px minmax(0,1fr) 280px;align-items:center;gap:34px}
-.lore-history__sigil{position:relative;width:82px;height:82px;margin:auto}.lore-history__sigil span{position:absolute;inset:8px;border:1px solid rgba(var(--theme-accent-rgb),.45);transform:rotate(45deg)}.lore-history__sigil span:nth-child(2){inset:22px}.lore-history__sigil i{position:absolute;inset:33px;border:1px solid rgba(var(--theme-accent-strong-rgb),.74);border-radius:50%;box-shadow:0 0 20px rgba(var(--theme-accent-rgb),.2)}
-.lore-history__eyebrow{margin:0 0 9px;font:500 9px/1 'Hanken Grotesk',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.82)}
-.lore-history h1{margin:0;font:500 clamp(42px,5vw,66px)/.9 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.98)}
-.lore-history__lead{max-width:570px;margin:15px 0 0;font:400 17px/1.45 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.66)}
-.lore-history__note{padding:17px 20px;border-left:1px solid rgba(var(--theme-accent-rgb),.32);background:linear-gradient(90deg,rgba(var(--theme-accent-rgb),.035),transparent)}.lore-history__note span{font:500 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.25em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.7)}.lore-history__note p{margin:8px 0 0;font:italic 14px/1.38 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.5)}
-.history-map{position:relative;display:flex;max-width:1080px;margin:46px auto 0;padding:26px 42px 92px;flex-direction:column;gap:18px;isolation:isolate}
-.history-map::before{content:'';position:absolute;inset:0 5px 50px;pointer-events:none;border:1px solid rgba(var(--theme-accent-rgb),.1);background:repeating-linear-gradient(45deg,transparent 0 13px,rgba(var(--theme-accent-rgb),.012) 13px 14px),linear-gradient(90deg,transparent,rgba(var(--theme-accent-rgb),.018) 48%,rgba(var(--theme-accent-rgb),.035) 50%,rgba(var(--theme-accent-rgb),.018) 52%,transparent);mask-image:linear-gradient(transparent,#000 4%,#000 94%,transparent)}
-.history-map__spine{position:absolute;z-index:1;top:0;bottom:47px;left:50%;width:12px;transform:translateX(-50%);pointer-events:none}.history-map__spine span{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(transparent,rgba(var(--theme-accent-rgb),.62) 4%,rgba(var(--theme-accent-strong-rgb),.78) 50%,rgba(var(--theme-accent-rgb),.55) 96%,transparent);filter:drop-shadow(0 0 5px rgba(var(--theme-accent-rgb),.3))}.history-map__spine span:nth-child(1){left:1px}.history-map__spine span:nth-child(2){left:6px;background:repeating-linear-gradient(to bottom,rgba(var(--theme-accent-strong-rgb),.86) 0 7px,transparent 7px 11px)}.history-map__spine span:nth-child(3){right:0}
-.history-era{position:relative;z-index:2;display:grid;min-height:164px;grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);align-items:center}.history-era__content{position:relative;z-index:4;min-width:0}.history-era--left .history-era__content{grid-column:1}.history-era--right .history-era__content{grid-column:3}.history-era__card{position:relative;display:flex;min-height:112px;align-items:center;justify-content:center;border:1px solid rgba(var(--theme-accent-rgb),.25);background:radial-gradient(circle at 20% 50%,rgba(var(--theme-accent-rgb),.05),transparent 48%),repeating-linear-gradient(90deg,rgba(var(--theme-contrast-rgb),.012) 0 1px,transparent 1px 5px),rgb(var(--theme-surface-rgb));padding:25px 42px;text-decoration:none;color:inherit;text-align:center;cursor:pointer;box-shadow:0 15px 38px rgba(0,0,0,.17),0 0 0 5px rgba(var(--theme-surface-rgb),.28);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}.history-era__card::before{content:'';position:absolute;inset:7px;pointer-events:none;border:1px dashed rgba(var(--theme-accent-rgb),.12)}.history-era__card:hover,.history-era__card:focus-visible{transform:translateY(-3px);border-color:rgba(var(--theme-accent-rgb),.52);box-shadow:0 18px 46px rgba(0,0,0,.2),0 0 25px rgba(var(--theme-accent-rgb),.08);outline:none}
-.history-era__index{position:absolute;right:22px;top:17px;font:500 8px/1 'Hanken Grotesk',sans-serif;letter-spacing:.15em;color:rgba(var(--theme-accent-strong-rgb),.58)}.history-era__card>strong{font:600 29px/.98 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.96);text-wrap:balance}
-.history-era__entries{position:relative;display:grid;margin-top:12px;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.history-era__entries::before{content:'';position:absolute;left:50%;bottom:100%;width:1px;height:13px;background:rgba(var(--theme-accent-rgb),.38)}.history-era__entries a{position:relative;display:flex;min-height:66px;align-items:center;justify-content:center;border:1px solid rgba(var(--theme-accent-rgb),.17);background:linear-gradient(135deg,rgba(var(--theme-accent-rgb),.025),transparent 55%),rgba(var(--theme-surface-rgb),.82);padding:14px 22px;text-align:center;text-decoration:none;color:inherit;transition:border-color .2s ease,background .2s ease,transform .2s ease}.history-era__entries a:hover,.history-era__entries a:focus-visible{border-color:rgba(var(--theme-accent-rgb),.46);background:rgba(var(--theme-accent-rgb),.055);transform:translateY(-2px);outline:none}.history-era__entries a>span{position:absolute;top:8px;right:9px;font:500 6px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-accent-rgb),.42)}.history-era__entries a>strong{font:600 15px/1.05 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.78);text-wrap:balance}.history-era__entries a>i{position:absolute;bottom:-4px;left:50%;width:7px;height:7px;border:1px solid rgba(var(--theme-accent-rgb),.32);background:rgb(var(--theme-surface-rgb));transform:translateX(-50%) rotate(45deg)}
-.history-era__stitch{position:absolute;top:15px;bottom:15px;width:1px;background:repeating-linear-gradient(to bottom,rgba(var(--theme-accent-rgb),.28) 0 3px,transparent 3px 7px)}.history-era--left .history-era__stitch{right:13px}.history-era--right .history-era__stitch{left:13px}
-.history-era__branch{position:absolute;z-index:-1;left:50%;width:calc(50% - 16px);height:18px;border-block:1px solid rgba(var(--theme-accent-rgb),.22)}.history-era--left .history-era__branch{transform:translateX(-100%)}.history-era--right .history-era__branch{transform:none}.history-era__branch span{position:absolute;inset:5px 0;border-top:1px dashed rgba(var(--theme-accent-rgb),.22)}
-.history-era__knot{position:absolute;z-index:3;left:50%;display:grid;width:38px;height:38px;place-items:center;border:1px solid rgba(var(--theme-accent-rgb),.62);background:rgb(var(--theme-surface-rgb));box-shadow:0 0 0 5px rgba(var(--theme-surface-rgb),.64),0 0 22px rgba(var(--theme-accent-rgb),.2);transform:translateX(-50%) rotate(45deg)}.history-era__knot::before{content:'';position:absolute;inset:5px;border:1px solid rgba(var(--theme-accent-rgb),.17)}.history-era__knot span{transform:rotate(-45deg);font:500 7px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-accent-strong-rgb),.76)}
-.history-map__end{position:absolute;z-index:3;left:50%;bottom:16px;display:flex;flex-direction:column;align-items:center;gap:9px;transform:translateX(-50%);font:500 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.23em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.3)}.history-map__end i{width:12px;height:12px;border:1px solid rgba(var(--theme-accent-rgb),.5);background:rgb(var(--theme-surface-rgb));transform:rotate(45deg)}
-.lore-history__footer{display:flex;align-items:center;justify-content:space-between;max-width:1080px;margin:auto;padding:24px 42px 42px;border-top:1px solid rgba(var(--theme-contrast-rgb),.06);font:500 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.26em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.26)}
-@media(max-width:820px){.lore-history{left:0;padding-bottom:56px}.lore-history__texture{left:0}.lore-history__header{padding:20px 20px 0}.lore-history__index{display:none}.lore-history__intro{margin-top:28px;padding:0 22px;grid-template-columns:60px minmax(0,1fr);gap:20px}.lore-history__sigil{width:52px;height:52px}.lore-history__sigil span{inset:6px}.lore-history__sigil span:nth-child(2){inset:16px}.lore-history__sigil i{inset:22px}.lore-history h1{font-size:42px}.lore-history__lead{font-size:15px}.lore-history__note{display:none}.history-map{margin-top:30px;padding:18px 18px 78px 64px;gap:20px}.history-map__spine{left:39px}.history-map::before{inset:0 4px 44px}.history-era{display:block;min-height:0}.history-era--left .history-era__content,.history-era--right .history-era__content{grid-column:auto}.history-era__card{min-height:96px;padding:22px 30px}.history-era__card>strong{font-size:25px}.history-era__entries{gap:7px}.history-era__entries a{min-height:62px;padding:13px 11px}.history-era__entries a>strong{font-size:14px}.history-era__knot{left:-25px;width:31px;height:31px}.history-era__branch{left:-25px;width:25px;height:12px;transform:none!important}.history-map__end{left:39px;align-items:flex-start;white-space:nowrap}.lore-history__footer{padding:22px 20px 28px}.lore-history__footer>span{display:none}}
-@media(prefers-reduced-motion:reduce){.history-era__card{transition:none}}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.lore-history{position:absolute;inset:0 0 0 68px;z-index:58;overflow:hidden;color:rgba(var(--theme-text-rgb),.9);background:#040406!important;isolation:isolate}.lore-toolbar{position:absolute;z-index:20;top:0;left:0;right:0;display:flex;height:58px;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(var(--theme-contrast-rgb),.07);background:rgba(4,4,6,.94);padding:0 18px 0 22px;backdrop-filter:blur(12px)}.lore-toolbar__brand{display:flex;align-items:center;gap:20px}.lore-toolbar__brand>span{padding-left:20px;border-left:1px solid rgba(var(--theme-contrast-rgb),.1);font:600 8px/1 'Hanken Grotesk',sans-serif;letter-spacing:.28em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.72)}.lore-toolbar__back{border:0;background:none;padding:10px 0;color:rgba(var(--theme-text-rgb),.38);font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.22em;text-transform:uppercase;cursor:pointer}.lore-toolbar__back:hover{color:rgba(var(--theme-heading-rgb),.8)}.lore-toolbar__tools{display:flex;align-items:center;gap:18px}.lore-search{position:relative;display:flex;width:220px;height:32px;align-items:center;border:1px solid rgba(var(--theme-accent-rgb),.25);background:rgba(var(--theme-surface-rgb),.4)}.lore-search i{width:7px;height:7px;margin:0 12px;border:1px solid rgba(var(--theme-accent-rgb),.52);transform:rotate(45deg)}.lore-search input{min-width:0;flex:1;border:0;outline:0;background:none;padding:0 11px 0 0;color:rgba(var(--theme-heading-rgb),.75);font:500 8px/1 'Hanken Grotesk',sans-serif;letter-spacing:.04em}.lore-search input::placeholder{color:rgba(var(--theme-accent-strong-rgb),.38)}.lore-search input::-webkit-search-cancel-button{display:none}.lore-filters{display:flex;gap:5px}.lore-filters button{display:grid;width:28px;height:28px;place-items:center;border:1px solid rgba(var(--theme-contrast-rgb),.1);background:transparent;color:rgba(var(--theme-text-rgb),.24);font:600 6px/1 'Hanken Grotesk',sans-serif;cursor:pointer}.lore-filters button:first-child{width:38px}.lore-filters button:hover,.lore-filters button.is-selected{border-color:rgba(var(--theme-accent-strong-rgb),.68);color:rgba(var(--theme-accent-strong-rgb),.9);background:rgba(var(--theme-accent-rgb),.035)}
+.lore-rail{position:absolute;z-index:15;top:58px;bottom:0;left:0;width:220px;border-right:1px solid rgba(var(--theme-contrast-rgb),.07);background:rgba(4,4,7,.84);padding:28px 13px}.lore-rail>p{margin:0 0 22px;font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.27em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.26)}.lore-rail nav{position:relative;display:flex;height:calc(100% - 30px);flex-direction:column;justify-content:space-between}.lore-rail button{position:relative;z-index:2;display:grid;width:100%;grid-template-columns:16px 24px minmax(0,1fr);align-items:center;border:0;background:none;padding:8px 0;color:rgba(var(--theme-text-rgb),.32);text-align:left;cursor:pointer;transition:color .2s}.lore-rail button:hover,.lore-rail button.is-active{color:rgba(var(--theme-accent-strong-rgb),.82)}.lore-rail button>i{grid-column:1;width:7px;height:7px;border:1px solid rgba(var(--theme-text-rgb),.25);background:#07080d;transform:rotate(45deg);transition:border-color .2s,background .2s}.lore-rail button.is-active>i{border-color:rgba(var(--theme-accent-strong-rgb),.88);background:rgba(var(--theme-accent-strong-rgb),.9);box-shadow:0 0 12px rgba(var(--theme-accent-rgb),.24)}.lore-rail button small{font:600 6px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-accent-rgb),.5)}.lore-rail button span{overflow:hidden;font:500 13px/1.1 'Cormorant Garamond',serif;text-overflow:ellipsis;white-space:nowrap}.lore-rail__map{color:rgba(var(--theme-accent-strong-rgb),.62)!important}.lore-rail__map i{border-color:rgba(var(--theme-accent-rgb),.52)!important}.lore-rail__map span{grid-column:2/4}.lore-rail__line{position:absolute;z-index:0;top:14px;bottom:14px;left:3px;width:1px;background:rgba(var(--theme-text-rgb),.1)}.lore-rail__line i{position:absolute;top:0;left:0;width:1px;background:linear-gradient(rgba(var(--theme-accent-strong-rgb),.85),rgba(var(--theme-accent-rgb),.3));box-shadow:0 0 8px rgba(var(--theme-accent-rgb),.18)}
+.lore-viewport{position:absolute;z-index:1;top:58px;right:0;bottom:0;left:220px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:rgba(var(--theme-text-rgb),.36) rgba(var(--theme-surface-rgb),.2);background:radial-gradient(ellipse 58% 35% at 50% 0,rgba(16,18,27,.82),#07080e 70%,#040406)}.lore-viewport::-webkit-scrollbar{width:9px}.lore-viewport::-webkit-scrollbar-track{background:rgba(var(--theme-surface-rgb),.35)}.lore-viewport::-webkit-scrollbar-thumb{border:2px solid rgba(var(--theme-surface-rgb),.35);background:rgba(var(--theme-text-rgb),.34)}.lore-history__texture{position:fixed;inset:58px 0 0 288px;z-index:-1;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(var(--theme-contrast-rgb),.014) 0 1px,transparent 1px 5px),repeating-linear-gradient(0deg,rgba(var(--theme-contrast-rgb),.01) 0 1px,transparent 1px 4px);opacity:.68}
+.history-canvas{position:relative;width:min(1240px,100%);min-height:100%;margin:0 auto;padding:82px 42px 90px;isolation:isolate}.timeline-row{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 116px minmax(0,1fr);align-items:center}.history-thread{position:absolute;z-index:-1;top:0;bottom:48px;left:50%;width:16px;pointer-events:none;transform:translateX(-50%)}.history-thread>i{position:absolute;top:0;bottom:0;left:50%}.history-thread>i:nth-child(1){width:2px;background:linear-gradient(transparent,rgba(var(--theme-accent-rgb),.48) 2%,rgba(var(--theme-accent-strong-rgb),.66) 50%,rgba(var(--theme-accent-rgb),.42) 98%,transparent);box-shadow:0 0 9px rgba(var(--theme-accent-rgb),.2);transform:translateX(-50%)}.history-thread>i:nth-child(2){width:7px;background:rgba(var(--theme-accent-rgb),.18);filter:blur(5px);transform:translateX(-50%)}.history-thread>i:nth-child(3),.history-thread>i:nth-child(4){width:1px;background:repeating-linear-gradient(to bottom,rgba(var(--theme-accent-strong-rgb),.75) 0 6px,transparent 6px 12px);animation:weaveY 8s linear infinite}.history-thread>i:nth-child(3){margin-left:-3px}.history-thread>i:nth-child(4){margin-left:3px;animation-direction:reverse;animation-duration:11s}.history-thread>b{position:absolute;top:4%;left:50%;width:9px;height:9px;border:1px solid rgba(var(--theme-accent-strong-rgb),.9);background:#07080d;box-shadow:0 0 18px rgba(var(--theme-accent-rgb),.38);transform:translateX(-50%) rotate(45deg);animation:sparkY 26s ease-in-out infinite}
+.history-intro{min-height:310px}.history-intro__copy{grid-column:1;text-align:right}.history-intro__copy>p{margin:0 0 17px;font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.28em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.62)}.history-intro h1{margin:0;font:600 clamp(51px,5.2vw,76px)/.88 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.98);text-wrap:balance}.history-intro aside{max-width:530px;margin:32px 0 0 auto;padding-right:24px;border-right:1px solid rgba(var(--theme-accent-rgb),.32)}.history-intro aside span{font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.25em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.68)}.history-intro aside p{margin:10px 0 0;font:italic 15px/1.55 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.47)}.history-intro__sigil{position:relative;grid-column:2;width:72px;height:72px;place-self:center;border:1px solid rgba(var(--theme-accent-rgb),.48);background:#090a10;box-shadow:0 0 0 7px rgba(5,6,10,.72),0 0 28px rgba(var(--theme-accent-rgb),.13);transform:rotate(45deg)}.history-intro__sigil::before{content:'';position:absolute;inset:10px;border:1px dashed rgba(var(--theme-accent-rgb),.18)}.history-intro__sigil span{position:absolute;inset:29px;border:1px solid rgba(var(--theme-accent-strong-rgb),.76)}
+.history-era{position:relative;padding:46px 0;transition:opacity .3s ease}.history-era.is-dimmed{opacity:.22}.history-era.is-search-dimmed{opacity:.2}.history-era__heading{min-height:185px}.history-era__title{grid-column:1;display:block;text-align:right;text-decoration:none;color:inherit}.history-era__title h2{margin:0;font:600 clamp(38px,4vw,55px)/.95 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.96);text-wrap:balance;transition:color .2s}.history-era__title:hover h2,.history-era__title:focus-visible h2{color:rgba(var(--theme-accent-strong-rgb),.95)}.history-era__title p{max-width:470px;margin:15px 0 0 auto;font:italic 15px/1.48 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.42);display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3}.history-node--era{position:relative;grid-column:2;display:grid;width:66px;height:66px;place-self:center;place-items:center;border:1px solid rgba(var(--theme-accent-rgb),.44);background:#090a10;color:inherit;text-decoration:none;box-shadow:0 0 0 6px rgba(5,6,10,.72),0 0 22px rgba(var(--theme-accent-rgb),.12);transform:rotate(45deg);animation:nodePulse 6s ease-in-out infinite}.history-node--era::before{content:'';position:absolute;inset:9px;border:1px dashed rgba(var(--theme-accent-rgb),.16)}.history-node--era span{transform:rotate(-45deg);font:600 8px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-accent-strong-rgb),.86)}
+.history-era__chapters{position:relative}.history-entry{min-height:136px;transition:opacity .25s}.history-entry.is-search-dimmed{opacity:.14}.history-entry__card{position:relative;display:block;min-height:98px;align-self:center;border:1px solid rgba(var(--theme-accent-rgb),.23);background:linear-gradient(145deg,rgba(15,16,24,.96),rgba(8,9,15,.95));padding:24px 28px 20px;color:inherit;text-decoration:none;box-shadow:0 16px 34px rgba(0,0,0,.14);transition:border-color .2s,background .2s,transform .2s}.history-entry__card::after{content:'';position:absolute;inset:7px;border:1px dashed rgba(var(--theme-accent-rgb),.1);pointer-events:none}.history-entry__card:hover,.history-entry__card:focus-visible{border-color:rgba(var(--theme-accent-strong-rgb),.56);background:linear-gradient(145deg,rgba(19,20,29,.98),rgba(9,10,17,.98));transform:translateY(-2px);outline:none}.history-entry--left .history-entry__card{grid-column:1;text-align:right}.history-entry--right .history-entry__card{grid-column:3;text-align:left}.history-entry__card small{position:absolute;top:11px;font:600 6px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-accent-rgb),.5)}.history-entry--left small{left:12px}.history-entry--right small{right:12px}.history-entry__card strong{display:block;font:600 21px/1.05 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.85);text-wrap:balance}.history-entry__card p{display:-webkit-box;margin:11px 0 0;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;font:italic 14px/1.45 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.4)}.history-entry__node{position:relative;grid-column:2;display:grid;width:100%;height:100%;place-items:center}.history-entry__node::before{content:'';position:absolute;top:50%;width:50%;height:1px;background:linear-gradient(90deg,rgba(var(--theme-accent-rgb),.46),transparent)}.history-entry--left .history-entry__node::before{right:50%;transform:scaleX(-1)}.history-entry--right .history-entry__node::before{left:50%}.history-entry__node i{position:relative;z-index:1;width:13px;height:13px;border:1px solid rgba(var(--theme-accent-rgb),.54);background:#08090f;box-shadow:0 0 0 4px rgba(5,6,10,.7);transform:rotate(45deg)}
+.history-end{min-height:100px}.history-end i{grid-column:2;width:13px;height:13px;place-self:start center;border:1px solid rgba(var(--theme-accent-rgb),.5);background:#08090f;transform:rotate(45deg)}.history-end span{position:absolute;top:29px;left:50%;transform:translateX(-50%);white-space:nowrap;font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.26em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.25)}
+@keyframes weaveY{to{background-position:0 24px}}@keyframes sparkY{0%,100%{top:4%;opacity:.2}10%,42%{opacity:1}50%{top:48%;opacity:.32}65%,92%{opacity:.9}96%{top:94%;opacity:.15}}@keyframes nodePulse{0%,100%{box-shadow:0 0 0 6px rgba(5,6,10,.72),0 0 16px rgba(var(--theme-accent-rgb),.08)}50%{box-shadow:0 0 0 6px rgba(5,6,10,.72),0 0 29px rgba(var(--theme-accent-rgb),.2)}}
+@media(max-width:1000px){.lore-rail{display:none}.lore-viewport{left:0}.lore-history__texture{left:68px}.history-canvas{max-width:780px;padding-inline:24px}.timeline-row{grid-template-columns:0 64px minmax(0,1fr)}.history-thread{left:56px}.history-intro__copy,.history-era__title{grid-column:3;text-align:left}.history-intro aside{margin-left:0;margin-right:auto;padding-right:0;padding-left:18px;border-right:0;border-left:1px solid rgba(var(--theme-accent-rgb),.32)}.history-intro__sigil,.history-node--era{grid-column:2}.history-era__title p{margin-left:0;margin-right:auto}.history-entry--left .history-entry__card,.history-entry--right .history-entry__card{grid-column:3;text-align:left}.history-entry__node{grid-column:2}.history-entry__node::before,.history-entry--left .history-entry__node::before,.history-entry--right .history-entry__node::before{left:50%;right:auto;transform:none}.history-entry--left small{right:12px;left:auto}.history-end i{grid-column:2}.history-end span{left:56px;transform:translateX(-50%)}}
+@media(max-width:720px){.lore-history{left:0}.lore-toolbar{height:54px;padding:0 12px}.lore-toolbar__brand>span{display:none}.lore-toolbar__tools{min-width:0;gap:8px}.lore-search{width:min(39vw,170px);height:29px}.lore-search i{margin:0 8px}.lore-filters{max-width:37vw;overflow-x:auto;scrollbar-width:none}.lore-filters::-webkit-scrollbar{display:none}.lore-filters button{width:26px;min-width:26px;height:26px}.lore-filters button:first-child{width:35px;min-width:35px}.lore-viewport{top:54px}.lore-history__texture{inset:54px 0 0 0}.history-canvas{padding:58px 15px 68px}.timeline-row{grid-template-columns:0 48px minmax(0,1fr)}.history-thread{left:39px}.history-intro{min-height:260px}.history-intro h1{font-size:46px}.history-intro aside p{font-size:14px}.history-intro__sigil{width:48px;height:48px}.history-intro__sigil span{inset:19px}.history-era{padding:30px 0}.history-era__heading{min-height:150px}.history-era__title h2{font-size:36px}.history-era__title p{font-size:14px}.history-node--era{width:46px;height:46px}.history-entry{min-height:122px}.history-entry__card{min-height:90px;padding:22px 18px 18px}.history-entry__card strong{font-size:19px}.history-entry__card p{font-size:13px}.history-end span{left:39px}}
+@media(prefers-reduced-motion:reduce){.history-thread>i,.history-thread>b,.history-node--era{animation:none}.history-era,.history-entry,.history-entry__card{transition:none}}
 </style>
