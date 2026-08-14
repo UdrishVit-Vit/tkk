@@ -2,6 +2,8 @@
 import { HISTORY_THREAD } from '~/data/loreHistory.js'
 import historyContent from '~/data/loreHistoryContent.generated.json'
 
+definePageMeta({ scrollToTop: false })
+
 const route = useRoute()
 const sectionIndex = computed(() => HISTORY_THREAD.sections.findIndex(item => item.slug === route.params.slug))
 const section = computed(() => HISTORY_THREAD.sections[sectionIndex.value])
