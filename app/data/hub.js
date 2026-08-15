@@ -13,7 +13,7 @@ export const SYSTEMS = [
       { name:'Мастерская',  sections:['Бестиарий','Глоссарий'] },
   ] },
   { id:'pf',   name:'Pathfinder', tag:'2e', sections:['Наследия','Классы','Архетипы','Предыстории','Снаряжение','Заклинания'] },
-  { id:'lore', name:'Lore',       tag:'Мир', sections:['Фракции','География','Глоссарий','История'] },
+  { id:'lore', name:'Lore',       tag:'Мир', sections:['Фракции','География','Глоссарий','Нить Башни Мафраш'] },
 ];
 
 export const POOL = {
@@ -49,9 +49,13 @@ export const NODE_IMG = {
   'Драгоценности':'dragocennosti','Магические предметы':'magicheskie',
   'Бестиарий':'bestiariy','Знамения':'znameniya','Гнев Ильбеша':'gnev',
   'Инструменты':'instrumenty','Чай':'chay',
-  'Ширма (справочник)':'shirma','Глоссарий':'shirma'
+  'Ширма (справочник)':'shirma','Глоссарий':'shirma','Нить Башни Мафраш':'historia.webp'
 };
-export function nodeImg(name){ const k = NODE_IMG[name]; return k ? ('/assets/nodes/'+k+'.png') : null; }
+export function nodeImg(name){
+  const k = NODE_IMG[name]
+  if (!k) return null
+  return '/assets/nodes/' + (k.includes('.') ? k : k + '.png')
+}
 
 export const CLASS_IMG = { 'Бард':'bard','Варвар':'barbarian','Воин':'fighter','Волшебник':'wizard',
   'Дрифтер':'drifter','Друид':'druid','Жрец':'cleric','Изобретатель':'artificer',
@@ -92,7 +96,7 @@ export function entriesFor(sysId, sec){
     if (s.indexOf('фракц')>-1) return POOL.factions;
     if (s.indexOf('геогр')>-1) return POOL.places;
     if (s.indexOf('глосс')>-1) return POOL.terms;
-    if (s.indexOf('истор')>-1) return POOL.eras;
+    if (s.indexOf('истор')>-1 || s.indexOf('нить башни')>-1) return POOL.eras;
   }
   if (s.indexOf('знамени')>-1) return POOL.omens;
   if (s.indexOf('гнев')>-1 || s.indexOf('ильбеш')>-1) return POOL.wrath;

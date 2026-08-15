@@ -266,7 +266,7 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Глоссарий': '/dnd55e/glossary'
   },
   lore: {
-    'История': '/lore/history'
+    'Нить Башни Мафраш': '/lore/history'
   },
 }
 function openSection(name) {
@@ -640,7 +640,7 @@ const vm = computed(() => {
   }
 
   const showSection = !!S.section && !!sysObj
-  const showLoreHistory = S.active === 'lore' && S.section === 'История'
+  const showLoreHistory = S.active === 'lore' && S.section === 'Нить Башни Мафраш'
   const cq = (S.cardQuery||'').trim().toLowerCase()
   const sectionCards = (showSection ? entriesFor(S.active, S.section) : []).map(raw => {
     const parts = String(raw).split('|')

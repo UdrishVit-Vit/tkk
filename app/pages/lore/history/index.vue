@@ -1,6 +1,6 @@
 <script setup>
 useHead({
-  title: 'История Эноа · Lore',
+  title: 'Нить Башни Мафраш · Lore',
   meta: [
     { name: 'description', content: 'Семь эпох истории Эноа, соединённые золотой нитью летописи.' },
   ],
@@ -8,5 +8,5 @@ useHead({
 </script>
 
 <template>
-  <HubPage initial-system="lore" initial-section="История" :sync-query="false" />
+  <HubPage initial-system="lore" initial-section="Нить Башни Мафраш" :sync-query="false" />
 </template>

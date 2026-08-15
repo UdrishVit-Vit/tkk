@@ -14,7 +14,7 @@ if (!section.value || !content.value) {
 }
 
 useHead(() => ({
-  title: `${section.value.title} · История Эноа`,
+  title: `${section.value.title} · Нить Башни Мафраш`,
   meta: [{ name: 'description', content: section.value.summary }],
 }))
 </script>
