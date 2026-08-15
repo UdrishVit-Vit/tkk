@@ -132,7 +132,7 @@ onBeforeUnmount(() => {
       <p>Нить времени</p>
       <nav>
         <button type="button" class="lore-rail__map" @click="selectedEra = 'all'; scrollToEra(null)">
-          <i aria-hidden="true" /> <span>Карта</span>
+          <i aria-hidden="true" /> <span>Нить Башни Мафраш</span>
         </button>
         <div class="lore-rail__line" aria-hidden="true"><i :style="{ height: `${scrollProgress * 100}%` }" /></div>
         <button
@@ -188,7 +188,15 @@ onBeforeUnmount(() => {
               <h2>{{ section.title }}</h2>
               <p>{{ section.summary }}</p>
             </NuxtLink>
-            <NuxtLink :to="`/lore/history/${section.slug}`" class="history-node history-node--era" :aria-label="`Открыть ${section.title}`" />
+            <NuxtLink
+              :to="`/lore/history/${section.slug}`"
+              class="history-node history-node--era"
+              :class="{ 'has-emblem': section.emblem }"
+              :style="section.emblem ? { '--era-emblem': `url(${section.emblem})` } : undefined"
+              :aria-label="`Открыть ${section.title}`"
+            >
+              <img v-if="section.emblem" :src="section.emblem" width="256" height="256" alt="" decoding="async">
+            </NuxtLink>
           </div>
 
           <div v-if="contentByEra[section.slug]?.chapters.length" class="history-era__chapters">
@@ -233,6 +241,7 @@ onBeforeUnmount(() => {
 /* Compact fixed navigator: it stays near the chronology while the inner canvas scrolls. */
 .lore-rail{top:18px;bottom:auto;left:max(18px,calc(50% - 650px));width:158px;height:min(580px,calc(100% - 46px));border:1px solid rgba(var(--theme-contrast-rgb),.08);background:rgba(4,4,7,.9);padding:18px 10px 16px;box-shadow:0 18px 45px rgba(0,0,0,.28);backdrop-filter:blur(12px)}
 .lore-rail>p{margin:0 0 14px;font-size:6px}.lore-rail nav{height:calc(100% - 20px)}.lore-rail button{grid-template-columns:12px 18px minmax(0,1fr);padding:5px 0}.lore-rail button>i{width:6px;height:6px}.lore-rail button small{font-size:5px}.lore-rail button span{font-size:12px}.lore-rail__line{top:10px;bottom:10px;left:2px}
+.lore-rail__map span{overflow:visible;line-height:1.05;white-space:normal}
 .lore-viewport{top:0;left:0}.lore-history__texture{inset:0 0 0 68px}
 
 /* The emblem is the main interactive knot and masks the thread underneath. */
@@ -242,10 +251,13 @@ onBeforeUnmount(() => {
 .history-intro__sigil img{position:relative;z-index:1;width:115px;height:115px;pointer-events:none}
 .history-intro__sigil:hover,.history-intro__sigil:focus-visible{outline:none;filter:drop-shadow(0 0 12px rgba(var(--theme-accent-rgb),.24));transform:scale(1.085)}
 .history-intro__sigil:focus-visible::before{border-color:rgba(var(--theme-accent-strong-rgb),.78)}.history-intro__sigil:active{transform:scale(1.025)}
-@media(min-width:1001px){.history-intro aside{max-width:400px}.history-era__title p{max-width:400px}.history-entry--left .history-entry__card{margin-left:110px}}
+.history-node--era.has-emblem{z-index:2;width:92px;height:92px;border:0;background:transparent;box-shadow:none;transform:none;animation:none;isolation:isolate;transition:transform .3s cubic-bezier(.2,.8,.2,1),filter .3s ease}
+.history-node--era.has-emblem::before{display:none}.history-node--era.has-emblem::after{content:'';position:absolute;z-index:0;inset:2px;background:var(--era-emblem) center/contain no-repeat;filter:brightness(0) drop-shadow(0 0 3px rgba(0,0,0,.95));opacity:.94;transform:scale(1.045)}
+.history-node--era.has-emblem img{position:relative;z-index:1;width:88px;height:88px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(var(--theme-accent-rgb),.2));pointer-events:none}.history-node--era.has-emblem:hover,.history-node--era.has-emblem:focus-visible{outline:none;filter:drop-shadow(0 0 10px rgba(var(--theme-accent-rgb),.26));transform:scale(1.1)}
+@media(min-width:1001px){.history-intro aside{max-width:400px}.history-era__title{margin-left:110px}.history-era__title p{max-width:400px}.history-entry--left .history-entry__card{margin-left:110px}}
 @keyframes weaveY{to{background-position:0 24px}}@keyframes sparkY{0%,100%{top:4%;opacity:.2}10%,42%{opacity:1}50%{top:48%;opacity:.32}65%,92%{opacity:.9}96%{top:94%;opacity:.15}}@keyframes nodePulse{0%,100%{box-shadow:0 0 0 6px rgba(5,6,10,.72),0 0 16px rgba(var(--theme-accent-rgb),.08)}50%{box-shadow:0 0 0 6px rgba(5,6,10,.72),0 0 29px rgba(var(--theme-accent-rgb),.2)}}@keyframes historySigilGlow{0%,100%{opacity:.86;transform:scale(.97)}50%{opacity:1;transform:scale(1.045)}}
 @media(max-width:1000px){.lore-rail{display:none}.lore-viewport{left:0}.lore-history__texture{left:68px}.history-canvas{max-width:780px;padding-inline:24px}.timeline-row{grid-template-columns:0 64px minmax(0,1fr)}.history-thread{left:56px}.history-intro__copy,.history-era__title{grid-column:3;text-align:left}.history-intro aside{margin-left:0;margin-right:auto;padding-right:0;padding-left:18px;border-right:0;border-left:1px solid rgba(var(--theme-accent-rgb),.32)}.history-intro__sigil,.history-node--era{grid-column:2}.history-era__title p{margin-left:0;margin-right:auto}.history-entry--left .history-entry__card,.history-entry--right .history-entry__card{grid-column:3;text-align:left}.history-entry__node{grid-column:2}.history-entry__node::before,.history-entry--left .history-entry__node::before,.history-entry--right .history-entry__node::before{left:50%;right:auto;transform:none}.history-entry--left small{right:12px;left:auto}.history-end i{grid-column:2}.history-end span{left:56px;transform:translateX(-50%)}}
 @media(max-width:720px){.lore-history{left:0}.lore-toolbar{height:54px;padding:0 12px}.lore-toolbar__brand>span{display:none}.lore-toolbar__tools{min-width:0;gap:8px}.lore-search{width:min(39vw,170px);height:29px}.lore-search i{margin:0 8px}.lore-filters{max-width:37vw;overflow-x:auto;scrollbar-width:none}.lore-filters::-webkit-scrollbar{display:none}.lore-filters button{width:26px;min-width:26px;height:26px}.lore-filters button:first-child{width:35px;min-width:35px}.lore-viewport{top:54px}.lore-history__texture{inset:54px 0 0 0}.history-canvas{padding:58px 15px 68px}.timeline-row{grid-template-columns:0 48px minmax(0,1fr)}.history-thread{left:39px}.history-intro{min-height:260px}.history-intro h1{font-size:46px}.history-intro aside p{font-size:14px}.history-intro__sigil{width:52px;height:52px}.history-intro__sigil::before{inset:7px}.history-intro__sigil img{width:50px;height:50px}.history-era{padding:30px 0}.history-era__heading{min-height:150px}.history-era__title h2{font-size:36px}.history-era__title p{font-size:14px}.history-node--era{width:46px;height:46px}.history-entry{min-height:122px}.history-entry__card{min-height:90px;padding:22px 18px 18px}.history-entry__card strong{font-size:19px}.history-entry__card p{font-size:13px}.history-end span{left:39px}}
-@media(max-width:720px){.lore-viewport{top:0}.lore-history__texture{inset:0}.history-intro__sigil{width:72px;height:72px}.history-intro__sigil::after{inset:1px}.history-intro__sigil img{width:68px;height:68px}}
+@media(max-width:720px){.lore-viewport{top:0}.lore-history__texture{inset:0}.history-intro__sigil{width:72px;height:72px}.history-intro__sigil::after{inset:1px}.history-intro__sigil img{width:68px;height:68px}.history-node--era.has-emblem{width:62px;height:62px}.history-node--era.has-emblem img{width:60px;height:60px}}
 @media(prefers-reduced-motion:reduce){.history-thread>i,.history-thread>b,.history-node--era,.history-intro__sigil img{animation:none}.history-intro__sigil,.history-era,.history-entry,.history-entry__card{transition:none}}
 </style>

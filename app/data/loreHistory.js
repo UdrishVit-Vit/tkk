@@ -7,6 +7,7 @@ export const HISTORY_THREAD = {
     {
       slug: 'zhertva-purusha',
       title: 'Жертва Пуруша',
+      emblem: '/assets/nodes/zhertva-purusha.webp',
       label: 'Начало мира',
       summary: 'Пуруш превращает собственное тело в Колыбель для Искры и разделяет себя на восемь первооснов — Садхияров.',
       chapters: [],
@@ -14,6 +15,7 @@ export const HISTORY_THREAD = {
     {
       slug: 'epoha-rassveta',
       title: 'Эпоха Рассвета',
+      emblem: '/assets/nodes/epoha-rassveta.webp',
       label: 'Первое святилище',
       summary: 'Садхияры возводят Святилище вокруг Кузни Судьбы. Солнца и луны становятся свидетелями первых нитей мира.',
       chapters: ['Война Искры'],
@@ -21,6 +23,7 @@ export const HISTORY_THREAD = {
     {
       slug: 'epoha-pererozhdeniya',
       title: 'Эпоха Перерождения',
+      emblem: '/assets/nodes/epoha-pererozhdeniya.webp',
       label: 'Новые хозяева',
       summary: 'Улунгуры принимают Колыбель, создают новых детей и открывают миру небо, жизнь, выбор и судьбу.',
       chapters: ['Первое Знамение', 'Порча', 'Вечный Змей', 'Тингир'],
