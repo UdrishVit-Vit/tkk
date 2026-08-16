@@ -40,7 +40,7 @@ function mobileCentralBack() {
   }
   if (state.section) {
     if (props.initialSection) {
-      navigateTo(state.active === '2024' ? '/dnd55e' : '/dnd5e')
+      navigateTo(state.active === '2024' ? '/dnd55e' : state.active === 'lore' ? '/lore' : '/dnd5e')
     } else {
       state.section = null
     }
@@ -55,7 +55,7 @@ function mobileCentralBack() {
 
 function closeLoreHistory() {
   if (props.initialSection && state.active === 'lore') {
-    navigateTo('/?system=lore')
+    navigateTo('/lore')
     return
   }
   state.section = null
@@ -122,6 +122,9 @@ if (!props.initialSystem && route.path === '/' && route.query.system === '5e' &&
 }
 if (!props.initialSystem && route.path === '/' && route.query.system === '2024' && !route.query.section && !route.query.class) {
   navigateTo('/dnd55e', { replace: true })
+}
+if (!props.initialSystem && route.path === '/' && route.query.system === 'lore' && !route.query.section && !route.query.class) {
+  navigateTo('/lore', { replace: true })
 }
 
 // Allow deep-linking straight into a system map, e.g. /dnd5e (used by the
@@ -216,6 +219,10 @@ function selectSystem(id) {
     navigateTo('/dnd55e')
     return
   }
+  if (id === 'lore' && !props.initialSystem) {
+    navigateTo('/lore')
+    return
+  }
   Object.assign(state, { view:'system', active:id, group:null, section:null, overlay:null })
 }
 function recenter() { Object.assign(state, { view:'home', active:null, group:null, section:null }) }
@@ -266,6 +273,7 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Глоссарий': '/dnd55e/glossary'
   },
   lore: {
+    'Глоссарий': '/lore/glossary',
     'Нить Башни Мафраш': '/lore/history'
   },
 }
@@ -552,7 +560,7 @@ const vm = computed(() => {
           img:(classImg(nm)||emblem(i)), label:nm, sub:'', lsize:13.5, dense:true, wrap:true, labelAbove:false, active:isOpen, onClick:() => openClass(nm) }, th))
       })
       nodes.unshift(mkNode({ cx:CX, x:0, y:0, scale:1.05, opacity:1, color:inkHi, knot:176,
-        mask:nodeImg(S.section), label:S.section, sub:sysObj.name, lsize:25, active:true, onClick:() => centreSectionClick() }, th))
+        mask:nodeImg(S.section, S.active), label:S.section, sub:sysObj.name, lsize:25, active:true, onClick:() => centreSectionClick() }, th))
     } else {
       const ringOf = (count, idx, radius, squash, phase) => {
         const a = (-90 + phase + idx*(360/count)) * Math.PI/180
@@ -572,7 +580,7 @@ const vm = computed(() => {
           label:nm, sub:'', lsize:12.5, dense:true, wrap:true, labelAbove:(p.y<0), onClick:null }, th))
       })
       nodes.unshift(mkNode({ cx:CX, x:0, y:0, scale:1.1, opacity:1, color:inkHi, knot:120,
-        mask:nodeImg(S.section), label:S.section, sub:sysObj.name, lsize:23, active:true, onClick:() => centreSectionClick() }, th))
+        mask:nodeImg(S.section, S.active), label:S.section, sub:sysObj.name, lsize:23, active:true, onClick:() => centreSectionClick() }, th))
     }
   } else if (sysObj) {
     if (sysObj.groups) {
@@ -603,7 +611,7 @@ const vm = computed(() => {
         connectors.push(mkLink(hub.stub, 'stub', false, th))
         hub.beads.forEach(([bx, by, s]) => markers.push(mkMarker(bx, by, s, false, th)))
         nodes.push(mkNode({ cx:CX, x:hx, y:hy, scale:1, opacity:1, color:inkHi, knot:62,
-          label:g.name, sub:'', lsize:17, labelAbove:(hy<0), mask:nodeImg(g.name), onClick:null }, th))
+          label:g.name, sub:'', lsize:17, labelAbove:(hy<0), mask:nodeImg(g.name, sysObj.id), onClick:null }, th))
         mine.forEach((o, si) => {
           const isOpen = S.section === o.sec
           const br = knotElbow(hx, hy, o.x, o.y, si)
@@ -611,7 +619,7 @@ const vm = computed(() => {
           connectors.push(mkLink(br.stub, 'stub', false, th))
           br.beads.forEach(([bx, by, s]) => markers.push(mkMarker(bx, by, s, false, th)))
           nodes.push(mkNode({ cx:CX, x:o.x, y:o.y, scale:isOpen?1.16:1, opacity:1, color: isOpen?inkHi:ink, knot:78,
-            label:o.sec, sub:'', lsize:12.5, dense:true, wrap:true, labelAbove:(o.y<0), active:isOpen, mask:nodeImg(o.sec), onClick:() => openSection(o.sec) }, th))
+            label:o.sec, sub:'', lsize:12.5, dense:true, wrap:true, labelAbove:(o.y<0), active:isOpen, mask:nodeImg(o.sec, sysObj.id), onClick:() => openSection(o.sec) }, th))
         })
       })
 
@@ -632,7 +640,7 @@ const vm = computed(() => {
         const p = pts[i], x = Math.round(p.x*Rx), y = Math.round(p.y*Ry), isOpen = S.section === sec
         connectors.push(mkLink('M0 0 L '+x+' '+y, 'section', isOpen, th))
         nodes.push(mkNode({ cx:CX, x, y, scale:isOpen?1.22:1, opacity:1, color: isOpen?inkHi:ink, knot:76,
-          label:sec, sub:'', lsize:13, dense:secs.length>6, wrap:true, active:isOpen, mask:nodeImg(sec), onClick:() => openSection(sec) }, th))
+          label:sec, sub:'', lsize:13, dense:secs.length>6, wrap:true, active:isOpen, mask:nodeImg(sec, sysObj.id), onClick:() => openSection(sec) }, th))
       })
     }
     nodes.unshift(mkNode({ cx:CX, x:0, y:0, scale:1.1, opacity:1, color:inkHi, knot:150,
@@ -641,6 +649,7 @@ const vm = computed(() => {
 
   const showSection = !!S.section && !!sysObj
   const showLoreHistory = S.active === 'lore' && S.section === 'Нить Башни Мафраш'
+  const showLoreGlossary = S.active === 'lore' && S.section === 'Глоссарий'
   const cq = (S.cardQuery||'').trim().toLowerCase()
   const sectionCards = (showSection ? entriesFor(S.active, S.section) : []).map(raw => {
     const parts = String(raw).split('|')
@@ -947,8 +956,9 @@ const vm = computed(() => {
     classInvocations: (cd.invocations||[]).map(f => ({ name:f[0], req:f[1]||'', hasReq:!!f[1], text:f[2] })),
     classHasInvocations: !!(cd.invocations && cd.invocations.length),
 
-    showCards: showSection && S.section !== 'Классы' && !showLoreHistory,
+    showCards: showSection && S.section !== 'Классы' && !showLoreHistory && !showLoreGlossary,
     showLoreHistory,
+    showLoreGlossary,
     sectionEyebrow: (sysObj ? sysObj.name : '') + ' · Узел узлов',
     sectionTitle: S.section || '',
     sectionCards,
@@ -995,7 +1005,7 @@ if (initialClass) await loadClassData()
   <div class="tkk" :class="`theme-${state.theme}`" :style="{ background: vm.th.bg }">
     <canvas ref="canvasEl" class="tkk-canvas" />
 
-    <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory" class="tkk-mobile" aria-label="Мобильная навигация">
+    <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary" class="tkk-mobile" aria-label="Мобильная навигация">
       <header class="tkk-mobile-head">
         <button class="tkk-mobile-back" :class="{ placeholder: !vm.isSystem }" type="button" :aria-label="vm.isSystem ? 'Назад к системам' : undefined" :tabindex="vm.isSystem ? 0 : -1" @click="vm.isSystem && goUp()">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
@@ -1060,7 +1070,7 @@ if (initialClass) await loadClassData()
             <section v-for="(group, groupIndex) in mobileGroups" :key="group.name" class="tkk-mobile-group">
               <header><span>0{{ groupIndex + 1 }}</span><h3>{{ group.name }}</h3></header>
               <button v-for="section in group.sections" :key="section" type="button" @click="openSection(section)">
-                <span class="tkk-mobile-section-knot"><img v-if="nodeImg(section)" :src="nodeImg(section)" alt=""></span>
+                <span class="tkk-mobile-section-knot"><img v-if="nodeImg(section, state.active)" :src="nodeImg(section, state.active)" alt=""></span>
                 <b>{{ section }}</b>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
               </button>
@@ -1228,6 +1238,7 @@ if (initialClass) await loadClassData()
 
     <LazyClassPage v-if="vm.showClassPage" :vm="vm" :state="state" @up="closeClass" />
     <LoreHistoryPage v-if="vm.showLoreHistory" :theme="vm.th" @up="closeLoreHistory" />
+    <LoreGlossaryPage v-if="vm.showLoreGlossary" :theme="vm.th" @up="closeLoreHistory" />
     <SectionCards v-if="vm.showCards" :vm="vm" @up="goUp" @add-bookmark="addBookmark" v-model:query="state.cardQuery" />
 
     <HubOverlays :vm="vm" :state="state" @close="state.overlay = null" @stop="stopClick" />

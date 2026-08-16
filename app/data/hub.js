@@ -51,7 +51,8 @@ export const NODE_IMG = {
   'Инструменты':'instrumenty','Чай':'chay',
   'Ширма (справочник)':'shirma','Глоссарий':'shirma','Нить Башни Мафраш':'historia.webp'
 };
-export function nodeImg(name){
+export function nodeImg(name, systemId = ''){
+  if (systemId === 'lore' && name === 'Глоссарий') return '/assets/nodes/glossary-lore.webp'
   const k = NODE_IMG[name]
   if (!k) return null
   return '/assets/nodes/' + (k.includes('.') ? k : k + '.png')
