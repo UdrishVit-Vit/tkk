@@ -229,6 +229,9 @@ function recenter() { Object.assign(state, { view:'home', active:null, group:nul
 function goUp() {
   const sys = SYSTEMS.find(x => x.id === state.active)
   if (state.cls) closeClass()
+  else if (state.section && props.initialSection) {
+    navigateTo(state.active === '2024' ? '/dnd55e' : state.active === 'lore' ? '/lore' : '/dnd5e')
+  }
   else if (state.section) state.section = null
   else if (sys?.groups && state.group != null) { state.group = null; state.section = null }
   else recenter()
@@ -273,6 +276,12 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Глоссарий': '/dnd55e/glossary'
   },
   lore: {
+    'Пантеон': '/lore/pantheon',
+    'Боги-кочевники': '/lore/nomad-gods',
+    'Гильдии': '/lore/guilds',
+    'Животные': '/lore/animals',
+    'Растения': '/lore/plants',
+    'Сказания': '/lore/tales',
     'Глоссарий': '/lore/glossary',
     'Нить Башни Мафраш': '/lore/history'
   },
@@ -367,17 +376,31 @@ function mkNode(o, th) {
   const knotFilter = selectedTheme.value === 'manu'
     ? manuShadow
     : 'drop-shadow(0 0 '+blur+'px '+th.glow+ga+'))'
+  const mantraFrame = o.frame === 'mantra'
+  const frameKnot = o.frameKnot || o.knot
+  const frameRadius = mantraFrame ? '2px' : '7px'
   return {
     label: o.label, sub: o.sub || '', onClick: o.onClick || null,
     sparkOccluder: { x:o.x, y:o.y, r:Math.max(18, o.knot*0.72) },
     noImg: !hasImg,
-    hasFrame: o.frame === 'diamond',
+    hasFrame: o.frame === 'diamond' || mantraFrame,
+    hasMantraFrame: mantraFrame,
     frameStyle: { position:'absolute', left:'0', top:'0',
-      width:Math.round(o.knot*1.42)+'px', height:Math.round(o.knot*1.42)+'px',
+      width:Math.round(frameKnot*1.42)+'px', height:Math.round(frameKnot*1.42)+'px',
       transform:'translate(-50%,-50%) rotate(45deg)',
-      border:'1px solid '+th.thread+(o.active?0.85:0.5)+')', borderRadius:'7px',
-      boxShadow:'0 0 14px '+th.glow+(o.active?0.3:0.16)+'), inset 0 0 12px '+th.glow+'0.06)',
+      border:'1px solid '+th.thread+(o.active?0.85:(mantraFrame?0.38:0.5))+')', borderRadius:frameRadius,
+      boxShadow:mantraFrame?'inset 0 0 10px '+th.glow+'0.035)':'0 0 14px '+th.glow+(o.active?0.3:0.16)+'), inset 0 0 12px '+th.glow+'0.06)',
       pointerEvents:'none', transition:'border-color .4s, box-shadow .4s' },
+    frameOuterStyle: { position:'absolute', left:'0', top:'0',
+      width:Math.round(frameKnot*1.82)+'px', height:Math.round(frameKnot*1.82)+'px',
+      transform:'translate(-50%,-50%) rotate(45deg)',
+      border:'1px solid '+th.thread+(o.active?0.4:0.17)+')', borderRadius:'1px',
+      pointerEvents:'none' },
+    frameInnerStyle: { position:'absolute', left:'0', top:'0',
+      width:Math.round(frameKnot*0.94)+'px', height:Math.round(frameKnot*0.94)+'px',
+      transform:'translate(-50%,-50%) rotate(45deg)',
+      border:'1px dotted '+th.thread+(o.active?0.58:0.26)+')', borderRadius:'1px',
+      pointerEvents:'none' },
     boxStyle: { position:'absolute', left:o.cx, top:'50%', width:'0', height:'0',
       transform:'translate('+o.x+'px,'+o.y+'px) scale('+o.scale+')', transformOrigin:'center', opacity:o.opacity,
       transition:'transform .5s cubic-bezier(.34,1.3,.5,1), opacity .55s ease',
@@ -427,6 +450,23 @@ function mkLink(d, kind, open, th) {
     flow: noFlow ? { stroke:'none', fill:'none' } : { stroke:'rgba('+th.hi+','+flowA+')', strokeWidth:Math.max(1, bw*0.55), fill:'none',
       strokeLinejoin:'round', strokeLinecap:'round', strokeDasharray:'2 560',
       animation:'threadBead 15s linear infinite', animationDelay:(idx*0.6)+'s' } }
+}
+
+function mkLoreLink(d, open, th, kind = 'thread') {
+  const ornament = kind === 'ornament'
+  const lace = kind === 'lace'
+  const alpha = ornament ? 0.08 : (lace ? 0.18 : (open ? 0.82 : 0.48))
+  const width = ornament ? 0.7 : (lace ? 0.9 : (open ? 1.8 : 1.15))
+  const base = {
+    stroke: th.thread + alpha + ')',
+    strokeWidth: width,
+    fill: 'none',
+    strokeLinejoin: 'miter',
+    strokeLinecap: 'square',
+    transition: 'stroke .45s, stroke-width .45s',
+  }
+  if (ornament) base.strokeDasharray = '1 9'
+  return { d, base, hasGlow:false, hasSpark:false, flow:{ stroke:'none', fill:'none' } }
 }
 function mkThread(d, open, dash, th) {
   const idx = _ci++
@@ -583,7 +623,83 @@ const vm = computed(() => {
         mask:nodeImg(S.section, S.active), label:S.section, sub:sysObj.name, lsize:23, active:true, onClick:() => centreSectionClick() }, th))
     }
   } else if (sysObj) {
-    if (sysObj.groups) {
+    if (sysObj.id === 'lore') {
+      // Lore is arranged as one woven carpet diagram. Eight outer subjects form
+      // an octagonal repeat while the glossary and chronology sit on the inner
+      // axis. Every route changes direction at 45°/90° instead of radiating as
+      // a straight spoke, so all navigation reads as one continuous ornament.
+      const lorePositions = {
+        'Пантеон': [0, -328],
+        'География': [296, -232],
+        'Фракции': [416, 0],
+        'Растения': [296, 232],
+        'Боги-кочевники': [0, 328],
+        'Животные': [-296, 232],
+        'Гильдии': [-416, 0],
+        'Сказания': [-296, -232],
+        'Глоссарий': [-142, -142],
+        'Нить Башни Мафраш': [142, 142],
+      }
+      const loreRoutes = {
+        'Пантеон': ['M 0 -82 L 0 -198 L -18 -216 L 0 -234 L 0 -328', [[0,-198],[-18,-216],[0,-234]]],
+        'География': ['M 62 -52 L 126 -116 L 154 -116 L 172 -134 L 296 -232', [[126,-116],[154,-116],[172,-134]]],
+        'Фракции': ['M 82 0 L 166 0 L 184 -18 L 202 0 L 416 0', [[166,0],[184,-18],[202,0]]],
+        'Растения': ['M 62 52 L 126 116 L 154 116 L 172 134 L 296 232', [[126,116],[154,116],[172,134]]],
+        'Боги-кочевники': ['M 0 82 L 0 198 L 18 216 L 0 234 L 0 328', [[0,198],[18,216],[0,234]]],
+        'Животные': ['M -62 52 L -126 116 L -154 116 L -172 134 L -296 232', [[-126,116],[-154,116],[-172,134]]],
+        'Гильдии': ['M -82 0 L -166 0 L -184 18 L -202 0 L -416 0', [[-166,0],[-184,18],[-202,0]]],
+        'Сказания': ['M -62 -52 L -126 -116 L -154 -116 L -172 -134 L -296 -232', [[-126,-116],[-154,-116],[-172,-134]]],
+        'Глоссарий': ['M -62 -52 L -86 -76 L -86 -104 L -114 -104 L -142 -142', [[-86,-76],[-86,-104],[-114,-104]]],
+        'Нить Башни Мафраш': ['M 62 52 L 86 76 L 86 104 L 114 104 L 142 142', [[86,76],[86,104],[114,104]]],
+      }
+
+      // Nested octagons, two interlocked squares and angular diagonals build the
+      // quiet carpet repeat behind the functional routes.
+      const ornamentPaths = [
+        'M 0 -328 L 296 -232 L 416 0 L 296 232 L 0 328 L -296 232 L -416 0 L -296 -232 Z',
+        'M 0 -328 L 416 0 L 0 328 L -416 0 Z',
+        'M -296 -232 L 296 -232 L 296 232 L -296 232 Z',
+        'M 0 -268 L 238 -188 L 338 0 L 238 188 L 0 268 L -238 188 L -338 0 L -238 -188 Z',
+        'M 0 -220 L 278 0 L 0 220 L -278 0 Z',
+        'M -196 -154 L 196 -154 L 196 154 L -196 154 Z',
+        'M -472 -104 L -368 -208 L -184 -208 L 0 -392 L 184 -208 L 368 -208 L 472 -104',
+        'M -472 104 L -368 208 L -184 208 L 0 392 L 184 208 L 368 208 L 472 104',
+      ]
+      ornamentPaths.forEach((d, i) => connectors.push(mkLoreLink(d, false, th, i < 3 ? 'lace' : 'ornament')))
+
+      const rotateLorePoint = ([x, y], angle) => {
+        const c = Math.cos(angle), s = Math.sin(angle)
+        return [Math.round(x*c-y*s), Math.round(x*s+y*c)]
+      }
+      const petal = [[0,-92],[-58,-154],[0,-244],[58,-154]]
+      for (let i=0; i<8; i++) {
+        const points = petal.map(point => rotateLorePoint(point, i*Math.PI/4))
+        const d = `M ${points[0][0]} ${points[0][1]} ` + points.slice(1).map(([px, py]) => `L ${px} ${py}`).join(' ') + ' Z'
+        connectors.push(mkLoreLink(d, false, th, i%2?'ornament':'lace'))
+      }
+      ;[
+        [0,-268],[238,-188],[338,0],[238,188],[0,268],[-238,188],[-338,0],[-238,-188],
+        [0,-220],[196,-154],[278,0],[196,154],[0,220],[-196,154],[-278,0],[-196,-154],
+      ].forEach(([mx, my], i) => markers.push(mkMarker(mx, my, i%4===0?3.4:2.2, false, th)))
+
+      sysObj.sections.forEach((sec) => {
+        const [x, y] = lorePositions[sec]
+        const [d, bends] = loreRoutes[sec]
+        const isOpen = S.section === sec
+        connectors.push(mkLoreLink(d, isOpen, th))
+        bends.forEach(([bx, by], bi) => markers.push(mkMarker(bx, by, bi === 1 ? 3.2 : 2.5, false, th)))
+        const inner = sec === 'Глоссарий' || sec === 'Нить Башни Мафраш'
+        nodes.push(mkNode({
+          cx:CX, x, y, scale:isOpen?1.14:1, opacity:1, color:isOpen?inkHi:ink,
+          knot:inner?77:68, frameKnot:inner?62:undefined, label:sec, sub:'', lsize:inner?15.3:12.5,
+          dense:true, wrap:true, labelAbove:inner && sec === 'Глоссарий', active:isOpen,
+          frame:'mantra', mask:nodeImg(sec, sysObj.id), onClick:() => openSection(sec),
+        }, th))
+      })
+
+      const outerThread = 'M 0 -328 L 296 -232 L 416 0 L 296 232 L 0 328 L -296 232 L -416 0 L -296 -232 Z'
+      sparks.push(mkSpark(outerThread, 92, '-18s'))
+    } else if (sysObj.groups) {
       // ---- knot library. Section knots sit on a ring; every connection is a
       // drafted "circuit-board" branch (the /dnd5e/races look) — right-angle
       // bends, stub ticks and small knot beads — so the design lives in the
@@ -643,15 +759,18 @@ const vm = computed(() => {
           label:sec, sub:'', lsize:13, dense:secs.length>6, wrap:true, active:isOpen, mask:nodeImg(sec, sysObj.id), onClick:() => openSection(sec) }, th))
       })
     }
+    const centreLabel = sysObj.id === 'lore' ? '' : sysObj.name
+    const centreSub = sysObj.id === 'lore' ? '' : sysObj.tag
     nodes.unshift(mkNode({ cx:CX, x:0, y:0, scale:1.1, opacity:1, color:inkHi, knot:150,
-      img:IMG[sysObj.id], label:sysObj.name, sub:sysObj.tag, lsize:25, active:true, onClick:() => recenter() }, th))
+      img:IMG[sysObj.id], label:centreLabel, sub:centreSub, lsize:25, active:true, onClick:() => recenter() }, th))
   }
 
   const showSection = !!S.section && !!sysObj
   const showLoreHistory = S.active === 'lore' && S.section === 'Нить Башни Мафраш'
   const showLoreGlossary = S.active === 'lore' && S.section === 'Глоссарий'
   const cq = (S.cardQuery||'').trim().toLowerCase()
-  const sectionCards = (showSection ? entriesFor(S.active, S.section) : []).map(raw => {
+  const sectionEntries = showSection ? entriesFor(S.active, S.section) : []
+  const sectionCards = sectionEntries.map(raw => {
     const parts = String(raw).split('|')
     let name, sub='', bon=''
     if (parts.length>=3) { name=parts[0]; sub=parts[1]; bon=parts[2] }
@@ -916,6 +1035,7 @@ const vm = computed(() => {
     th, ink, inkHi,
     nodes, connectors, markers, embers, sparks,
     sysObj,
+    isLoreMap: S.view === 'system' && S.active === 'lore' && !S.section,
     isSystem: S.view !== 'home',
     activeName: sysObj ? sysObj.name : '',
     showGroup: !!(sysObj?.groups && S.group != null),
@@ -962,6 +1082,7 @@ const vm = computed(() => {
     sectionEyebrow: (sysObj ? sysObj.name : '') + ' · Узел узлов',
     sectionTitle: S.section || '',
     sectionCards,
+    sectionHasEntries: sectionEntries.length > 0,
 
     query: S.query, results, noResults: results.length===0,
     bookmarks: S.bookmarks, hasBookmarks: S.bookmarks.length>0, noBookmarks: S.bookmarks.length===0,
@@ -1002,8 +1123,9 @@ if (initialClass) await loadClassData()
 </script>
 
 <template>
-  <div class="tkk" :class="`theme-${state.theme}`" :style="{ background: vm.th.bg }">
+  <div class="tkk" :class="[`theme-${state.theme}`, { 'is-lore-map': vm.isLoreMap }]" :style="{ background: vm.th.bg }">
     <canvas ref="canvasEl" class="tkk-canvas" />
+    <div v-if="vm.isLoreMap" class="tkk-lore-carpet-bg" aria-hidden="true" />
 
     <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary" class="tkk-mobile" aria-label="Мобильная навигация">
       <header class="tkk-mobile-head">
@@ -1080,7 +1202,7 @@ if (initialClass) await loadClassData()
       </template>
     </main>
 
-    <svg class="tkk-rings" :style="{ color: vm.th.ring }">
+    <svg v-if="!vm.isLoreMap" class="tkk-rings" :style="{ color: vm.th.ring }">
       <g :transform="`translate(${center.x},${center.y})`">
         <g style="animation:ringTurn 240s linear infinite">
           <circle r="318" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="1 13" opacity="0.5" />
@@ -1112,7 +1234,7 @@ if (initialClass) await loadClassData()
             />
           </mask>
         </defs>
-        <g class="tkk-halo" aria-hidden="true">
+        <g class="tkk-halo" :class="{ 'tkk-halo-lore': vm.isLoreMap }" aria-hidden="true">
           <rect x="-300" y="-300" width="600" height="600" transform="rotate(45)" />
           <rect x="-436" y="-436" width="872" height="872" transform="rotate(45)" />
         </g>
@@ -1135,7 +1257,9 @@ if (initialClass) await loadClassData()
     <div class="tkk-nodes" :style="{ transform: `scale(${fit})` }">
       <div v-for="(node, i) in vm.nodes" :key="'n'+i" class="tkk-node" :style="node.boxStyle" @click="node.onClick?.()">
         <div :style="node.discStyle" />
+        <div v-if="node.hasMantraFrame" class="tkk-mantra-frame tkk-mantra-frame-outer" :style="node.frameOuterStyle" />
         <div v-if="node.hasFrame" :style="node.frameStyle" />
+        <div v-if="node.hasMantraFrame" class="tkk-mantra-frame tkk-mantra-frame-inner" :style="node.frameInnerStyle" />
         <div class="tkk-knot" :style="node.knotStyle">
           <svg v-if="node.noImg" viewBox="-50 -50 100 100" style="width:100%;height:100%;display:block">
             <g fill="none" stroke="currentColor" stroke-width="1.15">
@@ -1281,10 +1405,18 @@ if (initialClass) await loadClassData()
 .tkk.theme-madness .tkk-sidebar{border-right-color:rgba(215,187,255,.1);background:linear-gradient(180deg,rgba(30,20,50,.72),rgba(12,8,22,.62));box-shadow:10px 0 42px rgba(4,2,10,.16)}
 .tkk.theme-madness .tkk-sidebar-btn:hover{color:rgba(235,221,255,.98);background:linear-gradient(135deg,rgba(174,116,255,.14),rgba(90,89,211,.1));box-shadow:0 0 18px rgba(160,105,238,.09)}
 .tkk-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+.tkk-lore-carpet-bg{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.72;background:linear-gradient(45deg,transparent 49.85%,rgba(var(--theme-accent-rgb),.026) 49.94% 50.06%,transparent 50.15%) 0 0/184px 184px,linear-gradient(135deg,transparent 49.85%,rgba(var(--theme-contrast-rgb),.021) 49.94% 50.06%,transparent 50.15%) 0 0/184px 184px,radial-gradient(circle,rgba(var(--theme-accent-rgb),.16) 0 1px,transparent 1.5px) 0 0/92px 92px;-webkit-mask-image:radial-gradient(ellipse 72% 82% at 52% 50%,#000 18%,rgba(0,0,0,.72) 58%,transparent 92%);mask-image:radial-gradient(ellipse 72% 82% at 52% 50%,#000 18%,rgba(0,0,0,.72) 58%,transparent 92%)}
 .tkk-rings{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
 .tkk-conn{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
 .tkk-halo rect{fill:none;stroke:rgba(var(--theme-accent-rgb),.14);stroke-width:1}
 .tkk-halo rect:first-child{stroke:rgba(var(--theme-accent-rgb),.22)}
+.tkk-halo-lore rect{stroke:rgba(var(--theme-accent-rgb),.11);stroke-width:.7}
+.tkk-halo-lore rect:first-child{stroke:rgba(var(--theme-accent-rgb),.18)}
+.tkk.is-lore-map .tkk-knot{filter:drop-shadow(0 0 5px rgba(var(--theme-accent-rgb),.16))!important}
+.tkk.is-lore-map .tkk-node:hover .tkk-knot{transform:translate(-50%,-50%) scale(1.12)!important;filter:drop-shadow(0 0 11px rgba(var(--theme-accent-rgb),.34))!important}
+.tkk.is-lore-map .tkk-mantra-frame{transition:transform .5s ease,border-color .35s,opacity .35s}
+.tkk.is-lore-map .tkk-node:hover .tkk-mantra-frame-outer{transform:translate(-50%,-50%) rotate(45deg) scale(1.04)!important;border-color:rgba(var(--theme-accent-strong-rgb),.34)!important}
+.tkk.is-lore-map .tkk-node:hover .tkk-mantra-frame-inner{transform:translate(-50%,-50%) rotate(45deg) scale(.94)!important;border-color:rgba(var(--theme-accent-strong-rgb),.5)!important}
 .tkk-nodes{position:absolute;inset:0;z-index:4;pointer-events:none;transform-origin:calc(50% + 34px) 50%}
 .tkk-node{cursor:default}
 .tkk-knot:hover{transform:translate(-50%,-50%) scale(1.2) !important}

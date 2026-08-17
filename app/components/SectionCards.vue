@@ -43,6 +43,11 @@ defineEmits(['up', 'addBookmark', 'update:query'])
           </div>
         </div>
       </div>
+      <div v-if="!vm.sectionCards.length" class="cards-empty">
+        <span>◇</span>
+        <strong>{{ vm.sectionHasEntries ? 'Ничего не найдено' : 'Раздел готов к наполнению' }}</strong>
+        <p>{{ vm.sectionHasEntries ? 'Попробуйте изменить поисковый запрос.' : 'Материалы этого раздела появятся здесь.' }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -60,6 +65,10 @@ defineEmits(['up', 'addBookmark', 'update:query'])
 .cards-filter{flex:none;display:flex;align-items:center;gap:9px;padding:0 22px;background:rgba(var(--theme-accent-rgb),.14);border:1px solid rgba(var(--theme-accent-rgb),.34);border-radius:13px;cursor:pointer;font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(244,214,150,.95)}
 .cards-filter:hover{background:rgba(var(--theme-contrast-rgb),.06)}
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(286px,1fr));gap:18px}
+.cards-empty{display:grid;min-height:260px;place-items:center;align-content:center;gap:8px;border:1px dashed rgba(var(--theme-contrast-rgb),.12);border-radius:16px;background:rgba(var(--theme-contrast-rgb),.018);text-align:center}
+.cards-empty span{font-family:'Cormorant Garamond',serif;font-size:34px;color:rgba(var(--theme-accent-strong-rgb),.62)}
+.cards-empty strong{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:500;color:rgba(var(--theme-heading-rgb),.88)}
+.cards-empty p{margin:0;font-size:11px;letter-spacing:.08em;color:rgba(var(--theme-text-rgb),.42)}
 .card-tile{position:relative;overflow:hidden;height:130px;border:1px solid rgba(var(--theme-contrast-rgb),.09);border-radius:14px;background:linear-gradient(135deg,rgba(var(--theme-contrast-rgb),.04),rgba(var(--theme-contrast-rgb),.012));cursor:pointer;transition:all .28s}
 .card-tile:hover{background:rgba(var(--theme-contrast-rgb),.06);border-color:rgba(var(--theme-accent-rgb),.4);transform:translateY(-3px)}
 .card-glow{position:absolute;top:0;right:0;bottom:0;width:46%;background:radial-gradient(120% 120% at 90% 30%,rgba(var(--theme-accent-rgb),.16),rgba(var(--theme-accent-rgb),0) 62%);-webkit-mask-image:linear-gradient(90deg,transparent,#000 60%);mask-image:linear-gradient(90deg,transparent,#000 60%)}

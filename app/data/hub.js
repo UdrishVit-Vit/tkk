@@ -13,7 +13,10 @@ export const SYSTEMS = [
       { name:'Мастерская',  sections:['Бестиарий','Глоссарий'] },
   ] },
   { id:'pf',   name:'Pathfinder', tag:'2e', sections:['Наследия','Классы','Архетипы','Предыстории','Снаряжение','Заклинания'] },
-  { id:'lore', name:'Lore',       tag:'Мир', sections:['Фракции','География','Глоссарий','Нить Башни Мафраш'] },
+  { id:'lore', name:'Lore',       tag:'Мир', sections:[
+      'Пантеон','Боги-кочевники','Фракции','Гильдии','География',
+      'Животные','Растения','Сказания','Глоссарий','Нить Башни Мафраш'
+  ] },
 ];
 
 export const POOL = {
@@ -53,6 +56,12 @@ export const NODE_IMG = {
 };
 export function nodeImg(name, systemId = ''){
   if (systemId === 'lore' && name === 'Глоссарий') return '/assets/nodes/glossary-lore.webp'
+  if (systemId === 'lore' && name === 'Фракции') return '/assets/nodes/factions-lore.webp'
+  if (systemId === 'lore' && name === 'Пантеон') return '/assets/nodes/pantheon-lore.webp'
+  if (systemId === 'lore' && name === 'Боги-кочевники') return '/assets/nodes/nomad-gods-lore.webp'
+  if (systemId === 'lore' && name === 'География') return '/assets/nodes/geography-lore.webp'
+  if (systemId === 'lore' && name === 'Гильдии') return '/assets/nodes/guilds-lore.webp'
+  if (systemId === 'lore' && name === 'Сказания') return '/assets/nodes/tales-lore.webp'
   const k = NODE_IMG[name]
   if (!k) return null
   return '/assets/nodes/' + (k.includes('.') ? k : k + '.png')
