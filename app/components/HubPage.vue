@@ -278,6 +278,7 @@ const SECTION_ROUTES_BY_SYSTEM = {
   lore: {
     'Пантеон': '/lore/pantheon',
     'Боги-кочевники': '/lore/nomad-gods',
+    'Фракции': '/lore/factions',
     'Гильдии': '/lore/guilds',
     'Животные': '/lore/animals',
     'Растения': '/lore/plants',
@@ -768,6 +769,8 @@ const vm = computed(() => {
   const showSection = !!S.section && !!sysObj
   const showLoreHistory = S.active === 'lore' && S.section === 'Нить Башни Мафраш'
   const showLoreGlossary = S.active === 'lore' && S.section === 'Глоссарий'
+  const showLorePantheon = S.active === 'lore' && S.section === 'Пантеон'
+  const showLoreFactions = S.active === 'lore' && S.section === 'Фракции'
   const cq = (S.cardQuery||'').trim().toLowerCase()
   const sectionEntries = showSection ? entriesFor(S.active, S.section) : []
   const sectionCards = sectionEntries.map(raw => {
@@ -1076,9 +1079,11 @@ const vm = computed(() => {
     classInvocations: (cd.invocations||[]).map(f => ({ name:f[0], req:f[1]||'', hasReq:!!f[1], text:f[2] })),
     classHasInvocations: !!(cd.invocations && cd.invocations.length),
 
-    showCards: showSection && S.section !== 'Классы' && !showLoreHistory && !showLoreGlossary,
+    showCards: showSection && S.section !== 'Классы' && !showLoreHistory && !showLoreGlossary && !showLorePantheon && !showLoreFactions,
     showLoreHistory,
     showLoreGlossary,
+    showLorePantheon,
+    showLoreFactions,
     sectionEyebrow: (sysObj ? sysObj.name : '') + ' · Узел узлов',
     sectionTitle: S.section || '',
     sectionCards,
@@ -1127,7 +1132,7 @@ if (initialClass) await loadClassData()
     <canvas ref="canvasEl" class="tkk-canvas" />
     <div v-if="vm.isLoreMap" class="tkk-lore-carpet-bg" aria-hidden="true" />
 
-    <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary" class="tkk-mobile" aria-label="Мобильная навигация">
+    <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary && !vm.showLorePantheon && !vm.showLoreFactions" class="tkk-mobile" aria-label="Мобильная навигация">
       <header class="tkk-mobile-head">
         <button class="tkk-mobile-back" :class="{ placeholder: !vm.isSystem }" type="button" :aria-label="vm.isSystem ? 'Назад к системам' : undefined" :tabindex="vm.isSystem ? 0 : -1" @click="vm.isSystem && goUp()">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
@@ -1363,6 +1368,8 @@ if (initialClass) await loadClassData()
     <LazyClassPage v-if="vm.showClassPage" :vm="vm" :state="state" @up="closeClass" />
     <LoreHistoryPage v-if="vm.showLoreHistory" :theme="vm.th" @up="closeLoreHistory" />
     <LoreGlossaryPage v-if="vm.showLoreGlossary" :theme="vm.th" @up="closeLoreHistory" />
+    <LorePantheonPage v-if="vm.showLorePantheon" :theme="vm.th" @up="closeLoreHistory" />
+    <LoreFactionsPage v-if="vm.showLoreFactions" :theme="vm.th" @up="closeLoreHistory" />
     <SectionCards v-if="vm.showCards" :vm="vm" @up="goUp" @add-bookmark="addBookmark" v-model:query="state.cardQuery" />
 
     <HubOverlays :vm="vm" :state="state" @close="state.overlay = null" @stop="stopClick" />
