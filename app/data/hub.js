@@ -14,8 +14,8 @@ export const SYSTEMS = [
   ] },
   { id:'pf',   name:'Pathfinder', tag:'2e', sections:['Наследия','Классы','Архетипы','Предыстории','Снаряжение','Заклинания'] },
   { id:'lore', name:'Lore',       tag:'Мир', sections:[
-      'Пантеон','Боги-кочевники','Фракции','Гильдии','География',
-      'Животные','Растения','Сказания','Глоссарий','Нить Башни Мафраш'
+      'Пантеон','Фракции','Гильдии','География',
+      'Животные','Растения','Сказания','Узлы','Глоссарий','Нить Башни Мафраш'
   ] },
 ];
 
@@ -58,7 +58,6 @@ export function nodeImg(name, systemId = ''){
   if (systemId === 'lore' && name === 'Глоссарий') return '/assets/nodes/glossary-lore.webp'
   if (systemId === 'lore' && name === 'Фракции') return '/assets/nodes/factions-lore.webp'
   if (systemId === 'lore' && name === 'Пантеон') return '/assets/nodes/pantheon-lore.webp'
-  if (systemId === 'lore' && name === 'Боги-кочевники') return '/assets/nodes/nomad-gods-lore.webp'
   if (systemId === 'lore' && name === 'География') return '/assets/nodes/geography-lore.webp'
   if (systemId === 'lore' && name === 'Гильдии') return '/assets/nodes/guilds-lore.webp'
   if (systemId === 'lore' && name === 'Сказания') return '/assets/nodes/tales-lore.webp'

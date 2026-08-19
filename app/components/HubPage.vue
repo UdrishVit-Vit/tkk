@@ -277,12 +277,12 @@ const SECTION_ROUTES_BY_SYSTEM = {
   },
   lore: {
     'Пантеон': '/lore/pantheon',
-    'Боги-кочевники': '/lore/nomad-gods',
     'Фракции': '/lore/factions',
     'Гильдии': '/lore/guilds',
     'Животные': '/lore/animals',
     'Растения': '/lore/plants',
     'Сказания': '/lore/tales',
+    'Узлы': '/lore/uzly',
     'Глоссарий': '/lore/glossary',
     'Нить Башни Мафраш': '/lore/history'
   },
@@ -625,34 +625,29 @@ const vm = computed(() => {
     }
   } else if (sysObj) {
     if (sysObj.id === 'lore') {
-      // Lore is arranged as one woven carpet diagram. Eight outer subjects form
-      // an octagonal repeat while the glossary and chronology sit on the inner
-      // axis. Every route changes direction at 45°/90° instead of radiating as
-      // a straight spoke, so all navigation reads as one continuous ornament.
-      const lorePositions = {
-        'Пантеон': [0, -328],
-        'География': [296, -232],
-        'Фракции': [416, 0],
-        'Растения': [296, 232],
-        'Боги-кочевники': [0, 328],
-        'Животные': [-296, 232],
-        'Гильдии': [-416, 0],
-        'Сказания': [-296, -232],
-        'Глоссарий': [-142, -142],
-        'Нить Башни Мафраш': [142, 142],
+      // Lore is arranged as one woven carpet diagram: every subject sits on a
+      // single evenly-spaced ring (angle = 360°/N), so adding or removing a
+      // subject never leaves a gap or crowds a neighbour. Each route bends
+      // once as it nears its node instead of radiating as a straight spoke,
+      // so navigation still reads as one continuous ornament.
+      const loreRingSections = ['Пантеон', 'География', 'Фракции', 'Растения', 'Нить Башни Мафраш', 'Животные', 'Гильдии', 'Сказания', 'Узлы', 'Глоссарий']
+      const loreRingRadius = 350
+      function loreSpoke(angleDeg) {
+        const rad = angleDeg * Math.PI / 180
+        const ux = Math.sin(rad), uy = -Math.cos(rad)
+        const perp = [uy, -ux]
+        const pt = (r, k = 0) => [Math.round(ux * r + perp[0] * k), Math.round(uy * r + perp[1] * k)]
+        const pStart = pt(82), p1 = pt(loreRingRadius * .6), p2 = pt(loreRingRadius * .66, 18), p3 = pt(loreRingRadius * .72), pEnd = pt(loreRingRadius)
+        const d = `M ${pStart[0]} ${pStart[1]} L ${p1[0]} ${p1[1]} L ${p2[0]} ${p2[1]} L ${p3[0]} ${p3[1]} L ${pEnd[0]} ${pEnd[1]}`
+        return { pos: pEnd, d, bends: [p1, p2, p3] }
       }
-      const loreRoutes = {
-        'Пантеон': ['M 0 -82 L 0 -198 L -18 -216 L 0 -234 L 0 -328', [[0,-198],[-18,-216],[0,-234]]],
-        'География': ['M 62 -52 L 126 -116 L 154 -116 L 172 -134 L 296 -232', [[126,-116],[154,-116],[172,-134]]],
-        'Фракции': ['M 82 0 L 166 0 L 184 -18 L 202 0 L 416 0', [[166,0],[184,-18],[202,0]]],
-        'Растения': ['M 62 52 L 126 116 L 154 116 L 172 134 L 296 232', [[126,116],[154,116],[172,134]]],
-        'Боги-кочевники': ['M 0 82 L 0 198 L 18 216 L 0 234 L 0 328', [[0,198],[18,216],[0,234]]],
-        'Животные': ['M -62 52 L -126 116 L -154 116 L -172 134 L -296 232', [[-126,116],[-154,116],[-172,134]]],
-        'Гильдии': ['M -82 0 L -166 0 L -184 18 L -202 0 L -416 0', [[-166,0],[-184,18],[-202,0]]],
-        'Сказания': ['M -62 -52 L -126 -116 L -154 -116 L -172 -134 L -296 -232', [[-126,-116],[-154,-116],[-172,-134]]],
-        'Глоссарий': ['M -62 -52 L -86 -76 L -86 -104 L -114 -104 L -142 -142', [[-86,-76],[-86,-104],[-114,-104]]],
-        'Нить Башни Мафраш': ['M 62 52 L 86 76 L 86 104 L 114 104 L 142 142', [[86,76],[86,104],[114,104]]],
-      }
+      const lorePositions = {}
+      const loreRoutes = {}
+      loreRingSections.forEach((sec, i) => {
+        const spoke = loreSpoke(i * (360 / loreRingSections.length))
+        lorePositions[sec] = spoke.pos
+        loreRoutes[sec] = [spoke.d, spoke.bends]
+      })
 
       // Nested octagons, two interlocked squares and angular diagonals build the
       // quiet carpet repeat behind the functional routes.
@@ -689,11 +684,10 @@ const vm = computed(() => {
         const isOpen = S.section === sec
         connectors.push(mkLoreLink(d, isOpen, th))
         bends.forEach(([bx, by], bi) => markers.push(mkMarker(bx, by, bi === 1 ? 3.2 : 2.5, false, th)))
-        const inner = sec === 'Глоссарий' || sec === 'Нить Башни Мафраш'
         nodes.push(mkNode({
           cx:CX, x, y, scale:isOpen?1.14:1, opacity:1, color:isOpen?inkHi:ink,
-          knot:inner?77:68, frameKnot:inner?62:undefined, label:sec, sub:'', lsize:inner?15.3:12.5,
-          dense:true, wrap:true, labelAbove:inner && sec === 'Глоссарий', active:isOpen,
+          knot:70, label:sec, sub:'', lsize:12.5,
+          dense:true, wrap:true, active:isOpen,
           frame:'mantra', mask:nodeImg(sec, sysObj.id), onClick:() => openSection(sec),
         }, th))
       })
@@ -771,6 +765,8 @@ const vm = computed(() => {
   const showLoreGlossary = S.active === 'lore' && S.section === 'Глоссарий'
   const showLorePantheon = S.active === 'lore' && S.section === 'Пантеон'
   const showLoreFactions = S.active === 'lore' && S.section === 'Фракции'
+  const showLoreTales = S.active === 'lore' && S.section === 'Сказания'
+  const showLoreUzly = S.active === 'lore' && S.section === 'Узлы'
   const cq = (S.cardQuery||'').trim().toLowerCase()
   const sectionEntries = showSection ? entriesFor(S.active, S.section) : []
   const sectionCards = sectionEntries.map(raw => {
@@ -1079,11 +1075,13 @@ const vm = computed(() => {
     classInvocations: (cd.invocations||[]).map(f => ({ name:f[0], req:f[1]||'', hasReq:!!f[1], text:f[2] })),
     classHasInvocations: !!(cd.invocations && cd.invocations.length),
 
-    showCards: showSection && S.section !== 'Классы' && !showLoreHistory && !showLoreGlossary && !showLorePantheon && !showLoreFactions,
+    showCards: showSection && S.section !== 'Классы' && !showLoreHistory && !showLoreGlossary && !showLorePantheon && !showLoreFactions && !showLoreTales && !showLoreUzly,
     showLoreHistory,
     showLoreGlossary,
     showLorePantheon,
     showLoreFactions,
+    showLoreTales,
+    showLoreUzly,
     sectionEyebrow: (sysObj ? sysObj.name : '') + ' · Узел узлов',
     sectionTitle: S.section || '',
     sectionCards,
@@ -1132,7 +1130,7 @@ if (initialClass) await loadClassData()
     <canvas ref="canvasEl" class="tkk-canvas" />
     <div v-if="vm.isLoreMap" class="tkk-lore-carpet-bg" aria-hidden="true" />
 
-    <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary && !vm.showLorePantheon && !vm.showLoreFactions" class="tkk-mobile" aria-label="Мобильная навигация">
+    <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary && !vm.showLorePantheon && !vm.showLoreFactions && !vm.showLoreTales && !vm.showLoreUzly" class="tkk-mobile" aria-label="Мобильная навигация">
       <header class="tkk-mobile-head">
         <button class="tkk-mobile-back" :class="{ placeholder: !vm.isSystem }" type="button" :aria-label="vm.isSystem ? 'Назад к системам' : undefined" :tabindex="vm.isSystem ? 0 : -1" @click="vm.isSystem && goUp()">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
@@ -1370,6 +1368,8 @@ if (initialClass) await loadClassData()
     <LoreGlossaryPage v-if="vm.showLoreGlossary" :theme="vm.th" @up="closeLoreHistory" />
     <LorePantheonPage v-if="vm.showLorePantheon" :theme="vm.th" @up="closeLoreHistory" />
     <LoreFactionsPage v-if="vm.showLoreFactions" :theme="vm.th" @up="closeLoreHistory" />
+    <LoreTalesPage v-if="vm.showLoreTales" :theme="vm.th" @up="closeLoreHistory" />
+    <LoreUzlyPage v-if="vm.showLoreUzly" :theme="vm.th" @up="closeLoreHistory" />
     <SectionCards v-if="vm.showCards" :vm="vm" @up="goUp" @add-bookmark="addBookmark" v-model:query="state.cardQuery" />
 
     <HubOverlays :vm="vm" :state="state" @close="state.overlay = null" @stop="stopClick" />
