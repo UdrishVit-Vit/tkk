@@ -61,6 +61,7 @@ export function nodeImg(name, systemId = ''){
   if (systemId === 'lore' && name === 'География') return '/assets/nodes/geography-lore.webp'
   if (systemId === 'lore' && name === 'Гильдии') return '/assets/nodes/guilds-lore.webp'
   if (systemId === 'lore' && name === 'Сказания') return '/assets/nodes/tales-lore.webp'
+  if (systemId === 'lore' && name === 'Узлы') return '/assets/nodes/uzly-lore.webp'
   const k = NODE_IMG[name]
   if (!k) return null
   return '/assets/nodes/' + (k.includes('.') ? k : k + '.png')
