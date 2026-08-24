@@ -286,6 +286,7 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Классы': '/pf2e/classes',
     'Снаряжение': '/pf2e/equipment',
     'Магические предметы': '/pf2e/magic-items',
+    'Заклинания': '/pf2e/spells',
     'Бестиарий': '/pf2e/bestiary',
     'Глоссарий': '/pf2e/glossary'
   },
