@@ -12,7 +12,12 @@ export const SYSTEMS = [
       { name:'Инструменты', sections:['Знамения','Гнев Ильбеша','Чай'] },
       { name:'Мастерская',  sections:['Бестиарий','Глоссарий'] },
   ] },
-  { id:'pf',   name:'Pathfinder', tag:'2e', sections:['Наследия','Классы','Архетипы','Предыстории','Снаряжение','Заклинания'] },
+  { id:'pf',   name:'Pathfinder', tag:'2e', groups:[
+      { name:'Персонаж',    sections:['Наследия','Классы','Архетипы','Предыстории','Заклинания'] },
+      { name:'Предметы',    sections:['Снаряжение','Магические предметы'] },
+      { name:'Инструменты', sections:['Знамения','Гнев Ильбеша','Чай'] },
+      { name:'Мастерская',  sections:['Бестиарий','Глоссарий'] },
+  ] },
   { id:'lore', name:'Lore',       tag:'Мир', sections:[
       'Пантеон','Фракции','Гильдии','География',
       'Животные','Растения','Сказания','Узлы','Глоссарий','Нить Башни Мафраш'
@@ -40,6 +45,7 @@ export const POOL = {
   wrath:['Пробуждение Ильбеша','Первая печать','Осада Башни Нитей','Голос из Бездны','Разорванный узел','Затмение'],
   species:["Адаад|Adaad|Тел +1, к другой +1","Аджаид|Adzhaid|Лов +1","Борос|Boros|Тел +2, Мдр +1","Бралл|Bralltsy|Инт +1, к другой +1","Вету|Vetu|по разновидности","Дангун|Danguntsy|Хар +1, к другой +1","Джабари|Jabari|Тел +1, Сил +1, Мдр +1","Маракиец|Marakiyets|Тел +1, Лов +1","Морхор|Morhor|Сил +1, Тел +1, Мдр +1","Ойрдуг|Oyrdug|Инт +2, Тел +1","Самагхи|Samaghi|Лов +1, Инт +1, Мдр +1","Удриш|Udrish|Инт +1, Лов +1","Худдулин|Huddulin|Лов +2","Эхор’нур|Ekhornur|Инт +3, Мдр +2, Тел -1"],
   tea:['Чёрный лист','Зелёный туман','Травяной сбор','Улун Башни','Белый иней','Пуэр Эха'],
+  ancestries:["Аджаид|Adzhaid|Лов, Тел, свободное","Борос|Boros|Тел, Мдр, свободное","Вету|Vetu|Лов, Хар, свободное","Вирморожденный|Virmborn|Сил, Тел, свободное","Джабари|Jabari|Сил, Тел, свободное","Маракиец|Marakiyets|Лов, Тел, свободное","Мор’хор|Morhor|Сил, Мдр, свободное","Ойрдуг|Oyrdug|Инт, Тел, свободное","Самагхи|Samaghi|Лов, Мдр, свободное","Удриш|Udrish|Инт, Лов, свободное","Худдулин|Huddulin|Лов, Мдр, свободное","Человек|Human|Два свободных","Чотгор|Chotgor|Мдр, Инт, свободное","Эхор’нур|Ekhornur|Инт, Мдр, свободное"],
 };
 
 export const IMG = { main:'/assets/knot-main.png', '5e':'/assets/knot-5e.png', '2024':'/assets/knot-2024.png', pf:'/assets/knot-pf.png', lore:'/assets/knot-lore.png' };
@@ -52,7 +58,8 @@ export const NODE_IMG = {
   'Драгоценности':'dragocennosti','Магические предметы':'magicheskie',
   'Бестиарий':'bestiariy','Знамения':'znameniya','Гнев Ильбеша':'gnev',
   'Инструменты':'instrumenty','Чай':'chay',
-  'Ширма (справочник)':'shirma','Глоссарий':'shirma','Нить Башни Мафраш':'historia.webp'
+  'Ширма (справочник)':'shirma','Глоссарий':'shirma','Нить Башни Мафраш':'historia.webp',
+  'Наследия':'rasy','Архетипы':'osobennosti'
 };
 export function nodeImg(name, systemId = ''){
   if (systemId === 'lore' && name === 'Глоссарий') return '/assets/nodes/glossary-lore.webp'
@@ -117,7 +124,7 @@ export function entriesFor(sysId, sec){
   if (s.indexOf('магическ')>-1) return POOL.magic;
   if (s.indexOf('бестиар')>-1) return POOL.beasts;
   if (s.indexOf('рас')>-1 || s.indexOf('вид')>-1) return POOL.species;
-  if (s.indexOf('наслед')>-1) return POOL.races;
+  if (s.indexOf('наслед')>-1) return sysId === 'pf' ? POOL.ancestries : POOL.races;
   if (s.indexOf('класс')>-1) return POOL.classes;
   if (s.indexOf('черт')>-1) return POOL.feats;
   if (s.indexOf('заклин')>-1) return POOL.spells;

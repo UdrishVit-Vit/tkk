@@ -1,6 +1,6 @@
 # Схема сайта TKK.club
 
-Последнее обновление: 2026-07-08.
+Последнее обновление: 2026-08-24.
 
 Документ фиксирует текущую структуру проекта `C:\Projects\ENOA\tkk`: где лежат страницы, данные, ассеты и как связаны разделы D&D 5e 2014. Это рабочая карта сайта, чтобы после новых правок быстро понимать, куда добавлять контент и какие маршруты проверять.
 
@@ -273,6 +273,50 @@ threadSources:
 раздела и подсвечивает конкретную карточку, строку сводки, разновидность или
 элемент таблицы под указателем. При `prefers-reduced-motion` искра отключается.
 
+## 7b. Pathfinder 2e
+
+Третья система сайта. Живёт по тем же правилам, что D&D 5e и 5.5e, но с собственной
+механикой Pathfinder Second Edition.
+
+| Зона | Маршрут | Основной файл |
+| --- | --- | --- |
+| Хаб PF2e | `/pf2e` | `app/pages/pf2e/index.vue` |
+| Наследия (список) | `/pf2e/ancestries` | `app/pages/pf2e/ancestries/index.vue` |
+| Наследие (досье) | `/pf2e/ancestries/:slug` | `app/pages/pf2e/ancestries/[slug].vue` |
+| Классы (список) | `/pf2e/classes` | `app/pages/pf2e/classes/index.vue` |
+| Класс (досье) | `/pf2e/classes/:slug` | `app/pages/pf2e/classes/[slug].vue` |
+
+### Наследия (предки)
+
+- Контент: `content/pf2e/ancestries/*.md`, 14 файлов — те же народы Эноа, что и в D&D.
+- Коллекция: `pf2eAncestries` в `content.config.ts`.
+- Компонент: общий `SpeciesCataloguePage.vue`, у которого теперь три редакции
+  (`5e`, `2024`, `pf2e`) в карте `EDITIONS`.
+- PF2e-поля схемы: `rarity`, `hp`, `ancestryTraits`, `abilityScore`, `abilityFlaw`,
+  `senses`, `languages`, `ancestryFeats` (уровни 1/5/9/13/17).
+- Наследия (heritages) хранятся тем же механизмом, что разновидности рас:
+  раздел `Разновидности` в `ruleSections` плюс записи вида `Борос (Сапак)`.
+- Изображения и узлы переиспользуются из `/images/races/...`: `assetCataloguePath()`
+  сводит `/pf2e/ancestries/*` к `/dnd5e/races/*`.
+
+### Классы
+
+- Данные: `app/data/pf2e/classes/*.js` (15 файлов) + `index.js` и `progression.js`.
+- `progression.js` хранит общий для всех классов «хребет» 1–20 уровней и строит
+  таблицу класса из него, колонки заклинателя и собственных особенностей класса.
+- Компонент: `app/components/pf2e/ClassesPage.vue`.
+- Каждый класс содержит: начальные владения, ключевую характеристику, хиты,
+  ключевые особенности, подкласс (инстинкт/доктрина/муза/тропа и т. д.),
+  таблицу 1–20 и классовые таланты.
+
+### Общий дизайн каталогов
+
+- `app/assets/css/thread-dossier.css` — вынесенные стили «живой нити»
+  (список-созвездие `.rl-*` и досье `.rd-*`). Подключается через
+  `<style scoped src="...">` и в досье рас, и в досье классов.
+- `app/composables/useThreadConstellation.js` — геометрия списка-созвездия:
+  кольцо узлов, изломанные нити, искры и процедурные мандалы.
+
 ## 8. Компоненты
 
 | Компонент | Назначение |
@@ -340,6 +384,11 @@ threadSources:
 - `/dnd5e/screens/move/moving`
 - `/dnd5e/screens/equipment`
 - `/dnd5e/screens/equipment/weapons`
+- `/pf2e`
+- `/pf2e/ancestries`
+- `/pf2e/ancestries/borosy`
+- `/pf2e/classes`
+- `/pf2e/classes/barbarian`
 
 Команды:
 

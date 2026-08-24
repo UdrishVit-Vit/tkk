@@ -219,6 +219,10 @@ function selectSystem(id) {
     navigateTo('/dnd55e')
     return
   }
+  if (id === 'pf' && !props.initialSystem) {
+    navigateTo('/pf2e')
+    return
+  }
   if (id === 'lore' && !props.initialSystem) {
     navigateTo('/lore')
     return
@@ -230,7 +234,7 @@ function goUp() {
   const sys = SYSTEMS.find(x => x.id === state.active)
   if (state.cls) closeClass()
   else if (state.section && props.initialSection) {
-    navigateTo(state.active === '2024' ? '/dnd55e' : state.active === 'lore' ? '/lore' : '/dnd5e')
+    navigateTo(systemHome(state.active))
   }
   else if (state.section) state.section = null
   else if (sys?.groups && state.group != null) { state.group = null; state.section = null }
@@ -243,6 +247,8 @@ function crumbSystem() {
 // "Расы и происхождения" (D&D 5e/2014) and "Виды" (D&D 5.5e/2024) are different
 // rulesets with their own terms — each gets its own page branch instead of
 // sharing one /races list, the same way Pathfinder will get its own branch.
+const SYSTEM_HOME = { '5e': '/dnd5e', '2024': '/dnd55e', pf: '/pf2e', lore: '/lore' }
+function systemHome(id) { return SYSTEM_HOME[id] || '/dnd5e' }
 const SECTION_ROUTES_BY_SYSTEM = {
   '5e': {
     'Расы и происхождения': '/dnd5e/races',
@@ -274,6 +280,10 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Чай': '/dnd55e/tea',
     'Бестиарий': '/dnd55e/bestiary',
     'Глоссарий': '/dnd55e/glossary'
+  },
+  pf: {
+    'Наследия': '/pf2e/ancestries',
+    'Классы': '/pf2e/classes'
   },
   lore: {
     'Пантеон': '/lore/pantheon',
@@ -334,7 +344,7 @@ function closeClass() {
 function centreSectionClick() {
   if (props.initialSection) {
     if (state.cls) { closeClass(); return }
-    navigateTo(state.active === '5e' ? '/dnd5e' : '/dnd55e')
+    navigateTo(systemHome(state.active))
     return
   }
   openSection(state.section)

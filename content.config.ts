@@ -105,6 +105,21 @@ const raceThreadSourceSchema = z.object({
   detailImages: themedImagesSchema.optional()
 })
 
+// Pathfinder 2e ancestry feats: level-gated options with the game's own
+// activity metadata (actions, frequency, trigger, requirements).
+const pf2eAncestryFeatSchema = z.object({
+  level: z.number().int().min(1),
+  name: z.string(),
+  traits: z.array(z.string()).default([]),
+  actions: z.string().optional(),
+  prerequisites: z.string().optional(),
+  frequency: z.string().optional(),
+  trigger: z.string().optional(),
+  requirements: z.string().optional(),
+  text: z.string(),
+  special: z.string().optional()
+})
+
 export default defineContentConfig({
   collections: {
     content: defineCollection({
@@ -182,6 +197,55 @@ export default defineContentConfig({
         primaryTraits: z.array(primaryTraitSchema).default([]),
         windTattooTable: windTattooTableSchema.optional(),
         ruleSections: z.array(ruleSectionSchema).default([]),
+        bloodTables: bloodTablesSchema.optional(),
+        nameData: nameDataSchema.optional(),
+
+        image: z.string().default(''),
+        imageAlt: z.string().default(''),
+        cardImages: themedImagesSchema,
+        detailImages: themedImagesSchema
+      })
+    })
+    ,
+
+    // Pathfinder 2e ancestries reuse the Enoa dossiers, but every mechanic is
+    // rebuilt on PF2e maths: ancestry HP, boosts and a flaw, heritages instead
+    // of subraces, and ancestry feats gated by level.
+    pf2eAncestries: defineCollection({
+      type: 'page',
+      source: 'pf2e/ancestries/**/*.md',
+      schema: z.object({
+        ...baseEntity,
+        type: z.literal('ancestry').default('ancestry'),
+        rulesSystem: z.literal('pf2e').default('pf2e'),
+
+        region: z.array(z.string()).default([]),
+        playable: z.boolean().default(true),
+        hasDndRules: z.boolean().default(true),
+
+        source: z.string().default('TL'),
+        sourceTitle: z.string().default('The Threads of Largo'),
+        sourceAuthor: z.string().optional(),
+        sourceUrl: z.string().optional(),
+        sourceNote: z.string().optional(),
+        publishedAt: z.string().optional(),
+        originalName: z.string().default(''),
+
+        rarity: z.string().default('Обычное'),
+        hp: z.number().int().default(8),
+        ancestryTraits: z.array(z.string()).default([]),
+        creatureType: z.string().default('гуманоид'),
+        abilityScore: z.string().default('—'),
+        abilityFlaw: z.string().default('—'),
+        raceSize: z.string().default('Средний'),
+        speed: z.string().default('25 футов'),
+        senses: z.string().default('—'),
+        languages: z.string().default('—'),
+
+        primaryTraits: z.array(primaryTraitSchema).default([]),
+        ruleSections: z.array(ruleSectionSchema).default([]),
+        ancestryFeats: z.array(pf2eAncestryFeatSchema).default([]),
+        windTattooTable: windTattooTableSchema.optional(),
         bloodTables: bloodTablesSchema.optional(),
         nameData: nameDataSchema.optional(),
 
