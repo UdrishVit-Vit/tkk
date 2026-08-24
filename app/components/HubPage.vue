@@ -283,7 +283,9 @@ const SECTION_ROUTES_BY_SYSTEM = {
   },
   pf: {
     'Наследия': '/pf2e/ancestries',
-    'Классы': '/pf2e/classes'
+    'Классы': '/pf2e/classes',
+    'Снаряжение': '/pf2e/equipment',
+    'Магические предметы': '/pf2e/magic-items'
   },
   lore: {
     'Пантеон': '/lore/pantheon',

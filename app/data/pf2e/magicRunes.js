@@ -1,0 +1,83 @@
+// Runes are the backbone of Pathfinder 2e treasure: fundamental runes keep a
+// character's numbers on the expected curve, property runes add the character.
+// A rune can be transferred to another item for a fee instead of being re-bought.
+
+export const PF2E_FUNDAMENTAL_RUNES = [
+  { id: 'weapon-potency-1', title: 'Руна мощи оружия +1', en: 'Weapon potency (+1)', cat: 'runes-fundamental', level: 2, price: '35 зм', desc: 'Оружие даёт бонус предмета +1 к броскам атаки и может нести одну руну свойства.' },
+  { id: 'weapon-potency-2', title: 'Руна мощи оружия +2', en: 'Weapon potency (+2)', cat: 'runes-fundamental', level: 10, price: '935 зм', desc: 'Бонус предмета +2 к броскам атаки; оружие несёт до двух рун свойств.' },
+  { id: 'weapon-potency-3', title: 'Руна мощи оружия +3', en: 'Weapon potency (+3)', cat: 'runes-fundamental', level: 16, price: '8 935 зм', desc: 'Бонус предмета +3 к броскам атаки; оружие несёт до трёх рун свойств.' },
+  { id: 'striking', title: 'Руна разящего удара', en: 'Striking', cat: 'runes-fundamental', level: 4, price: '65 зм', desc: 'Оружие бросает два кубика урона вместо одного.' },
+  { id: 'greater-striking', title: 'Большая руна разящего удара', en: 'Greater striking', cat: 'runes-fundamental', level: 12, price: '1 065 зм', desc: 'Оружие бросает три кубика урона.' },
+  { id: 'major-striking', title: 'Великая руна разящего удара', en: 'Major striking', cat: 'runes-fundamental', level: 19, price: '31 065 зм', desc: 'Оружие бросает четыре кубика урона.' },
+  { id: 'armor-potency-1', title: 'Руна мощи брони +1', en: 'Armor potency (+1)', cat: 'runes-fundamental', level: 5, price: '160 зм', desc: 'Броня даёт бонус предмета +1 к КБ и может нести одну руну свойства.' },
+  { id: 'armor-potency-2', title: 'Руна мощи брони +2', en: 'Armor potency (+2)', cat: 'runes-fundamental', level: 11, price: '1 060 зм', desc: 'Бонус предмета +2 к КБ; броня несёт до двух рун свойств.' },
+  { id: 'armor-potency-3', title: 'Руна мощи брони +3', en: 'Armor potency (+3)', cat: 'runes-fundamental', level: 18, price: '20 560 зм', desc: 'Бонус предмета +3 к КБ; броня несёт до трёх рун свойств.' },
+  { id: 'resilient', title: 'Руна стойкости', en: 'Resilient', cat: 'runes-fundamental', level: 8, price: '340 зм', desc: 'Броня даёт бонус предмета +1 к спасброскам.' },
+  { id: 'greater-resilient', title: 'Большая руна стойкости', en: 'Greater resilient', cat: 'runes-fundamental', level: 14, price: '3 440 зм', desc: 'Бонус предмета +2 к спасброскам.' },
+  { id: 'major-resilient', title: 'Великая руна стойкости', en: 'Major resilient', cat: 'runes-fundamental', level: 20, price: '49 440 зм', desc: 'Бонус предмета +3 к спасброскам.' }
+]
+
+export const PF2E_WEAPON_RUNES = [
+  { id: 'fanged', title: 'Клыкастая руна', en: 'Fanged', cat: 'runes-weapon', level: 2, price: '30 зм', desc: 'Наносится на безоружную атаку и позволяет ей нести руны, как обычному оружию.' },
+  { id: 'crushing', title: 'Дробящая руна', en: 'Crushing', cat: 'runes-weapon', level: 3, price: '50 зм', desc: 'При критическом попадании цель получает состояние «Оглушённый 1».' },
+  { id: 'kin-warding', title: 'Руна родовой защиты', en: 'Kin-warding', cat: 'runes-weapon', level: 3, price: '52 зм', desc: 'Дварфийская руна: даёт бонус предмета +1 к спасброскам против магии, пока вы держите оружие.' },
+  { id: 'returning', title: 'Возвращающая руна', en: 'Returning', cat: 'runes-weapon', level: 3, price: '55 зм', desc: 'Брошенное оружие возвращается в вашу руку в конце вашего хода.' },
+  { id: 'bane', title: 'Руна погибели', en: 'Bane', cat: 'runes-weapon', level: 4, price: '100 зм', desc: 'Одним действием настраивается на выбранный вид существ: против них оружие даёт бонус +1 к атаке и +2к6 урона на 1 минуту.' },
+  { id: 'ghost-touch', title: 'Руна касания духов', en: 'Ghost touch', cat: 'runes-weapon', level: 4, price: '75 зм', desc: 'Оружие полноценно поражает бесплотных существ и не проходит сквозь них.' },
+  { id: 'merciful', title: 'Милосердная руна', en: 'Merciful', cat: 'runes-weapon', level: 4, price: '70 зм', desc: 'Оружие может по вашему выбору наносить нелетальный урон без штрафа.' },
+  { id: 'cunning', title: 'Хитроумная руна', en: 'Cunning', cat: 'runes-weapon', level: 5, price: '140 зм', desc: 'Даёт бонус предмета +1 к проверкам «Вспомнить знание» о существах, по которым вы попали этим оружием.' },
+  { id: 'disrupting', title: 'Разрушающая руна', en: 'Disrupting', cat: 'runes-weapon', level: 5, price: '150 зм', desc: 'Против нежити оружие наносит дополнительно 1к6 урона духа и накладывает «Ослабленный 1» при провале спасброска.' },
+  { id: 'fearsome', title: 'Устрашающая руна', en: 'Fearsome', cat: 'runes-weapon', level: 5, price: '160 зм', desc: 'При критическом попадании цель получает состояние «Напуганный 1».' },
+  { id: 'pacifying', title: 'Усмиряющая руна', en: 'Pacifying', cat: 'runes-weapon', level: 5, price: '150 зм', desc: 'Существо, по которому вы попали, при провале спасброска Воли теряет желание продолжать бой на 1 раунд.' },
+  { id: 'demolishing', title: 'Крушащая руна', en: 'Demolishing', cat: 'runes-weapon', level: 6, price: '225 зм', desc: 'Оружие игнорирует часть твёрдости предметов и конструктов.' },
+  { id: 'shifting', title: 'Переменчивая руна', en: 'Shifting', cat: 'runes-weapon', level: 6, price: '225 зм', desc: 'Одним действием оружие превращается в другое оружие той же группы.' },
+  { id: 'called', title: 'Призывная руна', en: 'Called', cat: 'runes-weapon', level: 7, price: '350 зм', desc: 'Одним действием вы призываете оружие в руку с расстояния до 500 футов.' },
+  { id: 'extending', title: 'Удлиняющая руна', en: 'Extending', cat: 'runes-weapon', level: 7, price: '700 зм', desc: 'Оружие с чертой «досягаемость» увеличивает досягаемость ещё на 5 футов.' },
+  { id: 'wounding', title: 'Ранящая руна', en: 'Wounding', cat: 'runes-weapon', level: 7, price: '340 зм', desc: 'Попадание наносит 1к6 продолжительного урона кровотечением.' },
+  { id: 'corrosive', title: 'Разъедающая руна', en: 'Corrosive', cat: 'runes-weapon', level: 8, price: '500 зм', desc: 'Оружие наносит дополнительно 1к6 урона кислотой; критическое попадание разъедает броню цели.' },
+  { id: 'flaming', title: 'Пылающая руна', en: 'Flaming', cat: 'runes-weapon', level: 8, price: '500 зм', desc: 'Дополнительно 1к6 урона огнём; при критическом попадании — 1к10 продолжительного урона огнём.' },
+  { id: 'frost', title: 'Морозная руна', en: 'Frost', cat: 'runes-weapon', level: 8, price: '500 зм', desc: 'Дополнительно 1к6 урона холодом; при критическом попадании цель может стать «Замедленной 1».' },
+  { id: 'shock', title: 'Разрядная руна', en: 'Shock', cat: 'runes-weapon', level: 8, price: '500 зм', desc: 'Дополнительно 1к6 урона электричеством; критическое попадание бьёт по всем смежным с целью существам.' },
+  { id: 'thundering', title: 'Громовая руна', en: 'Thundering', cat: 'runes-weapon', level: 8, price: '500 зм', desc: 'Дополнительно 1к6 урона звуком; при критическом попадании цель может оглохнуть.' },
+  { id: 'bloodbane', title: 'Кровавая руна', en: 'Bloodbane', cat: 'runes-weapon', level: 8, price: '475 зм', desc: 'Дварфийская руна: против врагов вашего рода оружие наносит дополнительный урон и получает бонус к атаке.' },
+  { id: 'giant-killing', title: 'Руна убийцы великанов', en: 'Giant-killing', cat: 'runes-weapon', level: 8, price: '450 зм', desc: 'Против существ с чертой «великан» оружие даёт бонус +1 к атаке и наносит 1к6 дополнительного урона.' },
+  { id: 'grievous', title: 'Тяжкая руна', en: 'Grievous', cat: 'runes-weapon', level: 9, price: '700 зм', desc: 'Усиливает эффект критической специализации группы оружия.' },
+  { id: 'anchoring', title: 'Якорная руна', en: 'Anchoring', cat: 'runes-weapon', level: 10, price: '900 зм', desc: 'При критическом попадании цель не может телепортироваться до конца вашего следующего хода.' },
+  { id: 'impactful', title: 'Ударная руна', en: 'Impactful', cat: 'runes-weapon', level: 10, price: '1 000 зм', desc: 'Дополнительно 1к6 урона силовым полем; при критическом попадании цель отбрасывается.' },
+  { id: 'serrating', title: 'Зазубривающая руна', en: 'Serrating', cat: 'runes-weapon', level: 10, price: '1 000 зм', desc: 'Оружие наносит дополнительно 1к4 урона и оставляет рваные раны.' },
+  { id: 'holy-rune', title: 'Святая руна', en: 'Holy', cat: 'runes-weapon', level: 11, price: '1 400 зм', desc: 'Оружие получает черту «святое» и наносит 1к6 урона духа существам с чертой «нечестивое».' },
+  { id: 'unholy-rune', title: 'Нечестивая руна', en: 'Unholy', cat: 'runes-weapon', level: 11, price: '1 400 зм', desc: 'Оружие получает черту «нечестивое» и наносит 1к6 урона духа существам с чертой «святое».' },
+  { id: 'hopeful', title: 'Обнадёживающая руна', en: 'Hopeful', cat: 'runes-weapon', level: 11, price: '1 200 зм', desc: 'Раз в день позволяет перебросить проваленный бросок атаки этим оружием.' },
+  { id: 'brilliant', title: 'Сияющая руна', en: 'Brilliant', cat: 'runes-weapon', level: 12, price: '2 000 зм', desc: 'Дополнительно 1к4 урона огнём, 1к4 светом и 1к4 духа против уязвимых к свету существ.' },
+  { id: 'dancing', title: 'Танцующая руна', en: 'Dancing', cat: 'runes-weapon', level: 13, price: '2 700 зм', desc: 'Оружие сражается само: отпущенное, оно летает и атакует по вашей команде.' },
+  { id: 'keen', title: 'Острая руна', en: 'Keen', cat: 'runes-weapon', level: 13, price: '3 000 зм', desc: 'Бросок атаки, превысивший Сл на 1–9 при выпавшем 19, считается критическим попаданием.' },
+  { id: 'spell-storing', title: 'Руна хранения заклинания', en: 'Spell-storing', cat: 'runes-weapon', level: 13, price: '2 700 зм', desc: 'Оружие хранит одно заклинание 3 круга или ниже и высвобождает его при попадании.' },
+  { id: 'ancestral-echoing', title: 'Руна родового эха', en: 'Ancestral echoing', cat: 'runes-weapon', level: 15, price: '9 900 зм', desc: 'Дварфийская руна: ваше мастерство этим оружием считается на одну ступень выше.' },
+  { id: 'speed', title: 'Руна скорости', en: 'Speed', cat: 'runes-weapon', level: 16, price: '10 000 зм', desc: 'Вы получаете состояние «Ускоренный 1» в каждом бою, в котором атакуете этим оружием; действие можно потратить только на Бег или Удар.' },
+  { id: 'vorpal', title: 'Обезглавливающая руна', en: 'Vorpal', cat: 'runes-weapon', level: 17, price: '15 000 зм', desc: 'При критическом попадании с выпавшим 20 цель с головой должна преуспеть в спасброске Стойкости или потерять её.' }
+]
+
+export const PF2E_ARMOR_RUNES = [
+  { id: 'slick', title: 'Скользкая руна', en: 'Slick', cat: 'runes-armor', level: 5, price: '45 зм', desc: 'Бонус предмета +1 к Акробатике для «Протиснуться» и «Вырваться».' },
+  { id: 'shadow', title: 'Теневая руна', en: 'Shadow', cat: 'runes-armor', level: 5, price: '55 зм', desc: 'Бонус предмета +1 к проверкам Скрытности.' },
+  { id: 'stanching', title: 'Кровоостанавливающая руна', en: 'Stanching', cat: 'runes-armor', level: 5, price: '130 зм', desc: 'Бонус предмета +1 к спасброскам против продолжительного кровотечения и облегчение его прекращения.' },
+  { id: 'glamered', title: 'Личинная руна', en: 'Glamered', cat: 'runes-armor', level: 5, price: '140 зм', desc: 'Одним действием броня принимает вид обычной одежды.' },
+  { id: 'ready', title: 'Готовая руна', en: 'Ready', cat: 'runes-armor', level: 6, price: '200 зм', desc: 'Раз в день позволяет «Поднять щит» как свободное действие.' },
+  { id: 'swallow-spike', title: 'Руна поглощения шипов', en: 'Swallow-spike', cat: 'runes-armor', level: 6, price: '200 зм', desc: 'Даёт сопротивление колющему урону; при критическом провале спасброска броня гасит часть удара.' },
+  { id: 'deathless', title: 'Руна бессмертия', en: 'Deathless', cat: 'runes-armor', level: 7, price: '330 зм', desc: 'Бонус предмета +1 к спасброскам против эффектов нежити и уменьшение значения «Умирающий» раз в день.' },
+  { id: 'acid-resistant', title: 'Руна стойкости к кислоте', en: 'Acid-resistant', cat: 'runes-armor', level: 8, price: '420 зм', desc: 'Сопротивление 5 урону кислотой (растёт у больших ступеней).' },
+  { id: 'cold-resistant', title: 'Руна стойкости к холоду', en: 'Cold-resistant', cat: 'runes-armor', level: 8, price: '420 зм', desc: 'Сопротивление 5 урону холодом.' },
+  { id: 'electricity-resistant', title: 'Руна стойкости к электричеству', en: 'Electricity-resistant', cat: 'runes-armor', level: 8, price: '420 зм', desc: 'Сопротивление 5 урону электричеством.' },
+  { id: 'fire-resistant', title: 'Руна стойкости к огню', en: 'Fire-resistant', cat: 'runes-armor', level: 8, price: '420 зм', desc: 'Сопротивление 5 урону огнём.' },
+  { id: 'sizing', title: 'Руна подгонки', en: 'Sizing', cat: 'runes-armor', level: 8, price: '500 зм', desc: 'Одним действием броня подстраивается под любой размер носителя.' },
+  { id: 'invisibility-rune', title: 'Руна невидимости', en: 'Invisibility', cat: 'runes-armor', level: 8, price: '500 зм', desc: 'Раз в день броня накладывает на носителя «Невидимость» на 1 минуту.' },
+  { id: 'advancing', title: 'Наступающая руна', en: 'Advancing', cat: 'runes-armor', level: 9, price: '625 зм', desc: 'Раз в день позволяет «Бежать» дополнительно как реакцию, когда враг отходит от вас.' },
+  { id: 'bitter', title: 'Горькая руна', en: 'Bitter', cat: 'runes-armor', level: 9, price: '700 зм', desc: 'Бонус предмета +1 к спасброскам против ядов и уменьшение стадии яда раз в день.' },
+  { id: 'greater-invisibility-rune', title: 'Большая руна невидимости', en: 'Greater invisibility', cat: 'runes-armor', level: 10, price: '1 000 зм', desc: 'Невидимость сохраняется, даже если вы атакуете, до конца эффекта.' },
+  { id: 'fortification', title: 'Руна укрепления', en: 'Fortification', cat: 'runes-armor', level: 12, price: '2 000 зм', desc: 'Критическое попадание по вам может стать обычным попаданием при успешной проверке Сл 17.' },
+  { id: 'winged', title: 'Крылатая руна', en: 'Winged', cat: 'runes-armor', level: 13, price: '2 500 зм', desc: 'Раз в день броня даёт скорость полёта на 5 минут.' },
+  { id: 'rock-braced', title: 'Руна каменной опоры', en: 'Rock-braced', cat: 'runes-armor', level: 13, price: '3 000 зм', desc: 'Дварфийская руна: вас крайне трудно сдвинуть или сбить с ног.' },
+  { id: 'soaring', title: 'Парящая руна', en: 'Soaring', cat: 'runes-armor', level: 14, price: '3 750 зм', desc: 'Бонус предмета +1 к Акробатике для полёта и мягкое приземление при падении.' },
+  { id: 'antimagic', title: 'Антимагическая руна', en: 'Antimagic', cat: 'runes-armor', level: 15, price: '6 500 зм', desc: 'Даёт бонус к спасброскам против магии и шанс полностью отменить заклинание, нацеленное на вас.' },
+  { id: 'ethereal', title: 'Эфирная руна', en: 'Ethereal', cat: 'runes-armor', level: 17, price: '13 500 зм', desc: 'Раз в день броня переносит вас на Эфирный план на 10 минут.' }
+]
