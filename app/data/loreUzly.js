@@ -1,3 +1,5 @@
+import OGNI_EDITION from './loreUzlyOgni.generated.json'
+
 export const UZLY_THREAD = {
   title: 'Узлы',
   eyebrow: 'Lore · переплетения судеб',
@@ -57,7 +59,7 @@ export const UZLY_THREAD = {
 }
 
 export const UZLY_CONTENT = {
-  source: '',
+  source: OGNI_EDITION.source,
   categories: [
     {
       slug: 'ogni',
@@ -66,6 +68,7 @@ export const UZLY_CONTENT = {
           type: 'prose',
           paragraphs: [
             '«Огни» — кампания «Вечерние Кости» в мире Эноа, действие которой разворачивается спустя 200 лет после событий «Вестников Бури». История охватывает Юг Даскара — Земли Ханидов: от караван-сарая «Северный Ветер», где встречаются пятеро искателей, до Мигдаша, Сар-Така, Хурхона и вод Даджара.',
+            'Главы 01–32 первого сезона приведены здесь полностью — по литературной редакции, составленной Vit-Vit. Каждая сессия записывалась, расшифровывалась и проходила сверку лора; из хроники убраны игровая механика и технические реплики, сохранены решения, сомнения, наблюдения и слова героев.',
           ],
         },
         {
@@ -80,6 +83,7 @@ export const UZLY_CONTENT = {
             { label: 'Сезонов', value: '3' },
             { label: 'Эпизодов', value: '69 (на 22.02.2022)' },
             { label: 'Статус', value: 'Закрыта' },
+            { label: 'Литературная редакция', value: 'Главы 01–32, Vit-Vit' },
           ],
         },
         {
@@ -212,4 +216,24 @@ export const UZLY_CONTENT = {
     { slug: 'vestniki-buri', intro: [], chapters: [] },
     { slug: 'hroniki-enoa', intro: [], chapters: [] },
   ],
+}
+
+// Главы сезона I узла «Огни» приходят из литературной редакции (см.
+// scripts/import-uzly-ogni.py). Короткая аннотация из архива остаётся ведущей
+// строкой главы, а её место в блоках занимает полный текст.
+const OGNI_CHAPTERS = new Map(OGNI_EDITION.chapters.map(chapter => [chapter.slug, chapter]))
+const PLACEHOLDER_SUMMARY = 'Описание пока не добавлено.'
+
+for (const category of UZLY_CONTENT.categories) {
+  if (category.slug !== 'ogni') continue
+  category.chapters = category.chapters.map((chapter) => {
+    const edition = OGNI_CHAPTERS.get(chapter.slug)
+    if (!edition) return chapter
+    const summary = chapter.blocks?.[0]?.paragraphs?.[0] || ''
+    return {
+      ...chapter,
+      summary: summary === PLACEHOLDER_SUMMARY ? '' : summary,
+      blocks: edition.blocks,
+    }
+  })
 }
