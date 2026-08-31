@@ -455,15 +455,24 @@ function setFiltersOpen(value) {
 // понятию текущей выборки: со всеми фильтрами, поиском и срезом по главам.
 // Возврат к списку остаётся кнопкой — иначе жест значил бы сразу две вещи.
 const SWIPE_START = 8
-const SWIPE_TRIGGER = 64
+// Порог короткий: страница переворачивается по самому движению, а не после того,
+// как читатель дотянет карточку до какой-то отметки.
+const SWIPE_TRIGGER = 46
 const isNarrow = ref(false)
 const swipeShift = ref(0)
-const swiping = ref(false)
 let swipeQuery
 let swipeOrigin = null
 
 function currentIndex() {
   return filteredTerms.value.findIndex(term => term.id === selected.value?.id)
+}
+
+function canStep(delta) {
+  const list = filteredTerms.value
+  if (!list.length) return false
+  const index = currentIndex()
+  const next = (index < 0 ? 0 : index) + delta
+  return next >= 0 && next < list.length
 }
 
 function stepTerm(delta) {
@@ -494,7 +503,22 @@ const TURN_IN_MS = 260
 const TURN_OUT_SHIFT = 0.2
 const TURN_JUMP_SHIFT = 0.13
 
+// Край выборки: дальше листать некуда. Короткий толчок вместо перелистывания —
+// чтобы жест не остался без ответа, но и не выглядел как неудавшийся переход.
+async function bounceEdge(delta) {
+  if (reducedMotion.value || turning.value) return
+  const width = detailPanel.value?.offsetWidth || 320
+  turning.value = 'out'
+  swipeShift.value = (delta > 0 ? -1 : 1) * width * 0.045
+  await wait(90)
+  turning.value = 'in'
+  swipeShift.value = 0
+  await wait(TURN_IN_MS)
+  turning.value = ''
+}
+
 async function turnPage(delta) {
+  if (turning.value) return
   const width = detailPanel.value?.offsetWidth || 320
   const away = delta > 0 ? -1 : 1
 
@@ -509,6 +533,7 @@ async function turnPage(delta) {
   await wait(TURN_OUT_MS)
 
   if (!stepTerm(delta)) {
+    // Край проверяется до анимации, но подстрахуемся: карточку надо вернуть.
     turning.value = 'in'
     swipeShift.value = 0
     swipeFade.value = 1
@@ -542,7 +567,7 @@ function onSwipeStart(event) {
 }
 
 function onSwipeMove(event) {
-  if (!swipeOrigin || event.touches.length !== 1) return
+  if (!swipeOrigin || swipeOrigin.done || event.touches.length !== 1) return
   const touch = event.touches[0]
   const dx = touch.clientX - swipeOrigin.x
   const dy = touch.clientY - swipeOrigin.y
@@ -551,32 +576,22 @@ function onSwipeMove(event) {
     if (Math.abs(dx) < SWIPE_START && Math.abs(dy) < SWIPE_START) return
     // Вертикаль важнее: чтение длинной статьи не должно спотыкаться о жест.
     swipeOrigin.axis = Math.abs(dx) > Math.abs(dy) * 1.4 ? 'x' : 'y'
-    swiping.value = swipeOrigin.axis === 'x'
   }
   if (swipeOrigin.axis !== 'x') return
   if (event.cancelable) event.preventDefault()
+  if (Math.abs(dx) < SWIPE_TRIGGER) return
 
-  // На краях выборки карточка пружинит, а не уезжает в пустоту.
-  const index = currentIndex()
-  const atEdge = (dx < 0 && index >= filteredTerms.value.length - 1) || (dx > 0 && index <= 0)
-  swipeShift.value = dx * (atEdge ? 0.14 : 0.4)
+  // Карточка за пальцем не тянется: как только движение прочитано, страница
+  // переворачивается. Один жест — одна страница, поэтому остаток движения
+  // до отрыва пальца игнорируется.
+  swipeOrigin.done = true
+  const delta = dx < 0 ? 1 : -1
+  if (canStep(delta)) turnPage(delta)
+  else bounceEdge(delta)
 }
 
 function onSwipeEnd() {
-  const axis = swipeOrigin?.axis
-  const shift = swipeShift.value
   swipeOrigin = null
-  swiping.value = false
-
-  if (axis === 'x' && shift <= -SWIPE_TRIGGER) {
-    turnPage(1)
-    return
-  }
-  if (axis === 'x' && shift >= SWIPE_TRIGGER) {
-    turnPage(-1)
-    return
-  }
-  swipeShift.value = 0
 }
 
 onMounted(() => {
@@ -881,7 +896,7 @@ onBeforeUnmount(() => {
 
       <article
         ref="detailPanel"
-        :class="['detail-panel', { 'mobile-open': mobileDetailOpen, 'is-swiping': swiping }, turning && `is-turn-${turning}`]"
+        :class="['detail-panel', { 'mobile-open': mobileDetailOpen }, turning && `is-turn-${turning}`]"
         :style="{ '--swipe-shift': `${swipeShift}px`, '--swipe-fade': swipeFade }"
         aria-live="polite"
         @touchstart.passive="onSwipeStart"
@@ -1236,8 +1251,6 @@ onBeforeUnmount(() => {
    выключен — иначе карточка тянется за пальцем с запозданием. */
 @media(max-width:720px){
   .detail-panel.mobile-open{transform:translateX(var(--swipe-shift,0px));opacity:var(--swipe-fade,1)}
-  /* Палец ведёт карточку сам — переход только помешает. */
-  .detail-panel.is-swiping{transition:none}
   /* Уход: коротко и с разгоном, страница уходит из-под пальца. */
   .detail-panel.is-turn-out{transition:transform .11s cubic-bezier(.4,0,1,1),opacity .11s cubic-bezier(.4,0,1,1)}
   /* Перенос на противоположный край — вне времени, его не должно быть видно. */
