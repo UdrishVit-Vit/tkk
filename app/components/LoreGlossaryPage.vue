@@ -198,9 +198,11 @@ const selectedAttribution = computed(() => selected.value?.attributedTo || selec
 const relatedTerms = computed(() => (selected.value?.related || [])
   .map(id => LORE_GLOSSARY_BY_ID[id])
   .filter(Boolean))
+// Позиция в текущей выборке, а не в полном своде: на телефоне карточки
+// листаются смахиванием, и счётчик показывает, где читатель находится.
 const selectedNumber = computed(() => {
-  const index = glossary.value.findIndex(term => term.id === selected.value?.id)
-  return index < 0 ? '—' : String(index + 1).padStart(2, '0')
+  const index = filteredTerms.value.findIndex(term => term.id === selected.value?.id)
+  return index < 0 ? '—' : `${index + 1} / ${filteredTerms.value.length}`
 })
 
 // Полное досье: народы, пантеон, фракции. Глоссарий показывает его целиком —
@@ -447,6 +449,78 @@ function setFiltersOpen(value) {
   else delete next.panel
   router.replace({ query: next })
 }
+
+// ——— Смахивание по статьям на телефоне ———
+// Карточка открыта поверх списка, поэтому горизонтальный жест ведёт к соседнему
+// понятию текущей выборки: со всеми фильтрами, поиском и срезом по главам.
+// Возврат к списку остаётся кнопкой — иначе жест значил бы сразу две вещи.
+const SWIPE_START = 8
+const SWIPE_TRIGGER = 64
+const isNarrow = ref(false)
+const swipeShift = ref(0)
+const swiping = ref(false)
+let swipeQuery
+let swipeOrigin = null
+
+function currentIndex() {
+  return filteredTerms.value.findIndex(term => term.id === selected.value?.id)
+}
+
+function stepTerm(delta) {
+  const list = filteredTerms.value
+  if (!list.length) return false
+  const index = currentIndex()
+  const next = list[Math.min(list.length - 1, Math.max(0, (index < 0 ? 0 : index) + delta))]
+  if (!next || next.id === selected.value?.id) return false
+  chooseTerm(next)
+  detailPanel.value?.scrollTo({ top: 0 })
+  return true
+}
+
+function onSwipeStart(event) {
+  if (!isNarrow.value || !mobileDetailOpen.value || event.touches.length !== 1) return
+  const touch = event.touches[0]
+  swipeOrigin = { x: touch.clientX, y: touch.clientY, axis: null }
+}
+
+function onSwipeMove(event) {
+  if (!swipeOrigin || event.touches.length !== 1) return
+  const touch = event.touches[0]
+  const dx = touch.clientX - swipeOrigin.x
+  const dy = touch.clientY - swipeOrigin.y
+
+  if (!swipeOrigin.axis) {
+    if (Math.abs(dx) < SWIPE_START && Math.abs(dy) < SWIPE_START) return
+    // Вертикаль важнее: чтение длинной статьи не должно спотыкаться о жест.
+    swipeOrigin.axis = Math.abs(dx) > Math.abs(dy) * 1.4 ? 'x' : 'y'
+    swiping.value = swipeOrigin.axis === 'x'
+  }
+  if (swipeOrigin.axis !== 'x') return
+  if (event.cancelable) event.preventDefault()
+
+  // На краях выборки карточка пружинит, а не уезжает в пустоту.
+  const index = currentIndex()
+  const atEdge = (dx < 0 && index >= filteredTerms.value.length - 1) || (dx > 0 && index <= 0)
+  swipeShift.value = dx * (atEdge ? 0.14 : 0.4)
+}
+
+function onSwipeEnd() {
+  if (swipeOrigin?.axis === 'x') {
+    if (swipeShift.value <= -SWIPE_TRIGGER) stepTerm(1)
+    else if (swipeShift.value >= SWIPE_TRIGGER) stepTerm(-1)
+  }
+  swipeOrigin = null
+  swiping.value = false
+  swipeShift.value = 0
+}
+
+onMounted(() => {
+  swipeQuery = window.matchMedia('(max-width: 720px)')
+  isNarrow.value = swipeQuery.matches
+  const sync = event => { isNarrow.value = event.matches }
+  swipeQuery.addEventListener('change', sync)
+  onBeforeUnmount(() => swipeQuery.removeEventListener('change', sync))
+})
 
 function notifyAction(message) {
   actionMessage.value = message
@@ -731,7 +805,17 @@ onBeforeUnmount(() => {
         </div>
       </section>
 
-      <article ref="detailPanel" class="detail-panel" :class="{ 'mobile-open': mobileDetailOpen }" aria-live="polite">
+      <article
+        ref="detailPanel"
+        class="detail-panel"
+        :class="{ 'mobile-open': mobileDetailOpen, 'is-swiping': swiping }"
+        :style="{ '--swipe-shift': `${swipeShift}px` }"
+        aria-live="polite"
+        @touchstart.passive="onSwipeStart"
+        @touchmove="onSwipeMove"
+        @touchend="onSwipeEnd"
+        @touchcancel="onSwipeEnd"
+      >
         <button class="mobile-close" type="button" @click="mobileDetailOpen = false">← К списку понятий</button>
         <div v-if="selected && detailVisible" class="detail-actions" aria-label="Действия с карточкой">
           <span v-if="actionMessage" class="action-message">{{ actionMessage }}</span>
@@ -1072,6 +1156,14 @@ onBeforeUnmount(() => {
   letter-spacing:0;
   color:var(--gold-bright);
   text-shadow:0 0 18px rgba(var(--theme-accent-rgb),.12);
+}
+
+/* Смахивание по статьям: сдвиг живёт в переменной, чтобы не спорить с
+   transform, которым карточка выезжает поверх списка. Во время жеста переход
+   выключен — иначе карточка тянется за пальцем с запозданием. */
+@media(max-width:720px){
+  .detail-panel.mobile-open{transform:translateX(var(--swipe-shift,0px))}
+  .detail-panel.is-swiping{transition:none}
 }
 
 /* Короткое толкование: поднятая литера на одной строке. Кегль 1.8em держит
