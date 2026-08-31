@@ -305,6 +305,14 @@ const selectedRole = computed(() => {
   return profile.role.split(/[;,]/).map(part => part.trim()).filter(Boolean).join(' · ')
 })
 
+// Буквица на две строки требует минимум трёх строк текста — иначе ей не к чему
+// прижиматься и она повисает под абзацем. Медиана толкований здесь 114 знаков,
+// поэтому у коротких статей вместо буквицы поднятая литера на одной строке.
+const DROPCAP_MIN = 170
+const dropcapMode = computed(() => (
+  (selected.value?.definition?.length || 0) >= DROPCAP_MIN ? 'drop' : 'versal'
+))
+
 // Сводка под именем нужна, только если добавляет что-то к строке роли:
 // «Сар худдулин и паладин Истинного» после «САР ХУДДУЛИН · ПАЛАДИН ИСТИННОГО» —
 // это повтор, а «Морхор и плут Огней» уже говорит, с кем он идёт.
@@ -745,7 +753,7 @@ onBeforeUnmount(() => {
           <p v-if="selected.aliases?.length" class="aliases">Также: {{ selected.aliases.join(' · ') }}</p>
           <div class="detail-divider"><i /></div>
           <p v-if="showLead" class="definition definition-lead"><LoreRichText :text="selected.definition" :skip-id="selected.id" @term="openTerm" /></p>
-          <p v-else-if="!portraitFacets.length" class="definition"><span class="definition-dropcap">{{ selected.definition.slice(0, 1) }}</span><LoreRichText :text="selected.definition.slice(1)" :skip-id="selected.id" @term="openTerm" /></p>
+          <p v-else-if="!portraitFacets.length" class="definition"><span :class="dropcapMode === 'drop' ? 'definition-dropcap' : 'definition-versal'">{{ selected.definition.slice(0, 1) }}</span><LoreRichText :text="selected.definition.slice(1)" :skip-id="selected.id" @term="openTerm" /></p>
 
 
           <section v-if="selectedDossier" class="dossier-block">
@@ -1045,6 +1053,37 @@ onBeforeUnmount(() => {
 .detail-panel .ogni-relations{margin-top:28px}
 .detail-panel .dossier-block h3{margin:30px 0 14px}
 .detail-panel .provenance{margin-top:var(--lore-step)}
+
+/* ——— Буквица ———
+   Считается по метрикам Cormorant Garamond: высота прописной .63em, подъём .92,
+   спуск .29 — и по межстрочному расстоянию текста (1.68).
+
+   Литера занимает две строки: её верх встаёт на верх прописных первой строки,
+   низ — на базовую линию второй. Высота литеры = 1.68 + .63 = 2.31em текста,
+   значит кегль = 2.31 / .63 = 3.667em. Собственный интерлиньяж .63 делает
+   строку буквицы равной высоте самой литеры, поэтому нижняя граница её блока
+   совпадает с базовой линией второй строки, а не висит ниже неё.
+   Отступ сверху .143em своего кегля = .525em текста — ровно расстояние от верха
+   строки до верха прописных. */
+.detail-panel .definition-dropcap{
+  float:left;
+  margin:.143em .085em 0 -.02em;
+  font:600 3.667em/.63 'Cormorant Garamond',serif;
+  letter-spacing:0;
+  color:var(--gold-bright);
+  text-shadow:0 0 18px rgba(var(--theme-accent-rgb),.12);
+}
+
+/* Короткое толкование: поднятая литера на одной строке. Кегль 1.8em держит
+   ink-высоту (.63 × 1.8 = 1.13em) внутри подъёма строки, поэтому строка не
+   разъезжается, а литера стоит на общей базовой линии. */
+.detail-panel .definition-versal{
+  font:600 1.8em/.6 'Cormorant Garamond',serif;
+  vertical-align:baseline;
+  margin-right:.02em;
+  color:var(--gold-bright);
+  text-shadow:0 0 14px rgba(var(--theme-accent-rgb),.12);
+}
 
 /* Та же шкала в списке и на рельсе категорий: карточка и указатель — одно окно. */
 .lore-glossary{--lore-band:600 10px/1.2 'Hanken Grotesk',sans-serif}
