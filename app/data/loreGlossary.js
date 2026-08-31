@@ -465,12 +465,30 @@ export const LORE_GLOSSARY_ARCHIVE = [
 
 export const LORE_GLOSSARY_SEASONS = LORE_OGNI_SEASONS
 
-const matchKey = value => String(value || '')
+// Ключ сведения: «Мор’хоры» и «морхор» — одна сущность, и она должна остаться
+// одной статьёй. Поэтому сравниваются не строки, а основы: у слова длиннее трёх
+// букв отбрасывается конечная изменяемая буква, у множественного числа — ещё и
+// «ы/и/а». Список закрытый: свободное усечение начинает склеивать чужое.
+const PLURAL_TAIL = /(?:ами|ями|ов|ев|ей|ах|ях|ы|и|а|я)$/
+
+function stemWord(word) {
+  if (word.length <= 3) return word
+  let base = word.replace(PLURAL_TAIL, '')
+  if (base.length < 3) base = word
+  if (base.length > 3 && 'ьйоуэе'.includes(base[base.length - 1])) base = base.slice(0, -1)
+  return base
+}
+
+export const loreMatchKey = value => String(value || '')
   .toLocaleLowerCase('ru-RU')
   .replace(/ё/g, 'е')
   .replace(/[’'`«»]/g, '')
   .replace(/[^\p{L}\p{N}]+/gu, ' ')
   .trim()
+  .split(' ')
+  .filter(Boolean)
+  .map(stemWord)
+  .join(' ')
 
 function ogniPayload(entry) {
   return {
@@ -494,6 +512,40 @@ function ogniPayload(entry) {
   }
 }
 
+// Две записи кампании об одной сущности («морхор» и «мор’хоры») складываются,
+// а не вытесняют друг друга.
+function mergeOgni(a, b) {
+  const facets = b.facets.reduce((acc, facet) => {
+    const existing = acc.find(item => item.id === facet.id)
+    if (existing) existing.items = [...existing.items, ...facet.items]
+    else acc.push({ ...facet })
+    return acc
+  }, a.facets.map(facet => ({ ...facet, items: [...facet.items] })))
+
+  const chapters = [...new Set([...a.chapters, ...b.chapters])].sort((x, y) => x - y)
+  const relations = [...a.relations]
+  for (const relation of b.relations) {
+    if (!relations.some(item => item.id === relation.id)) relations.push(relation)
+  }
+
+  return {
+    ...a,
+    facets,
+    chapters,
+    relations,
+    claims: [...a.claims, ...b.claims],
+    mentions: [...new Set([...a.mentions, ...b.mentions])].sort((x, y) => x - y),
+    summaryByChapter: [...a.summaryByChapter, ...b.summaryByChapter].sort((x, y) => x.chapter - y.chapter),
+    profile: { ...b.profile, ...a.profile },
+    hero: a.hero || b.hero,
+    stub: a.stub && b.stub,
+    summary: a.summary || b.summary,
+    summaryEarly: a.summaryEarly || b.summaryEarly,
+    firstChapter: chapters[0] ?? null,
+    lastChapter: chapters[chapters.length - 1] ?? null,
+  }
+}
+
 function buildGlossary() {
   const merged = LORE_GLOSSARY_ARCHIVE.map(term => ({
     ...term,
@@ -503,7 +555,7 @@ function buildGlossary() {
   const byKey = new Map()
   for (const term of merged) {
     for (const name of [term.term, ...(term.aliases || [])]) {
-      const key = matchKey(name)
+      const key = loreMatchKey(name)
       if (key && !byKey.has(key)) byKey.set(key, term)
     }
   }
@@ -511,21 +563,26 @@ function buildGlossary() {
 
   for (const entry of LORE_OGNI_ENTRIES) {
     const names = [entry.term, ...entry.aliases, ...entry.sourceNames]
-    const hit = names.map(matchKey).find(key => key && byKey.has(key))
+    const hit = names.map(loreMatchKey).find(key => key && byKey.has(key))
     const payload = ogniPayload(entry)
 
     if (hit) {
       const target = byKey.get(hit)
-      target.ogni = payload
-      target.ogniId = entry.id
+      target.ogni = target.ogni ? mergeOgni(target.ogni, payload) : payload
+      target.ogniId = target.ogniId || entry.id
       if (!target.sources.includes(LORE_OGNI_SOURCE.id)) target.sources.push(LORE_OGNI_SOURCE.id)
-      for (const alias of names.slice(1)) {
+      for (const alias of [entry.term, ...names.slice(1)]) {
         if (alias !== target.term && !(target.aliases || []).includes(alias)) {
           target.aliases = [...(target.aliases || []), alias]
         }
       }
       continue
     }
+
+    // Статья без толкования и без свидетельств не сообщает ничего, кроме того,
+    // что имя где-то прозвучало. Такую не публикуем: если она никуда не влилась,
+    // ей просто нечего показать читателю.
+    if (entry.stub) continue
 
     // Статья, которой у Башни Мафраш нет: она известна только по кампании.
     const id = takenIds.has(entry.id) ? `${entry.id}-ogni` : entry.id
@@ -546,7 +603,7 @@ function buildGlossary() {
     }
     merged.push(record)
     for (const name of [record.term, ...record.aliases]) {
-      const key = matchKey(name)
+      const key = loreMatchKey(name)
       if (key && !byKey.has(key)) byKey.set(key, record)
     }
   }

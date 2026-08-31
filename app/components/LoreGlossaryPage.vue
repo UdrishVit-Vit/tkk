@@ -7,8 +7,10 @@ import {
   LORE_GLOSSARY_SEASONS,
   LORE_GLOSSARY_SOURCES,
   cutOgniPayload,
+  loreMatchKey,
 } from '~/data/loreGlossary.js'
 import { ogniChapterLink } from '~/data/loreOgniGlossary/index.js'
+import { LORE_DOSSIERS } from '~/data/loreDossiers.js'
 
 defineProps({ theme: { type: Object, default: () => ({}) } })
 defineEmits(['up'])
@@ -200,6 +202,76 @@ const selectedNumber = computed(() => {
   return index < 0 ? '—' : String(index + 1).padStart(2, '0')
 })
 
+// Полное досье: народы, пантеон, фракции. Глоссарий показывает его целиком —
+// он опорная точка термина, а не отсылка «читайте в другом разделе».
+const dossierIndex = new Map()
+for (const dossier of LORE_DOSSIERS) {
+  const key = loreMatchKey(dossier.title)
+  if (key && !dossierIndex.has(key)) dossierIndex.set(key, dossier)
+}
+
+const selectedDossier = computed(() => {
+  const term = selected.value
+  if (!term) return null
+  for (const name of [term.term, ...(term.aliases || [])]) {
+    const hit = dossierIndex.get(loreMatchKey(name))
+    if (hit) return hit
+  }
+  return null
+})
+
+// Проза народов лежит в Markdown, поэтому подгружается по маршруту досье.
+const dossierContentPath = computed(() => selectedDossier.value?.contentPath || '')
+const { data: dossierDocument } = await useAsyncData(
+  'lore-glossary-dossier',
+  () => (dossierContentPath.value
+    ? queryCollection('dnd5eRaces').path(dossierContentPath.value).first()
+    : Promise.resolve(null)),
+  { watch: [dossierContentPath] },
+)
+
+function minimarkText(node) {
+  if (typeof node === 'string') return node
+  if (!Array.isArray(node)) return ''
+  return node.slice(2).map(minimarkText).join('')
+}
+
+// Блоки досье в одном виде, независимо от того, пришли они из Markdown или из
+// модулей пантеона и фракций.
+const dossierBlocks = computed(() => {
+  const dossier = selectedDossier.value
+  if (!dossier) return []
+
+  if (dossier.contentPath) {
+    const nodes = dossierDocument.value?.body?.value
+    if (!Array.isArray(nodes)) return []
+    const blocks = []
+    for (const node of nodes) {
+      if (!Array.isArray(node)) continue
+      const text = minimarkText(node).trim()
+      if (!text) continue
+      if (/^h[2-4]$/.test(node[0])) blocks.push({ type: 'heading', text })
+      else if (node[0] === 'p') blocks.push({ type: 'paragraph', text })
+      else if (node[0] === 'blockquote') blocks.push({ type: 'quote', text })
+    }
+    return blocks
+  }
+
+  const blocks = []
+  for (const block of dossier.blocks || []) {
+    if (block.type === 'prose') {
+      for (const paragraph of block.paragraphs || []) blocks.push({ type: 'paragraph', text: paragraph })
+    } else if (block.type === 'heading') {
+      blocks.push({ type: 'heading', text: block.text || block.title || '' })
+    } else if (block.type === 'list') {
+      blocks.push({ type: 'list', items: block.items || [] })
+    } else if (block.type === 'facts') {
+      blocks.push({ type: 'facts', items: block.items || [] })
+    }
+  }
+  return blocks
+})
+
 // Атрибуты делятся надвое. Устойчивые — облик, нрав, путь — это портрет, и
 // читаются они прозой: номер главы у каждой строки там только мешает.
 // Событийные живут во времени, и глава для них — главное.
@@ -331,6 +403,11 @@ function chooseCategory(id) {
   mobileDetailOpen.value = false
   listPanel.value?.scrollTo({ top: 0, behavior: 'smooth' })
   nextTick(syncQuery)
+}
+
+// Термин, кликнутый прямо в тексте статьи.
+function openTerm(id) {
+  chooseRelated(glossary.value.find(term => term.id === id) || LORE_GLOSSARY_BY_ID[id])
 }
 
 function chooseRelated(term) {
@@ -666,9 +743,29 @@ onBeforeUnmount(() => {
           <p v-if="selectedRole" class="detail-role">{{ selectedRole }}</p>
           <p v-if="selected.aliases?.length" class="aliases">Также: {{ selected.aliases.join(' · ') }}</p>
           <div class="detail-divider"><i /></div>
-          <p v-if="showLead" class="definition definition-lead">{{ selected.definition }}</p>
-          <p v-else-if="!portraitFacets.length" class="definition"><span class="definition-dropcap">{{ selected.definition.slice(0, 1) }}</span>{{ selected.definition.slice(1) }}</p>
+          <p v-if="showLead" class="definition definition-lead"><LoreRichText :text="selected.definition" :skip-id="selected.id" @term="openTerm" /></p>
+          <p v-else-if="!portraitFacets.length" class="definition"><span class="definition-dropcap">{{ selected.definition.slice(0, 1) }}</span><LoreRichText :text="selected.definition.slice(1)" :skip-id="selected.id" @term="openTerm" /></p>
 
+
+          <section v-if="selectedDossier" class="dossier-block">
+            <header>
+              <span>{{ selectedDossier.kindLabel }}<template v-if="selectedDossier.parent"> · {{ selectedDossier.parent }}</template></span>
+              <NuxtLink :to="selectedDossier.route" title="Открыть досье в его разделе">Открыть в разделе ↗</NuxtLink>
+            </header>
+            <template v-for="(block, index) in dossierBlocks" :key="index">
+              <h3 v-if="block.type === 'heading'">{{ block.text }}</h3>
+              <blockquote v-else-if="block.type === 'quote'"><LoreRichText :text="block.text" :skip-id="selected.id" @term="openTerm" /></blockquote>
+              <ul v-else-if="block.type === 'list'">
+                <li v-for="(item, itemIndex) in block.items" :key="itemIndex"><LoreRichText :text="item" :skip-id="selected.id" @term="openTerm" /></li>
+              </ul>
+              <dl v-else-if="block.type === 'facts'" class="dossier-facts">
+                <div v-for="(item, itemIndex) in block.items" :key="itemIndex">
+                  <dt>{{ item.label }}</dt><dd><LoreRichText :text="item.value" :skip-id="selected.id" @term="openTerm" /></dd>
+                </div>
+              </dl>
+              <p v-else><LoreRichText :text="block.text" :skip-id="selected.id" @term="openTerm" /></p>
+            </template>
+          </section>
 
           <section v-if="selected.ogni" class="ogni-block">
             <header>
@@ -683,14 +780,14 @@ onBeforeUnmount(() => {
 
             <section v-for="facet in portraitFacets" :key="facet.id" class="ogni-portrait">
               <h3>{{ facet.label }}</h3>
-              <p v-for="(item, index) in facet.items" :key="index">{{ item.text }}</p>
+              <p v-for="(item, index) in facet.items" :key="index"><LoreRichText :text="item.text" :skip-id="selected.id" @term="openTerm" /></p>
             </section>
 
             <section v-for="facet in recordFacets" :key="facet.id" class="ogni-facet">
               <h3>{{ facet.label }}<em>{{ facet.items.length }}</em></h3>
               <ul>
                 <li v-for="(item, index) in facet.items" :key="index" :data-status="item.status">
-                  <p>{{ item.text }}</p>
+                  <p><LoreRichText :text="item.text" :skip-id="selected.id" @term="openTerm" /></p>
                   <div>
                     <span>{{ item.statusLabel }}</span>
                     <NuxtLink
@@ -801,6 +898,23 @@ onBeforeUnmount(() => {
 .chapter-scale button:disabled{border-color:rgba(var(--theme-contrast-rgb),.08);color:rgba(var(--theme-text-rgb),.22);cursor:default}
 .chapter-badge{border:1px solid rgba(var(--theme-accent-rgb),.28);padding:3px 6px;color:var(--gold-bright);font:600 6px/1 'Hanken Grotesk',sans-serif;font-style:normal;letter-spacing:.12em;text-transform:uppercase}
 .provenance{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}.provenance p{margin:7px 0 0;color:rgba(var(--theme-text-rgb),.42);font:italic 12px/1.3 'Cormorant Garamond',serif}
+.dossier-block{max-width:600px;margin-top:34px;border-top:1px solid rgba(var(--theme-accent-rgb),.14);padding-top:22px}
+.dossier-block>header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px}
+.dossier-block>header>span{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.6)}
+.dossier-block>header>a{border:1px solid rgba(var(--theme-accent-rgb),.2);padding:5px 9px;color:rgba(var(--theme-accent-strong-rgb),.72);font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.12em;text-decoration:none;text-transform:uppercase}
+.dossier-block>header>a:hover{border-color:var(--gold-bright);color:var(--gold-bright)}
+.dossier-block h3{display:flex;align-items:center;gap:10px;margin:26px 0 12px;font:600 clamp(19px,1.7vw,24px)/1.15 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.86)}
+.dossier-block h3::after{content:'';height:1px;flex:1;background:linear-gradient(90deg,rgba(var(--theme-accent-rgb),.24),transparent)}
+.dossier-block p{margin:0 0 12px;color:rgba(var(--theme-text-rgb),.76);font:clamp(16px,1.35vw,19px)/1.62 'Cormorant Garamond',serif;text-wrap:pretty}
+.dossier-block blockquote{margin:0 0 16px;border-left:2px solid rgba(var(--theme-accent-rgb),.34);padding:2px 0 2px 15px;color:rgba(var(--theme-text-rgb),.56);font:italic clamp(15px,1.25vw,17px)/1.6 'Cormorant Garamond',serif}
+.dossier-block ul{margin:0 0 14px;padding:0;list-style:none}
+.dossier-block li{position:relative;margin-bottom:7px;padding-left:15px;color:rgba(var(--theme-text-rgb),.72);font:clamp(15px,1.25vw,17px)/1.55 'Cormorant Garamond',serif}
+.dossier-block li::before{content:'';position:absolute;top:9px;left:0;width:5px;height:5px;border:1px solid rgba(var(--theme-accent-rgb),.5);transform:rotate(45deg)}
+.dossier-facts{display:grid;gap:6px;margin:0 0 16px}
+.dossier-facts>div{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid rgba(var(--theme-accent-rgb),.09);padding-bottom:6px}
+.dossier-facts dt{flex:none;font:600 6px/1.4 'Hanken Grotesk',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.58)}
+.dossier-facts dd{margin:0;color:rgba(var(--theme-text-rgb),.72);font:15px/1.4 'Cormorant Garamond',serif}
+.detail-expanded .dossier-block{max-width:760px;margin-right:auto;margin-left:auto}
 .ogni-block{max-width:570px;margin-top:32px;border-top:1px solid rgba(var(--theme-accent-rgb),.14);padding-top:22px}
 .ogni-block>header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
 .ogni-block>header>span{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.6)}
