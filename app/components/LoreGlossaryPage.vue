@@ -200,6 +200,66 @@ const selectedNumber = computed(() => {
   return index < 0 ? '—' : String(index + 1).padStart(2, '0')
 })
 
+// Атрибуты делятся надвое. Устойчивые — облик, нрав, путь — это портрет, и
+// читаются они прозой: номер главы у каждой строки там только мешает.
+// Событийные живут во времени, и глава для них — главное.
+const PORTRAIT_FACETS = ['appearance', 'character', 'biography', 'ways', 'lands', 'properties', 'worship', 'artifacts']
+const PORTRAIT_TITLES = {
+  characters: { appearance: 'Облик', character: 'Нрав', biography: 'Путь' },
+}
+
+const portraitFacets = computed(() => {
+  const ogni = selected.value?.ogni
+  if (!ogni) return []
+  const titles = PORTRAIT_TITLES[selected.value.category] || {}
+  return ogni.facets
+    .filter(facet => PORTRAIT_FACETS.includes(facet.id))
+    .map(facet => ({ ...facet, label: titles[facet.id] || facet.label }))
+})
+
+const recordFacets = computed(() => {
+  const ogni = selected.value?.ogni
+  if (!ogni) return []
+  // «Кто это» у персонажа повторяет строку роли под именем — не дублируем.
+  const skip = new Set([...PORTRAIT_FACETS, ...(selected.value.category === 'characters' ? ['nature'] : [])])
+  return ogni.facets.filter(facet => !skip.has(facet.id))
+})
+
+// Роль персонажа — подпись под именем, а не отдельный блок.
+const selectedRole = computed(() => {
+  const profile = selected.value?.ogni?.profile
+  if (!profile?.role) return ''
+  return profile.role.split(/[;,]/).map(part => part.trim()).filter(Boolean).join(' · ')
+})
+
+// Сводка под именем нужна, только если добавляет что-то к строке роли:
+// «Сар худдулин и паладин Истинного» после «САР ХУДДУЛИН · ПАЛАДИН ИСТИННОГО» —
+// это повтор, а «Морхор и плут Огней» уже говорит, с кем он идёт.
+const showLead = computed(() => {
+  if (!portraitFacets.value.length) return false
+  if (!selectedRole.value) return true
+  const words = value => normalize(value).replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(' ')
+  const role = words(selectedRole.value).join(' ')
+  return words(selected.value.definition)
+    .filter(word => word.length > 3)
+    .some(word => !role.includes(word))
+})
+
+// Тридцать два номера подряд ничего не сообщают. Диапазон сообщает.
+const chapterSpan = computed(() => {
+  const chapters = selected.value?.ogni?.chapters || []
+  if (!chapters.length) return null
+  const first = chapters[0]
+  const last = chapters[chapters.length - 1]
+  if (chapters.length === 1) return { label: `глава ${first}`, chapter: first }
+  if (chapters.length <= 4) return { label: `главы ${chapters.join(', ')}`, chapter: first }
+  const solid = last - first + 1 === chapters.length
+  return {
+    label: solid ? `главы ${first}—${last}` : `${chapters.length} глав, с ${first} по ${last}`,
+    chapter: first,
+  }
+})
+
 // Связь ведёт к статье свода «Огни»: у слитых статей её id — это id архива,
 // поэтому ищем и по нему, и по исходному ключу кампании.
 const selectedRelations = computed(() => {
@@ -603,33 +663,30 @@ onBeforeUnmount(() => {
             <em>{{ selectedNumber }}</em>
           </div>
           <h2>{{ selected.term }}</h2>
+          <p v-if="selectedRole" class="detail-role">{{ selectedRole }}</p>
           <p v-if="selected.aliases?.length" class="aliases">Также: {{ selected.aliases.join(' · ') }}</p>
           <div class="detail-divider"><i /></div>
-          <p class="definition"><span class="definition-dropcap">{{ selected.definition.slice(0, 1) }}</span>{{ selected.definition.slice(1) }}</p>
+          <p v-if="showLead" class="definition definition-lead">{{ selected.definition }}</p>
+          <p v-else-if="!portraitFacets.length" class="definition"><span class="definition-dropcap">{{ selected.definition.slice(0, 1) }}</span>{{ selected.definition.slice(1) }}</p>
 
-          <dl class="provenance">
-            <div v-for="source in selectedSources" :key="source.id">
-              <dt>{{ source.id === 'ogni' ? 'Свидетельство кампании' : 'Источник Нити' }}</dt>
-              <dd><b><span>{{ source.mark }}</span></b>{{ source.title }}</dd>
-              <p>{{ source.id === 'ogni' ? source.attributedTo : selectedAttribution }}</p>
-            </div>
-          </dl>
 
           <section v-if="selected.ogni" class="ogni-block">
             <header>
               <span>Свод «Огни» · сезон {{ selected.ogni.season }}</span>
-              <div v-if="selected.ogni.chapters.length" class="ogni-chapters">
-                <small>{{ selected.ogni.chapters.length === 1 ? 'Глава' : 'Главы' }}</small>
-                <NuxtLink
-                  v-for="chapter in selected.ogni.chapters"
-                  :key="chapter"
-                  :to="chapterLink(selected.ogni.season, chapter)"
-                  :title="chapterTitle(selected.ogni.season, chapter)"
-                >{{ chapter }}</NuxtLink>
-              </div>
+              <NuxtLink
+                v-if="chapterSpan"
+                class="ogni-span"
+                :to="chapterLink(selected.ogni.season, chapterSpan.chapter)"
+                :title="chapterTitle(selected.ogni.season, chapterSpan.chapter)"
+              >{{ chapterSpan.label }}</NuxtLink>
             </header>
 
-            <section v-for="facet in selected.ogni.facets" :key="facet.id" class="ogni-facet">
+            <section v-for="facet in portraitFacets" :key="facet.id" class="ogni-portrait">
+              <h3>{{ facet.label }}</h3>
+              <p v-for="(item, index) in facet.items" :key="index">{{ item.text }}</p>
+            </section>
+
+            <section v-for="facet in recordFacets" :key="facet.id" class="ogni-facet">
               <h3>{{ facet.label }}<em>{{ facet.items.length }}</em></h3>
               <ul>
                 <li v-for="(item, index) in facet.items" :key="index" :data-status="item.status">
@@ -672,6 +729,14 @@ onBeforeUnmount(() => {
               Сущность упомянута в сезоне, но отдельных сведений о ней пока не записано.
             </p>
           </section>
+
+          <dl class="provenance">
+            <div v-for="source in selectedSources" :key="source.id">
+              <dt>{{ source.id === 'ogni' ? 'Свидетельство кампании' : 'Источник Нити' }}</dt>
+              <dd><b><span>{{ source.mark }}</span></b>{{ source.title }}</dd>
+              <p>{{ source.id === 'ogni' ? source.attributedTo : selectedAttribution }}</p>
+            </div>
+          </dl>
 
           <NuxtLink v-if="selected.history" class="history-link" :to="`/lore/history/${selected.history}`">
             <span>В Нити Башни Мафраш</span>
@@ -739,10 +804,15 @@ onBeforeUnmount(() => {
 .ogni-block{max-width:570px;margin-top:32px;border-top:1px solid rgba(var(--theme-accent-rgb),.14);padding-top:22px}
 .ogni-block>header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
 .ogni-block>header>span{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.6)}
-.ogni-chapters{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
-.ogni-chapters small{margin-right:3px;color:rgba(var(--theme-text-rgb),.3);font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase}
-.ogni-chapters a{display:grid;min-width:22px;height:22px;place-items:center;border:1px solid rgba(var(--theme-accent-rgb),.2);color:rgba(var(--theme-text-rgb),.55);font:600 8px/1 'Hanken Grotesk',sans-serif;text-decoration:none;transition:border-color .18s,color .18s}
-.ogni-chapters a:hover{border-color:var(--gold-bright);color:var(--gold-bright)}
+.detail-role{margin:14px 0 0;color:rgba(var(--theme-accent-strong-rgb),.68);font:600 8px/1.4 'Hanken Grotesk',sans-serif;letter-spacing:.22em;text-transform:uppercase}
+.definition-lead{max-width:600px;color:rgba(var(--theme-text-rgb),.58);font:italic clamp(17px,1.5vw,21px)/1.5 'Cormorant Garamond',serif}
+.ogni-span{border:1px solid rgba(var(--theme-accent-rgb),.2);padding:5px 9px;color:rgba(var(--theme-accent-strong-rgb),.72);font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.12em;text-decoration:none;text-transform:uppercase;transition:border-color .18s,color .18s}
+.ogni-span:hover{border-color:var(--gold-bright);color:var(--gold-bright)}
+.ogni-portrait{margin-top:28px}
+.ogni-portrait h3{display:flex;align-items:center;gap:10px;margin:0 0 13px;font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.62)}
+.ogni-portrait h3::after{content:'';height:1px;flex:1;background:linear-gradient(90deg,rgba(var(--theme-accent-rgb),.22),transparent)}
+.ogni-portrait p{margin:0 0 11px;color:rgba(var(--theme-text-rgb),.76);font:clamp(16px,1.35vw,19px)/1.62 'Cormorant Garamond',serif;text-wrap:pretty}
+.ogni-portrait p:last-child{margin-bottom:0}
 .ogni-facet{margin-top:24px}
 .ogni-facet h3{display:flex;align-items:center;gap:9px;margin:0;font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.72)}
 .ogni-facet h3::after{content:'';height:1px;flex:1;background:linear-gradient(90deg,rgba(var(--theme-accent-rgb),.3),transparent)}
@@ -769,7 +839,7 @@ onBeforeUnmount(() => {
 .ogni-relations button i{width:5px;height:5px;border:1px solid rgba(var(--theme-accent-rgb),.55);transform:rotate(45deg)}
 .ogni-relations button em{color:rgba(var(--theme-text-rgb),.3);font:600 7px/1 'Hanken Grotesk',sans-serif;font-style:normal}
 .ogni-cut{margin:13px 0 0;color:rgba(var(--theme-text-rgb),.38);font:italic 13px/1.4 'Cormorant Garamond',serif}
-.detail-expanded .ogni-block{max-width:760px;margin-right:auto;margin-left:auto}
+.detail-expanded .ogni-block,.detail-expanded .definition-lead{max-width:760px;margin-right:auto;margin-left:auto}
 @media(max-width:720px){.ogni-facet li{padding:9px 10px}.ogni-facet li p{font-size:14px}}
 @keyframes weaveY{to{background-position:0 260px}}@keyframes sigilGlow{0%,100%{filter:drop-shadow(0 0 7px rgba(var(--theme-accent-rgb),.2));opacity:.86}50%{filter:drop-shadow(0 0 13px rgba(var(--theme-accent-rgb),.42));opacity:1}}
 @media(max-width:1360px){.category-rail{left:calc(var(--thread-x) - 534px);width:148px}.glossary-layout{left:calc(var(--thread-x) - 386px);right:18px;grid-template-columns:340px 92px minmax(360px,1fr)}.detail-panel{padding-right:28px;padding-left:28px}.term-list>button{padding-right:13px;padding-left:13px}}
