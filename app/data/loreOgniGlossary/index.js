@@ -49,6 +49,15 @@ function mergeEntry(target, incoming) {
   merged.hero = target.hero || incoming.hero
   merged.profile = { ...target.profile, ...incoming.profile }
   merged.seasons = [...target.seasons, ...incoming.seasons]
+  merged.mentions = [...target.mentions, ...incoming.mentions]
+  merged.relations = [...target.relations, ...incoming.relations]
+  // Атрибуты сходятся по виду: «Биография» из второго сезона продолжает первую.
+  merged.facets = incoming.facets.reduce((acc, facet) => {
+    const existing = acc.find(item => item.id === facet.id)
+    if (existing) existing.items = [...existing.items, ...facet.items]
+    else acc.push({ ...facet })
+    return acc
+  }, target.facets.map(facet => ({ ...facet })))
   // Актуальной считается сводка позднейшего сезона.
   merged.summary = incoming.summary || target.summary
   return merged
@@ -90,6 +99,31 @@ export const LORE_OGNI_BY_ID = Object.fromEntries(
 )
 
 /**
+ * Срез сведений одной статьи по главе: остаётся только то, что к этой главе
+ * уже прозвучало. Сводка берётся на тот же момент; если её нет — пустая строка,
+ * потому что более поздняя сводка знает больше читателя.
+ */
+export function cutOgniPayload(ogni, cut) {
+  if (!ogni || !cut) return ogni
+  const withinCut = chapter => chapter == null || chapter <= cut
+  const facets = ogni.facets
+    .map(facet => ({ ...facet, items: facet.items.filter(item => withinCut(item.chapter)) }))
+    .filter(facet => facet.items.length)
+  const claims = ogni.claims.filter(claim => claim.chapter <= cut)
+
+  return {
+    ...ogni,
+    facets,
+    claims,
+    relations: ogni.relations.filter(relation => withinCut(relation.chapter)),
+    mentions: ogni.mentions.filter(chapter => chapter <= cut),
+    chapters: ogni.chapters.filter(chapter => chapter <= cut),
+    summary: (ogni.summaryByChapter.filter(item => item.chapter <= cut).pop() || {}).text || '',
+    withheld: ogni.claims.length - claims.length,
+  }
+}
+
+/**
  * Срез «я дошёл до главы N сезона S»: статья остаётся, если появилась не позже
  * среза, и показывает только те утверждения, что к этому моменту уже прозвучали.
  * Без аргументов возвращает весь свод.
@@ -97,26 +131,14 @@ export const LORE_OGNI_BY_ID = Object.fromEntries(
 export function filterOgniEntries({ season, chapter, entries = LORE_OGNI_ENTRIES } = {}) {
   if (!season) return entries
   const limit = Number.isFinite(chapter) ? chapter : Infinity
-  const withinCut = claim =>
-    claim.season < season || (claim.season === season && claim.chapter <= limit)
 
   return entries.reduce((acc, entry) => {
-    const claims = entry.claims.filter(withinCut)
     const seen = entry.seasons.some(
       s => s.season < season
         || (s.season === season && s.chapters.some(ch => ch <= limit)),
     )
     if (!seen) return acc
-
-    const summaryStep = [...(entry.summaryByChapter || [])]
-      .filter(s => s.chapter <= limit)
-      .pop()
-
-    acc.push({
-      ...entry,
-      claims,
-      summary: summaryStep ? summaryStep.text : entry.summaryEarly || entry.summary,
-    })
+    acc.push({ ...entry, ...cutOgniPayload(entry, limit) })
     return acc
   }, [])
 }

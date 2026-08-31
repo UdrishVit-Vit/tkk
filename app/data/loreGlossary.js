@@ -4,6 +4,8 @@ import {
   LORE_OGNI_SEASONS,
 } from './loreOgniGlossary/index.js'
 
+export { cutOgniPayload } from './loreOgniGlossary/index.js'
+
 export const LORE_GLOSSARY_CATEGORIES = [
   { id: 'foundations', title: 'Основа мира', short: 'Космология, устройство реальности и первосилы' },
   { id: 'beings', title: 'Существа и народы', short: 'Создатели, древние существа и смертные народы' },
@@ -481,6 +483,9 @@ function ogniPayload(entry) {
     summaryEarly: entry.summaryEarly,
     summaryByChapter: entry.summaryByChapter,
     claims: entry.claims,
+    facets: entry.facets,
+    relations: entry.relations,
+    mentions: entry.mentions,
     profile: entry.profile,
     hero: entry.hero,
     section: entry.section,

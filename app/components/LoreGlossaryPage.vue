@@ -6,6 +6,7 @@ import {
   LORE_GLOSSARY_DEFAULT_SOURCE,
   LORE_GLOSSARY_SEASONS,
   LORE_GLOSSARY_SOURCES,
+  cutOgniPayload,
 } from '~/data/loreGlossary.js'
 import { ogniChapterLink } from '~/data/loreOgniGlossary/index.js'
 
@@ -104,12 +105,11 @@ const glossary = computed(() => {
       if (inArchive) acc.push({ ...term, ogni: null, sources: [LORE_GLOSSARY_DEFAULT_SOURCE] })
       return acc
     }
-    const claims = term.ogni.claims.filter(claim => claim.chapter <= cut)
-    const step = term.ogni.summaryByChapter.filter(item => item.chapter <= cut).pop()
+    const ogni = cutOgniPayload(term.ogni, cut)
     acc.push({
       ...term,
-      definition: !inArchive && step ? step.text : term.definition,
-      ogni: { ...term.ogni, claims, withheld: term.ogni.claims.length - claims.length },
+      definition: !inArchive && ogni.summary ? ogni.summary : term.definition,
+      ogni,
     })
     return acc
   }, [])
@@ -200,23 +200,22 @@ const selectedNumber = computed(() => {
   return index < 0 ? '—' : String(index + 1).padStart(2, '0')
 })
 
-const PROFILE_ROWS = [
-  { key: 'role', label: 'Роль' },
-  { key: 'confirmed', label: 'Подтверждённый образ' },
-  { key: 'appearance', label: 'Облик' },
-  { key: 'personality', label: 'Характер' },
-  { key: 'biography', label: 'Предыстория' },
-]
+// Связь ведёт к статье свода «Огни»: у слитых статей её id — это id архива,
+// поэтому ищем и по нему, и по исходному ключу кампании.
+const selectedRelations = computed(() => {
+  const byOgniId = new Map(glossary.value.filter(term => term.ogniId).map(term => [term.ogniId, term]))
+  return (selected.value?.ogni?.relations || [])
+    .map(relation => ({ ...relation, target: byOgniId.get(relation.id) || LORE_GLOSSARY_BY_ID[relation.id] }))
+    .filter(relation => relation.target)
+})
 
-const selectedProfile = computed(() => {
-  const profile = selected.value?.ogni?.profile
-  if (!profile) return []
-  return PROFILE_ROWS
-    .filter(row => profile[row.key]?.length)
-    .map(row => ({
-      label: row.label,
-      lines: Array.isArray(profile[row.key]) ? profile[row.key] : [profile[row.key]],
-    }))
+// Главы, где имя звучит в книге, но отдельного свидетельства в справочнике нет:
+// честно показываем, что там ещё есть что вычитать.
+const mentionsBeyondClaims = computed(() => {
+  const ogni = selected.value?.ogni
+  if (!ogni?.mentions?.length) return []
+  const known = new Set(ogni.chapters)
+  return ogni.mentions.filter(chapter => !known.has(chapter))
 })
 
 function chapterLink(entrySeason, chapter) {
@@ -630,28 +629,47 @@ onBeforeUnmount(() => {
               </div>
             </header>
 
-            <dl v-if="selectedProfile.length" class="ogni-profile">
-              <div v-for="row in selectedProfile" :key="row.label">
-                <dt>{{ row.label }}</dt>
-                <dd><p v-for="(line, index) in row.lines" :key="index">{{ line }}</p></dd>
+            <section v-for="facet in selected.ogni.facets" :key="facet.id" class="ogni-facet">
+              <h3>{{ facet.label }}<em>{{ facet.items.length }}</em></h3>
+              <ul>
+                <li v-for="(item, index) in facet.items" :key="index" :data-status="item.status">
+                  <p>{{ item.text }}</p>
+                  <div>
+                    <span>{{ item.statusLabel }}</span>
+                    <NuxtLink
+                      v-if="item.chapter"
+                      :to="chapterLink(item.season, item.chapter)"
+                      :title="chapterTitle(item.season, item.chapter)"
+                    >гл. {{ item.chapter }}</NuxtLink>
+                  </div>
+                </li>
+              </ul>
+            </section>
+
+            <section v-if="selectedRelations.length" class="ogni-relations">
+              <h3>С кем и чем связано</h3>
+              <div>
+                <button
+                  v-for="relation in selectedRelations"
+                  :key="relation.id"
+                  type="button"
+                  :title="relation.chapter ? `Впервые вместе в главе ${relation.chapter}` : 'Связь без указания главы'"
+                  @click="chooseRelated(relation.target)"
+                >
+                  <i />{{ relation.term }}<em v-if="relation.chapter">{{ relation.chapter }}</em>
+                </button>
               </div>
-            </dl>
+            </section>
 
-            <ol v-if="selected.ogni.claims.length" class="ogni-claims">
-              <li v-for="(claim, index) in selected.ogni.claims" :key="index" :data-status="claim.status">
-                <div>
-                  <span>{{ claim.statusLabel }}</span>
-                  <NuxtLink :to="chapterLink(claim.season, claim.chapter)" :title="chapterTitle(claim.season, claim.chapter)">гл. {{ claim.chapter }}</NuxtLink>
-                </div>
-                <p>{{ claim.text }}</p>
-              </li>
-            </ol>
-
+            <p v-if="mentionsBeyondClaims.length" class="ogni-cut">
+              Имя встречается в книге ещё в главах {{ mentionsBeyondClaims.join(', ') }} — там о нём говорят,
+              но отдельных сведений в справочник пока не записано.
+            </p>
             <p v-if="selected.ogni.withheld" class="ogni-cut">
               Ещё {{ selected.ogni.withheld }} свидетельств откроется дальше по сезону.
             </p>
-            <p v-else-if="!selected.ogni.claims.length" class="ogni-cut">
-              Сущность упомянута в сезоне, но отдельных свидетельств о ней пока не записано.
+            <p v-else-if="!selected.ogni.facets.length" class="ogni-cut">
+              Сущность упомянута в сезоне, но отдельных сведений о ней пока не записано.
             </p>
           </section>
 
@@ -725,26 +743,34 @@ onBeforeUnmount(() => {
 .ogni-chapters small{margin-right:3px;color:rgba(var(--theme-text-rgb),.3);font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase}
 .ogni-chapters a{display:grid;min-width:22px;height:22px;place-items:center;border:1px solid rgba(var(--theme-accent-rgb),.2);color:rgba(var(--theme-text-rgb),.55);font:600 8px/1 'Hanken Grotesk',sans-serif;text-decoration:none;transition:border-color .18s,color .18s}
 .ogni-chapters a:hover{border-color:var(--gold-bright);color:var(--gold-bright)}
-.ogni-profile{margin:19px 0 0;display:grid;gap:13px}
-.ogni-profile dt{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.5)}
-.ogni-profile dd{margin:7px 0 0}
-.ogni-profile p{margin:0 0 6px;padding-left:14px;position:relative;color:rgba(var(--theme-text-rgb),.66);font:15px/1.5 'Cormorant Garamond',serif}
-.ogni-profile p::before{content:'';position:absolute;top:8px;left:0;width:5px;height:5px;border:1px solid rgba(var(--theme-accent-rgb),.5);transform:rotate(45deg)}
-.ogni-claims{margin:22px 0 0;padding:0;list-style:none;display:grid;gap:9px}
-.ogni-claims li{border:1px solid rgba(var(--theme-accent-rgb),.12);border-left:2px solid rgba(var(--theme-accent-rgb),.4);background:rgba(var(--theme-surface-rgb),.22);padding:11px 13px}
-.ogni-claims li>div{display:flex;align-items:center;justify-content:space-between;gap:9px}
-.ogni-claims li>div>span{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.62)}
-.ogni-claims li>div>a{color:rgba(var(--theme-text-rgb),.35);font:600 7px/1 'Hanken Grotesk',sans-serif;text-decoration:none}
-.ogni-claims li>div>a:hover{color:var(--gold-bright)}
-.ogni-claims p{margin:8px 0 0;color:rgba(var(--theme-text-rgb),.7);font:15px/1.5 'Cormorant Garamond',serif}
-.ogni-claims li[data-status=world-fact]{border-left-color:rgba(159,185,123,.72)}.ogni-claims li[data-status=world-fact]>div>span{color:rgba(159,185,123,.82)}
-.ogni-claims li[data-status=event]{border-left-color:rgba(214,170,96,.72)}
-.ogni-claims li[data-status=scene-canon]{border-left-color:rgba(150,176,214,.6)}.ogni-claims li[data-status=scene-canon]>div>span{color:rgba(150,176,214,.72)}
-.ogni-claims li[data-status=belief]{border-left-color:rgba(186,146,196,.6)}.ogni-claims li[data-status=belief]>div>span{color:rgba(186,146,196,.74)}
-.ogni-claims li[data-status=gm-hint]{border-left-color:rgba(206,120,104,.62)}.ogni-claims li[data-status=gm-hint]>div>span{color:rgba(206,120,104,.78)}
-.ogni-claims li[data-status=unconfirmed]{border-left-color:rgba(var(--theme-contrast-rgb),.24)}.ogni-claims li[data-status=unconfirmed]>div>span{color:rgba(var(--theme-text-rgb),.4)}
+.ogni-facet{margin-top:24px}
+.ogni-facet h3{display:flex;align-items:center;gap:9px;margin:0;font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.72)}
+.ogni-facet h3::after{content:'';height:1px;flex:1;background:linear-gradient(90deg,rgba(var(--theme-accent-rgb),.3),transparent)}
+.ogni-facet h3 em{order:3;color:rgba(var(--theme-text-rgb),.28);font:600 7px/1 'Hanken Grotesk',sans-serif;font-style:normal}
+.ogni-facet ul{margin:11px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.ogni-facet li{border-left:2px solid rgba(var(--theme-accent-rgb),.32);background:linear-gradient(90deg,rgba(var(--theme-surface-rgb),.26),transparent);padding:9px 12px}
+.ogni-facet li p{margin:0;color:rgba(var(--theme-text-rgb),.72);font:15px/1.5 'Cormorant Garamond',serif}
+.ogni-facet li>div{display:flex;align-items:center;gap:9px;margin-top:6px}
+.ogni-facet li>div>span{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.6)}
+.ogni-facet li>div>a{color:rgba(var(--theme-text-rgb),.34);font:600 7px/1 'Hanken Grotesk',sans-serif;text-decoration:none}
+.ogni-facet li>div>a:hover{color:var(--gold-bright)}
+.ogni-facet li[data-status=world-fact]{border-left-color:rgba(159,185,123,.72)}.ogni-facet li[data-status=world-fact]>div>span{color:rgba(159,185,123,.82)}
+.ogni-facet li[data-status=event]{border-left-color:rgba(214,170,96,.72)}
+.ogni-facet li[data-status=scene-canon]{border-left-color:rgba(150,176,214,.6)}.ogni-facet li[data-status=scene-canon]>div>span{color:rgba(150,176,214,.72)}
+.ogni-facet li[data-status=belief]{border-left-color:rgba(186,146,196,.6)}.ogni-facet li[data-status=belief]>div>span{color:rgba(186,146,196,.74)}
+.ogni-facet li[data-status=gm-hint]{border-left-color:rgba(206,120,104,.62)}.ogni-facet li[data-status=gm-hint]>div>span{color:rgba(206,120,104,.78)}
+.ogni-facet li[data-status=unconfirmed]{border-left-color:rgba(var(--theme-contrast-rgb),.24)}.ogni-facet li[data-status=unconfirmed]>div>span{color:rgba(var(--theme-text-rgb),.4)}
+.ogni-facet li[data-status=profile]{border-left-color:rgba(214,170,96,.5)}.ogni-facet li[data-status=profile]>div>span{color:rgba(var(--theme-accent-rgb),.45)}
+.ogni-relations{margin-top:26px}
+.ogni-relations h3{margin:0;font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.72)}
+.ogni-relations>div{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+.ogni-relations button{display:flex;align-items:center;gap:7px;border:1px solid rgba(var(--theme-accent-rgb),.14);background:rgba(var(--theme-surface-rgb),.24);padding:7px 10px;color:rgba(var(--theme-text-rgb),.6);font:13px/1 'Cormorant Garamond',serif;cursor:pointer}
+.ogni-relations button:hover{border-color:rgba(var(--theme-accent-rgb),.44);color:var(--gold-bright)}
+.ogni-relations button i{width:5px;height:5px;border:1px solid rgba(var(--theme-accent-rgb),.55);transform:rotate(45deg)}
+.ogni-relations button em{color:rgba(var(--theme-text-rgb),.3);font:600 7px/1 'Hanken Grotesk',sans-serif;font-style:normal}
 .ogni-cut{margin:13px 0 0;color:rgba(var(--theme-text-rgb),.38);font:italic 13px/1.4 'Cormorant Garamond',serif}
 .detail-expanded .ogni-block{max-width:760px;margin-right:auto;margin-left:auto}
+@media(max-width:720px){.ogni-facet li{padding:9px 10px}.ogni-facet li p{font-size:14px}}
 @keyframes weaveY{to{background-position:0 260px}}@keyframes sigilGlow{0%,100%{filter:drop-shadow(0 0 7px rgba(var(--theme-accent-rgb),.2));opacity:.86}50%{filter:drop-shadow(0 0 13px rgba(var(--theme-accent-rgb),.42));opacity:1}}
 @media(max-width:1360px){.category-rail{left:calc(var(--thread-x) - 534px);width:148px}.glossary-layout{left:calc(var(--thread-x) - 386px);right:18px;grid-template-columns:340px 92px minmax(360px,1fr)}.detail-panel{padding-right:28px;padding-left:28px}.term-list>button{padding-right:13px;padding-left:13px}}
 @media(max-width:1120px){.category-rail{display:none}.glossary-layout{left:calc(var(--thread-x) - 396px);grid-template-columns:350px 92px minmax(350px,1fr)}.mobile-categories{display:flex;flex:none;gap:4px;margin:0 18px 10px;overflow-x:auto;scrollbar-width:none}.mobile-categories button{flex:none;border:1px solid rgba(var(--theme-accent-rgb),.13);background:none;padding:7px 8px;color:rgba(var(--theme-text-rgb),.36);font:600 6px/1 'Hanken Grotesk',sans-serif;text-transform:uppercase}.mobile-categories button.active{border-color:rgba(var(--theme-accent-strong-rgb),.48);color:var(--gold-bright)}}

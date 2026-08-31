@@ -34,6 +34,9 @@ from collections import Counter, OrderedDict
 from datetime import datetime, timezone
 from pathlib import Path
 
+from ogni_facets import build_facets
+from ogni_text import chapter_texts, fold, mentioned, name_variants
+
 REPO = Path(__file__).resolve().parent.parent
 DATA_DIR = REPO / 'app' / 'data' / 'loreOgniGlossary'
 SLUGS_FILE = DATA_DIR / 'slugs.json'
@@ -152,6 +155,75 @@ class SlugRegistry:
         self.path.write_text(
             json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8'
         )
+
+
+def load_book():
+    if not UZLY_FILE.exists():
+        return {}
+    return json.loads(UZLY_FILE.read_text(encoding='utf-8'))
+
+
+def attach_mentions(entries, book):
+    """Главы книги, где имя статьи действительно встречается.
+
+    Список `chapters` пришёл из базы знаний: это главы, по которым записано
+    хоть одно утверждение. В книге сущность может мелькать и в других главах —
+    для читателя это тоже встреча, поэтому храним отдельным полем.
+    """
+    texts = chapter_texts(book)
+    if not texts:
+        return
+    for entry in entries:
+        variants = name_variants(entry)
+        if not variants:
+            entry['mentions'] = []
+            continue
+        entry['mentions'] = [
+            number for number, text in sorted(texts.items())
+            if any(mentioned(text, variant) for variant in variants)
+        ]
+
+
+def attach_relations(entries, limit=14):
+    """Связи между статьями: кого статья называет в своих сведениях.
+
+    Глава берётся у самого раннего утверждения, где встретилось имя, — связь
+    подчиняется тому же срезу по главам, что и остальные сведения.
+    """
+    index = []
+    for entry in entries:
+        variants = name_variants(entry)
+        if variants:
+            index.append((entry, variants))
+
+    for entry in entries:
+        pieces = [(claim['text'], claim['chapter']) for claim in entry['claims']]
+        pieces += [(item['text'], item.get('chapter')) for item in entry['summaryByChapter']]
+        if not pieces:
+            entry['relations'] = []
+            continue
+
+        found = {}
+        for other, variants in index:
+            if other['id'] == entry['id']:
+                continue
+            for text, chapter in pieces:
+                folded = fold(text)
+                if not any(mentioned(folded, variant) for variant in variants):
+                    continue
+                current = found.get(other['id'])
+                known = [c for c in ((current or {}).get('chapter'), chapter) if c is not None]
+                found[other['id']] = {
+                    'id': other['id'],
+                    'term': other['term'],
+                    'category': other['category'],
+                    'chapter': min(known) if known else None,
+                    'weight': (current['weight'] + 1) if current else 1,
+                }
+        entry['relations'] = sorted(
+            found.values(),
+            key=lambda item: (-item['weight'], item['chapter'] or 99, item['term']),
+        )[:limit]
 
 
 def read_chapter_index():
@@ -389,6 +461,13 @@ def main() -> int:
             hidden_all.append({'term': name, **h})
 
     entries.sort(key=lambda e: e['term'].lower())
+
+    book = load_book()
+    attach_mentions(entries, book)
+    attach_relations(entries)
+    for entry in entries:
+        entry['facets'] = build_facets(entry)
+
     chapter_count = max((e['lastChapter'] or 0) for e in entries)
 
     generated_at = datetime.now(timezone.utc).isoformat()
