@@ -7,6 +7,7 @@ import {
   LORE_GLOSSARY_SEASONS,
   LORE_GLOSSARY_SOURCES,
   cutOgniPayload,
+  loreDisplayTerm,
   loreMatchKey,
 } from '~/data/loreGlossary.js'
 import { ogniChapterLink } from '~/data/loreOgniGlossary/index.js'
@@ -810,7 +811,7 @@ onBeforeUnmount(() => {
                   :title="relation.chapter ? `Впервые вместе в главе ${relation.chapter}` : 'Связь без указания главы'"
                   @click="chooseRelated(relation.target)"
                 >
-                  <i />{{ relation.term }}<em v-if="relation.chapter">{{ relation.chapter }}</em>
+                  <i />{{ loreDisplayTerm(relation.term) }}<em v-if="relation.chapter">{{ relation.chapter }}</em>
                 </button>
               </div>
             </section>
@@ -978,5 +979,87 @@ onBeforeUnmount(() => {
 @media(max-width:720px){.filters-panel{right:0;width:auto}.filters-panel>header{padding:16px 18px}.filters-panel>header b{font-size:25px}.filters-scroll{padding:17px 18px 25px}.category-options{grid-template-columns:1fr 1fr}.filter-switches{grid-template-columns:1fr 1fr}.filters-panel>footer{padding:11px 18px 15px}}
 @media(max-width:440px){.category-options,.filter-switches{grid-template-columns:1fr}.filter-section-title{align-items:flex-start;gap:7px}.filter-section-title>small{text-align:right}.filters-panel>header b{font-size:22px}}
 @media print{.lore-glossary{position:static;inset:auto;overflow:visible;background:#fff!important;color:#171717}.glossary-texture,.category-rail,.index-heading,.thread-column,.detail-heading,.index-panel,.detail-actions,.mobile-close{display:none!important}.glossary-layout{position:static;display:block}.detail-panel,.detail-expanded .detail-panel{position:static!important;display:block!important;overflow:visible!important;background:#fff!important;box-shadow:none!important;padding:24mm 20mm!important;color:#171717!important;transform:none!important}.detail-panel::before{display:none}.detail-panel h2,.detail-expanded .detail-panel h2{max-width:none;color:#111!important;font-size:54pt}.detail-meta span,.aliases,.definition,.provenance dd,.history-link b,.related-block button{color:#222!important}.definition,.detail-expanded .definition{max-width:none;font-size:18pt}.provenance,.history-link,.related-block{max-width:none;border-color:#aaa!important;background:none!important}.history-link{display:none}.related-block button{border-color:#bbb!important}}
+/* ——— Типографическая система карточки ———
+   Шесть ступеней вместо разнобоя от 6 до 74 пикселей. Засечный шрифт несёт
+   смысл (заголовки и проза), гротеск — служебные подписи: вид блока, статус
+   сведения, номер главы. Ниже 10 пикселей ничего не опускается. */
+.detail-panel{
+  --lore-band:600 10px/1.2 'Hanken Grotesk',sans-serif;      /* марка блока */
+  --lore-tag:600 10px/1.3 'Hanken Grotesk',sans-serif;       /* статус, глава */
+  --lore-meta:500 12px/1.45 'Hanken Grotesk',sans-serif;     /* служебный текст */
+  --lore-body:400 clamp(16px,1.2vw,18px)/1.68 'Cormorant Garamond',serif;
+  --lore-lead:italic 400 clamp(18px,1.45vw,21px)/1.55 'Cormorant Garamond',serif;
+  --lore-head:600 clamp(20px,1.7vw,24px)/1.22 'Cormorant Garamond',serif;
+  --lore-track:.17em;
+  --lore-step:34px;
+}
+
+/* Марки блоков и служебные подписи — одна ступень на всех. */
+.detail-panel .detail-meta span,
+.detail-panel .dossier-block>header>span,
+.detail-panel .ogni-block>header>span,
+.detail-panel .ogni-relations h3,
+.detail-panel .provenance dt,
+.detail-panel .related-block>span,
+.detail-panel .history-link span{font:var(--lore-band);letter-spacing:var(--lore-track);text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.62)}
+.detail-panel .detail-meta em{font:var(--lore-tag);letter-spacing:.1em;color:rgba(var(--theme-text-rgb),.3)}
+.detail-panel .detail-role{font:var(--lore-band);letter-spacing:.2em;color:rgba(var(--theme-accent-strong-rgb),.7)}
+
+/* Заголовок статьи и подзаголовки внутри неё. */
+.detail-panel h2{font-size:clamp(40px,4.2vw,62px);letter-spacing:-.015em}
+.detail-panel .dossier-block h3,
+.detail-panel .ogni-portrait h3,
+.detail-panel .ogni-facet h3{font:var(--lore-head);letter-spacing:0;text-transform:none;color:rgba(var(--theme-heading-rgb),.84)}
+.detail-panel .ogni-facet h3 em{font:var(--lore-tag);letter-spacing:.1em;color:rgba(var(--theme-text-rgb),.3)}
+
+/* Проза: одна ступень для досье, портрета и записей. */
+.detail-panel .definition{font:var(--lore-body);font-size:clamp(18px,1.5vw,21px)}
+.detail-panel .definition-lead{font:var(--lore-lead)}
+.detail-panel .dossier-block p,
+.detail-panel .dossier-block li,
+.detail-panel .ogni-portrait p,
+.detail-panel .ogni-facet li p{font:var(--lore-body);color:rgba(var(--theme-text-rgb),.78)}
+.detail-panel .dossier-block blockquote{font:var(--lore-lead);font-size:clamp(16px,1.3vw,18px)}
+.detail-panel .aliases{font:var(--lore-lead);font-size:clamp(15px,1.2vw,17px)}
+.detail-panel .provenance dd{font:var(--lore-body);font-size:16px}
+.detail-panel .provenance p,
+.detail-panel .ogni-cut,
+.detail-panel .chapter-hint{font:var(--lore-meta);color:rgba(var(--theme-text-rgb),.44)}
+
+/* Подписи у сведений: статус и глава читаются, а не угадываются. */
+.detail-panel .ogni-facet li>div>span,
+.detail-panel .ogni-facet li>div>a,
+.detail-panel .ogni-span,
+.detail-panel .dossier-block>header>a,
+.detail-panel .dossier-facts dt{font:var(--lore-tag);letter-spacing:.12em;text-transform:uppercase}
+.detail-panel .dossier-facts dd,
+.detail-panel .ogni-relations button,
+.detail-panel .related-block button{font:var(--lore-meta);font-size:14px}
+.detail-panel .ogni-relations button em{font:var(--lore-tag);letter-spacing:.08em}
+
+/* Ритм блоков: один шаг между смысловыми частями. */
+.detail-panel .dossier-block,
+.detail-panel .ogni-block{margin-top:var(--lore-step);padding-top:26px}
+.detail-panel .ogni-portrait,
+.detail-panel .ogni-facet,
+.detail-panel .ogni-relations{margin-top:28px}
+.detail-panel .dossier-block h3{margin:30px 0 14px}
+.detail-panel .provenance{margin-top:var(--lore-step)}
+
+/* Та же шкала в списке и на рельсе категорий: карточка и указатель — одно окно. */
+.lore-glossary{--lore-band:600 10px/1.2 'Hanken Grotesk',sans-serif}
+.term-list small,.results-bar span,.results-bar button,.mobile-categories button,
+.category-rail header span,.category-rail footer>span,.category-rail footer small{font:var(--lore-band);letter-spacing:.16em;text-transform:uppercase}
+.term-list b{font:600 19px/1.15 'Cormorant Garamond',serif}
+.term-list em{font:italic 14px/1.45 'Cormorant Garamond',serif}
+.category-rail nav b{font:600 13px/1.2 'Cormorant Garamond',serif}
+.category-rail nav em{font:600 9px/1 'Hanken Grotesk',sans-serif}
+.category-rail header strong{font-size:20px}
+.category-rail footer b{font-size:14px}
+.index-heading>span{font:italic 13px/1.3 'Cormorant Garamond',serif}
+.search-field>span small{font:var(--lore-band);letter-spacing:.14em;text-transform:uppercase}
+.search-field input,.search-field>span input{font:500 12px/1.3 'Hanken Grotesk',sans-serif}
+.chapter-badge{font:var(--lore-band);letter-spacing:.12em}
+
 @media(prefers-reduced-motion:reduce){.lore-glossary *{scroll-behavior:auto!important;animation:none!important;transition-duration:.01ms!important}}
 </style>

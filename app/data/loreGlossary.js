@@ -546,6 +546,14 @@ function mergeOgni(a, b) {
   }
 }
 
+// Имена из стенограмм приходят как попало: «золотые шахты Гизана», «морхор».
+// Для заголовка статьи поднимаем первую букву, остальное не трогаем — внутри
+// названия регистр осмысленный: «знак Проклятых щитов».
+export function loreDisplayTerm(term) {
+  const value = String(term || '')
+  return value ? value[0].toLocaleUpperCase('ru-RU') + value.slice(1) : value
+}
+
 function buildGlossary() {
   const merged = LORE_GLOSSARY_ARCHIVE.map(term => ({
     ...term,
@@ -608,7 +616,9 @@ function buildGlossary() {
     }
   }
 
-  return merged.sort((a, b) => a.term.localeCompare(b.term, 'ru'))
+  return merged
+    .map(term => ({ ...term, term: loreDisplayTerm(term.term) }))
+    .sort((a, b) => a.term.localeCompare(b.term, 'ru'))
 }
 
 export const LORE_GLOSSARY = buildGlossary()
