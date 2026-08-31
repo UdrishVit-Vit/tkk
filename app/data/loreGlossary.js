@@ -1,10 +1,18 @@
+import {
+  LORE_OGNI_ENTRIES,
+  LORE_OGNI_SOURCE,
+  LORE_OGNI_SEASONS,
+} from './loreOgniGlossary/index.js'
+
 export const LORE_GLOSSARY_CATEGORIES = [
   { id: 'foundations', title: 'Основа мира', short: 'Космология, устройство реальности и первосилы' },
   { id: 'beings', title: 'Существа и народы', short: 'Создатели, древние существа и смертные народы' },
+  { id: 'characters', title: 'Лица', short: 'Герои, спутники и все, кого встречали в пути' },
   { id: 'places', title: 'Места', short: 'Города, земли и иные области мироздания' },
   { id: 'powers', title: 'Силы и сообщества', short: 'Ордены, институты, законы и объединения' },
   { id: 'history', title: 'События и эпохи', short: 'Поворотные моменты Нити Башни Мафраш' },
   { id: 'practices', title: 'Практики и предметы', short: 'Магия, знания, материалы и реликвии' },
+  { id: 'culture', title: 'Обычаи и языки', short: 'Речь, обряды, ремёсла и повседневный уклад' },
 ]
 
 // A record may override `source` and `attributedTo`. Current archive entries
@@ -18,11 +26,18 @@ export const LORE_GLOSSARY_SOURCES = {
     attributedTo: 'Башня Мафраш',
     description: 'Основной источник нынешнего свода понятий мира Эноа.',
   },
+  [LORE_OGNI_SOURCE.id]: {
+    ...LORE_OGNI_SOURCE,
+    mark: 'ОГ',
+    title: 'Огни',
+  },
 }
 
 export const LORE_GLOSSARY_DEFAULT_SOURCE = 'threads-of-unseen'
 
-export const LORE_GLOSSARY = [
+// Свод Башни Мафраш — то, что архив знает о мире сам по себе.
+// Ниже к нему подмешиваются сведения кампании: см. LORE_GLOSSARY.
+export const LORE_GLOSSARY_ARCHIVE = [
   {
     id: 'enoa', term: 'Эноа', category: 'foundations', aliases: ['Новое Святилище'],
     definition: 'Мир смертных и новое Святилище, возникшее вокруг Искры после древнейших эпох. После Раскола Эноа разделилась на осколки, крупнейшим из которых стал Даскар.',
@@ -439,5 +454,101 @@ export const LORE_GLOSSARY = [
     related: ['adzhaidy', 'bogi-kochevniki', 'daskar'], history: 'epoha-vosstanovleniya',
   },
 ]
+
+// ——— Сведение источников ———
+//
+// Глоссарий один. Свод Башни Мафраш и свод кампании «Огни» — два Источника
+// Нити внутри него: сущность, известная обоим, остаётся одной статьёй и просто
+// показывает оба свидетельства. Совпадение ищется по названию и синонимам.
+
+export const LORE_GLOSSARY_SEASONS = LORE_OGNI_SEASONS
+
+const matchKey = value => String(value || '')
+  .toLocaleLowerCase('ru-RU')
+  .replace(/ё/g, 'е')
+  .replace(/[’'`«»]/g, '')
+  .replace(/[^\p{L}\p{N}]+/gu, ' ')
+  .trim()
+
+function ogniPayload(entry) {
+  return {
+    season: entry.seasons[0]?.season || 1,
+    seasons: entry.seasons,
+    chapters: entry.chapters,
+    firstChapter: entry.firstChapter,
+    lastChapter: entry.lastChapter,
+    summary: entry.summary,
+    summaryEarly: entry.summaryEarly,
+    summaryByChapter: entry.summaryByChapter,
+    claims: entry.claims,
+    profile: entry.profile,
+    hero: entry.hero,
+    section: entry.section,
+    siteSection: entry.siteSection,
+    stub: entry.stub,
+  }
+}
+
+function buildGlossary() {
+  const merged = LORE_GLOSSARY_ARCHIVE.map(term => ({
+    ...term,
+    sources: [term.source || LORE_GLOSSARY_DEFAULT_SOURCE],
+  }))
+
+  const byKey = new Map()
+  for (const term of merged) {
+    for (const name of [term.term, ...(term.aliases || [])]) {
+      const key = matchKey(name)
+      if (key && !byKey.has(key)) byKey.set(key, term)
+    }
+  }
+  const takenIds = new Set(merged.map(term => term.id))
+
+  for (const entry of LORE_OGNI_ENTRIES) {
+    const names = [entry.term, ...entry.aliases, ...entry.sourceNames]
+    const hit = names.map(matchKey).find(key => key && byKey.has(key))
+    const payload = ogniPayload(entry)
+
+    if (hit) {
+      const target = byKey.get(hit)
+      target.ogni = payload
+      target.ogniId = entry.id
+      if (!target.sources.includes(LORE_OGNI_SOURCE.id)) target.sources.push(LORE_OGNI_SOURCE.id)
+      for (const alias of names.slice(1)) {
+        if (alias !== target.term && !(target.aliases || []).includes(alias)) {
+          target.aliases = [...(target.aliases || []), alias]
+        }
+      }
+      continue
+    }
+
+    // Статья, которой у Башни Мафраш нет: она известна только по кампании.
+    const id = takenIds.has(entry.id) ? `${entry.id}-ogni` : entry.id
+    takenIds.add(id)
+    const record = {
+      id,
+      ogniId: entry.id,
+      term: entry.term,
+      category: entry.category,
+      aliases: [...entry.aliases, ...entry.sourceNames],
+      definition: entry.summary || `Упоминается в кампании «Огни»${
+        entry.chapters.length ? `, главы ${entry.chapters.join(', ')}` : ''
+      }. Толкование ещё не внесено в архив.`,
+      related: [],
+      source: LORE_OGNI_SOURCE.id,
+      sources: [LORE_OGNI_SOURCE.id],
+      ogni: payload,
+    }
+    merged.push(record)
+    for (const name of [record.term, ...record.aliases]) {
+      const key = matchKey(name)
+      if (key && !byKey.has(key)) byKey.set(key, record)
+    }
+  }
+
+  return merged.sort((a, b) => a.term.localeCompare(b.term, 'ru'))
+}
+
+export const LORE_GLOSSARY = buildGlossary()
 
 export const LORE_GLOSSARY_BY_ID = Object.fromEntries(LORE_GLOSSARY.map(item => [item.id, item]))

@@ -4,8 +4,10 @@ import {
   LORE_GLOSSARY_BY_ID,
   LORE_GLOSSARY_CATEGORIES,
   LORE_GLOSSARY_DEFAULT_SOURCE,
+  LORE_GLOSSARY_SEASONS,
   LORE_GLOSSARY_SOURCES,
 } from '~/data/loreGlossary.js'
+import { ogniChapterLink } from '~/data/loreOgniGlossary/index.js'
 
 defineProps({ theme: { type: Object, default: () => ({}) } })
 defineEmits(['up'])
@@ -56,22 +58,74 @@ const normalize = value => String(value || '')
   .replace(/ё/g, 'е')
   .replace(/[’'«»]/g, '')
 
+function sourceIdsFor(term) {
+  return term?.sources?.length
+    ? term.sources
+    : [term?.source || LORE_GLOSSARY_DEFAULT_SOURCE]
+}
+
 function sourceFor(term) {
-  return LORE_GLOSSARY_SOURCES[term?.source || LORE_GLOSSARY_DEFAULT_SOURCE]
+  return LORE_GLOSSARY_SOURCES[sourceIdsFor(term)[0]]
     || LORE_GLOSSARY_SOURCES[LORE_GLOSSARY_DEFAULT_SOURCE]
 }
+
+function sourcesFor(term) {
+  return sourceIdsFor(term).map(id => LORE_GLOSSARY_SOURCES[id]).filter(Boolean)
+}
+
+// Прогресс по сезону: 0 — весь сезон открыт, иначе номер главы, на которой
+// читатель остановился. Статья не должна знать больше него.
+const season = LORE_GLOSSARY_SEASONS[0] || null
+const chapterMax = season?.chapterCount || 0
+const requestedChapter = Number.parseInt(route.query.chapter, 10)
+const chapterCut = ref(
+  Number.isFinite(requestedChapter) && requestedChapter >= 1 && requestedChapter <= chapterMax
+    ? requestedChapter
+    : 0,
+)
+const chapterSlider = computed({
+  get: () => chapterCut.value || chapterMax,
+  set: (value) => { chapterCut.value = Number(value) >= chapterMax ? 0 : Number(value) },
+})
+
+const glossary = computed(() => {
+  const cut = chapterCut.value
+  if (!cut) return LORE_GLOSSARY
+  return LORE_GLOSSARY.reduce((acc, term) => {
+    if (!term.ogni) {
+      acc.push(term)
+      return acc
+    }
+    const met = term.ogni.chapters.some(chapter => chapter <= cut)
+    const inArchive = sourceIdsFor(term).includes(LORE_GLOSSARY_DEFAULT_SOURCE)
+    if (!met) {
+      // Кампания эту сущность ещё не встретила: свод Башни Мафраш остаётся,
+      // свидетельство «Огней» появится позже.
+      if (inArchive) acc.push({ ...term, ogni: null, sources: [LORE_GLOSSARY_DEFAULT_SOURCE] })
+      return acc
+    }
+    const claims = term.ogni.claims.filter(claim => claim.chapter <= cut)
+    const step = term.ogni.summaryByChapter.filter(item => item.chapter <= cut).pop()
+    acc.push({
+      ...term,
+      definition: !inArchive && step ? step.text : term.definition,
+      ogni: { ...term.ogni, claims, withheld: term.ogni.claims.length - claims.length },
+    })
+    return acc
+  }, [])
+})
 
 const categoryCounts = computed(() => Object.fromEntries(
   LORE_GLOSSARY_CATEGORIES.map(category => [
     category.id,
-    LORE_GLOSSARY.filter(term => term.category === category.id).length,
+    glossary.value.filter(term => term.category === category.id).length,
   ]),
 ))
 
 const sourceCounts = computed(() => Object.fromEntries(
   sourceOptions.map(source => [
     source.id,
-    LORE_GLOSSARY.filter(term => sourceFor(term).id === source.id).length,
+    glossary.value.filter(term => sourceIdsFor(term).includes(source.id)).length,
   ]),
 ))
 
@@ -93,13 +147,14 @@ const activeFilterCount = computed(() => [
   sortDirection.value !== 'asc',
   historyOnly.value,
   relatedOnly.value,
+  chapterCut.value > 0,
 ].filter(Boolean).length)
 
 const termsBeforeLetter = computed(() => {
   const needle = normalize(query.value).trim()
-  return LORE_GLOSSARY
+  return glossary.value
     .filter(term => activeCategory.value === 'all' || term.category === activeCategory.value)
-    .filter(term => activeSource.value === 'all' || sourceFor(term).id === activeSource.value)
+    .filter(term => activeSource.value === 'all' || sourceIdsFor(term).includes(activeSource.value))
     .filter(term => !historyOnly.value || Boolean(term.history))
     .filter(term => !relatedOnly.value || Boolean(term.related?.length))
     .filter((term) => {
@@ -135,14 +190,42 @@ const selected = computed(() => (
   || null
 ))
 const selectedSource = computed(() => sourceFor(selected.value))
+const selectedSources = computed(() => sourcesFor(selected.value))
 const selectedAttribution = computed(() => selected.value?.attributedTo || selectedSource.value?.attributedTo)
 const relatedTerms = computed(() => (selected.value?.related || [])
   .map(id => LORE_GLOSSARY_BY_ID[id])
   .filter(Boolean))
 const selectedNumber = computed(() => {
-  const index = LORE_GLOSSARY.findIndex(term => term.id === selected.value?.id)
+  const index = glossary.value.findIndex(term => term.id === selected.value?.id)
   return index < 0 ? '—' : String(index + 1).padStart(2, '0')
 })
+
+const PROFILE_ROWS = [
+  { key: 'role', label: 'Роль' },
+  { key: 'confirmed', label: 'Подтверждённый образ' },
+  { key: 'appearance', label: 'Облик' },
+  { key: 'personality', label: 'Характер' },
+  { key: 'biography', label: 'Предыстория' },
+]
+
+const selectedProfile = computed(() => {
+  const profile = selected.value?.ogni?.profile
+  if (!profile) return []
+  return PROFILE_ROWS
+    .filter(row => profile[row.key]?.length)
+    .map(row => ({
+      label: row.label,
+      lines: Array.isArray(profile[row.key]) ? profile[row.key] : [profile[row.key]],
+    }))
+})
+
+function chapterLink(entrySeason, chapter) {
+  return ogniChapterLink(entrySeason, chapter) || '/lore/uzly/ogni'
+}
+
+function chapterTitle(entrySeason, chapter) {
+  return `Глава ${chapter} — открыть в узле «Огни»`
+}
 
 function shortDefinition(text) {
   const sentence = text.match(/^.*?[.!?](?:\s|$)/)?.[0] || text
@@ -165,6 +248,8 @@ function syncQuery() {
   else delete next.history
   if (relatedOnly.value) next.related = '1'
   else delete next.related
+  if (chapterCut.value) next.chapter = String(chapterCut.value)
+  else delete next.chapter
   if (detailVisible.value && selected.value?.id) next.term = selected.value.id
   else delete next.term
   router.replace({ query: next })
@@ -203,6 +288,7 @@ function resetFilters() {
   activeLetter.value = 'all'
   historyOnly.value = false
   relatedOnly.value = false
+  chapterCut.value = 0
   sourceQuery.value = ''
   sortDirection.value = 'asc'
   activeId.value = ''
@@ -286,7 +372,7 @@ function handleKeydown(event) {
   nextTick(() => document.querySelector(`[data-term-id="${next.id}"]`)?.scrollIntoView({ block: 'nearest' }))
 }
 
-watch([query, activeSource, activeLetter, sortDirection, historyOnly, relatedOnly], () => {
+watch([query, activeSource, activeLetter, sortDirection, historyOnly, relatedOnly, chapterCut], () => {
   if (!filteredTerms.value.some(term => term.id === activeId.value)) activeId.value = ''
   syncQuery()
 })
@@ -309,7 +395,7 @@ onBeforeUnmount(() => {
       </header>
       <nav>
         <button :class="{ active: activeCategory === 'all' }" type="button" @click="chooseCategory('all')">
-          <i /><span><b>Все понятия</b><small>Полный свод мира</small></span><em>{{ LORE_GLOSSARY.length }}</em>
+          <i /><span><b>Все понятия</b><small>Полный свод мира</small></span><em>{{ glossary.length }}</em>
         </button>
         <button
           v-for="category in LORE_GLOSSARY_CATEGORIES"
@@ -322,9 +408,9 @@ onBeforeUnmount(() => {
         </button>
       </nav>
       <footer>
-        <span>Текущий источник</span>
-        <b>The Threads of Unseen</b>
-        <small>Архив Башни Мафраш</small>
+        <span>Источники свода</span>
+        <b>Башня Мафраш · Огни</b>
+        <small>{{ sourceCounts['threads-of-unseen'] }} + {{ sourceCounts.ogni }} записей</small>
       </footer>
     </aside>
 
@@ -332,7 +418,7 @@ onBeforeUnmount(() => {
       <header class="index-heading">
         <p>LORE · Справочник мира Эноа</p>
         <h1>Глоссарий</h1>
-        <span>{{ filteredTerms.length }} из {{ LORE_GLOSSARY.length }} записей</span>
+        <span>{{ filteredTerms.length }} из {{ glossary.length }} записей</span>
       </header>
 
       <div class="thread-column">
@@ -391,7 +477,7 @@ onBeforeUnmount(() => {
                 <div class="filter-section-title"><span><i>01</i> Выберите категорию</span><small>{{ activeCategory === 'all' ? 'Все разделы' : categoryMap[activeCategory]?.title }}</small></div>
                 <div class="category-options">
                   <button :class="{ active: activeCategory === 'all' }" type="button" @click="chooseCategory('all')">
-                    <i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg></i><span><b>Все понятия</b><small>Весь архив</small></span><em>{{ LORE_GLOSSARY.length }}</em>
+                    <i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg></i><span><b>Все понятия</b><small>Весь архив</small></span><em>{{ glossary.length }}</em>
                   </button>
                   <button v-for="category in LORE_GLOSSARY_CATEGORIES" :key="category.id" :class="{ active: activeCategory === category.id }" type="button" @click="chooseCategory(category.id)">
                     <i><span /></i><span><b>{{ category.title }}</b><small>{{ category.short }}</small></span><em>{{ categoryCounts[category.id] }}</em>
@@ -408,7 +494,7 @@ onBeforeUnmount(() => {
                 <div class="filter-section-title"><span>Доступные источники</span><small>Происхождение сведений</small></div>
                 <div class="source-options">
                   <button :class="{ active: activeSource === 'all' }" type="button" @click="activeSource = 'all'">
-                    <i /> <span><b>Все источники</b><small>{{ LORE_GLOSSARY.length }} записей</small></span>
+                    <i /> <span><b>Все источники</b><small>{{ glossary.length }} записей</small></span>
                   </button>
                   <button v-for="source in filteredSourceOptions" :key="source.id" :class="{ active: activeSource === source.id }" type="button" @click="activeSource = source.id">
                     <i /> <span><b>{{ source.title }}</b><small>{{ source.attributedTo }} · {{ sourceCounts[source.id] }}</small></span><em>{{ source.mark }}</em>
@@ -425,7 +511,30 @@ onBeforeUnmount(() => {
                 </div>
               </div>
 
-              <div class="filter-section-title filter-options-title"><span><i>04</i> Дополнительные условия</span><small>Необязательно</small></div>
+              <div v-if="season" class="filter-section chapter-filter">
+                <div class="filter-section-title">
+                  <span><i>04</i> Прогресс по сезону</span>
+                  <small>{{ chapterCut ? `Открыто до главы ${chapterCut}` : 'Весь сезон открыт' }}</small>
+                </div>
+                <p class="chapter-hint">Свод «Огни» не покажет того, чего вы ещё не прочли.</p>
+                <div class="chapter-slider">
+                  <input
+                    v-model.number="chapterSlider"
+                    type="range"
+                    min="1"
+                    :max="chapterMax"
+                    step="1"
+                    :aria-label="`Открыто до главы ${chapterCut || chapterMax}`"
+                  />
+                  <div class="chapter-scale">
+                    <b>{{ chapterCut || chapterMax }}</b>
+                    <span>из {{ chapterMax }} глав</span>
+                    <button type="button" :disabled="!chapterCut" @click="chapterCut = 0">Весь сезон</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="filter-section-title filter-options-title"><span><i>05</i> Дополнительные условия</span><small>Необязательно</small></div>
               <div class="filter-switches">
                 <button :class="{ active: historyOnly }" type="button" :aria-pressed="historyOnly" @click="historyOnly = !historyOnly"><i><span /></i><span><b>Нить истории</b><small>Только упомянутые в летописи</small></span></button>
                 <button :class="{ active: relatedOnly }" type="button" :aria-pressed="relatedOnly" @click="relatedOnly = !relatedOnly"><i><span /></i><span><b>Связанные понятия</b><small>Только записи со связями</small></span></button>
@@ -447,6 +556,7 @@ onBeforeUnmount(() => {
 
         <div class="results-bar">
           <span>{{ categoryMap[activeCategory]?.title || 'Все понятия' }}</span>
+          <em v-if="chapterCut" class="chapter-badge">до главы {{ chapterCut }}</em>
           <button v-if="query || activeFilterCount" type="button" @click="resetFilters">Сбросить</button>
         </div>
 
@@ -461,7 +571,7 @@ onBeforeUnmount(() => {
           >
             <i class="list-knot" />
             <span>
-              <small>{{ categoryMap[term.category]?.title }} · {{ sourceFor(term).mark }}</small>
+              <small>{{ categoryMap[term.category]?.title }} · {{ sourcesFor(term).map(item => item.mark).join(' + ') }}</small>
               <b>{{ term.term }}</b>
               <em>{{ shortDefinition(term.definition) }}</em>
             </span>
@@ -499,15 +609,51 @@ onBeforeUnmount(() => {
           <p class="definition"><span class="definition-dropcap">{{ selected.definition.slice(0, 1) }}</span>{{ selected.definition.slice(1) }}</p>
 
           <dl class="provenance">
-            <div>
-              <dt>Источник</dt>
-              <dd><b><span>{{ selectedSource.mark }}</span></b>{{ selectedSource.title }}</dd>
-            </div>
-            <div>
-              <dt>Свидетельство</dt>
-              <dd>{{ selectedAttribution }}</dd>
+            <div v-for="source in selectedSources" :key="source.id">
+              <dt>{{ source.id === 'ogni' ? 'Свидетельство кампании' : 'Источник Нити' }}</dt>
+              <dd><b><span>{{ source.mark }}</span></b>{{ source.title }}</dd>
+              <p>{{ source.id === 'ogni' ? source.attributedTo : selectedAttribution }}</p>
             </div>
           </dl>
+
+          <section v-if="selected.ogni" class="ogni-block">
+            <header>
+              <span>Свод «Огни» · сезон {{ selected.ogni.season }}</span>
+              <div v-if="selected.ogni.chapters.length" class="ogni-chapters">
+                <small>{{ selected.ogni.chapters.length === 1 ? 'Глава' : 'Главы' }}</small>
+                <NuxtLink
+                  v-for="chapter in selected.ogni.chapters"
+                  :key="chapter"
+                  :to="chapterLink(selected.ogni.season, chapter)"
+                  :title="chapterTitle(selected.ogni.season, chapter)"
+                >{{ chapter }}</NuxtLink>
+              </div>
+            </header>
+
+            <dl v-if="selectedProfile.length" class="ogni-profile">
+              <div v-for="row in selectedProfile" :key="row.label">
+                <dt>{{ row.label }}</dt>
+                <dd><p v-for="(line, index) in row.lines" :key="index">{{ line }}</p></dd>
+              </div>
+            </dl>
+
+            <ol v-if="selected.ogni.claims.length" class="ogni-claims">
+              <li v-for="(claim, index) in selected.ogni.claims" :key="index" :data-status="claim.status">
+                <div>
+                  <span>{{ claim.statusLabel }}</span>
+                  <NuxtLink :to="chapterLink(claim.season, claim.chapter)" :title="chapterTitle(claim.season, claim.chapter)">гл. {{ claim.chapter }}</NuxtLink>
+                </div>
+                <p>{{ claim.text }}</p>
+              </li>
+            </ol>
+
+            <p v-if="selected.ogni.withheld" class="ogni-cut">
+              Ещё {{ selected.ogni.withheld }} свидетельств откроется дальше по сезону.
+            </p>
+            <p v-else-if="!selected.ogni.claims.length" class="ogni-cut">
+              Сущность упомянута в сезоне, но отдельных свидетельств о ней пока не записано.
+            </p>
+          </section>
 
           <NuxtLink v-if="selected.history" class="history-link" :to="`/lore/history/${selected.history}`">
             <span>В Нити Башни Мафраш</span>
@@ -560,6 +706,45 @@ onBeforeUnmount(() => {
 .provenance{display:grid;grid-template-columns:1.15fr 1fr;gap:8px;max-width:570px;margin:35px 0 0}.provenance>div{border:1px solid rgba(var(--theme-accent-rgb),.15);background:rgba(var(--theme-surface-rgb),.27);padding:14px 15px}.provenance dt,.related-block>span,.history-link span{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.5)}.provenance dd{margin:8px 0 0;font:600 14px/1.2 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.7)}.provenance dd b{display:inline-grid;width:25px;height:25px;place-items:center;margin-right:9px;border:1px solid rgba(var(--theme-accent-rgb),.34);font:600 7px/1 'Hanken Grotesk',sans-serif;color:var(--gold-bright);transform:rotate(45deg)}.provenance dd b span{transform:rotate(-45deg)}
 .history-link{display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:center;max-width:570px;margin-top:11px;border:1px solid rgba(var(--theme-accent-rgb),.18);background:rgba(var(--theme-surface-rgb),.28);padding:13px 15px;text-decoration:none;transition:border-color .2s}.history-link:hover{border-color:rgba(var(--theme-accent-strong-rgb),.48)}.history-link b{grid-row:2;font:600 16px/1.1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.78)}.history-link i{grid-row:1/3;grid-column:2;color:var(--gold-bright);font-style:normal}.related-block{max-width:570px;margin-top:29px;padding-top:19px;border-top:1px solid rgba(var(--theme-accent-rgb),.11)}.related-block>div{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}.related-block button{border:1px solid rgba(var(--theme-accent-rgb),.14);background:rgba(var(--theme-surface-rgb),.24);padding:8px 10px;color:rgba(var(--theme-text-rgb),.58);font:13px/1 'Cormorant Garamond',serif;cursor:pointer}.related-block button:hover{border-color:rgba(var(--theme-accent-rgb),.42);color:var(--gold-bright)}.related-block button i{display:inline-block;width:5px;height:5px;margin-right:7px;border:1px solid rgba(var(--theme-accent-rgb),.55);transform:rotate(45deg)}
 .detail-empty{display:grid;min-height:78%;place-content:center;text-align:center}.detail-empty>i{width:18px;height:18px;justify-self:center;margin-bottom:23px;border:1px solid rgba(var(--theme-accent-rgb),.42);box-shadow:0 0 20px rgba(var(--theme-accent-rgb),.08);transform:rotate(45deg)}.detail-empty span{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.21em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.48)}.detail-empty b{margin-top:11px;font:600 30px/1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.68)}.detail-empty p{max-width:310px;margin:10px auto 0;color:rgba(var(--theme-text-rgb),.34);font:italic 14px/1.35 'Cormorant Garamond',serif}.detail-expanded .detail-panel{position:fixed;z-index:200;inset:0;display:block;overflow-y:auto;padding:42px clamp(55px,12vw,210px) 80px;background:radial-gradient(ellipse 55% 42% at 60% 5%,#171923 0,#090a0f 58%,#040406 100%);box-shadow:0 0 80px #000;transform:none}.detail-expanded .detail-panel::before{position:fixed;inset:20px;border:1px solid rgba(var(--theme-accent-rgb),.15)}.detail-expanded .detail-actions{position:sticky;top:0;max-width:760px;margin:0 auto 22px;padding:8px 0;background:linear-gradient(90deg,transparent,rgba(9,10,15,.92) 20%,rgba(9,10,15,.92))}.detail-expanded .detail-meta,.detail-expanded .detail-panel h2,.detail-expanded .aliases,.detail-expanded .detail-divider,.detail-expanded .definition,.detail-expanded .provenance,.detail-expanded .history-link,.detail-expanded .related-block{max-width:760px;margin-right:auto;margin-left:auto}.detail-expanded .detail-panel h2{font-size:clamp(62px,7vw,104px)}.detail-expanded .definition{font-size:clamp(23px,2vw,31px)}
+.chapter-hint{margin:9px 0 0;color:rgba(var(--theme-text-rgb),.4);font:italic 12px/1.35 'Cormorant Garamond',serif}
+.chapter-slider{margin-top:11px;border:1px solid rgba(var(--theme-accent-rgb),.14);border-radius:2px;background:rgba(var(--theme-surface-rgb),.2);padding:13px 14px}
+.chapter-slider input{width:100%;height:3px;border-radius:2px;appearance:none;background:linear-gradient(90deg,rgba(var(--theme-accent-strong-rgb),.62),rgba(var(--theme-accent-rgb),.18));cursor:pointer}
+.chapter-slider input::-webkit-slider-thumb{width:15px;height:15px;border:1px solid var(--gold-bright);appearance:none;background:#0a0b11;box-shadow:0 0 10px rgba(244,224,170,.42);cursor:pointer;transform:rotate(45deg)}
+.chapter-slider input::-moz-range-thumb{width:13px;height:13px;border:1px solid var(--gold-bright);background:#0a0b11;box-shadow:0 0 10px rgba(244,224,170,.42);cursor:pointer}
+.chapter-scale{display:flex;align-items:baseline;gap:8px;margin-top:12px}
+.chapter-scale b{font:600 27px/1 'Cormorant Garamond',serif;color:var(--gold-bright)}
+.chapter-scale span{flex:1;color:rgba(var(--theme-text-rgb),.38);font:500 9px/1 'Hanken Grotesk',sans-serif}
+.chapter-scale button{border:1px solid rgba(var(--theme-accent-rgb),.2);border-radius:2px;background:none;padding:7px 9px;color:rgba(var(--theme-accent-strong-rgb),.7);font:600 8px/1 'Hanken Grotesk',sans-serif;text-transform:uppercase;cursor:pointer}
+.chapter-scale button:disabled{border-color:rgba(var(--theme-contrast-rgb),.08);color:rgba(var(--theme-text-rgb),.22);cursor:default}
+.chapter-badge{border:1px solid rgba(var(--theme-accent-rgb),.28);padding:3px 6px;color:var(--gold-bright);font:600 6px/1 'Hanken Grotesk',sans-serif;font-style:normal;letter-spacing:.12em;text-transform:uppercase}
+.provenance{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}.provenance p{margin:7px 0 0;color:rgba(var(--theme-text-rgb),.42);font:italic 12px/1.3 'Cormorant Garamond',serif}
+.ogni-block{max-width:570px;margin-top:32px;border-top:1px solid rgba(var(--theme-accent-rgb),.14);padding-top:22px}
+.ogni-block>header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.ogni-block>header>span{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.6)}
+.ogni-chapters{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.ogni-chapters small{margin-right:3px;color:rgba(var(--theme-text-rgb),.3);font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.ogni-chapters a{display:grid;min-width:22px;height:22px;place-items:center;border:1px solid rgba(var(--theme-accent-rgb),.2);color:rgba(var(--theme-text-rgb),.55);font:600 8px/1 'Hanken Grotesk',sans-serif;text-decoration:none;transition:border-color .18s,color .18s}
+.ogni-chapters a:hover{border-color:var(--gold-bright);color:var(--gold-bright)}
+.ogni-profile{margin:19px 0 0;display:grid;gap:13px}
+.ogni-profile dt{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.5)}
+.ogni-profile dd{margin:7px 0 0}
+.ogni-profile p{margin:0 0 6px;padding-left:14px;position:relative;color:rgba(var(--theme-text-rgb),.66);font:15px/1.5 'Cormorant Garamond',serif}
+.ogni-profile p::before{content:'';position:absolute;top:8px;left:0;width:5px;height:5px;border:1px solid rgba(var(--theme-accent-rgb),.5);transform:rotate(45deg)}
+.ogni-claims{margin:22px 0 0;padding:0;list-style:none;display:grid;gap:9px}
+.ogni-claims li{border:1px solid rgba(var(--theme-accent-rgb),.12);border-left:2px solid rgba(var(--theme-accent-rgb),.4);background:rgba(var(--theme-surface-rgb),.22);padding:11px 13px}
+.ogni-claims li>div{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.ogni-claims li>div>span{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.62)}
+.ogni-claims li>div>a{color:rgba(var(--theme-text-rgb),.35);font:600 7px/1 'Hanken Grotesk',sans-serif;text-decoration:none}
+.ogni-claims li>div>a:hover{color:var(--gold-bright)}
+.ogni-claims p{margin:8px 0 0;color:rgba(var(--theme-text-rgb),.7);font:15px/1.5 'Cormorant Garamond',serif}
+.ogni-claims li[data-status=world-fact]{border-left-color:rgba(159,185,123,.72)}.ogni-claims li[data-status=world-fact]>div>span{color:rgba(159,185,123,.82)}
+.ogni-claims li[data-status=event]{border-left-color:rgba(214,170,96,.72)}
+.ogni-claims li[data-status=scene-canon]{border-left-color:rgba(150,176,214,.6)}.ogni-claims li[data-status=scene-canon]>div>span{color:rgba(150,176,214,.72)}
+.ogni-claims li[data-status=belief]{border-left-color:rgba(186,146,196,.6)}.ogni-claims li[data-status=belief]>div>span{color:rgba(186,146,196,.74)}
+.ogni-claims li[data-status=gm-hint]{border-left-color:rgba(206,120,104,.62)}.ogni-claims li[data-status=gm-hint]>div>span{color:rgba(206,120,104,.78)}
+.ogni-claims li[data-status=unconfirmed]{border-left-color:rgba(var(--theme-contrast-rgb),.24)}.ogni-claims li[data-status=unconfirmed]>div>span{color:rgba(var(--theme-text-rgb),.4)}
+.ogni-cut{margin:13px 0 0;color:rgba(var(--theme-text-rgb),.38);font:italic 13px/1.4 'Cormorant Garamond',serif}
+.detail-expanded .ogni-block{max-width:760px;margin-right:auto;margin-left:auto}
 @keyframes weaveY{to{background-position:0 260px}}@keyframes sigilGlow{0%,100%{filter:drop-shadow(0 0 7px rgba(var(--theme-accent-rgb),.2));opacity:.86}50%{filter:drop-shadow(0 0 13px rgba(var(--theme-accent-rgb),.42));opacity:1}}
 @media(max-width:1360px){.category-rail{left:calc(var(--thread-x) - 534px);width:148px}.glossary-layout{left:calc(var(--thread-x) - 386px);right:18px;grid-template-columns:340px 92px minmax(360px,1fr)}.detail-panel{padding-right:28px;padding-left:28px}.term-list>button{padding-right:13px;padding-left:13px}}
 @media(max-width:1120px){.category-rail{display:none}.glossary-layout{left:calc(var(--thread-x) - 396px);grid-template-columns:350px 92px minmax(350px,1fr)}.mobile-categories{display:flex;flex:none;gap:4px;margin:0 18px 10px;overflow-x:auto;scrollbar-width:none}.mobile-categories button{flex:none;border:1px solid rgba(var(--theme-accent-rgb),.13);background:none;padding:7px 8px;color:rgba(var(--theme-text-rgb),.36);font:600 6px/1 'Hanken Grotesk',sans-serif;text-transform:uppercase}.mobile-categories button.active{border-color:rgba(var(--theme-accent-strong-rgb),.48);color:var(--gold-bright)}}
