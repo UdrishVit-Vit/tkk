@@ -477,8 +477,58 @@ function stepTerm(delta) {
   return true
 }
 
+// Переворот страницы: карточка уходит в сторону жеста, на её месте появляется
+// соседняя статья и приходит с другого края. Подмена содержимого прячется в
+// момент, когда карточка уже полупрозрачна, — поэтому текст не «прыгает».
+const swipeFade = ref(1)
+const turning = ref('')
+const reducedMotion = ref(false)
+
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+async function turnPage(delta) {
+  const width = detailPanel.value?.offsetWidth || 320
+  const away = delta > 0 ? -1 : 1
+
+  if (reducedMotion.value) {
+    stepTerm(delta)
+    return
+  }
+
+  turning.value = 'out'
+  swipeShift.value = away * width * 0.34
+  swipeFade.value = .2
+  await wait(150)
+
+  if (!stepTerm(delta)) {
+    turning.value = 'in'
+    swipeShift.value = 0
+    swipeFade.value = 1
+    await wait(300)
+    turning.value = ''
+    return
+  }
+
+  // Мгновенный перенос на противоположный край — без него страница вернулась бы
+  // оттуда же, куда ушла, и переворота не читалось бы.
+  turning.value = 'jump'
+  swipeShift.value = -away * width * 0.26
+  await nextTick()
+  // Стиль применяем принудительно: иначе браузер сольёт перенос и возврат в одно
+  // движение. На requestAnimationFrame полагаться нельзя — во вкладке, которую
+  // не видно, кадры не идут, и переворот застревает на полпути.
+  void detailPanel.value?.offsetWidth
+
+  turning.value = 'in'
+  swipeShift.value = 0
+  swipeFade.value = 1
+  await wait(320)
+  turning.value = ''
+}
+
 function onSwipeStart(event) {
-  if (!isNarrow.value || !mobileDetailOpen.value || event.touches.length !== 1) return
+  if (!isNarrow.value || !mobileDetailOpen.value || turning.value) return
+  if (event.touches.length !== 1) return
   const touch = event.touches[0]
   swipeOrigin = { x: touch.clientX, y: touch.clientY, axis: null }
 }
@@ -505,12 +555,19 @@ function onSwipeMove(event) {
 }
 
 function onSwipeEnd() {
-  if (swipeOrigin?.axis === 'x') {
-    if (swipeShift.value <= -SWIPE_TRIGGER) stepTerm(1)
-    else if (swipeShift.value >= SWIPE_TRIGGER) stepTerm(-1)
-  }
+  const axis = swipeOrigin?.axis
+  const shift = swipeShift.value
   swipeOrigin = null
   swiping.value = false
+
+  if (axis === 'x' && shift <= -SWIPE_TRIGGER) {
+    turnPage(1)
+    return
+  }
+  if (axis === 'x' && shift >= SWIPE_TRIGGER) {
+    turnPage(-1)
+    return
+  }
   swipeShift.value = 0
 }
 
@@ -519,7 +576,16 @@ onMounted(() => {
   isNarrow.value = swipeQuery.matches
   const sync = event => { isNarrow.value = event.matches }
   swipeQuery.addEventListener('change', sync)
-  onBeforeUnmount(() => swipeQuery.removeEventListener('change', sync))
+
+  const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+  reducedMotion.value = motionQuery.matches
+  const syncMotion = event => { reducedMotion.value = event.matches }
+  motionQuery.addEventListener('change', syncMotion)
+
+  onBeforeUnmount(() => {
+    swipeQuery.removeEventListener('change', sync)
+    motionQuery.removeEventListener('change', syncMotion)
+  })
 })
 
 function notifyAction(message) {
@@ -807,9 +873,8 @@ onBeforeUnmount(() => {
 
       <article
         ref="detailPanel"
-        class="detail-panel"
-        :class="{ 'mobile-open': mobileDetailOpen, 'is-swiping': swiping }"
-        :style="{ '--swipe-shift': `${swipeShift}px` }"
+        :class="['detail-panel', { 'mobile-open': mobileDetailOpen, 'is-swiping': swiping }, turning && `is-turn-${turning}`]"
+        :style="{ '--swipe-shift': `${swipeShift}px`, '--swipe-fade': swipeFade }"
         aria-live="polite"
         @touchstart.passive="onSwipeStart"
         @touchmove="onSwipeMove"
@@ -1162,8 +1227,15 @@ onBeforeUnmount(() => {
    transform, которым карточка выезжает поверх списка. Во время жеста переход
    выключен — иначе карточка тянется за пальцем с запозданием. */
 @media(max-width:720px){
-  .detail-panel.mobile-open{transform:translateX(var(--swipe-shift,0px))}
+  .detail-panel.mobile-open{transform:translateX(var(--swipe-shift,0px));opacity:var(--swipe-fade,1)}
+  /* Палец ведёт карточку сам — переход только помешает. */
   .detail-panel.is-swiping{transition:none}
+  /* Уход: коротко и с разгоном, страница будто вырывается из-под пальца. */
+  .detail-panel.is-turn-out{transition:transform .15s cubic-bezier(.4,0,1,1),opacity .15s cubic-bezier(.4,0,1,1)}
+  /* Перенос на противоположный край — вне времени, его не должно быть видно. */
+  .detail-panel.is-turn-jump{transition:none}
+  /* Приход: длиннее ухода и с торможением — так лист ложится, а не щёлкает. */
+  .detail-panel.is-turn-in{transition:transform .32s cubic-bezier(.16,.84,.3,1),opacity .26s ease-out}
 }
 
 /* Короткое толкование: поднятая литера на одной строке. Кегль 1.8em держит
