@@ -486,6 +486,14 @@ const reducedMotion = ref(false)
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
+// Длительности продублированы в стилях классов .is-turn-*: держим их вместе.
+const TURN_OUT_MS = 110
+const TURN_IN_MS = 260
+// Ход в долях ширины карточки. Короткий: страница должна сменяться, а не
+// оттягиваться — большой ход читается как рывок за край.
+const TURN_OUT_SHIFT = 0.2
+const TURN_JUMP_SHIFT = 0.13
+
 async function turnPage(delta) {
   const width = detailPanel.value?.offsetWidth || 320
   const away = delta > 0 ? -1 : 1
@@ -496,15 +504,15 @@ async function turnPage(delta) {
   }
 
   turning.value = 'out'
-  swipeShift.value = away * width * 0.34
-  swipeFade.value = .2
-  await wait(150)
+  swipeShift.value = away * width * TURN_OUT_SHIFT
+  swipeFade.value = .25
+  await wait(TURN_OUT_MS)
 
   if (!stepTerm(delta)) {
     turning.value = 'in'
     swipeShift.value = 0
     swipeFade.value = 1
-    await wait(300)
+    await wait(TURN_IN_MS)
     turning.value = ''
     return
   }
@@ -512,7 +520,7 @@ async function turnPage(delta) {
   // Мгновенный перенос на противоположный край — без него страница вернулась бы
   // оттуда же, куда ушла, и переворота не читалось бы.
   turning.value = 'jump'
-  swipeShift.value = -away * width * 0.26
+  swipeShift.value = -away * width * TURN_JUMP_SHIFT
   await nextTick()
   // Стиль применяем принудительно: иначе браузер сольёт перенос и возврат в одно
   // движение. На requestAnimationFrame полагаться нельзя — во вкладке, которую
@@ -522,7 +530,7 @@ async function turnPage(delta) {
   turning.value = 'in'
   swipeShift.value = 0
   swipeFade.value = 1
-  await wait(320)
+  await wait(TURN_IN_MS)
   turning.value = ''
 }
 
@@ -1230,12 +1238,12 @@ onBeforeUnmount(() => {
   .detail-panel.mobile-open{transform:translateX(var(--swipe-shift,0px));opacity:var(--swipe-fade,1)}
   /* Палец ведёт карточку сам — переход только помешает. */
   .detail-panel.is-swiping{transition:none}
-  /* Уход: коротко и с разгоном, страница будто вырывается из-под пальца. */
-  .detail-panel.is-turn-out{transition:transform .15s cubic-bezier(.4,0,1,1),opacity .15s cubic-bezier(.4,0,1,1)}
+  /* Уход: коротко и с разгоном, страница уходит из-под пальца. */
+  .detail-panel.is-turn-out{transition:transform .11s cubic-bezier(.4,0,1,1),opacity .11s cubic-bezier(.4,0,1,1)}
   /* Перенос на противоположный край — вне времени, его не должно быть видно. */
   .detail-panel.is-turn-jump{transition:none}
-  /* Приход: длиннее ухода и с торможением — так лист ложится, а не щёлкает. */
-  .detail-panel.is-turn-in{transition:transform .32s cubic-bezier(.16,.84,.3,1),opacity .26s ease-out}
+  /* Приход: с торможением, но без длинного выката — лист ложится сразу. */
+  .detail-panel.is-turn-in{transition:transform .26s cubic-bezier(.22,.8,.36,1),opacity .2s ease-out}
 }
 
 /* Короткое толкование: поднятая литера на одной строке. Кегль 1.8em держит
