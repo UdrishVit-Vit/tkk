@@ -7,9 +7,41 @@ const props = defineProps({
   skipId: { type: String, default: '' },
 })
 
-const emit = defineEmits(['term'])
+// Термин не уводит из статьи сразу: сначала всплывающая карточка, и только
+// с неё — переход. Читатель, встретивший незнакомое слово, чаще хочет
+// вспомнить, что это, и вернуться к чтению.
+const emit = defineEmits(['preview'])
 
 const tokens = computed(() => tokenizeLoreText(props.text, props.skipId))
+
+// На устройствах с указателем карточка появляется и при наведении — но с
+// задержкой, иначе она выскакивает от случайного движения по строке.
+const HOVER_DELAY = 380
+let hoverTimer = null
+let canHover = false
+
+onMounted(() => {
+  canHover = window.matchMedia('(hover: hover)').matches
+})
+onBeforeUnmount(() => window.clearTimeout(hoverTimer))
+
+function show(event, ids) {
+  window.clearTimeout(hoverTimer)
+  emit('preview', { ids, rect: event.currentTarget.getBoundingClientRect() })
+}
+
+function onEnter(event, ids) {
+  if (!canHover) return
+  const target = event.currentTarget
+  window.clearTimeout(hoverTimer)
+  hoverTimer = window.setTimeout(() => {
+    emit('preview', { ids, rect: target.getBoundingClientRect() })
+  }, HOVER_DELAY)
+}
+
+function onLeave() {
+  window.clearTimeout(hoverTimer)
+}
 </script>
 
 <template>
@@ -17,8 +49,11 @@ const tokens = computed(() => tokenizeLoreText(props.text, props.skipId))
     v-if="token.type === 'term'"
     type="button"
     class="lore-term"
-    :title="`${token.title} — открыть статью`"
-    @click="emit('term', token.id)"
+    :title="`${token.title} — показать карточку`"
+    @click="show($event, token.ids)"
+    @mouseenter="onEnter($event, token.ids)"
+    @mouseleave="onLeave"
+    @focus="show($event, token.ids)"
   >{{ token.text }}</button><template v-else>{{ token.text }}</template></template></span>
 </template>
 

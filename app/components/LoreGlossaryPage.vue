@@ -6,6 +6,7 @@ import {
   LORE_GLOSSARY_DEFAULT_SOURCE,
   LORE_GLOSSARY_SEASONS,
   LORE_GLOSSARY_SOURCES,
+  LORE_ENTITY_TYPES,
   cutOgniPayload,
   loreDisplayTerm,
   loreMatchKey,
@@ -57,6 +58,8 @@ const HISTORY_LABELS = {
 }
 
 const categoryMap = Object.fromEntries(LORE_GLOSSARY_CATEGORIES.map(item => [item.id, item]))
+// Вид точнее категории: категория — навигация, вид — что это такое.
+const typeMap = Object.fromEntries(LORE_ENTITY_TYPES.map(item => [item.id, item]))
 const normalize = value => String(value || '')
   .toLocaleLowerCase('ru-RU')
   .replace(/ё/g, 'е')
@@ -185,8 +188,23 @@ const filteredTerms = computed(() => termsBeforeLetter.value
     return sortDirection.value === 'asc' ? result : -result
   }))
 
-const requestedTerm = typeof route.query.term === 'string' ? route.query.term : ''
-const activeId = ref(LORE_GLOSSARY_BY_ID[requestedTerm] ? requestedTerm : '')
+// Статья живёт по собственному адресу: /lore/glossary/<id>. Старая ссылка вида
+// ?term=<id> продолжает работать — на неё уже могли сослаться.
+const GLOSSARY_PATH = '/lore/glossary'
+function termFromRoute() {
+  const fromPath = typeof route.params.slug === 'string' ? route.params.slug : ''
+  const fromQuery = typeof route.query.term === 'string' ? route.query.term : ''
+  const requested = fromPath || fromQuery
+  return LORE_GLOSSARY_BY_ID[requested] ? requested : ''
+}
+
+const activeId = ref(termFromRoute())
+// Карточка открыта ровно тогда, когда статья названа в адресе. Иначе при
+// закрытии карточки смена маршрута пересоздавала компонент, и он открывался
+// заново на первой статье списка. На телефоне это же правило разворачивает
+// статью поверх списка: пришли по ссылке на статью — её и показываем.
+detailVisible.value = Boolean(activeId.value)
+mobileDetailOpen.value = Boolean(activeId.value)
 const selected = computed(() => (
   filteredTerms.value.find(term => term.id === activeId.value)
   || filteredTerms.value[0]
@@ -374,7 +392,7 @@ function shortDefinition(text) {
   return sentence.length > 126 ? `${sentence.slice(0, 123).trim()}…` : sentence
 }
 
-function syncQuery() {
+function syncQuery(push = false) {
   const next = { ...route.query }
   if (query.value.trim()) next.q = query.value.trim()
   else delete next.q
@@ -392,18 +410,26 @@ function syncQuery() {
   else delete next.related
   if (chapterCut.value) next.chapter = String(chapterCut.value)
   else delete next.chapter
-  if (detailVisible.value && selected.value?.id) next.term = selected.value.id
-  else delete next.term
-  router.replace({ query: next })
+  // Термин теперь часть пути, а не запроса: фильтры остаются в адресе, статья
+  // получает свой URL.
+  delete next.term
+
+  const openId = detailVisible.value ? selected.value?.id : ''
+  const path = openId ? `${GLOSSARY_PATH}/${openId}` : GLOSSARY_PATH
+  if (path === route.path && JSON.stringify(next) === JSON.stringify(route.query)) return
+  // Переход к другой статье — это навигация, кнопка «назад» должна её отменять.
+  // Смена фильтра — уточнение того же экрана, история им не засоряется.
+  const navigate = push && path !== route.path ? router.push : router.replace
+  navigate.call(router, { path, query: next })
 }
 
-function chooseTerm(term, openOnMobile = true) {
+function chooseTerm(term, openOnMobile = true, push = true) {
   if (!term) return
   activeId.value = term.id
   detailVisible.value = true
   mobileDetailOpen.value = openOnMobile
   detailPanel.value?.scrollTo({ top: 0, behavior: 'smooth' })
-  syncQuery()
+  syncQuery(push)
 }
 
 function chooseCategory(id) {
@@ -418,7 +444,27 @@ function chooseCategory(id) {
 
 // Термин, кликнутый прямо в тексте статьи.
 function openTerm(id) {
+  closeTermCard()
   chooseRelated(glossary.value.find(term => term.id === id) || LORE_GLOSSARY_BY_ID[id])
+}
+
+// Всплывающая карточка термина: средняя ступень между словом и статьёй.
+// Имён-омонимов в Эноа хватает — народ вету и земли Вету, — поэтому карточка
+// умеет держать несколько статей и спрашивает, какая имелась в виду.
+const termCardIds = ref([])
+const termCardRect = ref(null)
+const termCardTerms = computed(() => termCardIds.value
+  .map(id => glossary.value.find(term => term.id === id) || LORE_GLOSSARY_BY_ID[id])
+  .filter(Boolean))
+
+function showTermCard({ ids, rect }) {
+  termCardIds.value = Array.isArray(ids) ? ids : [ids]
+  termCardRect.value = rect
+}
+
+function closeTermCard() {
+  termCardIds.value = []
+  termCardRect.value = null
 }
 
 function chooseRelated(term) {
@@ -633,7 +679,8 @@ function closeDetail() {
 async function shareSelected() {
   if (!selected.value) return
   const url = new URL(window.location.href)
-  url.searchParams.set('term', selected.value.id)
+  url.pathname = `${GLOSSARY_PATH}/${selected.value.id}`
+  url.searchParams.delete('term')
   const shareData = {
     title: `${selected.value.term} — Глоссарий Эноа`,
     text: selected.value.definition,
@@ -664,7 +711,8 @@ function handleKeydown(event) {
     return
   }
   if (event.key === 'Escape') {
-    if (detailExpanded.value) detailExpanded.value = false
+    if (termCardIds.value.length) closeTermCard()
+    else if (detailExpanded.value) detailExpanded.value = false
     else if (filtersOpen.value) setFiltersOpen(false)
     else if (mobileDetailOpen.value) mobileDetailOpen.value = false
     else return
@@ -676,7 +724,7 @@ function handleKeydown(event) {
   const current = Math.max(0, filteredTerms.value.findIndex(term => term.id === selected.value?.id))
   const direction = event.key === 'ArrowDown' ? 1 : -1
   const next = filteredTerms.value[Math.min(filteredTerms.value.length - 1, Math.max(0, current + direction))]
-  chooseTerm(next, false)
+  chooseTerm(next, false, false)
   nextTick(() => document.querySelector(`[data-term-id="${next.id}"]`)?.scrollIntoView({ block: 'nearest' }))
 }
 
@@ -685,9 +733,52 @@ watch([query, activeSource, activeLetter, sortDirection, historyOnly, relatedOnl
   syncQuery()
 })
 
-onMounted(() => window.addEventListener('keydown', handleKeydown))
+// Адрес — источник правды о выбранной статье: кнопки «назад» и «вперёд»
+// в браузере должны листать глоссарий, а не только менять строку адреса.
+watch(() => [route.params.slug, route.query.term], () => {
+  const fromRoute = termFromRoute()
+  if (!fromRoute || fromRoute === activeId.value) return
+  activeId.value = fromRoute
+  detailVisible.value = true
+})
+
+// Заголовок страницы описывает открытую статью, а не первую в списке:
+// с закрытой карточкой адрес указывает на весь свод.
+const visibleTerm = computed(() => (detailVisible.value ? selected.value : null))
+
+useSeoMeta({
+  title: () => (visibleTerm.value
+    ? `${visibleTerm.value.term} — Глоссарий Эноа`
+    : 'Глоссарий Эноа · Lore'),
+  description: () => (visibleTerm.value?.definition
+    || 'Справочник имён, мест, существ и понятий мира Эноа.'),
+})
+
+// Карточка привязана к месту слова на экране, поэтому при прокрутке и смене
+// размера окна она осталась бы висеть в пустоте — проще закрыть.
+function dismissTermCard(event) {
+  if (!termCardIds.value.length) return
+  if (event?.type === 'pointerdown') {
+    const target = event.target
+    if (target?.closest?.('.term-card') || target?.closest?.('.lore-term')) return
+  }
+  closeTermCard()
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+  window.addEventListener('pointerdown', dismissTermCard, true)
+  window.addEventListener('scroll', dismissTermCard, true)
+  window.addEventListener('resize', dismissTermCard)
+  // Пришли по старой ссылке ?term=… — приводим адрес к каноническому виду,
+  // чтобы дальше ссылались уже на путь.
+  if (route.query.term && activeId.value) syncQuery()
+})
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('pointerdown', dismissTermCard, true)
+  window.removeEventListener('scroll', dismissTermCard, true)
+  window.removeEventListener('resize', dismissTermCard)
   window.clearTimeout(actionTimer)
 })
 </script>
@@ -917,16 +1008,28 @@ onBeforeUnmount(() => {
         </div>
         <template v-if="selected && detailVisible">
           <div class="detail-meta">
-            <span>{{ categoryMap[selected.category]?.title }}</span>
+            <span>{{ typeMap[selected.type]?.title || categoryMap[selected.category]?.title }}</span>
             <em>{{ selectedNumber }}</em>
           </div>
           <h2>{{ selected.term }}</h2>
           <p v-if="selectedRole" class="detail-role">{{ selectedRole }}</p>
           <p v-if="selected.aliases?.length" class="aliases">Также: {{ selected.aliases.join(' · ') }}</p>
           <div class="detail-divider"><i /></div>
-          <p v-if="showLead" class="definition definition-lead"><LoreRichText :text="selected.definition" :skip-id="selected.id" @term="openTerm" /></p>
-          <p v-else-if="!portraitFacets.length" class="definition"><span :class="dropcapMode === 'drop' ? 'definition-dropcap' : 'definition-versal'">{{ selected.definition.slice(0, 1) }}</span><LoreRichText :text="selected.definition.slice(1)" :skip-id="selected.id" @term="openTerm" /></p>
+          <p v-if="showLead" class="definition definition-lead"><LoreRichText :text="selected.definition" :skip-id="selected.id" @preview="showTermCard" /></p>
+          <p v-else-if="!portraitFacets.length" class="definition"><span :class="dropcapMode === 'drop' ? 'definition-dropcap' : 'definition-versal'">{{ selected.definition.slice(0, 1) }}</span><LoreRichText :text="selected.definition.slice(1)" :skip-id="selected.id" @preview="showTermCard" /></p>
 
+
+          <section v-if="selected.links?.length" class="ogni-links">
+            <h3>Связи</h3>
+            <dl>
+              <div v-for="(link, index) in selected.links" :key="index">
+                <dt>{{ link.label }}</dt>
+                <dd>
+                  <button type="button" :title="link.why" @click="openTerm(link.id)">{{ link.term }}</button>
+                </dd>
+              </div>
+            </dl>
+          </section>
 
           <section v-if="selectedDossier" class="dossier-block">
             <header>
@@ -935,16 +1038,16 @@ onBeforeUnmount(() => {
             </header>
             <template v-for="(block, index) in dossierBlocks" :key="index">
               <h3 v-if="block.type === 'heading'">{{ block.text }}</h3>
-              <blockquote v-else-if="block.type === 'quote'"><LoreRichText :text="block.text" :skip-id="selected.id" @term="openTerm" /></blockquote>
+              <blockquote v-else-if="block.type === 'quote'"><LoreRichText :text="block.text" :skip-id="selected.id" @preview="showTermCard" /></blockquote>
               <ul v-else-if="block.type === 'list'">
-                <li v-for="(item, itemIndex) in block.items" :key="itemIndex"><LoreRichText :text="item" :skip-id="selected.id" @term="openTerm" /></li>
+                <li v-for="(item, itemIndex) in block.items" :key="itemIndex"><LoreRichText :text="item" :skip-id="selected.id" @preview="showTermCard" /></li>
               </ul>
               <dl v-else-if="block.type === 'facts'" class="dossier-facts">
                 <div v-for="(item, itemIndex) in block.items" :key="itemIndex">
-                  <dt>{{ item.label }}</dt><dd><LoreRichText :text="item.value" :skip-id="selected.id" @term="openTerm" /></dd>
+                  <dt>{{ item.label }}</dt><dd><LoreRichText :text="item.value" :skip-id="selected.id" @preview="showTermCard" /></dd>
                 </div>
               </dl>
-              <p v-else><LoreRichText :text="block.text" :skip-id="selected.id" @term="openTerm" /></p>
+              <p v-else><LoreRichText :text="block.text" :skip-id="selected.id" @preview="showTermCard" /></p>
             </template>
           </section>
 
@@ -961,14 +1064,14 @@ onBeforeUnmount(() => {
 
             <section v-for="facet in portraitFacets" :key="facet.id" class="ogni-portrait">
               <h3>{{ facet.label }}</h3>
-              <p v-for="(item, index) in facet.items" :key="index"><LoreRichText :text="item.text" :skip-id="selected.id" @term="openTerm" /></p>
+              <p v-for="(item, index) in facet.items" :key="index"><LoreRichText :text="item.text" :skip-id="selected.id" @preview="showTermCard" /></p>
             </section>
 
             <section v-for="facet in recordFacets" :key="facet.id" class="ogni-facet">
               <h3>{{ facet.label }}<em>{{ facet.items.length }}</em></h3>
               <ul>
                 <li v-for="(item, index) in facet.items" :key="index" :data-status="item.status">
-                  <p><LoreRichText :text="item.text" :skip-id="selected.id" @term="openTerm" /></p>
+                  <p><LoreRichText :text="item.text" :skip-id="selected.id" @preview="showTermCard" /></p>
                   <div>
                     <span>{{ item.statusLabel }}</span>
                     <NuxtLink
@@ -981,8 +1084,9 @@ onBeforeUnmount(() => {
               </ul>
             </section>
 
+
             <section v-if="selectedRelations.length" class="ogni-relations">
-              <h3>С кем и чем связано</h3>
+              <h3>Встречается рядом</h3>
               <div>
                 <button
                   v-for="relation in selectedRelations"
@@ -1037,6 +1141,16 @@ onBeforeUnmount(() => {
         </div>
       </article>
     </section>
+
+    <Teleport to="body">
+      <LoreTermCard
+        :terms="termCardTerms"
+        :anchor="termCardRect"
+        :type-titles="typeMap"
+        @open="openTerm"
+        @close="closeTermCard"
+      />
+    </Teleport>
   </main>
 </template>
 
@@ -1126,6 +1240,17 @@ onBeforeUnmount(() => {
 .ogni-facet li[data-status=gm-hint]{border-left-color:rgba(206,120,104,.62)}.ogni-facet li[data-status=gm-hint]>div>span{color:rgba(206,120,104,.78)}
 .ogni-facet li[data-status=unconfirmed]{border-left-color:rgba(var(--theme-contrast-rgb),.24)}.ogni-facet li[data-status=unconfirmed]>div>span{color:rgba(var(--theme-text-rgb),.4)}
 .ogni-facet li[data-status=profile]{border-left-color:rgba(214,170,96,.5)}.ogni-facet li[data-status=profile]>div>span{color:rgba(var(--theme-accent-rgb),.45)}
+.ogni-links{margin-top:26px}
+.ogni-links h3{margin:0 0 12px;font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.72)}
+.ogni-links dl{display:grid;gap:7px;margin:0}
+.ogni-links dl>div{display:flex;align-items:baseline;gap:12px;border-bottom:1px solid rgba(var(--theme-accent-rgb),.09);padding-bottom:7px}
+.ogni-links dt{flex:none;min-width:120px;font:600 6px/1.4 'Hanken Grotesk',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.62)}
+.ogni-links dd{margin:0}
+.ogni-links button{border:0;border-bottom:1px solid rgba(var(--theme-accent-rgb),.36);background:none;padding:0;color:rgba(var(--theme-heading-rgb),.82);font:16px/1.3 'Cormorant Garamond',serif;cursor:pointer}
+.ogni-links button:hover{border-bottom-color:var(--gold-bright);color:var(--gold-bright)}
+.detail-panel .ogni-links dt{font:var(--lore-band);letter-spacing:var(--lore-track);text-transform:uppercase}
+.detail-panel .ogni-links h3{font:var(--lore-band);letter-spacing:var(--lore-track);text-transform:uppercase}
+.detail-panel .ogni-links button{font:var(--lore-body);font-size:16px}
 .ogni-relations{margin-top:26px}
 .ogni-relations h3{margin:0;font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.72)}
 .ogni-relations>div{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
