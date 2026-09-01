@@ -4,9 +4,34 @@ import {
   DND55E_BACKGROUND_ABILITIES,
   DND55E_BACKGROUND_FEATS,
   DND55E_BACKGROUND_GROUPS,
-  DND55E_BACKGROUND_RULES,
-  DND55E_BACKGROUND_TIES
+  DND55E_BACKGROUND_TIES,
+  DND55E_SKILL_GLOSSARY,
+  DND55E_TOOL_EQUIPMENT
 } from '~/data/dnd55e/backgrounds.js'
+import { DND55E_GLOSSARY } from '~/data/dnd55e/glossary.js'
+
+// Ширма — единственный источник названий терминов: заголовки не дублируются в данных
+// предысторий, поэтому переименование правила не оставляет здесь мёртвой строки.
+const GLOSSARY_TITLES = new Map(DND55E_GLOSSARY.map(item => [item.id, item.title]))
+
+const glossaryPath = id => `/dnd55e/glossary?rule=${id}`
+
+function skillLinks(item) {
+  return item.skills
+    .map(skill => ({ id: DND55E_SKILL_GLOSSARY[skill], title: skill }))
+    .filter(entry => entry.id)
+}
+
+function ruleLinks(item) {
+  return item.glossary
+    .map(id => ({ id, title: GLOSSARY_TITLES.get(id) }))
+    .filter(entry => entry.title)
+}
+
+function toolPath(item) {
+  const id = DND55E_TOOL_EQUIPMENT[item.tool.replace(' (на выбор)', '')]
+  return id ? `/dnd55e/equipment?item=${id}` : null
+}
 
 const search = ref('')
 const open = ref(null)
@@ -152,25 +177,6 @@ useSeoMeta({
     @toggle-filter="toggleFilter"
     @reset-filters="resetFilters"
   >
-    <template #intro>
-      <aside class="bg-edition-note">
-        <span class="bg-edition-mark" aria-hidden="true">◈</span>
-        <div>
-          <b>Каркас предыстории 2024 одинаков для всех записей</b>
-          <p>
-            Мир Эноа меняет не механику, а подачу: кто вы были, чьи это были порядки и почему вы ушли.
-            Материалы редакции 2014 года сюда не подмешиваются.
-          </p>
-          <dl class="bg-rules">
-            <div v-for="rule in DND55E_BACKGROUND_RULES" :key="rule.title" class="bg-rule">
-              <dt>{{ rule.title }}</dt>
-              <dd>{{ rule.text }}</dd>
-            </div>
-          </dl>
-        </div>
-      </aside>
-    </template>
-
     <template #item="{ item }">
       <span class="bg-list-card">
         <span class="bg-list-icon" aria-hidden="true">
@@ -221,11 +227,19 @@ useSeoMeta({
         </div>
         <div class="tref-stat">
           <dt>Навыки</dt>
-          <dd>{{ item.raw.skills.join(', ') }}</dd>
+          <dd>
+            <template v-for="(entry, index) in skillLinks(item.raw)" :key="entry.id">
+              <template v-if="index">, </template>
+              <NuxtLink :to="glossaryPath(entry.id)">{{ entry.title }}</NuxtLink>
+            </template>
+          </dd>
         </div>
         <div class="tref-stat">
           <dt>Инструмент</dt>
-          <dd>{{ item.raw.tool }}</dd>
+          <dd>
+            <NuxtLink v-if="toolPath(item.raw)" :to="toolPath(item.raw)">{{ item.raw.tool }}</NuxtLink>
+            <template v-else>{{ item.raw.tool }}</template>
+          </dd>
         </div>
       </dl>
 
@@ -281,68 +295,28 @@ useSeoMeta({
 
       <aside class="bg-advice">
         <b>Как это играется</b>
-        <p>{{ item.raw.play }}</p>
+        <p><RuleRichText :text="item.raw.play" edition="2024" /></p>
       </aside>
+
+      <section v-if="ruleLinks(item.raw).length" class="bg-block bg-screen">
+        <h3>Ширма</h3>
+        <p class="bg-screen-hint">Правила редакции 2024, которые стоит открыть до первой сессии за этого персонажа.</p>
+        <div class="bg-screen-links">
+          <NuxtLink
+            v-for="entry in [...skillLinks(item.raw), ...ruleLinks(item.raw)]"
+            :key="entry.id"
+            :to="glossaryPath(entry.id)"
+            class="bg-screen-link"
+          >{{ entry.title }}</NuxtLink>
+          <NuxtLink :to="featPath(item.raw)" class="bg-screen-link feat">{{ item.raw.feat.title }}</NuxtLink>
+          <NuxtLink v-if="toolPath(item.raw)" :to="toolPath(item.raw)" class="bg-screen-link tool">{{ item.raw.tool }}</NuxtLink>
+        </div>
+      </section>
     </template>
   </ThreadRefPage>
 </template>
 
 <style scoped>
-.bg-edition-note{
-  display:flex;
-  align-items:flex-start;
-  gap:14px;
-  max-width:860px;
-  margin:24px 0 2px;
-  border:1px solid rgba(var(--theme-accent-rgb),.22);
-  border-radius:10px;
-  background:linear-gradient(100deg,rgba(var(--theme-accent-rgb),.075),rgba(var(--theme-surface-rgb),.36));
-  padding:15px 17px;
-}
-.bg-edition-mark{
-  display:grid;
-  width:25px;
-  height:25px;
-  flex:0 0 auto;
-  place-items:center;
-  color:rgba(var(--theme-accent-strong-rgb),.9);
-  font-size:18px;
-}
-.bg-edition-note b{
-  font-family:'Cormorant Garamond',serif;
-  color:rgba(var(--theme-accent-strong-rgb),.94);
-  font-size:18px;
-  font-weight:600;
-}
-.bg-edition-note > div > p{
-  margin:4px 0 0;
-  color:rgba(var(--theme-text-rgb),.62);
-  font-size:12px;
-  line-height:1.6;
-}
-.bg-rules{
-  display:grid;
-  gap:7px;
-  margin:12px 0 0;
-  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-}
-.bg-rule{
-  border-left:2px solid rgba(var(--theme-accent-rgb),.26);
-  padding-left:10px;
-}
-.bg-rule dt{
-  color:rgba(var(--theme-accent-strong-rgb),.86);
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-}
-.bg-rule dd{
-  margin:3px 0 0;
-  color:rgba(var(--theme-text-rgb),.6);
-  font-size:12px;
-  line-height:1.55;
-}
 .bg-list-card{
   display:grid;
   grid-template-columns:38px minmax(0,1fr);
@@ -553,8 +527,40 @@ useSeoMeta({
   font-size:13px;
   line-height:1.66;
 }
+.bg-screen-hint{
+  margin:0 0 9px;
+  color:rgba(var(--theme-text-rgb),.5);
+  font-size:12px;
+  line-height:1.55;
+}
+.bg-screen-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.bg-screen-link{
+  border:1px solid rgba(var(--theme-accent-rgb),.24);
+  border-radius:999px;
+  background:rgba(var(--theme-accent-rgb),.05);
+  padding:5px 12px;
+  color:rgba(var(--theme-accent-strong-rgb),.86);
+  font-size:12px;
+  text-decoration:none;
+  transition:background .18s ease,border-color .18s ease;
+}
+.bg-screen-link:hover{
+  border-color:rgba(var(--theme-accent-rgb),.5);
+  background:rgba(var(--theme-accent-rgb),.12);
+}
+.bg-screen-link.feat::before,
+.bg-screen-link.tool::before{
+  margin-right:6px;
+  color:rgba(var(--theme-accent-rgb),.6);
+  font-size:10px;
+}
+.bg-screen-link.feat::before{content:'✦'}
+.bg-screen-link.tool::before{content:'⚒'}
 @media (max-width:700px){
-  .bg-edition-note{padding:13px}
   .bg-heading{grid-template-columns:56px minmax(0,1fr);gap:13px}
   .bg-heading-icon{width:48px;height:48px;font-size:22px}
   .bg-title{font-size:25px}
