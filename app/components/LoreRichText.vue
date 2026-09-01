@@ -5,6 +5,9 @@ const props = defineProps({
   text: { type: String, default: '' },
   // Статья, внутри которой идёт текст: сама на себя не ссылается.
   skipId: { type: String, default: '' },
+  // Какие имена в этом куске делать ссылками. Пусто — все. В книге иначе
+  // нельзя: имя героя встречается пятьсот раз, и подчёркнуто было бы каждое.
+  allow: { type: Object, default: null },
 })
 
 // Термин не уводит из статьи сразу: сначала всплывающая карточка, и только
@@ -12,7 +15,13 @@ const props = defineProps({
 // вспомнить, что это, и вернуться к чтению.
 const emit = defineEmits(['preview'])
 
-const tokens = computed(() => tokenizeLoreText(props.text, props.skipId))
+const tokens = computed(() => {
+  const parsed = tokenizeLoreText(props.text, props.skipId)
+  if (!props.allow) return parsed
+  return parsed.map(token => (token.type !== 'term' || token.ids.some(id => props.allow.has(id))
+    ? token
+    : { type: 'text', text: token.text }))
+})
 
 // На устройствах с указателем карточка появляется и при наведении — но с
 // задержкой, иначе она выскакивает от случайного движения по строке.
