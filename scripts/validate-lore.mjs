@@ -90,10 +90,17 @@ for (const entry of LORE_GLOSSARY) {
   for (const id of entry.related || []) {
     if (!byId.has(id)) note('ошибка', entry, `ссылка «related» ведёт в никуда: ${id}`)
   }
+  // Одна и та же связь внесена дважды, когда новую добавили, не заметив
+  // старой: в карточке она удваивается, а основания расходятся. Пара статей с
+  // двумя разными связями — не ошибка: Ха’ар и Мардук и братья, и противники.
+  const pairs = new Set()
   for (const link of entry.links || []) {
     if (!byId.has(link.id)) note('ошибка', entry, `типизированная связь ведёт в никуда: ${link.id}`)
     if (link.id === entry.id) note('ошибка', entry, 'типизированная связь указывает на саму статью')
     if (!link.label) note('предупреждение', entry, `у связи с «${link.term}» нет подписи`)
+    const pair = `${link.id}|${link.type}`
+    if (pairs.has(pair)) note('предупреждение', entry, `связь «${link.label}» с «${link.term}» внесена дважды`)
+    pairs.add(pair)
   }
   for (const relation of entry.ogni?.relations || []) {
     if (!byId.has(relation.id) && !LORE_GLOSSARY.some(item => item.ogniId === relation.id)) {

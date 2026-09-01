@@ -179,6 +179,13 @@ const TYPE_OVERRIDES = {
   'propast-snov': 'location',
   razar: 'organization',
   'kostyanye-providtsy': 'organization',
+  // «Время Королей»: отряд — не орден, логово — не крепость, а год — не событие.
+  'vsadniki-shamasa': 'organization',
+  'logovo-vsadnikov': 'location',
+  'pochtovoe-derevo': 'location',
+  'shpil-zur': 'location',
+  'god-krasnogo-varana': 'era',
+  'koren-chumy': 'resource',
   // Ремёсла и вещи.
   'tanets-vetra': 'magic',
   indigo: 'resource',

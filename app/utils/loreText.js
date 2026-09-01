@@ -66,7 +66,9 @@ function buildIndex() {
       // апострофа, а в прозе он на месте.
       const body = words
         .map(word => stem(word).split('').join(APOSTROPHE))
-        .map(word => `${word}(?:${ENDINGS})?`)
+        // Апостроф бывает и перед окончанием: у «Ятх’У» основа «ятх», а «у» —
+        // окончание, и без этой поблажки подсвечивалось только «Ятх».
+        .map(word => `${word}${APOSTROPHE}(?:${ENDINGS})?`)
         .join('[\\s’\'-]+')
       if (clean.length >= 4) long.push(body)
       // У короткого имени первая буква обязана быть прописной, остальные — как

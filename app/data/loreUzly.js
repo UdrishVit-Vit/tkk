@@ -1,4 +1,5 @@
 import OGNI_EDITION from './loreUzlyOgni.generated.json'
+import KOROLEY_EDITION from './loreUzlyVremyaKoroley.generated.json'
 
 export const UZLY_THREAD = {
   title: 'Узлы',
@@ -17,7 +18,7 @@ export const UZLY_THREAD = {
       slug: 'vremya-koroley',
       title: 'Время Королей',
       label: 'Приквел «Вечерних Костей»',
-      summary: 'Приквел всех кампаний «Вечерние Кости» в мире Эноа — шесть сказаний о Нармандахе, Садале, Саргоне, Мидале, Эдр\'е и Ятх\'у.',
+      summary: 'Приквел всех кампаний «Вечерние Кости» в мире Эноа: десять глав о шестерых Всадниках Шамаса и о том, как наёмник с ничейных земель стал Царём Царей.',
       chapters: [],
     },
     {
@@ -177,16 +178,24 @@ export const UZLY_CONTENT = {
         {
           type: 'prose',
           paragraphs: [
-            '«Время Королей» — приквел всех кампаний «Вечерние Кости» в мире Эноа.',
+            '«Время Королей» — приквел всех кампаний «Вечерние Кости» в мире Эноа. Действие идёт в Эпоху людей, за сорок лет до коронации Царя Царей: десять королевств режут друг друга, а пятеро наёмников с ничейных земель берут заказы с дерева, на котором висят узлы из шёлка.',
+            'Книга приведена здесь полностью, по литературной редакции. Реплики в рукописи были склеены в сплошные полотна — здесь они разнесены по абзацам; смена сцены отбита звёздочкой, а сказания, набранные курсивом, стоят цитатой.',
           ],
+        },
+        {
+          type: 'verse',
+          paragraphs: KOROLEY_EDITION.epigraph,
         },
         {
           type: 'facts',
           items: [
+            { label: 'Эпоха', value: 'Эпоха людей' },
+            { label: 'Время действия', value: 'От года Красного варана до Раскола' },
             { label: 'Дата выхода', value: '26 сентября 2021 - 8 ноября 2021' },
             { label: 'Система НРИ', value: 'Dungeons & Dragons (5e)' },
             { label: 'Мастер', value: 'Виталий Демура' },
             { label: 'Статус', value: 'Завершена' },
+            { label: 'Глав', value: '10' },
           ],
         },
         {
@@ -202,12 +211,16 @@ export const UZLY_CONTENT = {
         },
       ],
       chapters: [
-        { slug: 'nachalo-konca', title: 'Начало Конца', blocks: [{ type: 'prose', paragraphs: ['Описание пока не добавлено.'] }] },
-        { slug: 'vremya', title: 'Время', blocks: [{ type: 'prose', paragraphs: ['Описание пока не добавлено.'] }] },
-        { slug: 'zolotoy-telec', title: 'Золотой Телец', blocks: [{ type: 'prose', paragraphs: ['Описание пока не добавлено.'] }] },
-        { slug: 'vladyka', title: 'Владыка', blocks: [{ type: 'prose', paragraphs: ['Описание пока не добавлено.'] }] },
-        { slug: 'slava', title: 'Слава', blocks: [{ type: 'prose', paragraphs: ['Описание пока не добавлено.'] }] },
-        { slug: 'voyna-koroley', title: 'Война Королей', blocks: [{ type: 'prose', paragraphs: ['Описание пока не добавлено.'] }] },
+        { slug: 'nachalo-konca', title: 'Начало конца', blocks: [{ type: 'prose', paragraphs: ['Коронация Царя Царей — и сорок лет до неё: пятеро наёмников теряют друг друга в горящем Есоре, где им нужно забрать зелёный камень жизни у правителя Итона.'] }] },
+        { slug: 'logovo', title: 'Логово', blocks: [{ type: 'prose', paragraphs: ['Дом в ничейных землях и дерево с заказами, к одному из которых кто-то приплёл золотую нить. Братец Ману садится у их костра и предлагает сделку: он усыпит гидру.'] }] },
+        { slug: 'otsech-golovy', title: 'Отсечь головы', blocks: [{ type: 'prose', paragraphs: ['Болота у Паркаса, восемь глав кровавой гидры Тусуса и ночь в Стальном бастионе, где Фахат отдал Ятх\'У время своей ведьмы — до рассвета.'] }] },
+        { slug: 'vremya', title: 'Время', blocks: [{ type: 'prose', paragraphs: ['Первый приказ Мелозара: десять детей времени в царстве Му и Ло. В городе Улок последние полчаса повторяются снова и снова, и только браслеты стражи разрывают петлю.'] }] },
+        { slug: 'deti-vremeni', title: 'Дети времени', blocks: [{ type: 'prose', paragraphs: ['Безумец у горстки камней, назвавшийся Нараром, вечно умирающий сын Короля боли и трёхголовый мор\'хор на цепи — на пути к стыку двух башен.'] }] },
+        { slug: 'zolotoy-telec', title: 'Золотой телец', blocks: [{ type: 'prose', paragraphs: ['Суд Башни над Ятх\'У, красная кость Улы для Нармандаха и подземный замок Ветамона, из колбы которого выходит та, что назовёт себя Эдр\'ой. А ночью в лагерь приходит Драгмир.'] }] },
+        { slug: 'vladyka', title: 'Владыка', blocks: [{ type: 'prose', paragraphs: ['Гибель Охурозара, погребальный костёр и слова силы, которыми его младший брат впервые приказал — и которым поклонились даже светила.'] }] },
+        { slug: 'slava', title: 'Слава', blocks: [{ type: 'prose', paragraphs: ['Ликон, выкошенный хворью, флейта Короля музыки и Королева чумы, посаженная в чёрную банку. Через три луны владыка выходит из юрты другим.'] }] },
+        { slug: 'vrata', title: 'Врата', blocks: [{ type: 'prose', paragraphs: ['Пятнадцать лет империи: тень владыки, война с Лабиринтом, пятое копьё, спрятанное Ятх\'У, — и последний приказ: разбудить Мардука.'] }] },
+        { slug: 'voyna-koroley', title: 'Война королей', blocks: [{ type: 'prose', paragraphs: ['Пробуждение древнего красного дракона, осада бастиона Драгмира — и выбор, которого не предсказала ни одна нить.'] }] },
       ],
     },
     { slug: 'shulamy', intro: [], chapters: [] },
@@ -218,22 +231,28 @@ export const UZLY_CONTENT = {
   ],
 }
 
-// Главы сезона I узла «Огни» приходят из литературной редакции (см.
-// scripts/import-uzly-ogni.py). Короткая аннотация из архива остаётся ведущей
-// строкой главы, а её место в блоках занимает полный текст.
-const OGNI_CHAPTERS = new Map(OGNI_EDITION.chapters.map(chapter => [chapter.slug, chapter]))
+// Полные тексты глав приходят из литературных редакций: сезон I «Огней» из PDF
+// (scripts/import-uzly-ogni.py), «Время Королей» из docx
+// (scripts/import-uzly-vremya-koroley.py). Короткая аннотация из архива
+// остаётся ведущей строкой главы, а её место в блоках занимает полный текст.
+const EDITIONS = {
+  ogni: OGNI_EDITION,
+  'vremya-koroley': KOROLEY_EDITION,
+}
 const PLACEHOLDER_SUMMARY = 'Описание пока не добавлено.'
 
 for (const category of UZLY_CONTENT.categories) {
-  if (category.slug !== 'ogni') continue
+  const edition = EDITIONS[category.slug]
+  if (!edition) continue
+  const byslug = new Map(edition.chapters.map(chapter => [chapter.slug, chapter]))
   category.chapters = category.chapters.map((chapter) => {
-    const edition = OGNI_CHAPTERS.get(chapter.slug)
-    if (!edition) return chapter
+    const text = byslug.get(chapter.slug)
+    if (!text) return chapter
     const summary = chapter.blocks?.[0]?.paragraphs?.[0] || ''
     return {
       ...chapter,
       summary: summary === PLACEHOLDER_SUMMARY ? '' : summary,
-      blocks: edition.blocks,
+      blocks: text.blocks,
     }
   })
 }

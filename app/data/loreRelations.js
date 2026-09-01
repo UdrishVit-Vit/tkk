@@ -102,9 +102,7 @@ export const LORE_RELATIONS = [
   { from: 'karabalgun', to: 'adaady', type: 'origin', label: 'из народа', inverse: 'отсюда родом', why: 'Адаады: «Карабалгун — адаад»' },
   { from: 'stepnoy-tigr', to: 'adaady', type: 'leads', label: 'во главе племён', inverse: 'во главе', why: 'Адаады: «Степные тигры стоят во главе племён»' },
   { from: 'vizir', to: 'seryy-sultan', type: 'member', label: 'следует по положению', inverse: 'над визирями', why: 'Раскаленное железо: «Правит маракийцами Серый Султан, за ним по положению следуют 7 визирей»' },
-  { from: 'seryy-sultan', to: 'maraq', type: 'leads', label: 'правит', inverse: 'во главе', why: 'Раскаленное железо: «Правит маракийцами Серый Султан»' },
   { from: 'seryy-sultan', to: 'marduk', type: 'enemy', label: 'убил', inverse: 'убит', why: 'Ненависть Драконоподобных: «Убийство Темного Вирма Серым Султаном»; Тёмный Вирм — это Мардук' },
-  { from: 'marduk', to: 'maraq', type: 'leads', label: 'правил', inverse: 'под властью', why: 'Ха’ар и Мардук: «Мардук подчинил Маракийский Султанат»' },
   { from: 'danguntsy', to: 'mel-ozar', type: 'kin', label: 'кровь Мел', inverse: 'от него кровь', why: 'Удача и индиго: «В дангунцах течёт знатная кровь Мел», восходящая к Королю Королей' },
   { from: 'merang', to: 'pepelnye-marakiytsy', type: 'located', label: 'город-государство', inverse: 'столица', why: 'Пепельные маракийцы: «Город-государство пепельных маракийцев — Меранг»' },
   { from: 'a-za-al', to: 'pepelnye-marakiytsy', type: 'origin', label: 'из ветви', inverse: 'отсюда родом', why: 'Пепельные маракийцы: «Сам генерал А’за’ал был потомком пепельных маракийцев»' },
@@ -148,6 +146,77 @@ export const LORE_RELATIONS = [
   { from: 'uatana', to: 'vetu', type: 'located', label: 'земли народа', inverse: 'родина', why: 'Вету: «змееобразные метисы болот Уатаны»' },
   { from: 'tash-nagar', to: 'virmorozhdennye', type: 'located', label: 'земли народа', inverse: 'родина', why: 'Вирморожденные: «народ Таш’Нагара»' },
   { from: 'virmohana', to: 'virmorozhdennye', type: 'owner', label: 'устройство общества', inverse: 'разделены ею', why: 'Вирмохана: «разделение на две основные касты: норбу и нагбо»' },
+
+
+  // Время Королей: родство и служба названы в книге прямо.
+  { from: 'mel-ozar', to: 'ohurozar', type: 'kin', label: 'младший брат', inverse: 'старший брат', why: 'гл. 4: «Мой младший брат — Мелозар»' },
+  { from: 'midal', to: 'sadal', type: 'kin', label: 'сестра-близнец', inverse: 'брат-близнец', why: 'гл. 10: «И всё-таки я старше»; всюду названы близнецами' },
+  { from: 'zumrat', to: 'sadal', type: 'kin', label: 'старший брат', inverse: 'младший брат', why: 'гл. 10: «Теперь ты старший брат»' },
+  { from: 'zumrat', to: 'midal', type: 'kin', label: 'старший брат', inverse: 'младшая сестра', why: 'гл. 6: «Мидал, Садал и Зумрат слышат один другого»' },
+  { from: 'marduk', to: 'haar', type: 'kin', label: 'брат', inverse: 'брат', why: 'гл. 10: «Вы брат Мардука, верно?» — о Хааре' },
+  { from: 'sargon', to: 'semya-mehshir', type: 'origin', label: 'из семьи', inverse: 'отсюда родом', why: 'гл. 10: «Я Саргон, с семьи Михшир»' },
+  { from: 'sargon', to: 'dragmir', type: 'owner', label: 'связан договором', inverse: 'держит договор', why: 'гл. 7: «С рождения я был клинком Драгмира»' },
+  { from: 'sargon', to: 'mel-ozar', type: 'member', label: 'клинок владыки', inverse: 'клинок', why: 'гл. 7: «Позволь мне быть твоим клинком» — «Я принимаю твой клинок, Саргон»' },
+  { from: 'midal', to: 'mel-ozar', type: 'member', label: 'тень владыки', inverse: 'тень', why: 'гл. 9: «станешь ли ты охранять мою тень?»' },
+  { from: 'narmandah', to: 'tsam', type: 'ally', label: 'соратник', inverse: 'соратница', why: 'гл. 6: Цам вела его дела в ямах; гл. 9: правое крыло и карающий клинок' },
+  { from: 'narmandah', to: 'yamy', type: 'leads', label: 'чемпион ям', inverse: 'чемпион', why: 'гл. 6: «Нара уже пять лет был абсолютным чемпионом ям»' },
+  { from: 'narmandah', to: 'ula', type: 'owner', label: 'в игре с ней', inverse: 'играет с ним', why: 'гл. 6: «Ты что, с Улой разговаривал?»' },
+
+  // Крылья и клинок «Золотого Симурга».
+  { from: 'ohurozar', to: 'bratstvo-simurga', type: 'leads', label: 'глава', inverse: 'во главе', why: 'гл. 4: «Я тут главный, вроде бы»' },
+  { from: 'mel-ozar', to: 'bratstvo-simurga', type: 'leads', label: 'владыка', inverse: 'во главе', why: 'гл. 7: «Мелозар стал новым и единственным владыкой „Золотого Симурга“»' },
+  { from: 'emefeyus', to: 'bratstvo-simurga', type: 'member', label: 'левое крыло', inverse: 'левое крыло', why: 'гл. 4: «Левое крыло „Золотого Симурга“ Эмефеюс»' },
+  { from: 'tsam', to: 'bratstvo-simurga', type: 'member', label: 'правое крыло', inverse: 'правое крыло', why: 'гл. 4: «И правое крыло „Золотого Симурга“ Цам»' },
+  { from: 'vsadniki-shamasa', to: 'bratstvo-simurga', type: 'member', label: 'клинок братства', inverse: 'клинок', why: 'гл. 6: «тринадцать лет он служил клинком „Золотого Симурга“»' },
+  { from: 'sargon', to: 'vsadniki-shamasa', type: 'member', label: 'из Всадников', inverse: 'в отряде', why: 'Всадники Шамаса — пятеро с ничейных земель' },
+  { from: 'narmandah', to: 'vsadniki-shamasa', type: 'member', label: 'из Всадников', inverse: 'в отряде', why: 'Всадники Шамаса — пятеро с ничейных земель' },
+  { from: 'sadal', to: 'vsadniki-shamasa', type: 'member', label: 'из Всадников', inverse: 'в отряде', why: 'Всадники Шамаса — пятеро с ничейных земель' },
+  { from: 'midal', to: 'vsadniki-shamasa', type: 'member', label: 'из Всадников', inverse: 'в отряде', why: 'Всадники Шамаса — пятеро с ничейных земель' },
+  { from: 'yath-u', to: 'vsadniki-shamasa', type: 'member', label: 'из Всадников', inverse: 'в отряде', why: 'Всадники Шамаса — пятеро с ничейных земель' },
+  { from: 'edra', to: 'vsadniki-shamasa', type: 'member', label: 'шестая', inverse: 'шестая', why: 'гл. 6: «Вот так Всадников Шамаса стало шестеро»' },
+
+  // Народы и создатели.
+  { from: 'sadal', to: 'elorcy', type: 'origin', label: 'из народа', inverse: 'отсюда родом', why: 'Книга всюду зовёт близнецов элорцами' },
+  { from: 'midal', to: 'elorcy', type: 'origin', label: 'из народа', inverse: 'отсюда родом', why: 'Книга всюду зовёт близнецов элорцами' },
+  { from: 'zumrat', to: 'elorcy', type: 'origin', label: 'из народа', inverse: 'отсюда родом', why: 'гл. 6: трое близнецов, рождённых за вуалью' },
+  { from: 'um', to: 'elorcy', type: 'leads', label: 'архиепископ', inverse: 'во главе', why: 'гл. 6: «Его статус среди элорцев был невероятно высоким»' },
+  { from: 'elorcy', to: 'var-elor', type: 'origin', label: 'народ осколка', inverse: 'родина', why: 'гл. 6: «единственный раз в истории Вар’Элора»' },
+  { from: 'yath-u', to: 'ehornury', type: 'origin', label: 'из народа', inverse: 'отсюда родом', why: 'гл. 1: «Таких существ знали, как эхор’нуры»' },
+  { from: 'yath-u', to: 'fulum', type: 'origin', label: 'ушёл из Башни', inverse: 'изгнанник', why: 'гл. 6: суд Верховного совета и уход из Башни' },
+  { from: 'narmandah', to: 'borosy', type: 'origin', label: 'из народа', inverse: 'отсюда родом', why: 'Книга всюду зовёт Нару боросом' },
+  { from: 'sargon', to: 'dragmirtsy', type: 'origin', label: 'из народа', inverse: 'отсюда родом', why: 'гл. 1: «высоким и мускулистым драгмирцем»' },
+  { from: 'edra', to: 'enuma', type: 'kin', label: 'создание', inverse: 'создатель', why: 'гл. 9: «я не горжусь тем, что создал её»' },
+  { from: 'emefeyus', to: 'morhory', type: 'origin', label: 'из народа', inverse: 'отсюда родом', why: 'гл. 4: «Ятх’У сразу узнал мор’хора»' },
+  { from: 'emefeyus', to: 'spiral-stradaniy', type: 'origin', label: 'родом отсюда', inverse: 'отсюда родом', why: 'гл. 4: «он из спирали Страданий, одного из главных советов их вида»' },
+
+  // Короли и их земли.
+  { from: 'tusus', to: 'parkas', type: 'leads', label: 'правит', inverse: 'во главе', why: 'гл. 3: «они, из Паркаса, приезжают. Тусус выбирает…»' },
+  { from: 'fahat', to: 'stalnoy-bastion', type: 'leads', label: 'правит', inverse: 'во главе', why: 'гл. 3: «Прибыли они в царство Фахата. Там, где стоит Железный бастион»' },
+  { from: 'mu-i-lo', to: 'ulok', type: 'leads', label: 'правят', inverse: 'во главе', why: 'гл. 4: «В городе под названием Улок, в царстве Му и Ло»' },
+  { from: 'iton', to: 'esor', type: 'leads', label: 'правит', inverse: 'во главе', why: 'гл. 1: «Итон, нынешний правитель»' },
+  { from: 'krovavaya-gidra', to: 'tusus', type: 'owner', label: 'зверь короля', inverse: 'держит зверя', why: 'гл. 3: «Это гидра короля! Во имя Тусуса…»' },
+  { from: 'deti-vremeni', to: 'mu-i-lo', type: 'owner', label: 'выведены ими', inverse: 'вывели', why: 'гл. 5: «они субстанция, которую вывели короли»' },
+  { from: 'aegus', to: 'ulok', type: 'located', label: 'сын висит в башне', inverse: 'здесь висит принц', why: 'гл. 5: «Король боли отослал своего сына на вечные муки»' },
+
+  // Вещи и их владельцы.
+  { from: 'salbariy', to: 'ehornury', type: 'owner', label: 'металл народа', inverse: 'владеют им', why: 'гл. 5: «Фулум построили такие, как я»; люди с сальбарием работать не могут' },
+  { from: 'kub-vrat', to: 'pyur', type: 'origin', label: 'дар Пйюра', inverse: 'подарил', why: 'гл. 10: «Это был подарок. Подарки — не отдарки»' },
+  { from: 'kub-vrat', to: 'yath-u', type: 'owner', label: 'у него на хранении', inverse: 'хранит', why: 'гл. 8: «На Великой Охоте обрёл его ты»' },
+  { from: 'krasnaya-kost', to: 'ula', type: 'origin', label: 'дар Улы', inverse: 'дала', why: 'гл. 6: «это выглядело, как клеймо Улы»' },
+  { from: 'maski-korolev', to: 'mel-ozar', type: 'owner', label: 'носит', inverse: 'носит маски', why: 'гл. 8: «На его ремне висело четыре маски»' },
+  { from: 'lazerus', to: 'mel-ozar', type: 'enemy', label: 'выкован против него', inverse: 'против него', why: 'Эпилог: «есть кое-кто, кто изобрёл кое-что против него»' },
+  { from: 'iskry-titana', to: 'kollektsioner', type: 'owner', label: 'принесены им', inverse: 'принёс', why: 'гл. 9: «У меня есть кое-что. Я вам это передам»' },
+
+  // Что с чем случилось.
+  { from: 'ohota-dvuh-bratev', to: 'ohurozar', type: 'enemy', label: 'гибель', inverse: 'погиб', why: 'гл. 6-7: Драгмир свернул шею владыке в ночь охоты' },
+  { from: 'dragmir', to: 'ohurozar', type: 'enemy', label: 'убил', inverse: 'убит', why: 'гл. 7: «Драгмир отрубил голову Охурозара и поднял её над лагерем»' },
+  { from: 'voyna-koroley', to: 'dragmir', type: 'enemy', label: 'гибель', inverse: 'погиб', why: 'гл. 10: «Драгмир должен пасть сегодня»' },
+  { from: 'voyna-koroley', to: 'vremena-koroley', type: 'located', label: 'конец эпохи', inverse: 'кончились ею', why: 'гл. 9-10: последняя битва, после которой не осталось королей' },
+  { from: 'koronatsiya-tsarya-tsarey', to: 'mel-ozar', type: 'owner', label: 'его коронация', inverse: 'коронован', why: 'гл. 1: «Рядами сотни, тысячи приклонились Королю Королей»' },
+  { from: 'sabara', to: 'mel-ozar', type: 'owner', label: 'дала ему плоть', inverse: 'обрёл плоть', why: 'гл. 7: «Приведите мне её, Королеву чумы, Сабару. Она сможет меня вылечить»' },
+  { from: 'marduk', to: 'voyna-koroley', type: 'ally', label: 'выжег бастион', inverse: 'решил исход', why: 'гл. 10: «покрыв бастион синим пламенем, которое не щадило никого»' },
+  { from: 'marduk', to: 'dragmirtsy', type: 'origin', label: 'его дыхание', inverse: 'созданы им', why: 'гл. 10: «Драгмирцы были созданы из воли Драгмира и дыхания Мардука»' },
+  { from: 'vechnoe-solntsestoyanie', to: 'raskol', type: 'located', label: 'в те же дни', inverse: 'в те же дни', why: 'Эпилог: солнцестояние и раскол мира описаны одной сценой' },
 
   // Происхождение — из авторского указателя персонажей базы знаний
   // (Campaign_KB/visual/character_lore_index.json).
