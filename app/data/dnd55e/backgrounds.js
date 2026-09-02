@@ -12,8 +12,10 @@
 // и не смешивается с материалами редакции 2014 года.
 //
 // Поле `glossary` — ручные ссылки на ширму /dnd55e/glossary: термины, которые стоит
-// прочитать до первой сессии именно за этого персонажа. Ссылки на навыки и инструмент
-// собираются автоматически по таблицам ниже.
+// прочитать до первой сессии именно за этого персонажа. Ссылки на характеристики,
+// навыки, инструмент и снаряжение собираются автоматически по таблицам ниже.
+
+import { DND55E_EQUIPMENT } from './equipment2024.js'
 
 export const DND55E_BACKGROUND_GROUPS = {
   phb: {
@@ -56,6 +58,16 @@ export const DND55E_BACKGROUND_TIES = [
   'Вуаль',
   'Глубины'
 ]
+
+// Характеристика → запись ширмы /dnd55e/glossary.
+export const DND55E_ABILITY_GLOSSARY = {
+  'Сила': 'strength-phb',
+  'Ловкость': 'dexterity-phb',
+  'Телосложение': 'constitution-phb',
+  'Интеллект': 'intelligence-phb',
+  'Мудрость': 'wisdom-phb',
+  'Харизма': 'charisma-phb'
+}
 
 // Навык → запись ширмы /dnd55e/glossary.
 export const DND55E_SKILL_GLOSSARY = {
@@ -111,13 +123,40 @@ export const DND55E_TOOL_EQUIPMENT = {
 
 const PHB_SOURCE = 'PHB'
 const PHB_SOURCE_TITLE = 'Player’s Handbook 2024'
-const ENOA_SOURCE = 'TU'
-const ENOA_SOURCE_TITLE = 'The Threads of Unseen · Башня Мафраш'
+const ENOA_SOURCE = 'TVV'
+const ENOA_SOURCE_TITLE = 'The Threads of Vit-Vit'
 
 const variant = (title, region, text) => ({ title, region, text })
 const hook = (roll, text) => ({ roll, text })
 
-const phb = data => ({
+// Позиция набора «А» пишется как в книге: «Масло (3 фляги)», «Боеприпасы (стрелы, 20 шт.)».
+// Название до скобки ищется в каталоге снаряжения, скобка становится уточнением.
+// Не нашлось (выбор игрока, авторский предмет) — позиция остаётся без ссылки.
+const EQUIPMENT_ID_BY_TITLE = new Map(DND55E_EQUIPMENT.map(item => [item.title, item.id]))
+
+function resolveEquipmentEntry(raw) {
+  const match = raw.match(/^(.+?)\s*\((.+)\)$/)
+  const title = match ? match[1].trim() : raw
+  return {
+    label: raw,
+    title,
+    note: match ? match[2] : '',
+    id: EQUIPMENT_ID_BY_TITLE.get(title) || null
+  }
+}
+
+function withEquipment(data) {
+  if (!data.equipment) return data
+  return {
+    ...data,
+    equipment: {
+      ...data.equipment,
+      items: data.equipment.items.map(resolveEquipmentEntry)
+    }
+  }
+}
+
+const phb = data => withEquipment({
   group: 'phb',
   source: PHB_SOURCE,
   sourceTitle: PHB_SOURCE_TITLE,
@@ -125,7 +164,7 @@ const phb = data => ({
   ...data
 })
 
-const enoa = data => ({
+const enoa = data => withEquipment({
   group: 'enoa',
   source: ENOA_SOURCE,
   sourceTitle: ENOA_SOURCE_TITLE,
@@ -150,10 +189,10 @@ export const DND55E_BACKGROUNDS = [
         'Книга (молитвы)',
         'Священный символ',
         'Пергамент (10 листов)',
-        'Ряса',
-        '8 зм'
+        'Ряса'
       ],
-      gold: '50 зм'
+      coins: '8 зм',
+      alt: '50 зм'
     },
     ties: ['Нарекатели', 'Кочевники'],
     glossary: ['spell-phb', 'cantrip-phb', 'ability-check-phb'],
@@ -208,10 +247,10 @@ export const DND55E_BACKGROUNDS = [
       items: [
         'Выбранные ремесленные инструменты',
         'Кошель (2 шт.)',
-        'Дорожная одежда',
-        '32 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '32 зм',
+      alt: '50 зм'
     },
     ties: ['Гильдии'],
     glossary: ['proficiency-phb', 'utilize-phb', 'ability-check-phb'],
@@ -261,10 +300,10 @@ export const DND55E_BACKGROUNDS = [
       items: [
         'Набор для фальсификации',
         'Богатая одежда',
-        'Костюм',
-        '15 зм'
+        'Костюм'
       ],
-      gold: '50 зм'
+      coins: '15 зм',
+      alt: '50 зм'
     },
     ties: ['Синдикат Фаланга', 'Гильдии'],
     glossary: ['deception-phb', 'influence-phb', 'attitude-phb'],
@@ -316,10 +355,10 @@ export const DND55E_BACKGROUNDS = [
         'Воровские инструменты',
         'Лом',
         'Кошель (2 шт.)',
-        'Дорожная одежда',
-        '16 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '16 зм',
+      alt: '50 зм'
     },
     ties: ['Синдикат Фаланга', 'Глубины'],
     glossary: ['initiative-phb', 'hide-phb', 'surprised-phb'],
@@ -371,10 +410,10 @@ export const DND55E_BACKGROUNDS = [
         'Костюм (2 шт.)',
         'Стальное зеркало',
         'Духи',
-        'Дорожная одежда',
-        '11 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '11 зм',
+      alt: '50 зм'
     },
     ties: ['Кочевники', 'Марак'],
     glossary: ['heroic-inspiration-phb', 'performance-phb', 'influence-phb'],
@@ -427,10 +466,10 @@ export const DND55E_BACKGROUNDS = [
         'Набор лекаря',
         'Железный котелок',
         'Лопата',
-        'Дорожная одежда',
-        '30 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '30 зм',
+      alt: '50 зм'
     },
     ties: ['Гильдии', 'Кочевники'],
     glossary: ['hit-point-dice-phb', 'exhaustion-phb', 'long-rest-phb'],
@@ -480,15 +519,15 @@ export const DND55E_BACKGROUNDS = [
       items: [
         'Копьё',
         'Лёгкий арбалет',
-        'Болты (20 шт.)',
+        'Боеприпасы (болты, 20 шт.)',
         'Игровой набор',
         'Закрытый фонарь',
         'Кандалы',
         'Колчан',
-        'Дорожная одежда',
-        '12 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '12 зм',
+      alt: '50 зм'
     },
     ties: ['Гильдии', 'Когорта'],
     glossary: ['initiative-phb', 'passive-perception-phb', 'search-phb'],
@@ -537,15 +576,15 @@ export const DND55E_BACKGROUNDS = [
     equipment: {
       items: [
         'Короткий лук',
-        'Стрелы (20 шт.)',
+        'Боеприпасы (стрелы, 20 шт.)',
         'Инструменты картографа',
         'Спальник',
         'Колчан',
         'Палатка',
-        'Дорожная одежда',
-        '3 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '3 зм',
+      alt: '50 зм'
     },
     ties: ['Кочевники', 'Вуаль', 'Глубины'],
     glossary: ['survival-phb', 'hide-phb', 'exhaustion-phb'],
@@ -599,10 +638,10 @@ export const DND55E_BACKGROUNDS = [
         'Книга (философия)',
         'Лампа',
         'Масло (3 фляги)',
-        'Дорожная одежда',
-        '16 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '16 зм',
+      alt: '50 зм'
     },
     ties: ['Нарекатели', 'Вуаль'],
     glossary: ['healing-phb', 'unconscious-phb', 'short-rest-phb'],
@@ -652,10 +691,10 @@ export const DND55E_BACKGROUNDS = [
       items: [
         'Инструменты навигатора',
         'Кошель (2 шт.)',
-        'Дорожная одежда',
-        '22 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '22 зм',
+      alt: '50 зм'
     },
     ties: ['Гильдии', 'Марак'],
     glossary: ['coins-dmg', 'influence-phb', 'attitude-phb'],
@@ -705,10 +744,10 @@ export const DND55E_BACKGROUNDS = [
       items: [
         'Игровой набор',
         'Богатая одежда',
-        'Духи',
-        '29 зм'
+        'Духи'
       ],
-      gold: '50 зм'
+      coins: '29 зм',
+      alt: '50 зм'
     },
     ties: ['Гильдии', 'Марак', 'Кочевники'],
     glossary: ['influence-phb', 'attitude-phb', 'history-phb'],
@@ -760,10 +799,10 @@ export const DND55E_BACKGROUNDS = [
         'Инструменты каллиграфа',
         'Книга (история)',
         'Пергамент (8 листов)',
-        'Ряса',
-        '8 зм'
+        'Ряса'
       ],
-      gold: '50 зм'
+      coins: '8 зм',
+      alt: '50 зм'
     },
     ties: ['Башня Мафраш'],
     glossary: ['arcana-phb', 'study-phb', 'cantrip-phb'],
@@ -814,10 +853,10 @@ export const DND55E_BACKGROUNDS = [
         'Кинжал',
         'Инструменты навигатора',
         'Верёвка',
-        'Дорожная одежда',
-        '20 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '20 зм',
+      alt: '50 зм'
     },
     ties: ['Глубины', 'Гильдии'],
     glossary: ['unarmed-strike-phb', 'improvised-weapons-phb', 'prone-phb'],
@@ -869,10 +908,10 @@ export const DND55E_BACKGROUNDS = [
         'Богатая одежда',
         'Лампа',
         'Масло (3 фляги)',
-        'Пергамент (12 листов)',
-        '23 зм'
+        'Пергамент (12 листов)'
       ],
-      gold: '50 зм'
+      coins: '23 зм',
+      alt: '50 зм'
     },
     ties: ['Нарекатели', 'Гильдии', 'Башня Мафраш'],
     glossary: ['investigation-phb', 'study-phb', 'passive-perception-phb'],
@@ -922,14 +961,14 @@ export const DND55E_BACKGROUNDS = [
       items: [
         'Копьё',
         'Короткий лук',
-        'Стрелы (20 шт.)',
+        'Боеприпасы (стрелы, 20 шт.)',
         'Игровой набор',
         'Набор лекаря',
         'Колчан',
-        'Дорожная одежда',
-        '14 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '14 зм',
+      alt: '50 зм'
     },
     ties: ['Гильдии', 'Марак', 'Когорта'],
     glossary: ['damage-roll-phb', 'critical-hit-phb', 'frightened-phb'],
@@ -982,10 +1021,10 @@ export const DND55E_BACKGROUNDS = [
         'Игровой набор',
         'Спальник',
         'Кошель (2 шт.)',
-        'Дорожная одежда',
-        '16 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '16 зм',
+      alt: '50 зм'
     },
     ties: ['Вуаль', 'Кочевники'],
     glossary: ['heroic-inspiration-phb', 'insight-phb', 'hide-phb'],
@@ -1039,10 +1078,10 @@ export const DND55E_BACKGROUNDS = [
         'Крюк-кошка',
         'Закрытый фонарь',
         'Масло (3 фляги)',
-        'Дорожная одежда',
-        '40 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '40 зм',
+      alt: '50 зм'
     },
     ties: ['Глубины'],
     glossary: ['suffocation-phb', 'hit-point-dice-phb', 'athletics-phb'],
@@ -1094,10 +1133,10 @@ export const DND55E_BACKGROUNDS = [
         'Воровские инструменты',
         'Спальник',
         'Огниво',
-        'Дорожная одежда',
-        '20 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '20 зм',
+      alt: '50 зм'
     },
     ties: ['Когорта', 'Вуаль'],
     glossary: ['initiative-phb', 'hide-phb', 'exhaustion-phb'],
@@ -1150,10 +1189,10 @@ export const DND55E_BACKGROUNDS = [
         'Спальник',
         'Одеяло',
         'Ряса',
-        'Дорожная одежда',
-        '40 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '40 зм',
+      alt: '50 зм'
     },
     ties: ['Нарекатели', 'Вуаль'],
     glossary: ['intimidation-phb', 'attitude-phb', 'exhaustion-phb'],
@@ -1205,10 +1244,10 @@ export const DND55E_BACKGROUNDS = [
         'Инструменты каллиграфа',
         'Книга (путевые записи)',
         'Пергамент (6 листов)',
-        'Ряса',
-        '13 зм'
+        'Ряса'
       ],
-      gold: '50 зм'
+      coins: '13 зм',
+      alt: '50 зм'
     },
     ties: ['Башня Мафраш'],
     glossary: ['arcana-phb', 'spell-phb', 'cantrip-phb'],
@@ -1257,13 +1296,13 @@ export const DND55E_BACKGROUNDS = [
     equipment: {
       items: [
         'Инструменты навигатора',
-        'Карта Мифрасового Пути',
+        'Карта (Мифрасовый Путь)',
         'Палатка',
         'Бурдюк',
-        'Дорожная одежда',
-        '20 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '20 зм',
+      alt: '50 зм'
     },
     ties: ['Гильдии', 'Марак', 'Кочевники'],
     glossary: ['survival-phb', 'influence-phb', 'attitude-phb'],
@@ -1313,13 +1352,13 @@ export const DND55E_BACKGROUNDS = [
       items: [
         'Серп',
         'Набор травника',
-        'Гадальные лопатки додор',
         'Спальник',
         'Огниво',
-        'Дорожная одежда',
-        '40 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      extra: ['Гадальные лопатки додор'],
+      coins: '40 зм',
+      alt: '50 зм'
     },
     ties: ['Кочевники'],
     glossary: ['religion-phb', 'insight-phb', 'spell-phb'],
@@ -1368,14 +1407,14 @@ export const DND55E_BACKGROUNDS = [
     equipment: {
       items: [
         'Инструменты ткача',
-        'Связка шёлковых шнуров',
         'Футляр для карты или свитка',
         'Лампа',
         'Масло (3 фляги)',
-        'Дорожная одежда',
-        '35 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      extra: ['Связка шёлковых шнуров'],
+      coins: '35 зм',
+      alt: '50 зм'
     },
     ties: ['Три Королевства', 'Гильдии', 'Башня Мафраш'],
     glossary: ['investigation-phb', 'history-phb', 'study-phb'],
@@ -1428,10 +1467,10 @@ export const DND55E_BACKGROUNDS = [
         'Крюк-кошка',
         'Факел (10 шт.)',
         'Сеть',
-        'Дорожная одежда',
-        '38 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '38 зм',
+      alt: '50 зм'
     },
     ties: ['Три Королевства'],
     glossary: ['climbing-phb', 'perception-phb', 'darkness-phb'],
@@ -1483,10 +1522,10 @@ export const DND55E_BACKGROUNDS = [
         'Набор лекаря',
         'Верёвка',
         'Фляга',
-        'Дорожная одежда',
-        '40 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '40 зм',
+      alt: '50 зм'
     },
     ties: ['Синдикат Фаланга', 'Три Королевства'],
     glossary: ['unarmed-strike-phb', 'grappling-phb', 'improvised-weapons-phb'],
@@ -1539,10 +1578,10 @@ export const DND55E_BACKGROUNDS = [
         'Железный котелок',
         'Бурдюк',
         'Одеяло (2 шт.)',
-        'Дорожная одежда',
-        '32 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '32 зм',
+      alt: '50 зм'
     },
     ties: ['Кочевники', 'Гильдии'],
     glossary: ['healing-phb', 'insight-phb', 'long-rest-phb'],
@@ -1595,10 +1634,10 @@ export const DND55E_BACKGROUNDS = [
         'Лопата',
         'Закрытый фонарь',
         'Масло (3 фляги)',
-        'Дорожная одежда',
-        '25 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '25 зм',
+      alt: '50 зм'
     },
     ties: ['Три Королевства', 'Гильдии'],
     glossary: ['exhaustion-phb', 'athletics-phb', 'suffocation-phb'],
@@ -1650,10 +1689,10 @@ export const DND55E_BACKGROUNDS = [
         'Священный символ',
         'Книга (список имён)',
         'Ряса',
-        'Дорожная одежда',
-        '10 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '10 зм',
+      alt: '50 зм'
     },
     ties: ['Нарекатели'],
     glossary: ['religion-phb', 'intimidation-phb', 'frightened-phb'],
@@ -1705,11 +1744,11 @@ export const DND55E_BACKGROUNDS = [
         'Копьё',
         'Спальник',
         'Огниво',
-        'Точильный камень',
-        'Дорожная одежда',
-        '20 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      extra: ['Точильный камень'],
+      coins: '20 зм',
+      alt: '50 зм'
     },
     ties: ['Гильдии'],
     glossary: ['damage-roll-phb', 'survival-phb', 'critical-hit-phb'],
@@ -1758,14 +1797,14 @@ export const DND55E_BACKGROUNDS = [
     equipment: {
       items: [
         'Музыкальный инструмент',
-        'Дээл или чуба',
         'Спальник',
         'Бурдюк',
         'Огниво',
-        'Дорожная одежда',
-        '25 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      extra: ['Дээл или чуба'],
+      coins: '25 зм',
+      alt: '50 зм'
     },
     ties: ['Кочевники'],
     glossary: ['heroic-inspiration-phb', 'performance-phb', 'history-phb'],
@@ -1816,11 +1855,11 @@ export const DND55E_BACKGROUNDS = [
         'Набор для грима',
         'Кинжал',
         'Костюм',
-        'Белый шёлковый мешочек',
-        'Дорожная одежда',
-        '17 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      extra: ['Белый шёлковый мешочек'],
+      coins: '17 зм',
+      alt: '50 зм'
     },
     ties: ['Три Королевства', 'Синдикат Фаланга'],
     glossary: ['hide-phb', 'deception-phb', 'passive-perception-phb'],
@@ -1873,7 +1912,7 @@ export const DND55E_BACKGROUNDS = [
         'Кошель',
         'Дорожная одежда'
       ],
-      gold: '50 зм'
+      alt: '50 зм'
     },
     ties: ['Три Королевства', 'Башня Мафраш'],
     glossary: ['arcana-phb', 'utilize-phb', 'magic-items-phb'],
@@ -1922,14 +1961,14 @@ export const DND55E_BACKGROUNDS = [
     equipment: {
       items: [
         'Инструменты кожевника',
-        'Кнут или посох',
+        'Боевой посох',
         'Верёвка',
         'Бурдюк (2 шт.)',
         'Спальник',
-        'Дорожная одежда',
-        '32 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '32 зм',
+      alt: '50 зм'
     },
     ties: ['Кочевники', 'Гильдии'],
     glossary: ['animal-handling-phb', 'survival-phb', 'exhaustion-phb'],
@@ -1979,12 +2018,12 @@ export const DND55E_BACKGROUNDS = [
       items: [
         'Набор для грима',
         'Набор лекаря',
-        'Ткань и бинты',
         'Стальное зеркало',
-        'Дорожная одежда',
-        '12 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      extra: ['Ткань и бинты'],
+      coins: '12 зм',
+      alt: '50 зм'
     },
     ties: ['Вуаль', 'Нарекатели'],
     glossary: ['healing-phb', 'deception-phb', 'medicine-phb'],
@@ -2033,12 +2072,12 @@ export const DND55E_BACKGROUNDS = [
     equipment: {
       items: [
         'Инструменты алхимика',
-        'Кирка или лом',
+        'Лом',
         'Мешок (2 шт.)',
         'Бурдюк',
         'Дорожная одежда'
       ],
-      gold: '50 зм'
+      alt: '50 зм'
     },
     ties: ['Марак', 'Гильдии'],
     glossary: ['nature-phb', 'utilize-phb', 'poisoned-phb'],
@@ -2091,7 +2130,7 @@ export const DND55E_BACKGROUNDS = [
         'Богатая одежда',
         'Кошель (2 шт.)'
       ],
-      gold: '50 зм'
+      alt: '50 зм'
     },
     ties: ['Синдикат Фаланга', 'Гильдии'],
     glossary: ['coins-dmg', 'investigation-phb', 'influence-phb'],
@@ -2143,10 +2182,10 @@ export const DND55E_BACKGROUNDS = [
         'Кандалы',
         'Ручной топор',
         'Спальник',
-        'Дорожная одежда',
-        '18 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '18 зм',
+      alt: '50 зм'
     },
     ties: ['Гильдии', 'Синдикат Фаланга'],
     glossary: ['insight-phb', 'grappling-phb', 'restrained-phb'],
@@ -2199,10 +2238,10 @@ export const DND55E_BACKGROUNDS = [
         'Закрытый фонарь',
         'Масло (3 фляги)',
         'Ряса',
-        'Дорожная одежда',
-        '28 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '28 зм',
+      alt: '50 зм'
     },
     ties: ['Когорта'],
     glossary: ['unconscious-phb', 'healing-phb', 'exhaustion-phb'],
@@ -2254,10 +2293,10 @@ export const DND55E_BACKGROUNDS = [
         'Футляр для карты или свитка',
         'Бурдюк',
         'Огниво',
-        'Дорожная одежда',
-        '30 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '30 зм',
+      alt: '50 зм'
     },
     ties: ['Гильдии', 'Вуаль'],
     glossary: ['dash-phb', 'acrobatics-phb', 'exhaustion-phb'],
@@ -2311,7 +2350,7 @@ export const DND55E_BACKGROUNDS = [
         'Кошель (2 шт.)',
         'Дорожная одежда'
       ],
-      gold: '50 зм'
+      alt: '50 зм'
     },
     ties: ['Кочевники'],
     glossary: ['sleight-of-hand-phb', 'deception-phb', 'heroic-inspiration-phb'],
@@ -2364,10 +2403,10 @@ export const DND55E_BACKGROUNDS = [
         'Верёвка',
         'Закрытый фонарь',
         'Масло (3 фляги)',
-        'Дорожная одежда',
-        '10 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '10 зм',
+      alt: '50 зм'
     },
     ties: ['Спирали', 'Башня Мафраш'],
     glossary: ['arcana-phb', 'search-phb', 'darkness-phb'],
@@ -2419,10 +2458,10 @@ export const DND55E_BACKGROUNDS = [
         'Боевой посох',
         'Спальник',
         'Одеяло',
-        'Дорожная одежда',
-        '36 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '36 зм',
+      alt: '50 зм'
     },
     ties: ['Спирали'],
     glossary: ['unarmed-strike-phb', 'insight-phb', 'exhaustion-phb'],
@@ -2474,7 +2513,7 @@ export const DND55E_BACKGROUNDS = [
         'Кинжал',
         'Дорожная одежда'
       ],
-      gold: '50 зм'
+      alt: '50 зм'
     },
     ties: ['Меридиры', 'Лабиринт'],
     glossary: ['poisoned-phb', 'hide-phb', 'damage-roll-phb'],
@@ -2526,10 +2565,10 @@ export const DND55E_BACKGROUNDS = [
         'Набор травника',
         'Стеклянная бутылка',
         'Флакон',
-        'Дорожная одежда',
-        '20 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '20 зм',
+      alt: '50 зм'
     },
     ties: ['Глубины'],
     glossary: ['poisoned-phb', 'healing-phb', 'utilize-phb'],
@@ -2581,10 +2620,10 @@ export const DND55E_BACKGROUNDS = [
         'Железный котелок',
         'Огниво',
         'Кошель',
-        'Дорожная одежда',
-        '35 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '35 зм',
+      alt: '50 зм'
     },
     ties: ['Марак'],
     glossary: ['influence-phb', 'attitude-phb', 'proficiency-phb'],
@@ -2635,10 +2674,10 @@ export const DND55E_BACKGROUNDS = [
         'Инструменты кузнеца',
         'Богатая одежда',
         'Огниво',
-        'Дорожная одежда',
-        '12 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '12 зм',
+      alt: '50 зм'
     },
     ties: ['Марак'],
     glossary: ['hit-point-dice-phb', 'long-rest-phb', 'attitude-phb'],
@@ -2689,10 +2728,10 @@ export const DND55E_BACKGROUNDS = [
         'Музыкальный инструмент',
         'Футляр для карты или свитка',
         'Ряса',
-        'Дорожная одежда',
-        '25 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '25 зм',
+      alt: '50 зм'
     },
     ties: ['Башня Мафраш'],
     glossary: ['heroic-inspiration-phb', 'insight-phb', 'history-phb'],
@@ -2745,10 +2784,10 @@ export const DND55E_BACKGROUNDS = [
         'Писчее перо',
         'Пергамент (10 листов)',
         'Ряса',
-        'Дорожная одежда',
-        '20 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '20 зм',
+      alt: '50 зм'
     },
     ties: ['Лабиринт', 'Вуаль'],
     glossary: ['cantrip-phb', 'spell-phb', 'frightened-phb'],
@@ -2800,10 +2839,10 @@ export const DND55E_BACKGROUNDS = [
         'Ручной топор',
         'Набор верхолаза',
         'Спальник',
-        'Дорожная одежда',
-        '12 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '12 зм',
+      alt: '50 зм'
     },
     ties: ['Марак', 'Кочевники'],
     glossary: ['animal-handling-phb', 'critical-hit-phb', 'intimidation-phb'],
@@ -2855,10 +2894,10 @@ export const DND55E_BACKGROUNDS = [
         'Набор травника',
         'Спальник',
         'Огниво',
-        'Дорожная одежда',
-        '40 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '40 зм',
+      alt: '50 зм'
     },
     ties: ['Кочевники'],
     glossary: ['hit-point-dice-phb', 'religion-phb', 'ability-check-phb'],
@@ -2909,10 +2948,10 @@ export const DND55E_BACKGROUNDS = [
         'Инструменты кузнеца',
         'Копьё',
         'Закрытый фонарь',
-        'Дорожная одежда',
-        '22 зм'
+        'Дорожная одежда'
       ],
-      gold: '50 зм'
+      coins: '22 зм',
+      alt: '50 зм'
     },
     ties: ['Нарекатели', 'Вуаль', 'Когорта'],
     glossary: ['initiative-phb', 'perception-phb', 'invisible-phb'],

@@ -1,5 +1,6 @@
 <script setup>
 import {
+  DND55E_ABILITY_GLOSSARY,
   DND55E_BACKGROUNDS,
   DND55E_BACKGROUND_ABILITIES,
   DND55E_BACKGROUND_FEATS,
@@ -15,6 +16,13 @@ import { DND55E_GLOSSARY } from '~/data/dnd55e/glossary.js'
 const GLOSSARY_TITLES = new Map(DND55E_GLOSSARY.map(item => [item.id, item.title]))
 
 const glossaryPath = id => `/dnd55e/glossary?rule=${id}`
+const equipmentPath = id => `/dnd55e/equipment?item=${id}`
+
+function abilityLinks(item) {
+  return item.abilities
+    .map(ability => ({ id: DND55E_ABILITY_GLOSSARY[ability], title: ability }))
+    .filter(entry => entry.id)
+}
 
 function skillLinks(item) {
   return item.skills
@@ -64,7 +72,8 @@ const visibleBackgrounds = computed(() => DND55E_BACKGROUNDS.filter((item) => {
     ...item.abilities,
     ...item.skills,
     ...item.ties,
-    ...item.equipment.items,
+    ...item.equipment.items.map(entry => entry.label),
+    ...(item.equipment.extra || []),
     ...item.variants.flatMap(entry => [entry.title, entry.region, entry.text]),
     ...item.hooks.entries.map(entry => entry.text)
   ]
@@ -220,7 +229,13 @@ useSeoMeta({
       <dl class="tref-stats bg-stats">
         <div class="tref-stat">
           <dt>Характеристики</dt>
-          <dd>{{ item.raw.abilities.join(', ') }}</dd>
+          <dd>
+            <template v-for="(entry, index) in abilityLinks(item.raw)" :key="entry.id">
+              <template v-if="index">, </template>
+              <NuxtLink :to="glossaryPath(entry.id)">{{ entry.title }}</NuxtLink>
+            </template>
+          </dd>
+          <p class="bg-stat-hint">+2 и +1 на две из них либо по +1 каждой</p>
         </div>
         <div class="tref-stat">
           <dt>Черта происхождения</dt>
@@ -247,22 +262,32 @@ useSeoMeta({
         </div>
       </dl>
 
-      <p class="bg-note">
-        Распределите между тремя характеристиками +2 и +1 либо по +1 каждой.
-      </p>
-
       <section class="bg-block">
-        <h3>Снаряжение</h3>
+        <h3>Стартовое снаряжение</h3>
+        <p class="bg-equip-rule">Возьмите набор целиком или деньги вместо него — смешивать нельзя.</p>
         <div class="bg-equipment">
           <div class="bg-equip-option">
-            <span class="bg-equip-label">Набор «А»</span>
-            <ul>
-              <li v-for="entry in item.raw.equipment.items" :key="entry">{{ entry }}</li>
+            <span class="bg-equip-label">Вариант «А»</span>
+            <ul class="bg-equip-list">
+              <li v-for="entry in item.raw.equipment.items" :key="entry.label">
+                <NuxtLink v-if="entry.id" :to="equipmentPath(entry.id)">{{ entry.title }}</NuxtLink>
+                <span v-else>{{ entry.title }}</span>
+                <small v-if="entry.note">({{ entry.note }})</small>
+              </li>
+              <li v-if="item.raw.equipment.coins" class="coins">
+                <span>{{ item.raw.equipment.coins }}</span>
+              </li>
             </ul>
+            <p v-if="item.raw.equipment.extra" class="bg-equip-extra">
+              При вас также: {{ item.raw.equipment.extra.join(', ').toLocaleLowerCase('ru') }}
+              <small>— вещи без игровой стоимости</small>
+            </p>
           </div>
+          <div class="bg-equip-or" aria-hidden="true">или</div>
           <div class="bg-equip-option alt">
-            <span class="bg-equip-label">Или</span>
-            <p>{{ item.raw.equipment.gold }}</p>
+            <span class="bg-equip-label">Вариант «Б»</span>
+            <p class="bg-equip-gold">{{ item.raw.equipment.alt }}</p>
+            <small>вместо всего набора</small>
           </div>
         </div>
       </section>
@@ -399,13 +424,35 @@ useSeoMeta({
   font-size:18px;
   line-height:1.42;
 }
+/* Четыре колонки на широкой карточке, две на узкой. Промежуточных раскладок нет
+   намеренно: при трёх колонках четвёртая ячейка уходит на вторую строку одна.
+   «Проницательность» в четверть узкой карточки не помещается и раньше обрезалась. */
 .bg-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
-.bg-stats a{color:rgba(var(--theme-accent-strong-rgb),.92)}
-.bg-note{
-  margin:-6px 0 18px;
-  color:rgba(var(--theme-text-rgb),.5);
-  font-size:11px;
-  letter-spacing:.02em;
+.bg-stats dd{overflow-wrap:break-word}
+@media (max-width:1200px){
+  .bg-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* Ссылка внутри карточки должна читаться как ссылка: пунктир, который
+   становится сплошным при наведении. Иначе значение неотличимо от текста. */
+.bg-stats a,
+.bg-equip-list a{
+  color:rgba(var(--theme-accent-strong-rgb),.92);
+  border-bottom:1px dotted rgba(var(--theme-accent-rgb),.55);
+  text-decoration:none;
+  transition:border-color .18s ease,color .18s ease;
+}
+.bg-stats a:hover,
+.bg-equip-list a:hover{
+  border-bottom-color:rgba(var(--theme-accent-strong-rgb),.9);
+  border-bottom-style:solid;
+  color:rgba(var(--theme-accent-strong-rgb),1);
+}
+.bg-stat-hint{
+  margin:5px 0 0;
+  color:rgba(var(--theme-text-rgb),.42);
+  font-size:10px;
+  font-weight:450;
+  line-height:1.4;
 }
 .bg-block{margin-top:20px}
 .bg-block h3{
@@ -415,44 +462,97 @@ useSeoMeta({
   font-size:20px;
   font-weight:600;
 }
+.bg-equip-rule{
+  margin:0 0 10px;
+  color:rgba(var(--theme-text-rgb),.5);
+  font-size:12px;
+  line-height:1.55;
+}
 .bg-equipment{
   display:grid;
-  gap:10px;
-  grid-template-columns:minmax(0,2fr) minmax(0,1fr);
+  align-items:stretch;
+  gap:12px;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,.62fr);
 }
 .bg-equip-option{
   border:1px solid rgba(var(--theme-text-rgb),.1);
   border-radius:9px;
   background:rgba(var(--theme-accent-rgb),.04);
-  padding:11px 14px;
+  padding:12px 15px;
 }
 .bg-equip-option.alt{
   display:flex;
   flex-direction:column;
   justify-content:center;
+  border-style:dashed;
   background:none;
+  text-align:center;
+}
+.bg-equip-option.alt > small{
+  margin-top:4px;
+  color:rgba(var(--theme-text-rgb),.42);
+  font-size:11px;
+}
+/* Разделитель «или» — единственное место, где выбор виден без чтения. */
+.bg-equip-or{
+  display:grid;
+  place-items:center;
+  color:rgba(var(--theme-accent-rgb),.62);
+  font-family:'Cormorant Garamond',serif;
+  font-size:15px;
+  font-style:italic;
 }
 .bg-equip-label{
   display:block;
-  margin-bottom:6px;
+  margin-bottom:8px;
   color:rgba(var(--theme-accent-rgb),.72);
   font-size:9px;
   font-weight:800;
   letter-spacing:.16em;
   text-transform:uppercase;
 }
-.bg-equip-option ul{
+.bg-equip-list{
   margin:0;
-  padding-left:17px;
-  color:rgba(var(--theme-text-rgb),.72);
+  padding:0;
+  list-style:none;
+  color:rgba(var(--theme-text-rgb),.75);
   font-size:13px;
-  line-height:1.7;
 }
-.bg-equip-option.alt p{
+.bg-equip-list li{
+  padding:3px 0;
+  line-height:1.5;
+}
+.bg-equip-list li + li{border-top:1px solid rgba(var(--theme-text-rgb),.05)}
+.bg-equip-list li small{
+  margin-left:6px;
+  color:rgba(var(--theme-text-rgb),.45);
+  font-size:11px;
+}
+.bg-equip-list li.coins{
+  margin-top:3px;
+  border-top:1px solid rgba(var(--theme-accent-rgb),.22);
+  padding-top:6px;
+  color:rgba(var(--theme-accent-strong-rgb),.88);
+  font-weight:650;
+}
+.bg-equip-extra{
+  margin:9px 0 0;
+  border-top:1px dashed rgba(var(--theme-text-rgb),.1);
+  padding-top:7px;
+  color:rgba(var(--theme-text-rgb),.55);
+  font-size:12px;
+  line-height:1.5;
+}
+.bg-equip-extra small{
+  color:rgba(var(--theme-text-rgb),.36);
+  font-size:11px;
+}
+.bg-equip-gold{
   margin:0;
   color:rgba(var(--theme-accent-strong-rgb),.9);
   font-family:'Cormorant Garamond',serif;
-  font-size:24px;
+  font-size:26px;
+  line-height:1;
 }
 .bg-lead{
   margin:0 0 12px;
@@ -570,5 +670,8 @@ useSeoMeta({
   .bg-title{font-size:25px}
   .bg-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .bg-equipment{grid-template-columns:minmax(0,1fr)}
+  .bg-equip-or{padding:2px 0}
+  .bg-equip-option.alt{flex-direction:row;align-items:baseline;justify-content:flex-start;gap:9px;text-align:left}
+  .bg-equip-option.alt .bg-equip-label{margin-bottom:0}
 }
 </style>

@@ -12,7 +12,7 @@ playable: true
 hasDndRules: true
 
 source: TVV
-sourceTitle: The Thread of Vit-Vit
+sourceTitle: The Threads of Vit-Vit
 originalName: Vetu
 image: ""
 imageAlt: Вету

@@ -311,7 +311,7 @@ export const DND55E_SPECIES = [
     originalName: 'Vetu',
     portrait: '/images/races/portraits/vetu.webp',
     source: 'TVV',
-    sourceTitle: 'The Threads of Vetu',
+    sourceTitle: 'The Threads of Vit-Vit',
     description: 'Змееобразные метисы болот Уатаны, воздвигшие города-зиккураты на Линиях Силы и несущие в себе цикл Иджин’Ана — проклятие, традицию и судьбу.'
   },
   {
