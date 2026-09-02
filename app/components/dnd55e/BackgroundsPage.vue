@@ -175,7 +175,6 @@ useSeoMeta({
     kicker="D&D 5.5e · редакция 2024"
     title="Предыстории"
     crumb-current="Предыстории"
-    lead="Предыстории Player’s Handbook 2024 в декорациях Эноа и несколько предысторий, выросших из самого мира."
     search-placeholder="Найти предысторию, черту, навык или связь"
     node-prefix="d55-bg"
     query-key="background"
