@@ -23,7 +23,11 @@ function skillLinks(item) {
 }
 
 function ruleLinks(item) {
+  // Навыки уже выведены отдельной строкой, поэтому в «Ширме» они не дублируются:
+  // предыстория вправе указать свой навык в glossary, чтобы подчеркнуть его роль.
+  const shown = new Set(skillLinks(item).map(entry => entry.id))
   return item.glossary
+    .filter(id => !shown.has(id))
     .map(id => ({ id, title: GLOSSARY_TITLES.get(id) }))
     .filter(entry => entry.title)
 }
