@@ -29,6 +29,7 @@ const visibleFeats = computed(() => DND55E_FEATS.filter((item) => {
     item.sourceTitle,
     item.requirement,
     item.summary,
+    item.intro,
     ...item.abilities,
     ...item.benefits.flatMap(entry => [entry.title, entry.text])
   ]
@@ -198,9 +199,13 @@ useSeoMeta({
         </div>
         <div class="tref-stat">
           <dt>Источник</dt>
-          <dd>PHB 2024</dd>
+          <dd>{{ item.raw.sourceTitle }}</dd>
         </div>
       </dl>
+
+      <p v-if="item.raw.intro" class="feat-intro">
+        <RuleRichText :text="item.raw.intro" edition="2024" />
+      </p>
 
       <section class="feat-benefits">
         <article v-for="entry in item.raw.benefits" :key="entry.title" class="feat-benefit">
@@ -324,6 +329,12 @@ useSeoMeta({
   line-height:1.42;
 }
 .feat-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+.feat-intro{
+  margin:0 0 4px;
+  color:rgba(var(--theme-text-rgb),.7);
+  font-size:13px;
+  line-height:1.7;
+}
 .feat-benefits{
   display:grid;
   gap:10px;

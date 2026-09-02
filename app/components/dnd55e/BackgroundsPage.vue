@@ -10,6 +10,12 @@ import {
   DND55E_TOOL_EQUIPMENT
 } from '~/data/dnd55e/backgrounds.js'
 import { DND55E_GLOSSARY } from '~/data/dnd55e/glossary.js'
+import { DND55E_FEATS } from '~/data/dnd55e/feats.js'
+
+// Подпись ячейки берётся из категории самой черты: у «Безымянного» она свободная,
+// а не черта происхождения, и ячейка не должна утверждать обратное.
+const FEAT_CATEGORY_TITLES = new Map(DND55E_FEATS.map(item => [item.id, item.categoryTitle]))
+const featCategory = item => FEAT_CATEGORY_TITLES.get(item.feat.id) || 'Черта происхождения'
 
 // Ширма — единственный источник названий терминов: заголовки не дублируются в данных
 // предысторий, поэтому переименование правила не оставляет здесь мёртвой строки.
@@ -238,7 +244,7 @@ useSeoMeta({
           <p class="bg-stat-hint">+2 и +1 на две из них либо по +1 каждой</p>
         </div>
         <div class="tref-stat">
-          <dt>Черта происхождения</dt>
+          <dt>{{ featCategory(item.raw) }}</dt>
           <dd>
             <NuxtLink :to="featPath(item.raw)">{{ item.raw.feat.title }}</NuxtLink>
             <template v-if="item.raw.feat.note"> ({{ item.raw.feat.note }})</template>
