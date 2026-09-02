@@ -11,7 +11,7 @@ playable: true
 hasDndRules: true
 
 source: TJB
-sourceTitle: The Thread of JorasBashu
+sourceTitle: The Threads of JorasBashu
 sourceAuthor: JorasBashu
 sourceNote: "Оригинальный арт: Laska Psy"
 originalName: ""

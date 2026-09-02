@@ -10,7 +10,7 @@ playable: true
 hasDndRules: true
 
 source: TH
-sourceTitle: The Thread of Hekych
+sourceTitle: The Threads of Hekych
 sourceAuthor: Hekych
 originalName: ""
 image: /images/races/virmorozhdennye/details/virmorozhdennye.webp

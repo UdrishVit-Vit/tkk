@@ -17,7 +17,7 @@ sourceAuthor: Largo
 threadSources:
   - id: tu
     source: TU
-    sourceTitle: The Thread of Unseen
+    sourceTitle: The Threads of Unseen
     sourceAuthor: Unseen
     creatureType: гуманоид
     abilityScore: Определяется предысторией

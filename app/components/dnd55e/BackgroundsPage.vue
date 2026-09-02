@@ -264,31 +264,30 @@ useSeoMeta({
 
       <section class="bg-block">
         <h3>Стартовое снаряжение</h3>
-        <p class="bg-equip-rule">Возьмите набор целиком или деньги вместо него — смешивать нельзя.</p>
         <div class="bg-equipment">
-          <div class="bg-equip-option">
-            <span class="bg-equip-label">Вариант «А»</span>
-            <ul class="bg-equip-list">
-              <li v-for="entry in item.raw.equipment.items" :key="entry.label">
+          <p class="bg-equip-rule">Выберите А или Б — смешивать нельзя.</p>
+          <p class="bg-equip-row">
+            <span class="bg-equip-key" aria-hidden="true">А</span>
+            <span class="bg-equip-items">
+              <template v-for="(entry, index) in item.raw.equipment.items" :key="entry.label">
+                <template v-if="index">, </template>
                 <NuxtLink v-if="entry.id" :to="equipmentPath(entry.id)">{{ entry.title }}</NuxtLink>
                 <span v-else>{{ entry.title }}</span>
-                <small v-if="entry.note">({{ entry.note }})</small>
-              </li>
-              <li v-if="item.raw.equipment.coins" class="coins">
-                <span>{{ item.raw.equipment.coins }}</span>
-              </li>
-            </ul>
-            <p v-if="item.raw.equipment.extra" class="bg-equip-extra">
-              При вас также: {{ item.raw.equipment.extra.join(', ').toLocaleLowerCase('ru') }}
-              <small>— вещи без игровой стоимости</small>
-            </p>
-          </div>
-          <div class="bg-equip-or" aria-hidden="true">или</div>
-          <div class="bg-equip-option alt">
-            <span class="bg-equip-label">Вариант «Б»</span>
-            <p class="bg-equip-gold">{{ item.raw.equipment.alt }}</p>
-            <small>вместо всего набора</small>
-          </div>
+                <small v-if="entry.note"> ({{ entry.note }})</small>
+              </template>
+              <template v-if="item.raw.equipment.coins">
+                <span class="bg-equip-coins"> и {{ item.raw.equipment.coins }}</span>
+              </template>
+            </span>
+          </p>
+          <p class="bg-equip-row">
+            <span class="bg-equip-key" aria-hidden="true">Б</span>
+            <span class="bg-equip-items"><b>{{ item.raw.equipment.alt }}</b> вместо всего набора</span>
+          </p>
+          <p v-if="item.raw.equipment.extra" class="bg-equip-extra">
+            При вас также: {{ item.raw.equipment.extra.join(', ').toLocaleLowerCase('ru') }}
+            <small>— вещи без игровой стоимости</small>
+          </p>
         </div>
       </section>
 
@@ -435,14 +434,14 @@ useSeoMeta({
 /* Ссылка внутри карточки должна читаться как ссылка: пунктир, который
    становится сплошным при наведении. Иначе значение неотличимо от текста. */
 .bg-stats a,
-.bg-equip-list a{
+.bg-equip-items a{
   color:rgba(var(--theme-accent-strong-rgb),.92);
   border-bottom:1px dotted rgba(var(--theme-accent-rgb),.55);
   text-decoration:none;
   transition:border-color .18s ease,color .18s ease;
 }
 .bg-stats a:hover,
-.bg-equip-list a:hover{
+.bg-equip-items a:hover{
   border-bottom-color:rgba(var(--theme-accent-strong-rgb),.9);
   border-bottom-style:solid;
   color:rgba(var(--theme-accent-strong-rgb),1);
@@ -462,83 +461,61 @@ useSeoMeta({
   font-size:20px;
   font-weight:600;
 }
-.bg-equip-rule{
-  margin:0 0 10px;
-  color:rgba(var(--theme-text-rgb),.5);
-  font-size:12px;
-  line-height:1.55;
-}
 .bg-equipment{
-  display:grid;
-  align-items:stretch;
-  gap:12px;
-  grid-template-columns:minmax(0,1fr) auto minmax(0,.62fr);
-}
-.bg-equip-option{
   border:1px solid rgba(var(--theme-text-rgb),.1);
   border-radius:9px;
   background:rgba(var(--theme-accent-rgb),.04);
   padding:12px 15px;
 }
-.bg-equip-option.alt{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  border-style:dashed;
-  background:none;
-  text-align:center;
-}
-.bg-equip-option.alt > small{
-  margin-top:4px;
-  color:rgba(var(--theme-text-rgb),.42);
-  font-size:11px;
-}
-/* Разделитель «или» — единственное место, где выбор виден без чтения. */
-.bg-equip-or{
-  display:grid;
-  place-items:center;
-  color:rgba(var(--theme-accent-rgb),.62);
-  font-family:'Cormorant Garamond',serif;
-  font-size:15px;
-  font-style:italic;
-}
-.bg-equip-label{
-  display:block;
-  margin-bottom:8px;
-  color:rgba(var(--theme-accent-rgb),.72);
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-}
-.bg-equip-list{
-  margin:0;
-  padding:0;
-  list-style:none;
-  color:rgba(var(--theme-text-rgb),.75);
-  font-size:13px;
-}
-.bg-equip-list li{
-  padding:3px 0;
+.bg-equip-rule{
+  margin:0 0 9px;
+  color:rgba(var(--theme-text-rgb),.5);
+  font-size:12px;
   line-height:1.5;
 }
-.bg-equip-list li + li{border-top:1px solid rgba(var(--theme-text-rgb),.05)}
-.bg-equip-list li small{
-  margin-left:6px;
+/* Строка варианта: буква слева, перечисление справа — как в книге. */
+.bg-equip-row{
+  display:grid;
+  align-items:baseline;
+  gap:10px;
+  grid-template-columns:22px minmax(0,1fr);
+  margin:0;
+  padding:7px 0;
+}
+.bg-equip-row + .bg-equip-row{border-top:1px solid rgba(var(--theme-text-rgb),.07)}
+.bg-equip-key{
+  display:grid;
+  width:22px;
+  height:22px;
+  place-items:center;
+  border:1px solid rgba(var(--theme-accent-rgb),.3);
+  border-radius:50%;
+  color:rgba(var(--theme-accent-strong-rgb),.85);
+  font-size:11px;
+  font-weight:700;
+}
+.bg-equip-items{
+  color:rgba(var(--theme-text-rgb),.75);
+  font-size:13px;
+  line-height:1.72;
+}
+.bg-equip-items small{
   color:rgba(var(--theme-text-rgb),.45);
   font-size:11px;
 }
-.bg-equip-list li.coins{
-  margin-top:3px;
-  border-top:1px solid rgba(var(--theme-accent-rgb),.22);
-  padding-top:6px;
-  color:rgba(var(--theme-accent-strong-rgb),.88);
+.bg-equip-items b{
+  color:rgba(var(--theme-accent-strong-rgb),.9);
   font-weight:650;
 }
+.bg-equip-coins{
+  color:rgba(var(--theme-accent-strong-rgb),.88);
+  font-weight:650;
+  white-space:nowrap;
+}
 .bg-equip-extra{
-  margin:9px 0 0;
+  margin:8px 0 0;
   border-top:1px dashed rgba(var(--theme-text-rgb),.1);
-  padding-top:7px;
+  padding-top:8px;
   color:rgba(var(--theme-text-rgb),.55);
   font-size:12px;
   line-height:1.5;
@@ -546,13 +523,6 @@ useSeoMeta({
 .bg-equip-extra small{
   color:rgba(var(--theme-text-rgb),.36);
   font-size:11px;
-}
-.bg-equip-gold{
-  margin:0;
-  color:rgba(var(--theme-accent-strong-rgb),.9);
-  font-family:'Cormorant Garamond',serif;
-  font-size:26px;
-  line-height:1;
 }
 .bg-lead{
   margin:0 0 12px;
@@ -669,9 +639,5 @@ useSeoMeta({
   .bg-heading-icon{width:48px;height:48px;font-size:22px}
   .bg-title{font-size:25px}
   .bg-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .bg-equipment{grid-template-columns:minmax(0,1fr)}
-  .bg-equip-or{padding:2px 0}
-  .bg-equip-option.alt{flex-direction:row;align-items:baseline;justify-content:flex-start;gap:9px;text-align:left}
-  .bg-equip-option.alt .bg-equip-label{margin-bottom:0}
 }
 </style>
