@@ -7,6 +7,7 @@ import { DND55E_LEVEL_6_SPELLS } from './spells-level6.js'
 import { DND55E_LEVEL_7_SPELLS } from './spells-level7.js'
 import { DND55E_LEVEL_8_SPELLS } from './spells-level8.js'
 import { DND55E_LEVEL_9_SPELLS } from './spells-level9.js'
+import { DND55E_SHAMAN_SPELLS, DND55E_SHAMAN_BORROWED } from './spells-shaman.js'
 
 export const DND55E_SPELL_SCHOOLS = {
   abjuration: { title: 'Ограждение', icon: '/assets/spells/schools/abjuration.png' },
@@ -290,19 +291,30 @@ export const DND55E_CANTRIPS = [
   })
 ]
 
+// Шаман берёт часть общего списка 2024: подготовленное им заклинание из этого
+// среза считается напевом. Помечаем такие заклинания, не трогая исходные файлы.
+const withShaman = spells => spells.map(entry => (
+  DND55E_SHAMAN_BORROWED.has(entry.originalName) && !entry.classes?.includes('Шаман')
+    ? { ...entry, classes: [...(entry.classes || []), 'Шаман'] }
+    : entry
+))
+
 export const DND55E_SPELLS = [
-  ...DND55E_CANTRIPS,
-  ...DND55E_LEVEL_1_SPELLS,
-  ...DND55E_LEVEL_2_SPELLS,
-  ...DND55E_LEVEL_3_SPELLS,
-  ...DND55E_LEVEL_4_SPELLS,
-  ...DND55E_LEVEL_5_SPELLS,
-  ...DND55E_LEVEL_6_SPELLS,
-  ...DND55E_LEVEL_7_SPELLS,
-  ...DND55E_LEVEL_8_SPELLS,
-  ...DND55E_LEVEL_9_SPELLS
+  ...withShaman([
+    ...DND55E_CANTRIPS,
+    ...DND55E_LEVEL_1_SPELLS,
+    ...DND55E_LEVEL_2_SPELLS,
+    ...DND55E_LEVEL_3_SPELLS,
+    ...DND55E_LEVEL_4_SPELLS,
+    ...DND55E_LEVEL_5_SPELLS,
+    ...DND55E_LEVEL_6_SPELLS,
+    ...DND55E_LEVEL_7_SPELLS,
+    ...DND55E_LEVEL_8_SPELLS,
+    ...DND55E_LEVEL_9_SPELLS
+  ]),
+  ...DND55E_SHAMAN_SPELLS
 ]
 
 export const DND55E_SPELL_CLASSES = [
-  'Бард', 'Волшебник', 'Друид', 'Жрец', 'Колдун', 'Паладин', 'Следопыт', 'Чародей'
+  'Бард', 'Волшебник', 'Друид', 'Жрец', 'Колдун', 'Паладин', 'Следопыт', 'Чародей', 'Шаман'
 ]
