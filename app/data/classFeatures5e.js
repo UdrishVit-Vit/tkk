@@ -1,33 +1,7 @@
 import { CLASSDATA } from './classdata.js'
 
-export const CLASS_FEATURE_SOURCE_NAMES = {
-  PHB: "Player's Handbook (2014)",
-  TCE: "Tasha's Cauldron of Everything",
-  TJB: 'The Threads of JorasBashu',
-  TLDC: 'The Threads of Lost Dice Club',
-  TS: 'The Threads of Shkad',
-  TU: 'The Threads of Unseen',
-  TL: 'The Threads of Largo',
-  TM: 'The Threads of Marn',
-  TVV: 'The Threads of Vit-Vit',
-  TMC: 'The Threads of Magnificent Cringelord',
-  TST: 'The Threads of Stekly',
-  TLEG: 'The Threads of Legolaisik',
-  TA: 'The Threads of Ainur',
-  TOMU: 'The Threads of Ob.med.uza',
-  TH: 'The Threads of Hekych',
-  TMG: 'The Threads of Mogrion',
-  TRC: 'The Threads of RandCarter',
-  TAX: 'The Threads of Axtimag',
-  TLU: 'The Threads of Lui',
-  TX: 'The Threads of Xrustalb',
-  TKK: 'TKK.club'
-}
-
-export const CLASS_FEATURE_SOURCE_URLS = {
-  PHB: 'https://www.dndbeyond.com/sources/dnd/phb-2014',
-  TCE: 'https://www.dndbeyond.com/sources/dnd/tcoe'
-}
+export { CLASS_FEATURE_SOURCE_NAMES, CLASS_FEATURE_SOURCE_URLS } from './classFeatureSources.js'
+import { CLASS_FEATURE_SOURCE_NAMES, CLASS_FEATURE_SOURCE_URLS } from './classFeatureSources.js'
 
 function slug(value) {
   return String(value || '')

@@ -1,13 +1,14 @@
 <script setup>
-import { CLASS_FEATURES_5E, CLASS_FEATURE_SOURCE_NAMES } from '~/data/classFeatures5e.js'
+import { CLASS_FEATURES_2024 } from '~/data/dnd55e/classFeatures2024.js'
+import { CLASS_FEATURE_SOURCE_NAMES } from '~/data/classFeatureSources.js'
 
 const search = ref('')
 const open = ref(null)
 const showFilter = ref(false)
 const active = reactive({ className: [], source: [], type: [] })
 
-const CLASS_NAMES = [...new Set(CLASS_FEATURES_5E.map(f => f.className))]
-const SOURCE_CODES = [...new Set(CLASS_FEATURES_5E.map(f => f.source))]
+const CLASS_NAMES = [...new Set(CLASS_FEATURES_2024.map(f => f.className))]
+const SOURCE_CODES = [...new Set(CLASS_FEATURES_2024.map(f => f.source))]
 // Ссылка вида ?source=TL из карточки класса сразу включает фильтр по источнику.
 const sourceQuery = useRoute().query.source
 const initialSource = Array.isArray(sourceQuery) ? sourceQuery[0] : sourceQuery
@@ -31,7 +32,7 @@ function matches(f) {
 const groups = computed(() => CLASS_NAMES.map(className => ({
   id: className,
   title: className,
-  items: CLASS_FEATURES_5E.filter(f => f.className === className && matches(f)).map(f => ({
+  items: CLASS_FEATURES_2024.filter(f => f.className === className && matches(f)).map(f => ({
     id: f.id,
     title: f.name,
     meta: [f.levelText, f.subclassName !== 'Базовый класс' ? f.subclassName : null].filter(Boolean).join(' · '),
@@ -60,8 +61,8 @@ function toggleFilter(key, value) {
 function resetFilters() { active.className = []; active.source = []; active.type = [] }
 
 useSeoMeta({
-  title: 'Особенности классов — D&D 5e — TKK.club',
-  description: 'Умения классов и подклассов D&D 5e: описания по уровням, источникам и классам.'
+  title: 'Особенности классов — D&D 5.5e 2024 — TKK.club',
+  description: 'Умения классов и подклассов D&D 5.5e редакции 2024 года: описания по уровням, источникам и классам.'
 })
 </script>
 
@@ -69,14 +70,17 @@ useSeoMeta({
   <ThreadRefPage
     emblem-img="/assets/nodes/osobennosti.png"
     emblem-alt="Особенности классов"
+    system-path="/dnd55e"
+    system-label="D&D 5.5e"
+    kicker="D&D 5.5e · редакция 2024"
     title="Особенности классов"
     crumb-current="Особенности классов"
-    lead="Умения классов и подклассов по уровням: то, что получает герой с ростом мастерства."
+    lead="Умения классов и подклассов D&D 5.5e по уровням: то, что получает герой с ростом мастерства."
     search-placeholder="Найти умение, класс или подкласс"
-    node-prefix="cf"
+    node-prefix="d55-cf"
     query-key="f"
     :groups="groups"
-    :total="CLASS_FEATURES_5E.length"
+    :total="CLASS_FEATURES_2024.length"
     :visible="totalVisible"
     :filters="filters"
     :is-active="isActive"

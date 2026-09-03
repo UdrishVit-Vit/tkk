@@ -856,7 +856,11 @@ function sourceRoute(source) {
   if (source === 'PHB 2024' && externalUrl && props.vm.classEn) {
     return `${externalUrl}#${encodeURIComponent(props.vm.classEn)}`
   }
-  return externalUrl || `/dnd5e/class-features?source=${encodeURIComponent(source || '')}`
+  // В данных 2024 источник записан как «TL · The Threads of Largo» — справочник
+  // фильтрует по короткому коду, поэтому берём часть до разделителя.
+  const code = String(source || '').split('·')[0].trim()
+  const base = props.vm.featureRefPath || '/dnd5e/class-features'
+  return externalUrl || `${base}?source=${encodeURIComponent(code)}`
 }
 
 function openClassFeatureAnchor(href) {

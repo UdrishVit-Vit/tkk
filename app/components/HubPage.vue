@@ -1,6 +1,7 @@
 <script setup>
 import { DND55E_CLASSES } from '~/data/dnd55e/catalogues.js'
 import { DND55E_CLASS_DETAILS } from '~/data/dnd55e/classdata2024.js'
+import { mergeArchetypes2024 } from '~/data/dnd55e/classArchetypes2024.js'
 import { SYSTEMS, POOL, IMG, THEMES, nodeImg, classImg, layoutPoints, entriesFor } from '~/data/hub.js'
 import { useKnotCanvas } from '~/composables/useKnotCanvas.js'
 
@@ -112,7 +113,9 @@ const featureSlug = value => String(value || '')
   .replace(/[^a-zа-я0-9]+/giu, '-')
   .replace(/^-+|-+$/g, '')
 const classFeatureId = (...parts) => parts.map(featureSlug).filter(Boolean).join('--')
-const classFeatureUrl = id => `/dnd5e/class-features?feature=${encodeURIComponent(id)}`
+// Справочник умений у каждой редакции свой: /dnd5e/class-features и /dnd55e/class-features.
+const featureRefBase = system => (system === '2024' ? '/dnd55e' : '/dnd5e')
+const classFeatureUrl = (id, system) => `${featureRefBase(system)}/class-features?feature=${encodeURIComponent(id)}`
 
 if (!props.initialClass && route.query.section === 'classes' && route.query.class && CLASS_FROM_QUERY[route.query.class]) {
   navigateTo(`/dnd5e/classes/${route.query.class}`, { replace: true })
@@ -271,6 +274,7 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Классы': '/dnd55e/classes',
     'Виды': '/dnd55e/species',
     'Черты': '/dnd55e/feats',
+    'Особенности классов': '/dnd55e/class-features',
     'Предыстории': '/dnd55e/backgrounds',
     'Заклинания': '/dnd55e/spells',
     'Снаряжение': '/dnd55e/equipment',
@@ -806,6 +810,12 @@ const vm = computed(() => {
     ? DND55E_CLASSES.find(item => item.title === S.cls)
     : null
   const details2024 = class2024 ? (DND55E_CLASS_DETAILS[class2024.title] || {}) : null
+  // Архетипы классов 2024: собственные (перенесённые вручную, как у Шамана) плюс
+  // авторские архетипы из раздела 2014 — они общие для обеих редакций.
+  const archetypes2024 = () => mergeArchetypes2024(
+    details2024?.archetypes,
+    class2024 && classDataMap.value?.[class2024.title]?.archetypes
+  )
   const cd = class2024
     ? {
         en: class2024.originalName,
@@ -823,7 +833,7 @@ const vm = computed(() => {
         tableGrid: details2024.tableGrid || null,
         table: details2024.table || null,
         features: details2024.features || [],
-        archetypes: details2024.archetypes || [],
+        archetypes: archetypes2024(),
         description: {
           title: class2024.title,
           source: class2024.source,
@@ -844,14 +854,14 @@ const vm = computed(() => {
   }).filter(item => item.name)
   const classArchetypes = (cd.archetypes || []).map(a => ({
     ...a,
-    sourceUrl: `/dnd5e/class-features?source=${encodeURIComponent(a.source || '')}`,
+    sourceUrl: `${featureRefBase(S.active)}/class-features?source=${encodeURIComponent(a.source || '')}`,
     features: (a.features || []).map(f => {
       const id = classFeatureId(S.cls, a.id, f.name)
       return {
         ...f,
         archetypeName: a.name,
         id,
-        featureUrl: classFeatureUrl(id),
+        featureUrl: classFeatureUrl(id, S.active),
         rank: featureLevel(f.level),
         hasItems: a.name === 'Школа Клыков' && f.name === 'Импланты' ? false : !!(f.items && f.items.length),
         itemsTitle: f.itemsTitle || '',
@@ -879,7 +889,7 @@ const vm = computed(() => {
     return {
       ...feature,
       id,
-      featureUrl: classFeatureUrl(id),
+      featureUrl: classFeatureUrl(id, S.active),
       order,
       rank: feature.rank || featureLevel(feature.lvl),
       hasSpellTable: !!feature.spellTable.length,
@@ -921,7 +931,7 @@ const vm = computed(() => {
     })),
     ...((arch.spells && arch.spells.length) ? [{
       id: classFeatureId(S.cls, arch.id, 'Дополнительные заклинания'),
-      featureUrl: classFeatureUrl(classFeatureId(S.cls, arch.id, 'Дополнительные заклинания')),
+      featureUrl: classFeatureUrl(classFeatureId(S.cls, arch.id, 'Дополнительные заклинания'), S.active),
       name: 'Дополнительные заклинания',
       src: arch.source,
       sourceFullName: arch.sourceFullName || '',
@@ -1063,6 +1073,7 @@ const vm = computed(() => {
     classEn: cd.en || '',
     classSub: (sysObj ? sysObj.name : '') + ' · Класс',
     systemPath: S.active === '2024' ? '/dnd55e' : '/dnd5e',
+    featureRefPath: `${featureRefBase(S.active)}/class-features`,
     classesPath: S.active === '2024' ? '/dnd55e/classes' : '/dnd5e/classes',
     systemEditionLabel: sysObj ? `${sysObj.name} ${sysObj.tag}` : 'D&D 5e 2014',
     is2024: S.active === '2024',
