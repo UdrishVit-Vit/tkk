@@ -59,10 +59,13 @@ function compileIndex() {
     // Правила DMG и дополнений остаются в каталоге и подключаются вручную в
     // соответствующем контексте, чтобы «провал» спасброска не стал «Провалом»
     // местности, а название заклинания — одноимённой опасностью.
-    .filter(item => item.source === 'PHB' && !AUTO_LINK_EXCLUDE_IDS.has(item.id))
+    // Термины Эноа подключаются наравне с PHB: их канон живёт в одной статье,
+    // а сорок с лишним архетипов только ссылаются на неё.
+    .filter(item => (item.source === 'PHB' || item.source === 'ENOA') && !AUTO_LINK_EXCLUDE_IDS.has(item.id))
     .flatMap(item => [
       { title: item.title, item },
-      { title: item.originalName, item }
+      { title: item.originalName, item },
+      ...(item.aliases || []).map(alias => ({ title: alias, item }))
     ])
     .filter(entry => entry.title && entry.title.length >= 4)
     .map((entry) => {

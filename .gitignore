@@ -26,3 +26,6 @@ logs
 # Python caches
 __pycache__/
 *.pyc
+
+# Временные файлы рабочих скриптов
+.tmpwork/

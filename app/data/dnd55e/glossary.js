@@ -77,6 +77,11 @@ export const DND55E_GLOSSARY_CATEGORIES = {
     "title": "Эффекты окружающей среды",
     "icon": "⌬",
     "code": "ПРАВИЛА · D&D 5.5e 2024"
+  },
+  "enoa-forces": {
+    "title": "Силы Эноа",
+    "icon": "❈",
+    "code": "ЭНОА · Свод Башни Мафраш"
   }
 }
 
@@ -2910,6 +2915,66 @@ const GLOSSARY_INDEX = [
     "source": "DMG",
     "sourceTitle": "Dungeon Master’s Guide 2024",
     "edition": "2024",
+  },
+  {
+    "id": "spark-flint-enoa",
+    "aliases": ["Искра", "Кремень"],
+    "title": "Искра и Кремень",
+    "category": "enoa-forces",
+    "categoryTitle": "Силы Эноа",
+    "source": "ENOA",
+    "sourceTitle": "Эноа · Свод Башни Мафраш",
+    "edition": "2024",
+  },
+  {
+    "id": "veil-die-enoa",
+    "aliases": ["Кость Вуали"],
+    "title": "Кость Вуали",
+    "category": "enoa-forces",
+    "categoryTitle": "Силы Эноа",
+    "source": "ENOA",
+    "sourceTitle": "Эноа · Свод Башни Мафраш",
+    "edition": "2024",
+  },
+  {
+    "id": "thread-die-enoa",
+    "aliases": ["Кость Нити"],
+    "title": "Кость Нити",
+    "category": "enoa-forces",
+    "categoryTitle": "Силы Эноа",
+    "source": "ENOA",
+    "sourceTitle": "Эноа · Свод Башни Мафраш",
+    "edition": "2024",
+  },
+  {
+    "id": "veil-surge-enoa",
+    "aliases": ["Порыв Вуали"],
+    "title": "Порыв Вуали",
+    "category": "enoa-forces",
+    "categoryTitle": "Силы Эноа",
+    "source": "ENOA",
+    "sourceTitle": "Эноа · Свод Башни Мафраш",
+    "edition": "2024",
+  },
+  {
+    "id": "wheel-of-fate-enoa",
+    "aliases": ["Колесо Судьбы"],
+    "title": "Колесо Судьбы",
+    "category": "enoa-forces",
+    "categoryTitle": "Силы Эноа",
+    "source": "ENOA",
+    "sourceTitle": "Эноа · Свод Башни Мафраш",
+    "edition": "2024",
+  },
+  {
+    "id": "true-name-enoa",
+    "aliases": ["Пункт Тьмы", "истинное Имя"],
+    "title": "Имя (Нер) и Пункты Тьмы",
+    "category": "enoa-forces",
+    "categoryTitle": "Силы Эноа",
+    "source": "ENOA",
+    "sourceTitle": "Эноа · Свод Башни Мафраш",
+    "edition": "2024",
   }
 ]
 
@@ -2927,5 +2992,6 @@ export const DND55E_GLOSSARY_SOURCES = {
   "FRHoF": "Forgotten Realms: Heroes of Faerûn",
   "FRAiF": "Forgotten Realms: Adventures in Faerûn",
   "NF": "Netheril’s Fall",
-  "GHPG": "Grim Hollow Player’s Guide"
+  "GHPG": "Grim Hollow Player’s Guide",
+  "ENOA": "Эноа · Свод Башни Мафраш"
 }

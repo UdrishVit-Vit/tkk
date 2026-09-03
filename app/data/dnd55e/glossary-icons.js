@@ -313,7 +313,15 @@ export const DND55E_GLOSSARY_ICON_NAMES = {
   'frigid-water-dmg': 'iceberg',
   'extreme-heat-dmg': 'thermometer-hot',
   'extreme-cold-dmg': 'thermometer-cold',
-  'planar-effects-dmg': 'star-gate'
+  'planar-effects-dmg': 'star-gate',
+
+  // Силы Эноа
+  'spark-flint-enoa': 'flint-spark',
+  'veil-die-enoa': 'fog',
+  'veil-surge-enoa': 'spiky-explosion',
+  'true-name-enoa': 'soul-vessel',
+  'thread-die-enoa': 'bowen-knot',
+  'wheel-of-fate-enoa': 'stone-wheel'
 }
 
 export function glossaryIconName(id) {
