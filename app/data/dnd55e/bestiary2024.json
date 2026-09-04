@@ -3698,7 +3698,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 12",
-      "languages": "Общий, Primordial (Aquan)",
+      "languages": "Общий, Первичный (Акван)",
       "traits": [
         {
           "name": "Амфибия",
@@ -3753,7 +3753,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 10",
-      "languages": "Modron",
+      "languages": "Модронский",
       "traits": [
         {
           "name": "Распад",
@@ -3870,7 +3870,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Очарованный, Испуганный, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 9",
-      "languages": "understands Abyssal but can't speak",
+      "languages": "понимает язык Бездны, но не говорит",
       "traits": [],
       "actions": [
         {
@@ -3968,7 +3968,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 7",
-      "languages": "understands Slaad but can't speak",
+      "languages": "понимает язык слаадов, но не говорит",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -4073,7 +4073,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 12",
-      "languages": "understands Undercommon but can't speak; telepathy 60 ft.",
+      "languages": "понимает Подземный, но не говорит; телепатия 60 футов",
       "traits": [
         {
           "name": "Продвинутая телепатия",
@@ -4685,7 +4685,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Истощение, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Aquan, Terran)",
+      "languages": "Первичный (Акван, Терран)",
       "traits": [
         {
           "name": "Предсмертный взрыв",
@@ -4747,7 +4747,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 9",
-      "languages": "Abyssal; telepathy 60 ft. (works only with creatures that understand Abyssal)",
+      "languages": "Бездны; телепатия 60 футов (работает только с существами, понимающими язык Бездны)",
       "traits": [],
       "actions": [
         {
@@ -4801,7 +4801,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Истощение, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 12",
-      "languages": "Primordial (Auran, Ignan)",
+      "languages": "Первичный (Ауран, Игнан)",
       "traits": [
         {
           "name": "Предсмертный взрыв",
@@ -4910,7 +4910,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 10",
-      "languages": "Bullywug, Общий",
+      "languages": "Буллиуг, Общий",
       "traits": [
         {
           "name": "Амфибия",
@@ -5140,7 +5140,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 12",
-      "languages": "Общий, Primordial (Auran)",
+      "languages": "Общий, Первичный (Ауран)",
       "traits": [
         {
           "name": "Мимикрия",
@@ -5266,7 +5266,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, истинное зрение 30 футов, пассивная Внимательность 14",
-      "languages": "Undercommon",
+      "languages": "Подземный",
       "traits": [
         {
           "name": "Амфибия",
@@ -5440,7 +5440,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 15",
-      "languages": "Blink Dog, understands Elvish and Sylvan but can't speak them",
+      "languages": "Мерцающих псов, понимает Эльфийский и Сильван, но не говорит на них",
       "traits": [],
       "actions": [
         {
@@ -5495,7 +5495,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 10",
-      "languages": "Modron",
+      "languages": "Модронский",
       "traits": [
         {
           "name": "Распад",
@@ -5714,7 +5714,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Истощение, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Aquan, Ignan)",
+      "languages": "Первичный (Акван, Игнан)",
       "traits": [
         {
           "name": "Размытая форма",
@@ -5839,7 +5839,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "слепое зрение 10 футов, тёмное зрение 60 футов, пассивная Внимательность 15",
-      "languages": "understands Common and Draconic but can't speak",
+      "languages": "понимает Общий и Драконий, но не говорит",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -6366,7 +6366,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Troglodyte",
+      "languages": "Троглодитский",
       "traits": [
         {
           "name": "Вонь",
@@ -6704,7 +6704,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 14",
-      "languages": "Гоблинский, Worg",
+      "languages": "Гоблинский, Ворг",
       "traits": [],
       "actions": [
         {
@@ -7027,7 +7027,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Gnoll",
+      "languages": "Гнолльский",
       "traits": [],
       "actions": [
         {
@@ -7307,7 +7307,7 @@
       "damageImmunities": "холод, яд",
       "conditionImmunities": "Истощение, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 12",
-      "languages": "Primordial (Aquan, Auran)",
+      "languages": "Первичный (Акван, Ауран)",
       "traits": [
         {
           "name": "Предсмертный взрыв",
@@ -7372,7 +7372,7 @@
       "damageImmunities": "огонь",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Ignan)",
+      "languages": "Первичный (Игнан)",
       "traits": [
         {
           "name": "Предсмертный взрыв",
@@ -7433,7 +7433,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Истощение, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Ignan, Terran)",
+      "languages": "Первичный (Игнан, Терран)",
       "traits": [
         {
           "name": "Предсмертный взрыв",
@@ -7493,7 +7493,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 10",
-      "languages": "Modron",
+      "languages": "Модронский",
       "traits": [
         {
           "name": "Распад",
@@ -7672,7 +7672,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Истощение, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 12",
-      "languages": "Primordial (Auran, Terran)",
+      "languages": "Первичный (Ауран, Терран)",
       "traits": [
         {
           "name": "Предсмертный взрыв",
@@ -8053,7 +8053,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 15",
-      "languages": "Sahuagin",
+      "languages": "Сахуагин",
       "traits": [
         {
           "name": "Кровавое бешенство",
@@ -9089,7 +9089,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 16",
-      "languages": "Celestial; understands Common and Primordial (Auran) but can't speak them",
+      "languages": "Небесный; понимает Общий и Первичный (Ауран) но не говорит на них",
       "traits": [],
       "actions": [
         {
@@ -9555,7 +9555,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, истинное зрение 30 футов, пассивная Внимательность 16",
-      "languages": "Undercommon",
+      "languages": "Подземный",
       "traits": [
         {
           "name": "Амфибия",
@@ -9751,7 +9751,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 12",
-      "languages": "Modron",
+      "languages": "Модронский",
       "traits": [
         {
           "name": "Распад",
@@ -9816,7 +9816,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 13",
-      "languages": "Драконий, Sylvan; telepathy 60 ft. (faerie dragons only)",
+      "languages": "Драконий, Сильван; телепатия 60 футов (только с фейскими драконами)",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -9887,7 +9887,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 9",
-      "languages": "Общий, Giant",
+      "languages": "Общий, Великаний",
       "traits": [],
       "actions": [
         {
@@ -10229,7 +10229,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный, Испуганный, grappled, Парализованный, Окаменевший, Сбитый с ног, restrained, stunned",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 11",
-      "languages": "understands all but can't speak",
+      "languages": "понимает все языки, но не говорит",
       "traits": [
         {
           "name": "Рой",
@@ -10344,7 +10344,7 @@
       "damageImmunities": "огонь",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "understands Primordial but can't speak",
+      "languages": "понимает Первичный, но не говорит",
       "traits": [
         {
           "name": "Огненная аура",
@@ -10460,7 +10460,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Ослеплённый, Очарованный, Испуганный, Парализованный, Отравленный",
       "senses": "слепое зрение 30 футов, пассивная Внимательность 8",
-      "languages": "telepathy 30 ft.",
+      "languages": "телепатия 30 футов",
       "traits": [],
       "actions": [
         {
@@ -10627,7 +10627,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Очарованный, Истощение, Испуганный, grappled, Отравленный, restrained",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 9",
-      "languages": "understands Abyssal but can't speak",
+      "languages": "понимает язык Бездны, но не говорит",
       "traits": [
         {
           "name": "Аморфный",
@@ -10693,7 +10693,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 13",
-      "languages": "Thri-kreen; telepathy 60 ft.",
+      "languages": "Три-крин; телепатия 60 футов",
       "traits": [],
       "actions": [
         {
@@ -10946,7 +10946,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Сбитый с ног",
       "senses": "истинное зрение 30 футов, пассивная Внимательность 15",
-      "languages": "all",
+      "languages": "все языки",
       "traits": [
         {
           "name": "Бестелесное перемещение",
@@ -11523,7 +11523,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 14",
-      "languages": "Common (can't speak in rat form)",
+      "languages": "Общий (не говорит в облике крысы)",
       "traits": [],
       "actions": [
         {
@@ -11668,7 +11668,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 13",
-      "languages": "Драконий, Sylvan; telepathy 60 ft. (faerie dragons only)",
+      "languages": "Драконий, Сильван; телепатия 60 футов (только с фейскими драконами)",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -12078,7 +12078,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Бездны, Primordial (Aquan)",
+      "languages": "Бездны, Первичный (Акван)",
       "traits": [
         {
           "name": "Амфибия",
@@ -12208,7 +12208,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Истощение, Окаменевший, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Terran)",
+      "languages": "Первичный (Терран)",
       "traits": [
         {
           "name": "Облёт",
@@ -12433,7 +12433,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 14",
-      "languages": "Общий, Gith",
+      "languages": "Общий, Гитский",
       "traits": [],
       "actions": [
         {
@@ -12504,7 +12504,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Gnoll",
+      "languages": "Гнолльский",
       "traits": [],
       "actions": [
         {
@@ -12688,7 +12688,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 15",
-      "languages": "Общий, Druidic, Сильван",
+      "languages": "Общий, Друидический, Сильван",
       "traits": [],
       "actions": [
         {
@@ -12883,7 +12883,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Истощение, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 8",
-      "languages": "understands Common and Giant but can't speak",
+      "languages": "понимает Общий и Великаний, но не говорит",
       "traits": [
         {
           "name": "Стойкость нежити",
@@ -12940,7 +12940,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 120 футов (магическая Тьма не мешает этому чувству), пассивная Внимательность 12",
-      "languages": "Infernal; telepathy 120 ft.",
+      "languages": "Инфернальный; телепатия 120 футов",
       "traits": [
         {
           "name": "Облёт",
@@ -13010,7 +13010,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 11",
-      "languages": "Undercommon",
+      "languages": "Подземный",
       "traits": [
         {
           "name": "Кровавая ярость",
@@ -13196,7 +13196,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 14",
-      "languages": "Драконий, Primordial (Terran)",
+      "languages": "Драконий, Первичный (Терран)",
       "traits": [],
       "actions": [
         {
@@ -13383,7 +13383,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 14",
-      "languages": "Modron",
+      "languages": "Модронский",
       "traits": [
         {
           "name": "Распад",
@@ -13453,7 +13453,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 11",
-      "languages": "Общий, Giant, Primordial (Aquan)",
+      "languages": "Общий, Великаний, Первичный (Акван)",
       "traits": [
         {
           "name": "Магия шабаша",
@@ -13577,7 +13577,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 14",
-      "languages": "Undercommon",
+      "languages": "Подземный",
       "traits": [],
       "actions": [
         {
@@ -13642,7 +13642,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 8",
-      "languages": "Общий, Giant",
+      "languages": "Общий, Великаний",
       "traits": [],
       "actions": [
         {
@@ -13800,7 +13800,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 16",
-      "languages": "understands Celestial, Общий, Эльфийский, and Sylvan but can't speak",
+      "languages": "понимает Небесный, Общий, Эльфийский, и Сильван, но не говорит",
       "traits": [],
       "actions": [
         {
@@ -13849,7 +13849,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 15",
-      "languages": "understands Common and Elvish but can't speak",
+      "languages": "понимает Общий и Эльфийский, но не говорит",
       "traits": [
         {
           "name": "Облёт",
@@ -13971,7 +13971,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "слепое зрение 60 футов, пассивная Внимательность 12",
-      "languages": "understands Deep Speech but can't speak; telepathy 60 ft.",
+      "languages": "понимает Глубинную речь, но не говорит; телепатия 60 футов",
       "traits": [
         {
           "name": "Обнаружение интеллекта",
@@ -14403,7 +14403,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 16",
-      "languages": "Sahuagin",
+      "languages": "Сахуагин",
       "traits": [
         {
           "name": "Кровавое бешенство",
@@ -14557,7 +14557,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Истощение, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 9",
-      "languages": "understands Abyssal but can't speak",
+      "languages": "понимает язык Бездны, но не говорит",
       "traits": [],
       "actions": [
         {
@@ -14666,7 +14666,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Отравленный",
       "senses": "пассивная Внимательность 11",
-      "languages": "Primordial (Ignan)",
+      "languages": "Первичный (Игнан)",
       "traits": [
         {
           "name": "Аура огня",
@@ -15003,7 +15003,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Испуганный, Отравленный",
       "senses": "тёмное зрение 120 футов (магическая Тьма не мешает этому чувству), пассивная Внимательность 10",
-      "languages": "Infernal; telepathy 120 ft.",
+      "languages": "Инфернальный; телепатия 120 футов",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -15126,7 +15126,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 14",
-      "languages": "Common (can't speak in wolf form)",
+      "languages": "Общий (не говорит в облике волка)",
       "traits": [
         {
           "name": "Тактика стаи",
@@ -15335,7 +15335,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Истощение, grappled, Парализованный, Окаменевший, Отравленный, Сбитый с ног, restrained, Бессознательный",
       "senses": "слепое зрение 30 футов, пассивная Внимательность 10",
-      "languages": "understands Primordial but can't speak",
+      "languages": "понимает Первичный, но не говорит",
       "traits": [
         {
           "name": "Невидимость в воде",
@@ -15522,7 +15522,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 11",
-      "languages": "Общий, Gith",
+      "languages": "Общий, Гитский",
       "traits": [],
       "actions": [
         {
@@ -15719,7 +15719,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 11",
-      "languages": "Common plus three other languages",
+      "languages": "Общий и ещё три языка",
       "traits": [],
       "actions": [
         {
@@ -15864,7 +15864,7 @@
       "damageImmunities": "холод",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 15",
-      "languages": "Общий, Giant",
+      "languages": "Общий, Великаний",
       "traits": [
         {
           "name": "Тактика стаи",
@@ -15924,7 +15924,7 @@
       "damageImmunities": "холод",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 15",
-      "languages": "Yeti",
+      "languages": "Йети",
       "traits": [
         {
           "name": "Боязнь огня",
@@ -15994,7 +15994,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 12",
-      "languages": "Undercommon",
+      "languages": "Подземный",
       "traits": [
         {
           "name": "Кровавая ярость",
@@ -16120,7 +16120,7 @@
       "damageImmunities": "огонь",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 11",
-      "languages": "understands Abyssal, Общий, and Infernal but can't speak",
+      "languages": "понимает язык Бездны, Общий, и Инфернальный, но не говорит",
       "traits": [
         {
           "name": "Дар сопротивления к огню",
@@ -16185,7 +16185,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "слепое зрение 60 футов, тёмное зрение 120 футов, пассивная Внимательность 15",
-      "languages": "Hook Horror",
+      "languages": "Крюкастого ужаса",
       "traits": [],
       "actions": [
         {
@@ -16239,7 +16239,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, истинное зрение 30 футов, пассивная Внимательность 16",
-      "languages": "Undercommon",
+      "languages": "Подземный",
       "traits": [
         {
           "name": "Амфибия",
@@ -16479,7 +16479,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Истощение, Сбитый с ног",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 16",
-      "languages": "Глубинная речь, Undercommon; telepathy 120 ft.",
+      "languages": "Глубинная речь, Подземный; телепатия 120 футов",
       "traits": [],
       "actions": [
         {
@@ -16998,7 +16998,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 11",
-      "languages": "understands Sylvan but can't speak",
+      "languages": "понимает Сильван, но не говорит",
       "traits": [
         {
           "name": "Избегание",
@@ -17501,7 +17501,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 17",
-      "languages": "Aarakocra, Primordial (Auran)",
+      "languages": "Ааракокра, Первичный (Ауран)",
       "traits": [],
       "actions": [
         {
@@ -17832,7 +17832,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 12",
-      "languages": "Common (can't speak in boar form)",
+      "languages": "Общий (не говорит в облике кабана)",
       "traits": [],
       "actions": [
         {
@@ -17905,7 +17905,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 15",
-      "languages": "Common (can't speak in tiger form)",
+      "languages": "Общий (не говорит в облике тигра)",
       "traits": [],
       "actions": [
         {
@@ -18041,7 +18041,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Бездны, Gnoll",
+      "languages": "Бездны, Гнолльский",
       "traits": [],
       "actions": [
         {
@@ -18106,7 +18106,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 13",
-      "languages": "Bullywug, Общий",
+      "languages": "Буллиуг, Общий",
       "traits": [
         {
           "name": "Амфибия",
@@ -18182,7 +18182,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 15",
-      "languages": "Бездны, Общий, Infernal; telepathy 60 ft.",
+      "languages": "Бездны, Общий, Инфернальный; телепатия 60 футов",
       "traits": [
         {
           "name": "Облик суккуба",
@@ -18253,7 +18253,7 @@
       "damageImmunities": "психическая энергия, излучение",
       "conditionImmunities": "—",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 15",
-      "languages": "all; telepathy 120 ft.",
+      "languages": "все языки; телепатия 120 футов",
       "traits": [
         {
           "name": "Защищённое сознание",
@@ -18458,7 +18458,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Испуганный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 14",
-      "languages": "Драконий, Primordial (Terran)",
+      "languages": "Драконий, Первичный (Терран)",
       "traits": [],
       "actions": [
         {
@@ -18756,7 +18756,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Очарованный, Испуганный, grappled, Парализованный, Окаменевший, Отравленный, Сбитый с ног, restrained, stunned",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 9",
-      "languages": "Abyssal; telepathy 60 ft. (works only with creatures that understand Abyssal)",
+      "languages": "Бездны; телепатия 60 футов (работает только с существами, понимающими язык Бездны)",
       "traits": [
         {
           "name": "Зловонная аура",
@@ -18941,7 +18941,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 15",
-      "languages": "Бездны, Общий, Infernal; telepathy 60 ft.",
+      "languages": "Бездны, Общий, Инфернальный; телепатия 60 футов",
       "traits": [
         {
           "name": "Облик инкуба",
@@ -19019,7 +19019,7 @@
       "damageImmunities": "некротическая энергия, яд",
       "conditionImmunities": "Истощение, grappled, Парализованный, Окаменевший, Отравленный, Сбитый с ног, restrained",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 11",
-      "languages": "Abyssal; telepathy 120 ft.",
+      "languages": "Бездны; телепатия 120 футов",
       "traits": [
         {
           "name": "Демоническое восстановление",
@@ -19161,7 +19161,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 14",
-      "languages": "understands Deep Speech but can't speak",
+      "languages": "понимает Глубинную речь, но не говорит",
       "traits": [
         {
           "name": "Амфибия",
@@ -19296,7 +19296,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Ослеплённый, Очарованный, Оглохший, Испуганный, stunned, Бессознательный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 14",
-      "languages": "Giant",
+      "languages": "Великаний",
       "traits": [],
       "actions": [
         {
@@ -19357,7 +19357,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "слепое зрение 30 футов, тёмное зрение 120 футов, пассивная Внимательность 15",
-      "languages": "Abyssal; telepathy 120 ft.",
+      "languages": "Бездны; телепатия 120 футов",
       "traits": [
         {
           "name": "Демоническое восстановление",
@@ -19433,7 +19433,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, Tremorsense 60 футов, пассивная Внимательность 10",
-      "languages": "Umber Hulk",
+      "languages": "Умбрового увальня",
       "traits": [
         {
           "name": "Прокладывание туннеля",
@@ -19572,7 +19572,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 17",
-      "languages": "Common (can't speak in bear form)",
+      "languages": "Общий (не говорит в облике медведя)",
       "traits": [],
       "actions": [
         {
@@ -19952,7 +19952,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Очарованный, Парализованный, Отравленный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 13",
-      "languages": "Небесный, Эльфийский, Sylvan; telepathy 120 ft.",
+      "languages": "Небесный, Эльфийский, Сильван; телепатия 120 футов",
       "traits": [
         {
           "name": "Легендарное сопротивление (3/день)",
@@ -20044,7 +20044,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Истощение, Отравленный, Сбитый с ног",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 9",
-      "languages": "understands Deep Speech and Undercommon but can't speak",
+      "languages": "понимает Глубинную речь и Подземный, но не говорит",
       "traits": [
         {
           "name": "Стойкость нежити",
@@ -20109,7 +20109,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Парализованный, Окаменевший, Отравленный",
       "senses": "тёмное зрение 60 футов, Tremorsense 60 футов, пассивная Внимательность 16",
-      "languages": "Primordial (Terran)",
+      "languages": "Первичный (Терран)",
       "traits": [
         {
           "name": "Скольжение сквозь землю",
@@ -20249,7 +20249,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 11",
-      "languages": "Slaad; telepathy 60 ft.",
+      "languages": "Слаад; телепатия 60 футов",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -20316,7 +20316,7 @@
       "damageImmunities": "кислота, яд",
       "conditionImmunities": "Отравленный",
       "senses": "слепое зрение 60 футов, тёмное зрение 60 футов, пассивная Внимательность 15",
-      "languages": "Бездны, Infernal; telepathy 60 ft.",
+      "languages": "Бездны, Инфернальный; телепатия 60 футов",
       "traits": [
         {
           "name": "Восстановление исчадия",
@@ -20618,7 +20618,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 11",
-      "languages": "Otyugh; telepathy 120 ft. (doesn't allow the receiving creature to respond telepathically)",
+      "languages": "Отиуг; телепатия 120 футов (получатель не может ответить телепатически)",
       "traits": [],
       "actions": [
         {
@@ -21173,7 +21173,7 @@
       "damageImmunities": "огонь",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Ignan)",
+      "languages": "Первичный (Игнан)",
       "traits": [
         {
           "name": "Огненная аура",
@@ -21238,7 +21238,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 17",
-      "languages": "Sahuagin",
+      "languages": "Сахуагин",
       "traits": [
         {
           "name": "Кровавое бешенство",
@@ -21370,7 +21370,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 15",
-      "languages": "Giant",
+      "languages": "Великаний",
       "traits": [
         {
           "name": "Мерзкие конечности (4/день)",
@@ -21441,7 +21441,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 12",
-      "languages": "Giant",
+      "languages": "Великаний",
       "traits": [],
       "actions": [
         {
@@ -21502,7 +21502,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 120 футов (магическая Тьма не мешает этому чувству), пассивная Внимательность 18",
-      "languages": "Infernal; telepathy 120 ft.",
+      "languages": "Инфернальный; телепатия 120 футов",
       "traits": [
         {
           "name": "Шипастая шкура",
@@ -21582,7 +21582,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Истощение, grappled, Парализованный, Окаменевший, Отравленный, Сбитый с ног, restrained, Бессознательный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Aquan)",
+      "languages": "Первичный (Акван)",
       "traits": [
         {
           "name": "Заморозка",
@@ -21652,7 +21652,7 @@
       "damageImmunities": "яд, звук",
       "conditionImmunities": "Истощение, grappled, Парализованный, Окаменевший, Отравленный, Сбитый с ног, restrained, Бессознательный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Auran)",
+      "languages": "Первичный (Ауран)",
       "traits": [
         {
           "name": "Воздушное тело",
@@ -21717,7 +21717,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Истощение, Парализованный, Окаменевший, Отравленный, Бессознательный",
       "senses": "тёмное зрение 60 футов, Tremorsense 60 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Terran)",
+      "languages": "Первичный (Терран)",
       "traits": [
         {
           "name": "Скольжение сквозь землю",
@@ -21787,7 +21787,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Истощение, grappled, Парализованный, Окаменевший, Отравленный, Сбитый с ног, restrained, Бессознательный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Ignan)",
+      "languages": "Первичный (Игнан)",
       "traits": [
         {
           "name": "Огненная аура",
@@ -21923,7 +21923,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 11",
-      "languages": "Abyssal; telepathy 120 ft.",
+      "languages": "Бездны; телепатия 120 футов",
       "traits": [
         {
           "name": "Демоническое восстановление",
@@ -22052,7 +22052,7 @@
       ],
       "armorClass": "16",
       "hitPoints": "123 (13к8 + 65)",
-      "speed": "ходьба 15 футов ((30 ft. when rolling, 60 ft. rolling downhill))",
+      "speed": "ходьба 15 футов (30 футов перекатываясь, 60 футов под уклон)",
       "proficiencyBonus": "+3",
       "stats": {
         "str": "20 (+5)",
@@ -22068,7 +22068,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Очарованный, Истощение, Испуганный, Парализованный, Окаменевший, Отравленный",
       "senses": "тёмное зрение 60 футов, Tremorsense 60 футов, пассивная Внимательность 11",
-      "languages": "Primordial (Terran)",
+      "languages": "Первичный (Терран)",
       "traits": [],
       "actions": [
         {
@@ -22195,7 +22195,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 16",
-      "languages": "Общий, Gith",
+      "languages": "Общий, Гитский",
       "traits": [],
       "actions": [
         {
@@ -22266,7 +22266,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 16",
-      "languages": "Эльфийский, Undercommon",
+      "languages": "Эльфийский, Подземный",
       "traits": [
         {
           "name": "Паучье лазание",
@@ -22412,7 +22412,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, истинное зрение 30 футов, пассивная Внимательность 19",
-      "languages": "Undercommon",
+      "languages": "Подземный",
       "traits": [
         {
           "name": "Амфибия",
@@ -22491,7 +22491,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 14",
-      "languages": "Common plus three other languages",
+      "languages": "Общий и ещё три языка",
       "traits": [],
       "actions": [
         {
@@ -22692,7 +22692,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 17",
-      "languages": "Общий, Primordial (Aquan)",
+      "languages": "Общий, Первичный (Акван)",
       "traits": [
         {
           "name": "Амфибия",
@@ -22896,7 +22896,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Истощение, grappled, Парализованный, Окаменевший, Отравленный, Сбитый с ног, restrained, Бессознательный",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 18",
-      "languages": "Общий, Primordial (Auran)",
+      "languages": "Общий, Первичный (Ауран)",
       "traits": [
         {
           "name": "Воздушное тело",
@@ -23103,7 +23103,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 18",
-      "languages": "understands Draconic but can't speak",
+      "languages": "понимает Драконий, но не говорит",
       "traits": [],
       "actions": [
         {
@@ -23245,7 +23245,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 8",
-      "languages": "Giant",
+      "languages": "Великаний",
       "traits": [],
       "actions": [
         {
@@ -23312,7 +23312,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "слепое зрение 10 футов, тёмное зрение 120 футов, пассивная Внимательность 15",
-      "languages": "Abyssal; telepathy 120 ft.",
+      "languages": "Бездны; телепатия 120 футов",
       "traits": [
         {
           "name": "Демоническое восстановление",
@@ -23383,7 +23383,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Отравленный",
       "senses": "пассивная Внимательность 17",
-      "languages": "Primordial (Ignan)",
+      "languages": "Первичный (Игнан)",
       "traits": [
         {
           "name": "Аура огня",
@@ -23589,7 +23589,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Оглохший",
       "senses": "слепое зрение 60 футов, пассивная Внимательность 10",
-      "languages": "understands Common and Druidic but can't speak",
+      "languages": "понимает Общий и Друидический, но не говорит",
       "traits": [],
       "actions": [
         {
@@ -23718,7 +23718,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 16",
-      "languages": "Глубинная речь, Undercommon; telepathy 120 ft.",
+      "languages": "Глубинная речь, Подземный; телепатия 120 футов",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -23788,7 +23788,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 14",
-      "languages": "Giant",
+      "languages": "Великаний",
       "traits": [],
       "actions": [
         {
@@ -23853,7 +23853,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 17",
-      "languages": "Druidic, Эльфийский, Сильван",
+      "languages": "Друидический, Эльфийский, Сильван",
       "traits": [],
       "actions": [
         {
@@ -24121,7 +24121,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 14",
-      "languages": "Общий, Giant",
+      "languages": "Общий, Великаний",
       "traits": [
         {
           "name": "Регенерация",
@@ -24332,7 +24332,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 11",
-      "languages": "Slaad; telepathy 60 ft.",
+      "languages": "Слаад; телепатия 60 футов",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -24397,7 +24397,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Очарованный, Истощение, Испуганный, Парализованный, Окаменевший, Отравленный",
       "senses": "слепое зрение 10 футов, тёмное зрение 60 футов, пассивная Внимательность 10",
-      "languages": "understands commands given in any language but can't speak",
+      "languages": "понимает приказы на любом языке, но не говорит",
       "traits": [
         {
           "name": "Привязка",
@@ -24842,7 +24842,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 12",
-      "languages": "Общий, Gith",
+      "languages": "Общий, Гитский",
       "traits": [],
       "actions": [
         {
@@ -24907,7 +24907,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 15",
-      "languages": "Бездны, Общий, Gnoll",
+      "languages": "Бездны, Общий, Гнолльский",
       "traits": [],
       "actions": [
         {
@@ -25044,7 +25044,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 120 футов (магическая Тьма не мешает этому чувству), пассивная Внимательность 11",
-      "languages": "Infernal; telepathy 120 ft.",
+      "languages": "Инфернальный; телепатия 120 футов",
       "traits": [
         {
           "name": "Дьявольское восстановление",
@@ -25120,7 +25120,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "слепое зрение 30 футов, тёмное зрение 60 футов, пассивная Внимательность 12",
-      "languages": "Общий, Slaad; telepathy 60 ft.",
+      "languages": "Общий, Слаад; телепатия 60 футов",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -25197,7 +25197,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 90 футов, пассивная Внимательность 17",
-      "languages": "Общий, Deep Speech; telepathy 30 ft.",
+      "languages": "Общий, Глубинная речь; телепатия 30 футов",
       "traits": [],
       "actions": [
         {
@@ -25685,7 +25685,7 @@
       "damageImmunities": "холод",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 13",
-      "languages": "Giant",
+      "languages": "Великаний",
       "traits": [],
       "actions": [
         {
@@ -25750,7 +25750,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Испуганный",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 12",
-      "languages": "Глубинная речь, Undercommon",
+      "languages": "Глубинная речь, Подземный",
       "traits": [
         {
           "name": "Чувствительность к солнечному свету",
@@ -25962,7 +25962,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 14",
-      "languages": "Thri-kreen; telepathy 120 ft.",
+      "languages": "Три-крин; телепатия 120 футов",
       "traits": [],
       "actions": [
         {
@@ -26021,7 +26021,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 18",
-      "languages": "Giant, Undercommon",
+      "languages": "Великаний, Подземный",
       "traits": [],
       "actions": [
         {
@@ -26082,7 +26082,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 11",
-      "languages": "Abyssal; telepathy 120 ft.",
+      "languages": "Бездны; телепатия 120 футов",
       "traits": [
         {
           "name": "Демоническое восстановление",
@@ -26160,7 +26160,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 17",
-      "languages": "Abyssal; telepathy 120 ft.",
+      "languages": "Бездны; телепатия 120 футов",
       "traits": [
         {
           "name": "Демоническое восстановление",
@@ -26318,7 +26318,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 120 футов (магическая Тьма не мешает этому чувству), пассивная Внимательность 12",
-      "languages": "Infernal; telepathy 120 ft.",
+      "languages": "Инфернальный; телепатия 120 футов",
       "traits": [
         {
           "name": "Дьявольское восстановление",
@@ -26587,7 +26587,7 @@
       "damageImmunities": "кислота, яд",
       "conditionImmunities": "Отравленный",
       "senses": "слепое зрение 60 футов, пассивная Внимательность 14",
-      "languages": "Бездны, Infernal; telepathy 60 ft.",
+      "languages": "Бездны, Инфернальный; телепатия 60 футов",
       "traits": [
         {
           "name": "Восстановление исчадия",
@@ -26658,7 +26658,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 21",
-      "languages": "Общий, Giant",
+      "languages": "Общий, Великаний",
       "traits": [],
       "actions": [
         {
@@ -26728,7 +26728,7 @@
       "damageImmunities": "огонь",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 16",
-      "languages": "Giant",
+      "languages": "Великаний",
       "traits": [],
       "actions": [
         {
@@ -26787,7 +26787,7 @@
       "damageImmunities": "холод",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 60 футов, пассивная Внимательность 19",
-      "languages": "Yeti",
+      "languages": "Йети",
       "traits": [
         {
           "name": "Боязнь огня",
@@ -26862,7 +26862,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "слепое зрение 60 футов, тёмное зрение 60 футов, пассивная Внимательность 17",
-      "languages": "Общий, Slaad; telepathy 60 ft.",
+      "languages": "Общий, Слаад; телепатия 60 футов",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -26938,7 +26938,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 13",
-      "languages": "Общий, Druidic, Эльфийский, Сильван",
+      "languages": "Общий, Друидический, Эльфийский, Сильван",
       "traits": [
         {
           "name": "Осадное чудовище",
@@ -27008,7 +27008,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 20",
-      "languages": "Deep Speech; telepathy 120 ft.",
+      "languages": "Глубинная речь; телепатия 120 футов",
       "traits": [
         {
           "name": "Амфибия",
@@ -27183,7 +27183,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный, Истощение, Испуганный",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 19",
-      "languages": "all; telepathy 120 ft.",
+      "languages": "все языки; телепатия 120 футов",
       "traits": [
         {
           "name": "Возвышенное восстановление",
@@ -27332,7 +27332,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 12",
-      "languages": "Бездны, Эльфийский, Undercommon",
+      "languages": "Бездны, Эльфийский, Подземный",
       "traits": [
         {
           "name": "Демоническое восстановление",
@@ -27424,7 +27424,7 @@
       "damageImmunities": "яд, психическая энергия",
       "conditionImmunities": "Очарованный, Истощение, Испуганный, Парализованный, Окаменевший, Отравленный",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 10",
-      "languages": "understands Common plus two other languages but can't speak",
+      "languages": "понимает Общий и ещё два языка, но не говорит",
       "traits": [
         {
           "name": "Неизменяемая форма",
@@ -27565,7 +27565,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 21",
-      "languages": "Гоблинский, Сильван, Worg",
+      "languages": "Гоблинский, Сильван, Ворг",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -27975,7 +27975,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "слепое зрение 60 футов, тёмное зрение 60 футов, пассивная Внимательность 18",
-      "languages": "Общий, Slaad; telepathy 60 ft.",
+      "languages": "Общий, Слаад; телепатия 60 футов",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -28051,7 +28051,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "истинное зрение 30 футов, пассивная Внимательность 22",
-      "languages": "Giant",
+      "languages": "Великаний",
       "traits": [],
       "actions": [
         {
@@ -28336,7 +28336,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Окаменевший",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 11",
-      "languages": "Primordial (Terran)",
+      "languages": "Первичный (Терран)",
       "traits": [
         {
           "name": "Скольжение сквозь землю",
@@ -28423,7 +28423,7 @@
       "damageImmunities": "электричество, звук",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 13",
-      "languages": "Primordial (Auran)",
+      "languages": "Первичный (Ауран)",
       "traits": [
         {
           "name": "Стихийное восстановление",
@@ -28508,7 +28508,7 @@
       "damageImmunities": "психическая энергия",
       "conditionImmunities": "Очарованный, Испуганный",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 17",
-      "languages": "Глубинная речь, Undercommon; telepathy 120 ft.",
+      "languages": "Глубинная речь, Подземный; телепатия 120 футов",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -28586,7 +28586,7 @@
       "damageImmunities": "огонь",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 12",
-      "languages": "Primordial (Ignan)",
+      "languages": "Первичный (Игнан)",
       "traits": [
         {
           "name": "Стихийное восстановление",
@@ -28668,7 +28668,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "слепое зрение 30 футов, тёмное зрение 120 футов, пассивная Внимательность 13",
-      "languages": "Primordial (Aquan)",
+      "languages": "Первичный (Акван)",
       "traits": [
         {
           "name": "Амфибия",
@@ -28817,7 +28817,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Отравленный",
       "senses": "тёмное зрение 150 футов (магическая Тьма не мешает этому чувству), пассивная Внимательность 13",
-      "languages": "Infernal; telepathy 120 ft.",
+      "languages": "Инфернальный; телепатия 120 футов",
       "traits": [
         {
           "name": "Дьявольское восстановление",
@@ -29127,7 +29127,7 @@
       "damageImmunities": "кислота, яд",
       "conditionImmunities": "Очарованный, Отравленный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 17",
-      "languages": "all; telepathy 120 ft.",
+      "languages": "все языки; телепатия 120 футов",
       "traits": [
         {
           "name": "Восстановление исчадия",
@@ -29222,7 +29222,7 @@
       "damageImmunities": "психическая энергия",
       "conditionImmunities": "Очарованный (with Mind Blank)",
       "senses": "пассивная Внимательность 16",
-      "languages": "Common plus five other languages",
+      "languages": "Общий и ещё пять языков",
       "traits": [
         {
           "name": "Сопротивление магии",
@@ -29374,7 +29374,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "пассивная Внимательность 18",
-      "languages": "Общий, Gith",
+      "languages": "Общий, Гитский",
       "traits": [],
       "actions": [
         {
@@ -29584,7 +29584,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Отравленный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 16",
-      "languages": "Infernal; telepathy 120 ft.",
+      "languages": "Инфернальный; телепатия 120 футов",
       "traits": [
         {
           "name": "Дьявольское восстановление",
@@ -29665,7 +29665,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Сбитый с ног",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 22",
-      "languages": "Глубинная речь, Undercommon",
+      "languages": "Глубинная речь, Подземный",
       "traits": [
         {
           "name": "Легендарное сопротивление (3/день или 4/день в логове)",
@@ -30033,7 +30033,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Испуганный, Отравленный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 11",
-      "languages": "Abyssal; telepathy 120 ft.",
+      "languages": "Бездны; телепатия 120 футов",
       "traits": [
         {
           "name": "Демоническое восстановление",
@@ -30284,7 +30284,7 @@
       "damageImmunities": "кислота, яд",
       "conditionImmunities": "Очарованный, Испуганный, Отравленный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 17",
-      "languages": "Бездны, Infernal; telepathy 120 ft.",
+      "languages": "Бездны, Инфернальный; телепатия 120 футов",
       "traits": [
         {
           "name": "Восстановление исчадия",
@@ -30365,7 +30365,7 @@
       "damageImmunities": "электричество, звук",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, истинное зрение 30 футов, пассивная Внимательность 20",
-      "languages": "Общий, Giant",
+      "languages": "Общий, Великаний",
       "traits": [
         {
           "name": "Амфибия",
@@ -30628,7 +30628,7 @@
       "damageImmunities": "холод, огонь, яд",
       "conditionImmunities": "Отравленный",
       "senses": "слепое зрение 120 футов, пассивная Внимательность 17",
-      "languages": "Infernal; telepathy 120 ft.",
+      "languages": "Инфернальный; телепатия 120 футов",
       "traits": [
         {
           "name": "Дьявольское восстановление",
@@ -30705,7 +30705,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Очарованный, Истощение, Парализованный, Окаменевший, Отравленный, Сбитый с ног",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 22",
-      "languages": "Глубинная речь, Undercommon",
+      "languages": "Глубинная речь, Подземный",
       "traits": [
         {
           "name": "Легендарное сопротивление (3/день или 4/день в логове)",
@@ -30788,7 +30788,7 @@
       "damageImmunities": "холод, некротическая энергия",
       "conditionImmunities": "Очарованный, Истощение",
       "senses": "слепое зрение 120 футов, пассивная Внимательность 23",
-      "languages": "Common plus three other languages",
+      "languages": "Общий и ещё три языка",
       "traits": [
         {
           "name": "Легендарное сопротивление (3/день или 4/день в логове)",
@@ -31079,7 +31079,7 @@
       "damageImmunities": "некротическая энергия, яд",
       "conditionImmunities": "Очарованный, Истощение, Испуганный, Парализованный, Отравленный",
       "senses": "истинное зрение 60 футов, пассивная Внимательность 19",
-      "languages": "Common plus three other languages",
+      "languages": "Общий и ещё три языка",
       "traits": [
         {
           "name": "Легендарное сопротивление (3/день или 4/день в логове).",
@@ -31257,7 +31257,7 @@
       "damageImmunities": "огонь",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 10",
-      "languages": "Primordial (Ignan)",
+      "languages": "Первичный (Игнан)",
       "traits": [
         {
           "name": "Огненная аура",
@@ -31516,7 +31516,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "слепое зрение 30 футов, пассивная Внимательность 18",
-      "languages": "Общий, Драконий, Gith",
+      "languages": "Общий, Драконий, Гитский",
       "traits": [],
       "actions": [
         {
@@ -31586,7 +31586,7 @@
       "damageImmunities": "огонь, яд, психическая энергия",
       "conditionImmunities": "Очарованный, Истощение, Испуганный, Парализованный, Окаменевший, Отравленный",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 10",
-      "languages": "understands Common plus two other languages but can't speak",
+      "languages": "понимает Общий и ещё два языка, но не говорит",
       "traits": [
         {
           "name": "Неизменяемая форма",
@@ -31666,7 +31666,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Оглохший",
       "senses": "слепое зрение 120 футов, пассивная Внимательность 19",
-      "languages": "Общий, Druidic",
+      "languages": "Общий, Друидический",
       "traits": [
         {
           "name": "Семена заразы",
@@ -31738,7 +31738,7 @@
       "damageImmunities": "яд",
       "conditionImmunities": "Отравленный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 18",
-      "languages": "Abyssal; telepathy 120 ft.",
+      "languages": "Бездны; телепатия 120 футов",
       "traits": [
         {
           "name": "Демоническое восстановление",
@@ -31827,7 +31827,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный, Истощение, Испуганный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 21",
-      "languages": "all; telepathy 120 ft.",
+      "languages": "все языки; телепатия 120 футов",
       "traits": [
         {
           "name": "Божественная осведомлённость",
@@ -32284,7 +32284,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "—",
       "senses": "тёмное зрение 120 футов, пассивная Внимательность 11",
-      "languages": "Драконий, Primordial (Aquan)",
+      "languages": "Драконий, Первичный (Акван)",
       "traits": [
         {
           "name": "Амфибия",
@@ -32636,7 +32636,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Очарованный, Испуганный, Отравленный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 19",
-      "languages": "Abyssal; telepathy 120 ft.",
+      "languages": "Бездны; телепатия 120 футов",
       "traits": [
         {
           "name": "Предсмертная агония",
@@ -32722,7 +32722,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный, Испуганный, stunned",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 28",
-      "languages": "all",
+      "languages": "все языки",
       "traits": [
         {
           "name": "Владычество над животными",
@@ -33012,7 +33012,7 @@
       "damageImmunities": "огонь, яд",
       "conditionImmunities": "Отравленный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 20",
-      "languages": "Infernal; telepathy 120 ft.",
+      "languages": "Инфернальный; телепатия 120 футов",
       "traits": [
         {
           "name": "Дьявольское восстановление",
@@ -33102,7 +33102,7 @@
       "damageImmunities": "—",
       "conditionImmunities": "Очарованный, Истощение, Испуганный",
       "senses": "истинное зрение 60 футов, пассивная Внимательность 21",
-      "languages": "all",
+      "languages": "все языки",
       "traits": [
         {
           "name": "Магия шабаша",
@@ -33398,7 +33398,7 @@
       "damageImmunities": "некротическая энергия, яд",
       "conditionImmunities": "Очарованный, Истощение, Испуганный, Парализованный, Отравленный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 19",
-      "languages": "all",
+      "languages": "все языки",
       "traits": [
         {
           "name": "Легендарное сопротивление (4/день или 5/день в логове)",
@@ -33497,7 +33497,7 @@
       "damageImmunities": "яд, излучение",
       "conditionImmunities": "Очарованный, Истощение, Испуганный, Отравленный",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 24",
-      "languages": "all; telepathy 120 ft.",
+      "languages": "все языки; телепатия 120 футов",
       "traits": [
         {
           "name": "Божественная осведомлённость",
@@ -34164,7 +34164,7 @@
       "damageImmunities": "холод, электричество",
       "conditionImmunities": "Испуганный, grappled, Парализованный, restrained",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 21",
-      "languages": "understands Abyssal, Небесный, Инфернальный, and Primordial but can't speak; telepathy 120 ft.",
+      "languages": "понимает язык Бездны, Небесный, Инфернальный, и Первичный, но не говорит; телепатия 120 футов",
       "traits": [
         {
           "name": "Амфибия",
@@ -34263,7 +34263,7 @@
       "damageImmunities": "некротическая энергия, излучение",
       "conditionImmunities": "—",
       "senses": "истинное зрение 120 футов, пассивная Внимательность 23",
-      "languages": "all",
+      "languages": "все языки",
       "traits": [
         {
           "name": "Легендарное сопротивление (4/день)",
@@ -34542,7 +34542,7 @@
       "damageImmunities": "яд, психическая энергия",
       "conditionImmunities": "Очарованный, Истощение, Испуганный, Парализованный, Окаменевший, Отравленный, stunned, Бессознательный",
       "senses": "истинное зрение 300 футов, пассивная Внимательность 10",
-      "languages": "understands Celestial and Common but can't speak",
+      "languages": "понимает Небесный и Общий, но не говорит",
       "traits": [
         {
           "name": "Неизменяемая форма",

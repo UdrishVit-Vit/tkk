@@ -34,11 +34,11 @@ const parts = computed(() => {
     <div v-if="parts.levels.length" class="imp-levels">
       <div v-for="lvl in parts.levels" :key="lvl.level" class="imp-level">
         <span class="imp-level-tag">Ур. {{ lvl.level }}</span>
-        <p>{{ lvl.text }}</p>
+        <p><RuleRichText :text="lvl.text" /></p>
       </div>
     </div>
 
-    <p v-for="(note, i) in parts.notes" :key="i" class="tref-desc imp-note">{{ note }}</p>
+    <p v-for="(note, i) in parts.notes" :key="i" class="tref-desc imp-note"><RuleRichText :text="note" /></p>
   </div>
 </template>
 

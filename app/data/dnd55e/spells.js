@@ -8,6 +8,7 @@ import { DND55E_LEVEL_7_SPELLS } from './spells-level7.js'
 import { DND55E_LEVEL_8_SPELLS } from './spells-level8.js'
 import { DND55E_LEVEL_9_SPELLS } from './spells-level9.js'
 import { DND55E_SHAMAN_SPELLS, DND55E_SHAMAN_BORROWED } from './spells-shaman.js'
+import { DND55E_ENOA_SPELLS } from './spells-enoa.js'
 
 export const DND55E_SPELL_SCHOOLS = {
   abjuration: { title: 'Ограждение', icon: '/assets/spells/schools/abjuration.png' },
@@ -112,7 +113,7 @@ export const DND55E_CANTRIPS = [
     castingTime: 'Действие', range: '30 футов', components: ['С', 'М'], material: 'кусочек овечьей шерсти', duration: '1 минута',
     classes: ['Бард', 'Волшебник', 'Колдун', 'Чародей'], tags: ['Иллюзия', 'Утилита'],
     summary: 'Вы создаёте неподвижное изображение небольшого предмета или правдоподобный звук.',
-    description: 'Создайте звук либо изображение предмета, помещающееся в куб со стороной 5 футов. Изображение не создаёт звука, света, запаха или других ощущений, а физическое взаимодействие сразу раскрывает обман. Существо может распознать иллюзию действием Изучение и успешной проверкой Интеллекта (Расследование) против Сл ваших заклинаний. Повторное наложение завершает предыдущую иллюзию.'
+    description: 'Создайте звук либо изображение предмета, помещающееся в куб со стороной 5 футов. Изображение не создаёт звука, света, запаха или других ощущений, а физическое взаимодействие сразу раскрывает обман. Существо может распознать иллюзию действием Изучение и успешной проверкой Интеллекта (**Анализ**) против Сл ваших заклинаний. Повторное наложение завершает предыдущую иллюзию.'
   }),
   spell({
     id: 'true-strike', title: 'Меткий удар', originalName: 'True Strike', school: 'divination',
@@ -312,7 +313,8 @@ export const DND55E_SPELLS = [
     ...DND55E_LEVEL_8_SPELLS,
     ...DND55E_LEVEL_9_SPELLS
   ]),
-  ...DND55E_SHAMAN_SPELLS
+  ...DND55E_SHAMAN_SPELLS,
+  ...DND55E_ENOA_SPELLS
 ]
 
 export const DND55E_SPELL_CLASSES = [

@@ -8,7 +8,7 @@ import {
 const search = ref('')
 const open = ref(null)
 const showFilter = ref(false)
-const active = reactive({ level: [], school: [], class: [], concentration: [], ritual: [], component: [] })
+const active = reactive({ level: [], school: [], class: [], source: [], concentration: [], ritual: [], component: [] })
 
 const query = computed(() => search.value.trim().toLocaleLowerCase('ru'))
 
@@ -16,6 +16,7 @@ const visibleSpells = computed(() => DND55E_SPELLS.filter((spell) => {
   if (active.level.length && !active.level.includes(String(spell.level))) return false
   if (active.school.length && !active.school.includes(spell.school)) return false
   if (active.class.length && !spell.classes.some(value => active.class.includes(value))) return false
+  if (active.source.length && !active.source.includes(spell.source)) return false
   if (active.concentration.length) {
     const value = spell.concentration ? 'yes' : 'no'
     if (!active.concentration.includes(value)) return false
@@ -105,6 +106,12 @@ const filters = computed(() => [
     options: DND55E_SPELL_CLASSES.map(value => ({ value, label: value }))
   },
   {
+    key: 'source',
+    label: 'Источник',
+    options: [...new Map(DND55E_SPELLS.map(spell => [spell.source, spell.sourceTitle])).entries()]
+      .map(([value, title]) => ({ value, label: value, title }))
+  },
+  {
     key: 'concentration',
     label: 'Концентрация',
     options: [
@@ -153,6 +160,7 @@ function resetFilters() {
   active.level = []
   active.school = []
   active.class = []
+  active.source = []
   active.concentration = []
   active.ritual = []
   active.component = []
@@ -179,7 +187,7 @@ useSeoMeta({
     kicker="D&D 5.5e · редакция 2024"
     title="Заклинания"
     crumb-current="Заклинания"
-    lead="Заговоры и заклинания 1–9-го уровней по правилам Player’s Handbook 2024 с актуальными эффектами, компонентами и списками классов."
+    lead="Заговоры и заклинания 1–9-го уровней по правилам Player’s Handbook 2024, а также напевы шамана и собственные заклинания Эноа — с актуальными эффектами, компонентами и списками классов."
     search-placeholder="Найти заклинание, эффект, класс или компонент"
     node-prefix="d55-spell"
     query-key="spell"

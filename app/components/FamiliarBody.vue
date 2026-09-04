@@ -33,7 +33,7 @@ const parts = computed(() => {
       </span>
     </div>
 
-    <p v-for="(text, i) in parts.description" :key="'d' + i" class="tref-desc">{{ text }}</p>
+    <p v-for="(text, i) in parts.description" :key="'d' + i" class="tref-desc"><RuleRichText :text="text" /></p>
 
     <div v-if="parts.meta.length" class="fam-meta">
       <div
@@ -43,13 +43,13 @@ const parts = computed(() => {
         :class="{ danger: /провал/i.test(row.label) }"
       >
         <span class="fam-meta-label">{{ row.label }}</span>
-        <span class="fam-meta-text">{{ row.text }}</span>
+        <span class="fam-meta-text"><RuleRichText :text="row.text" /></span>
       </div>
     </div>
 
     <div v-if="parts.stats.length" class="fam-stats">
       <div class="fam-stats-label">Характеристики</div>
-      <p v-for="(text, i) in parts.stats" :key="'s' + i">{{ text }}</p>
+      <p v-for="(text, i) in parts.stats" :key="'s' + i"><RuleRichText :text="text" /></p>
     </div>
   </div>
 </template>
