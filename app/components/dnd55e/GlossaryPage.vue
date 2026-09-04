@@ -114,7 +114,6 @@ useSeoMeta({
     kicker="D&D 5.5e · редакция 2024"
     title="Глоссарий"
     crumb-current="Глоссарий"
-    lead="Действия, состояния, навыки, свойства оружия, опасности и другие термины правил D&D 5.5e."
     search-placeholder="Найти правило или термин"
     node-prefix="d55-glossary"
     query-key="rule"
@@ -135,18 +134,6 @@ useSeoMeta({
     @toggle-filter="toggleFilter"
     @reset-filters="resetFilters"
   >
-    <template #intro>
-      <aside class="glossary-edition-note">
-        <span class="glossary-edition-mark" aria-hidden="true">⌘</span>
-        <div>
-          <b>Справочник правил редакции 2024 года</b>
-          <p>
-            Самостоятельный свод терминов редакции 2024 года: определения и механика находятся прямо в карточках,
-            а перекрёстные ссылки ведут только на разделы D&D 5.5e. Источник каждого правила отмечен отдельно.
-          </p>
-        </div>
-      </aside>
-    </template>
 
     <template #item="{ item }">
       <span class="glossary-list-card">
@@ -239,38 +226,6 @@ useSeoMeta({
 </template>
 
 <style scoped>
-.glossary-edition-note{
-  display:flex;
-  align-items:flex-start;
-  gap:14px;
-  max-width:820px;
-  margin:24px 0 2px;
-  border:1px solid rgba(var(--theme-accent-rgb),.22);
-  border-radius:10px;
-  background:linear-gradient(100deg,rgba(var(--theme-accent-rgb),.075),rgba(var(--theme-surface-rgb),.36));
-  padding:15px 17px;
-}
-.glossary-edition-mark{
-  display:grid;
-  width:27px;
-  height:27px;
-  flex:0 0 auto;
-  place-items:center;
-  border:1px solid rgba(var(--theme-accent-rgb),.3);
-  color:rgba(var(--theme-accent-strong-rgb),.9);
-}
-.glossary-edition-note b{
-  color:rgba(var(--theme-accent-strong-rgb),.94);
-  font-family:'Cormorant Garamond',serif;
-  font-size:18px;
-  font-weight:600;
-}
-.glossary-edition-note p{
-  margin:4px 0 0;
-  color:rgba(var(--theme-text-rgb),.62);
-  font-size:12px;
-  line-height:1.6;
-}
 .glossary-list-card{
   display:grid;
   grid-template-columns:38px minmax(0,1fr);
@@ -477,7 +432,6 @@ useSeoMeta({
 }
 .glossary-rule-block footer b{color:rgba(var(--theme-accent-strong-rgb),.74)}
 @media (max-width:700px){
-  .glossary-edition-note{padding:13px}
   .glossary-heading{grid-template-columns:58px minmax(0,1fr);gap:13px}
   .glossary-heading-icon{width:54px;height:54px;font-size:24px}
   .glossary-title{font-size:25px}

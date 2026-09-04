@@ -116,7 +116,6 @@ useSeoMeta({
     kicker="D&D 5.5e · редакция 2024"
     title="Черты"
     crumb-current="Черты"
-    lead="Боевые стили, общие таланты и дары происхождения по правилам Player’s Handbook 2024."
     search-placeholder="Найти черту, требование или эффект"
     node-prefix="d55-feat"
     query-key="feat"
@@ -137,19 +136,6 @@ useSeoMeta({
     @toggle-filter="toggleFilter"
     @reset-filters="resetFilters"
   >
-    <template #intro>
-      <aside class="feat-edition-note">
-        <span class="feat-edition-mark" aria-hidden="true">✦</span>
-        <div>
-          <b>Редакция 2024 отделена от правил 2014 года</b>
-          <p>
-            Черты происхождения доступны при создании персонажа, общие черты обычно требуют 4-й уровень,
-            а боевые стили — одноимённую классовую способность. Увеличения характеристик у видов сюда не
-            возвращены: бонус +1 в описаниях общих черт является отдельной механикой развития персонажа.
-          </p>
-        </div>
-      </aside>
-    </template>
 
     <template #item="{ item }">
       <span class="feat-list-card">
@@ -218,38 +204,6 @@ useSeoMeta({
 </template>
 
 <style scoped>
-.feat-edition-note{
-  display:flex;
-  align-items:flex-start;
-  gap:14px;
-  max-width:800px;
-  margin:24px 0 2px;
-  border:1px solid rgba(var(--theme-accent-rgb),.22);
-  border-radius:10px;
-  background:linear-gradient(100deg,rgba(var(--theme-accent-rgb),.075),rgba(var(--theme-surface-rgb),.36));
-  padding:15px 17px;
-}
-.feat-edition-mark{
-  display:grid;
-  width:25px;
-  height:25px;
-  flex:0 0 auto;
-  place-items:center;
-  color:rgba(var(--theme-accent-strong-rgb),.9);
-  font-size:18px;
-}
-.feat-edition-note b{
-  font-family:'Cormorant Garamond',serif;
-  color:rgba(var(--theme-accent-strong-rgb),.94);
-  font-size:18px;
-  font-weight:600;
-}
-.feat-edition-note p{
-  margin:4px 0 0;
-  color:rgba(var(--theme-text-rgb),.62);
-  font-size:12px;
-  line-height:1.6;
-}
 .feat-list-card{
   display:grid;
   grid-template-columns:38px minmax(0,1fr);
@@ -359,7 +313,6 @@ useSeoMeta({
   line-height:1.66;
 }
 @media (max-width:700px){
-  .feat-edition-note{padding:13px}
   .feat-heading{grid-template-columns:56px minmax(0,1fr);gap:13px}
   .feat-heading-icon{width:48px;height:48px;font-size:22px}
   .feat-title{font-size:25px}

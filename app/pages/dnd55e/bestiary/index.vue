@@ -143,7 +143,6 @@ useSeoMeta({
     kicker="D&D 5.5e · редакция 2024"
     title="Бестиарий"
     crumb-current="Бестиарий"
-    lead="Существа из основных книг редакции 2024: характеристики, умения и действия."
     search-placeholder="Найти существо, тип или способность"
     node-prefix="d55-creature"
     query-key="creature"
@@ -163,19 +162,6 @@ useSeoMeta({
     @toggle-filter="toggleFilter"
     @reset-filters="resetFilters"
   >
-    <template #intro>
-      <aside class="bestiary-note">
-        <span class="bestiary-note-mark" aria-hidden="true">✦</span>
-        <div>
-          <b>Статблоки редакции 2024</b>
-          <p>
-            Существа без УО создаются заклинанием, классовой способностью или магическим предметом;
-            их параметры зависят от призывателя либо уровня заклинания. Гигантская сова находится в
-            группе УО 1/4 согласно Бестиарию 2024.
-          </p>
-        </div>
-      </aside>
-    </template>
 
     <template #item="{ item }">
       <span class="creature-list-card">
@@ -250,10 +236,6 @@ useSeoMeta({
 </template>
 
 <style scoped>
-.bestiary-note{display:flex;align-items:flex-start;gap:14px;max-width:850px;margin:24px 0 20px;padding:15px 17px;border:1px solid rgba(var(--theme-accent-rgb),.24);border-radius:10px;background:linear-gradient(100deg,rgba(var(--theme-accent-rgb),.08),rgba(var(--theme-surface-rgb),.32));color:rgba(var(--theme-text-rgb),.78)}
-.bestiary-note-mark{display:grid;place-items:center;width:34px;height:34px;flex:0 0 auto;border:1px solid rgba(var(--theme-accent-rgb),.34);border-radius:50%;color:var(--theme-accent-strong)}
-.bestiary-note b{color:var(--theme-heading)}
-.bestiary-note p{margin:5px 0 0;font-size:12px;line-height:1.55}
 .creature-list-card{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-width:0}
 .creature-list-copy{display:flex;min-width:0;flex-direction:column;gap:2px;text-align:left}
 .creature-list-name,.creature-list-original,.creature-list-type{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

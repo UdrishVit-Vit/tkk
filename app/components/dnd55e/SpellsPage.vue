@@ -187,7 +187,6 @@ useSeoMeta({
     kicker="D&D 5.5e · редакция 2024"
     title="Заклинания"
     crumb-current="Заклинания"
-    lead="Заговоры и заклинания 1–9-го уровней по правилам Player’s Handbook 2024, а также напевы шамана и собственные заклинания Эноа — с актуальными эффектами, компонентами и списками классов."
     search-placeholder="Найти заклинание, эффект, класс или компонент"
     node-prefix="d55-spell"
     query-key="spell"
@@ -208,18 +207,6 @@ useSeoMeta({
     @toggle-filter="toggleFilter"
     @reset-filters="resetFilters"
   >
-    <template #intro>
-      <aside class="spell-edition-note">
-        <span class="spell-edition-mark" aria-hidden="true">◐</span>
-        <div>
-          <b>Заклинания приведены к редакции 2024 года</b>
-          <p>
-            Каталог не копирует версии 2014 года: кары накладываются после попадания, лечение усилено,
-            а «Усыпление», «Прыжок» и другие заклинания используют новые механики.
-          </p>
-        </div>
-      </aside>
-    </template>
 
     <template #item="{ item }">
       <span class="spell-list-card">
@@ -311,28 +298,6 @@ useSeoMeta({
 </template>
 
 <style scoped>
-.spell-edition-note{
-  display:flex;
-  align-items:flex-start;
-  gap:14px;
-  max-width:800px;
-  margin:24px 0 2px;
-  border:1px solid rgba(var(--theme-accent-rgb),.22);
-  border-radius:10px;
-  background:linear-gradient(100deg,rgba(var(--theme-accent-rgb),.075),rgba(var(--theme-surface-rgb),.36));
-  padding:15px 17px;
-}
-.spell-edition-mark{
-  display:grid;
-  width:25px;
-  height:25px;
-  flex:0 0 auto;
-  place-items:center;
-  color:rgba(var(--theme-accent-strong-rgb),.9);
-  font-size:18px;
-}
-.spell-edition-note b{font-family:'Cormorant Garamond',serif;color:rgba(var(--theme-accent-strong-rgb),.94);font-size:18px;font-weight:600}
-.spell-edition-note p{margin:4px 0 0;color:rgba(var(--theme-text-rgb),.62);font-size:12px;line-height:1.6}
 .spell-list-card{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:9px;min-width:0;width:100%}
 .spell-list-icon{display:grid;width:38px;height:38px;place-items:center;border-right:1px solid rgba(var(--theme-text-rgb),.1);padding-right:7px}
 .spell-list-icon img{width:31px;height:31px;object-fit:contain;filter:sepia(.25) saturate(.75) brightness(1.08)}
@@ -360,7 +325,6 @@ useSeoMeta({
 .spell-classes h3{width:100%;margin-bottom:1px}
 .spell-classes span{border:1px solid rgba(var(--theme-accent-rgb),.18);border-radius:999px;background:rgba(var(--theme-accent-rgb),.045);padding:4px 9px;color:rgba(var(--theme-text-rgb),.68);font-size:11px}
 @media (max-width:700px){
-  .spell-edition-note{padding:13px}
   .spell-list-card{grid-template-columns:36px minmax(0,1fr)}
   .spell-components{display:none}
   .spell-heading{grid-template-columns:56px minmax(0,1fr);gap:13px}

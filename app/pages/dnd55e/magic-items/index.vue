@@ -145,7 +145,6 @@ useSeoMeta({
     kicker="D&D 5.5e · редакция 2024"
     title="Магические предметы"
     crumb-current="Магические предметы"
-    lead="Сокровища, оружие, доспехи и чудесные предметы по правилам редакции 2024 года."
     search-placeholder="Найти предмет, эффект или английское название"
     node-prefix="d55-magic-item"
     query-key="item"
@@ -165,18 +164,12 @@ useSeoMeta({
     @toggle-filter="toggleFilter"
     @reset-filters="resetFilters"
   >
-    <template #intro>
+    <template v-if="magicItemsError" #intro>
       <aside class="magic-items-note">
         <span class="magic-items-note-mark" aria-hidden="true">✦</span>
         <div>
-          <b>{{ magicItemsError ? 'Каталог временно недоступен' : 'Полный каталог D&D 2024' }}</b>
-          <p>
-            <template v-if="magicItemsError">Не удалось загрузить данные. Обновите страницу и попробуйте ещё раз.</template>
-            <template v-else>
-              В списке показаны только название предмета, оригинальное английское название и книга-источник.
-              Нажмите на предмет, чтобы открыть его тип, редкость, настройку и полное описание игровых свойств.
-            </template>
-          </p>
+          <b>Каталог временно недоступен</b>
+          <p>Не удалось загрузить данные. Обновите страницу и попробуйте ещё раз.</p>
         </div>
       </aside>
     </template>

@@ -1421,18 +1421,6 @@ function printRace() {
               </div>
             </section>
 
-            <aside v-if="is2024Edition" class="rd-edition-note rd-thread-node">
-              <span class="rd-edition-note-mark" aria-hidden="true">2024</span>
-              <div>
-                <h2>Происхождение персонажа в D&amp;D 5.5e</h2>
-                <p>
-                  Вид определяет тип существа, размер, скорость и особые черты. Он не повышает
-                  характеристики: эти повышения предоставляет предыстория. Общий и ещё два языка
-                  выбираются отдельно при создании персонажа.
-                </p>
-              </div>
-            </aside>
-
             <aside v-if="isPf2e" class="rd-edition-note rd-thread-node">
               <span class="rd-edition-note-mark" aria-hidden="true">PF2e</span>
               <div>
