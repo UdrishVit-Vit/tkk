@@ -339,6 +339,8 @@
 .rd-feat-name{display:flex;align-items:center;gap:8px;font-family:'Hanken Grotesk';font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.9)}
 .rd-feat-tag{flex:none;font-size:9px;font-weight:700;letter-spacing:.06em;color:rgba(20,15,6,.95);background:rgba(var(--theme-accent-rgb),.85);border-radius:5px;padding:2px 6px}
 .rd-feat-text{font-size:13.5px;line-height:1.65;color:rgba(var(--theme-text-rgb),.76)}
+.rd-feat-para{display:block}
+.rd-feat-para+.rd-feat-para{margin-top:9px}
 .rd-feat--v{border-color:rgba(var(--theme-accent-rgb),.4);background:rgba(var(--theme-accent-rgb),.07)}
 
 .rd-wind-table{display:grid;margin-top:14px;overflow:hidden;border:1px solid rgba(var(--theme-contrast-rgb),.1);border-radius:14px;background:rgba(var(--theme-contrast-rgb),.012)}
@@ -368,6 +370,8 @@
 .rd-item-row strong{display:block;margin-bottom:3px;color:rgba(var(--theme-heading-rgb),.92);font-size:14px}
 .rd-item-row p{margin:0;font-size:13px;line-height:1.55;color:rgba(var(--theme-text-rgb),.74)}
 .rd-item-name,.rd-item-copy{min-width:0}
+.rd-items.dice .rd-items-head,.rd-items.dice .rd-item-row{grid-template-columns:76px minmax(0,1fr)}
+.rd-items.dice .rd-item-row strong{margin-bottom:0;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;color:rgba(var(--theme-accent-rgb),.85);letter-spacing:.04em}
 .rd-item-mobile-label{display:none}
 
 /* ---- Кровь Змей — inline blood feature card ---- */
@@ -536,6 +540,9 @@
   .rd-items-head{display:none}
   .rd-item-row,.rd-items.compact .rd-item-row{display:grid;grid-template-columns:72px minmax(0,1fr);grid-template-areas:"image name" "image copy";gap:8px 12px;min-width:0;padding:13px;border:1px solid rgba(var(--theme-contrast-rgb),.09);border-radius:12px;background:rgba(var(--theme-contrast-rgb),.018)}
   .rd-items.compact .rd-item-row{grid-template-columns:1fr;grid-template-areas:"name" "copy"}
+  .rd-items.dice .rd-item-row,.rd-items.dice.compact .rd-item-row{grid-template-columns:56px minmax(0,1fr);grid-template-areas:"name copy";align-items:start}
+  .rd-items.dice .rd-item-name{align-self:start}
+  .rd-items.dice .rd-item-mobile-label{display:none}
   .rd-item-img{grid-area:image;align-self:start;width:72px;min-height:72px}
   .rd-item-img img{width:100%;max-width:68px;max-height:82px}
   .rd-item-name{grid-area:name;align-self:end}

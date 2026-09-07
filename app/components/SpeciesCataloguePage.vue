@@ -538,7 +538,9 @@ const varietyTitles = ['Янтарный', 'Пепельный', 'Драгмир
 const stigmataTitles = ['Глаза зверя', 'Вены Бездны', 'Хвост Порочного', 'Копыта Странника', 'Лапы чудовища', 'Оболочка медузы', 'Крыло падшего', 'Рога Тьмы', 'Бивни Рока', 'Язык Змеи', 'Крюки фатума', 'Раны Крови']
 const parasiteTitles = ['Багровый червь', 'Солнечный жук-рогач', 'Большой таракан Худа', 'Многохвостая крыса-барсук', 'Паук-слепун', 'Стеклянный муравей', 'Волосатая сороконожка-альбинос', 'Жадеитовый скарабей', 'Колония лазурных термитов', 'Саранча-иллюзионист']
 const paktTitles = ['Договор Густой Крови', 'Договор Проводника', 'Договор Монеты', 'Договор Смерти', 'Договор Искры', 'Запретный Договор']
-const anzuRageTitles = ['1', '2', '3', '4-10']
+// The source table uses an en dash in "4–10"; keep the hyphen spelling too so
+// either form in the content still lines up as a row.
+const anzuRageTitles = ['1', '2', '3', '4–10', '4-10']
 
 const parasiteImageByTitle = {
   'Багровый червь': '/images/races/udrishi/parasites/bagrovyy-cherv.webp',
@@ -614,7 +616,12 @@ function sectionItemsColumnLabel(section) {
   return 'Способности'
 }
 function sectionItemsNameLabel(section) {
-  return section.title === 'Мор’хоры (Дитя Анзу)' ? 'к10' : 'Название'
+  return sectionItemsIsDiceTable(section) ? 'к10' : 'Название'
+}
+// Roll tables put the die result in the first column, so it gets a narrow
+// numeric column instead of the wide name column.
+function sectionItemsIsDiceTable(section) {
+  return section?.title === 'Мор’хоры (Дитя Анзу)'
 }
 
 const sectionSubheadingsByTitle = {
@@ -623,12 +630,17 @@ const sectionSubheadingsByTitle = {
   'Человек (Бралл)': ['Красота в голове'],
   'Человек (Адаад)': ['Неугасающий дух']
 }
+// Sections where a long feature is written as several paragraphs: the plain
+// paragraphs that follow a labelled one belong to that feature, not to the
+// section description.
+const multiParagraphFeatureSections = ['Мор’хоры (Дитя Анзу)']
+
 function sectionParagraphs(section) {
   const intro = sectionIntro(section)
   if (!intro) return []
 
   const subheadings = sectionSubheadingsByTitle[section.title] || []
-  return intro.split(/\n\s*\n/g).map(p => p.trim()).filter(Boolean).map(paragraph => {
+  const blocks = intro.split(/\n\s*\n/g).map(p => p.trim()).filter(Boolean).map(paragraph => {
     if (subheadings.includes(paragraph)) return { text: paragraph, heading: true }
     if (/^—\s/.test(paragraph)) return { text: paragraph, quote: true }
     if (/^Таблица\s.{1,60}\.$/.test(paragraph)) return { text: paragraph, caption: true }
@@ -637,6 +649,17 @@ function sectionParagraphs(section) {
     if (!match) return { text: paragraph }
     return { label: match[1], text: match[2].trim() }
   })
+
+  if (!multiParagraphFeatureSections.includes(section.title)) return blocks
+
+  const merged = []
+  for (const block of blocks) {
+    const previous = merged[merged.length - 1]
+    const isPlain = !block.label && !block.heading && !block.quote && !block.caption
+    if (isPlain && previous?.label) previous.text = `${previous.text}\n\n${block.text}`
+    else merged.push(block)
+  }
+  return merged
 }
 
 // ---- varieties ----
@@ -1538,7 +1561,7 @@ function printRace() {
                         class="rd-feat rd-feat--v rd-feat--blood wide"
                       >
                         <span class="rd-feat-name">{{ card.title }}<span class="rd-feat-tag">{{ varietyShortTitle(activeVariety) }}</span></span>
-                        <span class="rd-feat-text">{{ card.text }}</span>
+                        <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(card.text)" :key="pi" class="rd-feat-para">{{ para }}</span></span>
                         <!-- Roll button -->
                         <button class="rd-blood-roll-btn" type="button" @click="rollBlood">
                           Бросить кубики
@@ -1605,19 +1628,19 @@ function printRace() {
                       <!-- Regular feature card -->
                       <div v-else class="rd-feat rd-feat--v" :class="{ wide: featWide(card.text) }">
                         <span class="rd-feat-name">{{ card.title }}<span class="rd-feat-tag">{{ varietyShortTitle(activeVariety) }}</span></span>
-                        <span class="rd-feat-text">{{ card.text }}</span>
+                        <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(card.text)" :key="pi" class="rd-feat-para">{{ para }}</span></span>
                       </div>
                     </template>
                     <div v-for="trait in baseFeatures" :key="'b-' + trait.title" class="rd-feat" :class="{ wide: featWide(trait.text) }">
                       <span class="rd-feat-name">{{ trait.title }}</span>
-                      <span class="rd-feat-text">{{ trait.text }}</span>
+                      <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(trait.text)" :key="pi" class="rd-feat-para">{{ para }}</span></span>
                     </div>
                   </div>
 
                   <div
                     v-if="varietyItemsList.length"
                     class="rd-items"
-                    :class="{ compact: !varietyItemsHaveImages }"
+                    :class="{ compact: !varietyItemsHaveImages, dice: sectionItemsIsDiceTable(activeVariety) }"
                   >
                     <div class="rd-items-head">
                       <span v-if="varietyItemsHaveImages">Изображение</span>
@@ -1826,7 +1849,7 @@ function printRace() {
               <div class="rd-features">
                 <div v-for="trait in baseFeatures" :key="trait.title" class="rd-feat" :class="{ wide: featWide(trait.text) }">
                   <span class="rd-feat-name">{{ trait.title }}</span>
-                  <span class="rd-feat-text">{{ trait.text }}</span>
+                  <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(trait.text)" :key="pi" class="rd-feat-para">{{ para }}</span></span>
                 </div>
               </div>
             </div>
@@ -1894,14 +1917,20 @@ function printRace() {
             <div v-for="section in extraRuleSections" :key="section.id" class="rd-block">
               <h2 class="rd-h2">{{ section.title }}</h2>
               <div v-if="sectionParagraphs(section).length" class="rd-variety-desc">
-                <p v-for="(p, pi) in sectionParagraphs(section)" :key="pi" :class="{ 'is-heading': p.heading, 'is-quote': p.quote }">
-                  <strong v-if="p.label" class="rd-section-label">{{ p.label }}:</strong> {{ p.text }}
-                </p>
+                <template v-for="(p, pi) in sectionParagraphs(section)" :key="pi">
+                  <p
+                    v-for="(para, qi) in featParagraphs(p.text)"
+                    :key="pi + '-' + qi"
+                    :class="{ 'is-heading': p.heading, 'is-quote': p.quote }"
+                  >
+                    <strong v-if="p.label && !qi" class="rd-section-label">{{ p.label }}:</strong> {{ para }}
+                  </p>
+                </template>
               </div>
               <div
                 v-if="sectionItems(section).length"
                 class="rd-items"
-                :class="{ compact: !sectionItems(section).some(i => i.image) }"
+                :class="{ compact: !sectionItems(section).some(i => i.image), dice: sectionItemsIsDiceTable(section) }"
               >
                 <div class="rd-items-head">
                   <span v-if="sectionItems(section).some(i => i.image)">Изображение</span>
