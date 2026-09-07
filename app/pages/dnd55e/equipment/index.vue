@@ -509,6 +509,18 @@ useSeoMeta({
       <section v-else-if="item.raw.kind === 'tool'" class="equipment-rule-block">
         <h3>Использование</h3>
         <p>{{ item.raw.utilize }}</p>
+        <template v-for="detail in item.raw.details || []" :key="detail.title">
+          <h3>{{ detail.title }}</h3>
+          <p>{{ detail.text }}</p>
+          <div v-if="detail.table" class="equipment-dc-table">
+            <div class="equipment-dc-head">
+              <span v-for="column in detail.table.columns" :key="column">{{ column }}</span>
+            </div>
+            <div v-for="row in detail.table.rows" :key="row[0]" class="equipment-dc-row">
+              <span v-for="(cell, ci) in row" :key="ci">{{ cell }}</span>
+            </div>
+          </div>
+        </template>
         <template v-if="item.raw.craft !== '—'">
           <h3>Создание предметов</h3>
           <p>{{ item.raw.craft }}</p>
@@ -554,6 +566,11 @@ useSeoMeta({
 .rules-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.rules-panel{border:1px solid rgba(var(--theme-accent-rgb),.16);border-radius:10px;background:rgba(var(--theme-surface-rgb),.28);overflow:hidden}.rules-panel.wide{grid-column:1/-1}.rules-panel summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;cursor:pointer;list-style:none;color:rgba(var(--theme-heading-rgb),.92);font-weight:750}.rules-panel summary::-webkit-details-marker{display:none}.rules-panel summary::before{content:'+';width:20px;height:20px;display:grid;place-items:center;border:1px solid rgba(var(--theme-accent-rgb),.28);border-radius:50%;color:var(--theme-accent-strong);font-weight:500}.rules-panel[open] summary::before{content:'−'}.rules-panel summary span{margin-right:auto}.rules-panel summary small{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(var(--theme-text-rgb),.46)}.rules-panel-body{padding:2px 15px 15px;border-top:1px solid rgba(var(--theme-accent-rgb),.1);color:rgba(var(--theme-text-rgb),.76)}.rules-panel-body p{line-height:1.58;margin:11px 0 0}
 .coin-line{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0}.coin-line span{display:flex;flex-direction:column;padding:8px;border:1px solid rgba(var(--theme-accent-rgb),.14);border-radius:7px;background:rgba(var(--theme-contrast-rgb),.03)}.coin-line small{color:rgba(var(--theme-text-rgb),.5)}
 .glossary-grid,.mastery-grid,.pack-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding-top:12px}.glossary-grid article,.pack-list article{padding:11px 12px;border-radius:8px;background:rgba(var(--theme-contrast-rgb),.025)}.glossary-grid h3,.mastery-grid h3,.pack-list h3,.crafting-layout h3{margin:0;color:var(--theme-accent-strong);font-size:14px}.glossary-grid h3 small,.mastery-grid h3 small{margin-left:4px;color:rgba(var(--theme-text-rgb),.46);font-size:11px;font-weight:500}.glossary-grid p,.mastery-grid p,.pack-list p{margin:4px 0 0;font-size:13px}.mastery-grid article{display:flex;gap:10px;padding:12px;border:1px solid rgba(var(--theme-accent-rgb),.12);border-radius:8px}.mastery-rune{color:var(--theme-accent-strong);font-size:9px;margin-top:4px}.crafting-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:18px;padding-top:14px}.crafting-layout h3:not(:first-child){margin-top:14px}.equipment-used-links{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:4px;font-size:13px}
+.equipment-dc-table{display:grid;margin-top:6px;overflow:hidden;border:1px solid rgba(var(--theme-contrast-rgb),.1);border-radius:8px}
+.equipment-dc-head,.equipment-dc-row{display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;padding:7px 12px}
+.equipment-dc-head{background:rgba(var(--theme-accent-rgb),.1);color:rgba(var(--theme-accent-strong-rgb),.92);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.equipment-dc-row{border-top:1px solid rgba(var(--theme-contrast-rgb),.07);font-size:13px;line-height:1.5}
+.equipment-dc-row span:first-child{color:var(--theme-accent-strong);font-weight:700}
 .rule-link{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(var(--theme-accent-rgb),.48)}.rule-link:hover{color:var(--theme-accent-strong);border-bottom-style:solid}
 .equipment-list-card{display:flex;align-items:center;width:100%;min-width:0}.equipment-list-copy{display:flex;flex-direction:column;min-width:0}.equipment-list-name{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .equipment-card-heading{margin:14px 0 18px}.equipment-card-title,.equipment-card-original,.equipment-card-summary{display:block}.equipment-card-title{font:700 25px/1.15 Georgia,serif;color:var(--theme-heading)}.equipment-card-original{margin-top:2px;color:rgba(var(--theme-accent-rgb),.7);font-size:13px}.equipment-card-summary{max-width:720px;margin-top:8px;color:rgba(var(--theme-text-rgb),.72);line-height:1.52}

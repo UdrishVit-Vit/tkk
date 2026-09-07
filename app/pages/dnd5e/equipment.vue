@@ -98,6 +98,14 @@ useSeoMeta({
         <div v-for="detail in item.raw.details" :key="detail.title" class="eq-detail">
           <h3>{{ detail.title }}</h3>
           <p><RuleRichText :text="detail.text" :current-path="itemPath(item.raw)" :exclude-paths="DETAIL_LINK_EXCLUDE" /></p>
+          <div v-if="detail.table" class="eq-table">
+            <div class="eq-table-head">
+              <span v-for="column in detail.table.columns" :key="column">{{ column }}</span>
+            </div>
+            <div v-for="row in detail.table.rows" :key="row[0]" class="eq-table-row">
+              <span v-for="(cell, ci) in row" :key="ci">{{ cell }}</span>
+            </div>
+          </div>
         </div>
       </div>
 
