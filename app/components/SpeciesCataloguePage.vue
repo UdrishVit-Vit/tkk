@@ -1019,6 +1019,27 @@ function relatedLink(term) {
 // Снаряжение, которое само объявило, что нужно чертам этого народа: набор
 // татуировщика для «Татуировок Ветров», и так далее.
 const raceEquipment = computed(() => equipmentUsedOn(selectedPath.value))
+// Механика татуировок — самая правиловая часть досье аджаидов: проверки
+// инструментов, спасброски, отдых, состояния. В этих блоках термины ведут в
+// глоссарий своей редакции; остальное досье остаётся прозой, где автоссылки
+// только мешают читать.
+const RULE_LINKED_TITLES = new Set([
+  'Татуировки Ветров',
+  'Татуировки ветров',
+  'Адепт Чернил Крови'
+])
+function isRuleLinked(title) {
+  return RULE_LINKED_TITLES.has(String(title || '').trim())
+}
+
+// Обычные слова, совпадающие с названиями правил: татуировка «действует до
+// отдыха» — не действие в бою, «знак дома» — не заклинание «Знак».
+const RULE_LINK_EXCLUDE = [
+  '/dnd5e/screens/action',
+  '/dnd55e/glossary?rule=action',
+  '/dnd5e/spells?s=symbol'
+]
+
 // Long feature descriptions read poorly in a single narrow column — let them span two.
 function featWide(text = '') {
   return (text || '').length > 200
@@ -1572,7 +1593,7 @@ function printRace() {
                         class="rd-feat rd-feat--v rd-feat--blood wide"
                       >
                         <span class="rd-feat-name">{{ card.title }}<span class="rd-feat-tag">{{ varietyShortTitle(activeVariety) }}</span></span>
-                        <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(card.text)" :key="pi" class="rd-feat-para">{{ para }}</span></span>
+                        <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(card.text)" :key="pi" class="rd-feat-para"><RuleRichText v-if="isRuleLinked(card.title)" :text="para" :exclude-paths="RULE_LINK_EXCLUDE" /><template v-else>{{ para }}</template></span></span>
                         <!-- Roll button -->
                         <button class="rd-blood-roll-btn" type="button" @click="rollBlood">
                           Бросить кубики
@@ -1639,12 +1660,12 @@ function printRace() {
                       <!-- Regular feature card -->
                       <div v-else class="rd-feat rd-feat--v" :class="{ wide: featWide(card.text) }">
                         <span class="rd-feat-name">{{ card.title }}<span class="rd-feat-tag">{{ varietyShortTitle(activeVariety) }}</span></span>
-                        <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(card.text)" :key="pi" class="rd-feat-para">{{ para }}</span></span>
+                        <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(card.text)" :key="pi" class="rd-feat-para"><RuleRichText v-if="isRuleLinked(card.title)" :text="para" :exclude-paths="RULE_LINK_EXCLUDE" /><template v-else>{{ para }}</template></span></span>
                       </div>
                     </template>
                     <div v-for="trait in baseFeatures" :key="'b-' + trait.title" class="rd-feat" :class="{ wide: featWide(trait.text) }">
                       <span class="rd-feat-name">{{ trait.title }}</span>
-                      <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(trait.text)" :key="pi" class="rd-feat-para">{{ para }}</span></span>
+                      <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(trait.text)" :key="pi" class="rd-feat-para"><RuleRichText v-if="isRuleLinked(trait.title)" :text="para" :exclude-paths="RULE_LINK_EXCLUDE" /><template v-else>{{ para }}</template></span></span>
                     </div>
                   </div>
 
@@ -1860,7 +1881,7 @@ function printRace() {
               <div class="rd-features">
                 <div v-for="trait in baseFeatures" :key="trait.title" class="rd-feat" :class="{ wide: featWide(trait.text) }">
                   <span class="rd-feat-name">{{ trait.title }}</span>
-                  <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(trait.text)" :key="pi" class="rd-feat-para">{{ para }}</span></span>
+                  <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(trait.text)" :key="pi" class="rd-feat-para"><RuleRichText v-if="isRuleLinked(trait.title)" :text="para" :exclude-paths="RULE_LINK_EXCLUDE" /><template v-else>{{ para }}</template></span></span>
                 </div>
               </div>
             </div>
@@ -1878,12 +1899,12 @@ function printRace() {
                   <article class="rd-wind-cell rd-wind-cell--white" role="cell">
                     <span class="rd-wind-cell-label">Белый Ветер</span>
                     <h3>{{ entry.whiteTitle }}</h3>
-                    <p>{{ entry.whiteText }}</p>
+                    <p><RuleRichText :text="entry.whiteText" :exclude-paths="RULE_LINK_EXCLUDE" /></p>
                   </article>
                   <article class="rd-wind-cell rd-wind-cell--black" role="cell">
                     <span class="rd-wind-cell-label">Чёрный Ветер</span>
                     <h3>{{ entry.blackTitle }}</h3>
-                    <p>{{ entry.blackText }}</p>
+                    <p><RuleRichText :text="entry.blackText" :exclude-paths="RULE_LINK_EXCLUDE" /></p>
                     <p class="rd-wind-darkness">
                       Вы получаете <strong>{{ entry.darknessPoints }}</strong>
                       {{ entry.darknessPoints === 1 ? 'Пункт Тьмы' : 'Пункта Тьмы' }}.
@@ -1908,12 +1929,12 @@ function printRace() {
                     <article class="rd-wind-cell rd-wind-cell--white">
                       <span class="rd-wind-cell-label">Белый Ветер</span>
                       <h3>{{ entry.whiteTitle }}</h3>
-                      <p>{{ entry.whiteText }}</p>
+                      <p><RuleRichText :text="entry.whiteText" :exclude-paths="RULE_LINK_EXCLUDE" /></p>
                     </article>
                     <article class="rd-wind-cell rd-wind-cell--black">
                       <span class="rd-wind-cell-label">Чёрный Ветер</span>
                       <h3>{{ entry.blackTitle }}</h3>
-                      <p>{{ entry.blackText }}</p>
+                      <p><RuleRichText :text="entry.blackText" :exclude-paths="RULE_LINK_EXCLUDE" /></p>
                       <p class="rd-wind-darkness">
                         Вы получаете <strong>{{ entry.darknessPoints }}</strong>
                         {{ entry.darknessPoints === 1 ? 'Пункт Тьмы' : 'Пункта Тьмы' }}.
@@ -1934,7 +1955,8 @@ function printRace() {
                     :key="pi + '-' + qi"
                     :class="{ 'is-heading': p.heading, 'is-quote': p.quote }"
                   >
-                    <strong v-if="p.label && !qi" class="rd-section-label">{{ p.label }}:</strong> {{ para }}
+                    <strong v-if="p.label && !qi" class="rd-section-label">{{ p.label }}:</strong>
+                    <RuleRichText v-if="isRuleLinked(section.title)" :text="para" :exclude-paths="RULE_LINK_EXCLUDE" /><template v-else>{{ para }}</template>
                   </p>
                 </template>
               </div>
@@ -1958,7 +1980,7 @@ function printRace() {
                   </div>
                   <div class="rd-item-copy">
                     <span class="rd-item-mobile-label">{{ sectionItemsColumnLabel(section) }}</span>
-                    <p>{{ item.text }}</p>
+                    <p><RuleRichText v-if="isRuleLinked(section.title)" :text="item.text" :exclude-paths="RULE_LINK_EXCLUDE" /><template v-else>{{ item.text }}</template></p>
                   </div>
                 </div>
               </div>

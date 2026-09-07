@@ -252,6 +252,15 @@ export const DND55E_SPECIES = [
     description: 'Дети Бесклыкого и Джа, голос дикой природы Даскара, сильные волей и телом и хранящие древние суровые традиции гор.'
   },
   {
+    id: 'koboldy',
+    title: 'Кобольд',
+    originalName: 'Kobold',
+    portrait: '',
+    source: 'TL',
+    sourceTitle: 'The Threads of Largo',
+    description: 'Мелкий народ дюн и кяризов, порождённый Иджин’Аном, плетущий ловушки и молящийся звезде-трюкачу Джу’джу’вару.'
+  },
+  {
     id: 'lyudi',
     title: 'Человек',
     originalName: 'Humans',
