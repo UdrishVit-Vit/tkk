@@ -1,5 +1,6 @@
 <script setup>
 import { useThreadConstellation } from '~/composables/useThreadConstellation.js'
+import { loreLinkFor } from '~/utils/loreLink.js'
 
 const route = useRoute()
 
@@ -1008,6 +1009,11 @@ function findRuleText(race, title) {
 function fullText(text = '') {
   return normalizeBreaks(text).trim() || '—'
 }
+// «Связанные нити» ведут в свод: имя разрешается в адрес статьи, а то, чего в
+// своде ещё нет, остаётся обычной подписью.
+function relatedLink(term) {
+  return loreLinkFor(term)
+}
 // Long feature descriptions read poorly in a single narrow column — let them span two.
 function featWide(text = '') {
   return (text || '').length > 200
@@ -2011,7 +2017,12 @@ function printRace() {
               <div class="rd-foot-col">
               <h2 class="rd-h2">Связанные нити</h2>
               <div class="rd-related">
-                <span v-for="term in selectedRace.related" :key="term" class="rd-pill">{{ term }}</span>
+                <template v-for="term in selectedRace.related" :key="term"><NuxtLink
+                  v-if="relatedLink(term)"
+                  :to="relatedLink(term)"
+                  class="rd-pill is-link"
+                  :title="`${term} — статья свода`"
+                >{{ term }}</NuxtLink><span v-else class="rd-pill">{{ term }}</span></template>
               </div>
               </div>
             </section>

@@ -443,6 +443,8 @@
   .rd-pf-feat-head h3{font-size:19px}
 }
 .rd-pill{border:1px solid rgba(var(--theme-accent-rgb),.3);background:rgba(var(--theme-accent-rgb),.08);color:rgba(var(--theme-accent-strong-rgb),.92);border-radius:999px;padding:6px 14px;font-family:'Cormorant Garamond',serif;font-size:14px}
+.rd-pill.is-link{text-decoration:none;cursor:pointer}
+.rd-pill.is-link:hover,.rd-pill.is-link:focus-visible{border-color:rgba(var(--theme-accent-strong-rgb),.62);background:rgba(var(--theme-accent-rgb),.16);color:rgba(var(--theme-accent-strong-rgb),1);outline:0}
 
 .rd-swap-enter-active,.rd-swap-leave-active{transition:opacity .18s ease,transform .18s ease}
 .rd-swap-enter-from,.rd-swap-leave-to{opacity:0;transform:translateY(8px)}
