@@ -25,11 +25,13 @@ const tokens = computed(() => String(props.text || '')
     const link = chunk.match(exactExplicitLinkPattern)
     if (link) return [{ type: 'extlink', text: link[1], path: link[2], bold: false }]
     return chunk
-      .split(/(\*\*[^*\n]+\*\*|\*[^*\n]+\*)/g)
+      // Курсив принимаем и через `*звёздочки*`, и через `_подчёркивания_`:
+      // в текстах правил встречаются оба варианта разметки.
+      .split(/(\*\*[^*\n]+\*\*|\*[^*\n]+\*|_[^_\n]+_)/g)
       .filter(Boolean)
       .flatMap((segment) => {
         const bold = segment.startsWith('**') && segment.endsWith('**')
-        const italic = !bold && segment.startsWith('*') && segment.endsWith('*')
+        const italic = !bold && ((segment.startsWith('*') && segment.endsWith('*')) || (segment.startsWith('_') && segment.endsWith('_')))
         const text = bold ? segment.slice(2, -2) : italic ? segment.slice(1, -1) : segment
         const tokenize = activeEdition.value === '2024' ? tokenizeRuleText55e : tokenizeRuleText
         return tokenize(text, props.currentPath, props.excludePaths).map(token => ({ ...token, bold, italic }))
