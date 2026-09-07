@@ -1,6 +1,7 @@
 <script setup>
 import { useThreadConstellation } from '~/composables/useThreadConstellation.js'
 import { loreLinkFor } from '~/utils/loreLink.js'
+import { equipmentUsedOn } from '~/utils/equipmentUsage.js'
 
 const route = useRoute()
 
@@ -1014,6 +1015,10 @@ function fullText(text = '') {
 function relatedLink(term) {
   return loreLinkFor(term)
 }
+
+// Снаряжение, которое само объявило, что нужно чертам этого народа: набор
+// татуировщика для «Татуировок Ветров», и так далее.
+const raceEquipment = computed(() => equipmentUsedOn(selectedPath.value))
 // Long feature descriptions read poorly in a single narrow column — let them span two.
 function featWide(text = '') {
   return (text || '').length > 200
@@ -2013,8 +2018,20 @@ function printRace() {
             </div>
 
             <!-- Related terms close the dossier; names now live in their standard position above the summary. -->
-            <section v-if="selectedRace.related?.length" class="rd-foot rd-thread-node">
-              <div class="rd-foot-col">
+            <section v-if="selectedRace.related?.length || raceEquipment.length" class="rd-foot rd-thread-node">
+              <div v-if="raceEquipment.length" class="rd-foot-col">
+              <h2 class="rd-h2">Снаряжение</h2>
+              <div class="rd-related">
+                <NuxtLink
+                  v-for="item in raceEquipment"
+                  :key="item.path"
+                  :to="item.path"
+                  class="rd-pill is-link"
+                  :title="`${item.title} — правила снаряжения`"
+                >{{ item.title }}</NuxtLink>
+              </div>
+              </div>
+              <div v-if="selectedRace.related?.length" class="rd-foot-col">
               <h2 class="rd-h2">Связанные нити</h2>
               <div class="rd-related">
                 <template v-for="term in selectedRace.related" :key="term"><NuxtLink

@@ -47,6 +47,12 @@ function resetFilters() { active.category = []; active.tag = [] }
 
 function tagLabel(t) { return EQUIPMENT_TAGS[t] || t }
 
+function itemPath(item) { return `/dnd5e/equipment?e=${item.id}` }
+
+// Обычные слова описаний совпадают с названиями заклинаний: «принесённый обет»
+// — не «Обет», «племенные знаки» — не «Знак». Автоссылка на них только сбивает.
+const DETAIL_LINK_EXCLUDE = ['/dnd5e/spells?s=geas', '/dnd5e/spells?s=symbol']
+
 useSeoMeta({
   title: 'Снаряжение — D&D 5e — TKK.club',
   description: 'Снаряжение D&D 5e: походные предметы, контейнеры, расходники, наборы и инструменты.'
@@ -87,6 +93,46 @@ useSeoMeta({
       </dl>
 
       <p v-if="item.raw.description" class="tref-desc">{{ item.raw.description }}</p>
+
+      <div v-if="item.raw.details?.length" class="eq-details">
+        <div v-for="detail in item.raw.details" :key="detail.title" class="eq-detail">
+          <h3>{{ detail.title }}</h3>
+          <p><RuleRichText :text="detail.text" :current-path="itemPath(item.raw)" :exclude-paths="DETAIL_LINK_EXCLUDE" /></p>
+        </div>
+      </div>
+
+      <div v-if="item.raw.table" class="eq-table">
+        <div class="eq-table-head">
+          <span v-for="column in item.raw.table.columns" :key="column">{{ column }}</span>
+        </div>
+        <div v-for="row in item.raw.table.rows" :key="row[0]" class="eq-table-row">
+          <span v-for="(cell, ci) in row" :key="ci">{{ cell }}</span>
+        </div>
+      </div>
+
+      <div v-if="item.raw.usedBy?.length" class="eq-used">
+        <h3>Где используется</h3>
+        <div class="eq-used-links">
+          <NuxtLink v-for="use in item.raw.usedBy" :key="use.path" :to="use.path" class="eq-used-link">{{ use.title }}</NuxtLink>
+        </div>
+      </div>
     </template>
   </ThreadRefPage>
 </template>
+
+<style scoped>
+.eq-details{display:grid;gap:10px;margin-top:12px}
+.eq-detail h3{margin:0 0 3px;color:var(--theme-accent-strong);font-size:13px;font-weight:700}
+.eq-detail p{margin:0;font-size:13px;line-height:1.6}
+.eq-table{display:grid;margin-top:12px;overflow:hidden;border:1px solid rgba(var(--theme-contrast-rgb),.1);border-radius:10px}
+.eq-table-head,.eq-table-row{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;padding:8px 12px}
+.eq-table-head{background:rgba(var(--theme-accent-rgb),.1);color:rgba(var(--theme-accent-strong-rgb),.92);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.eq-table-row{border-top:1px solid rgba(var(--theme-contrast-rgb),.07);font-size:13px;line-height:1.55}
+.eq-table-row span:first-child{color:var(--theme-accent-strong);font-weight:700}
+.eq-used{margin-top:12px}
+.eq-used h3{margin:0 0 6px;color:var(--theme-accent-strong);font-size:13px;font-weight:700}
+.eq-used-links{display:flex;flex-wrap:wrap;gap:7px}
+.eq-used-link{border:1px solid rgba(var(--theme-accent-rgb),.3);background:rgba(var(--theme-accent-rgb),.08);color:rgba(var(--theme-accent-strong-rgb),.92);border-radius:999px;padding:5px 12px;font-size:12.5px;text-decoration:none;transition:border-color .25s ease,background .25s ease,color .25s ease}
+.eq-used-link:hover,.eq-used-link:focus-visible{border-color:rgba(var(--theme-accent-strong-rgb),.62);background:rgba(var(--theme-accent-rgb),.16);color:rgba(var(--theme-accent-strong-rgb),1);outline:0}
+@media (max-width:760px){.eq-table-head,.eq-table-row{grid-template-columns:52px minmax(0,1fr);gap:10px}}
+</style>
