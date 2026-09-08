@@ -16,6 +16,18 @@ sourceTitle: The Threads of Largo
 originalName: Kobold
 image: ""
 imageAlt: Кобольд
+cardImages:
+  shamas: /images/races/koboldy/cards/shamas.webp
+  manu: /images/races/koboldy/cards/manu.webp
+  marak: /images/races/koboldy/cards/marak.webp
+  dangun: /images/races/koboldy/cards/dangun.webp
+  brall: /images/races/koboldy/cards/brall.webp
+detailImages:
+  shamas: /images/races/koboldy/details/shamas.webp
+  manu: /images/races/koboldy/details/manu.webp
+  marak: /images/races/koboldy/details/marak.webp
+  dangun: /images/races/koboldy/details/dangun.webp
+  brall: /images/races/koboldy/details/brall.webp
 creatureType: дракон
 abilityScore: Лов +2, Хар +1
 raceSize: Маленький
