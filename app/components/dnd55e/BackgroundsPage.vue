@@ -46,6 +46,11 @@ function ruleLinks(item) {
     .filter(entry => entry.title)
 }
 
+// enoaLead пишется строкой, а где текста много — массивом абзацев.
+function leadParagraphs(item) {
+  return Array.isArray(item.enoaLead) ? item.enoaLead : [item.enoaLead]
+}
+
 function toolPath(item) {
   const id = DND55E_TOOL_EQUIPMENT[item.tool.replace(' (на выбор)', '')]
   return id ? `/dnd55e/equipment?item=${id}` : null
@@ -71,7 +76,7 @@ const visibleBackgrounds = computed(() => DND55E_BACKGROUNDS.filter((item) => {
     item.originalName,
     item.summary,
     item.tool,
-    item.enoaLead,
+    ...(Array.isArray(item.enoaLead) ? item.enoaLead : [item.enoaLead]),
     item.play,
     item.feat.title,
     item.feat.note,
@@ -298,7 +303,9 @@ useSeoMeta({
 
       <section class="bg-block">
         <h3>В мире Эноа</h3>
-        <p class="bg-lead"><RuleRichText :text="item.raw.enoaLead" edition="2024" /></p>
+        <p v-for="(para, index) in leadParagraphs(item.raw)" :key="index" class="bg-lead">
+          <RuleRichText :text="para" edition="2024" />
+        </p>
         <article v-for="entry in item.raw.variants" :key="entry.title" class="bg-variant">
           <h4>
             {{ entry.title }}
@@ -530,7 +537,7 @@ useSeoMeta({
   font-size:11px;
 }
 .bg-lead{
-  margin:0 0 12px;
+  margin:0 0 10px;
   color:rgba(var(--theme-text-rgb),.72);
   font-size:13px;
   line-height:1.68;
