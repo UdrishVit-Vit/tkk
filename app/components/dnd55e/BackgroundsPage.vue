@@ -291,7 +291,7 @@ useSeoMeta({
           </p>
           <p v-if="item.raw.equipment.extra" class="bg-equip-extra">
             При вас также: {{ item.raw.equipment.extra.join(', ').toLocaleLowerCase('ru') }}
-            <small>— вещи без игровой стоимости</small>
+            <small>— без игровой стоимости</small>
           </p>
         </div>
       </section>
