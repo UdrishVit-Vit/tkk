@@ -1026,7 +1026,13 @@ const raceEquipment = computed(() => equipmentUsedOn(selectedPath.value))
 const RULE_LINKED_TITLES = new Set([
   'Татуировки Ветров',
   'Татуировки ветров',
-  'Адепт Чернил Крови'
+  'Адепт Чернил Крови',
+  'Маракийская вспышка клинка',
+  'Взращенный в ямах',
+  'Глаза шторма',
+  'Танец ветра',
+  'Внутренний огонь',
+  'Тело Колоссов'
 ])
 function isRuleLinked(title) {
   return RULE_LINKED_TITLES.has(String(title || '').trim())
@@ -1586,6 +1592,10 @@ function printRace() {
                   </div>
                   <div class="rd-details-divider" aria-hidden="true"><span /></div>
                   <div class="rd-features">
+                    <div v-for="trait in baseFeatures" :key="'b-' + trait.title" class="rd-feat" :class="{ wide: featWide(trait.text) }">
+                      <span class="rd-feat-name">{{ trait.title }}</span>
+                      <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(trait.text)" :key="pi" class="rd-feat-para"><RuleRichText v-if="isRuleLinked(trait.title)" :text="para" :exclude-paths="RULE_LINK_EXCLUDE" /><template v-else>{{ para }}</template></span></span>
+                    </div>
                     <template v-for="card in varietyFeatures" :key="'v-' + card.title">
                       <!-- Кровь змей: special interactive card with expandable blood lists -->
                       <div
@@ -1663,10 +1673,6 @@ function printRace() {
                         <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(card.text)" :key="pi" class="rd-feat-para"><RuleRichText v-if="isRuleLinked(card.title)" :text="para" :exclude-paths="RULE_LINK_EXCLUDE" /><template v-else>{{ para }}</template></span></span>
                       </div>
                     </template>
-                    <div v-for="trait in baseFeatures" :key="'b-' + trait.title" class="rd-feat" :class="{ wide: featWide(trait.text) }">
-                      <span class="rd-feat-name">{{ trait.title }}</span>
-                      <span class="rd-feat-text"><span v-for="(para, pi) in featParagraphs(trait.text)" :key="pi" class="rd-feat-para"><RuleRichText v-if="isRuleLinked(trait.title)" :text="para" :exclude-paths="RULE_LINK_EXCLUDE" /><template v-else>{{ para }}</template></span></span>
-                    </div>
                   </div>
 
                   <div
