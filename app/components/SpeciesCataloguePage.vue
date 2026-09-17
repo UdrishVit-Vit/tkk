@@ -908,11 +908,19 @@ const baseAbility = computed(() => {
   const s = selectedRace.value?.ruleSections?.find(x => x.title === 'Увеличение характеристик')
   return s ? { title: s.title, text: fullText(s.text) } : null
 })
+// Some varieties replace a base trait outright (their own text says so, e.g.
+// «Вместо способности маракийцев «Взращенные в ямах» вы получаете...») — keep
+// that trait out of the always-on base list while that variety is selected.
+const VARIETY_REPLACES_BASE_TRAIT = {
+  'Маракиец (Драгмирец)': ['Взращенный в ямах']
+}
 const baseFeatures = computed(() => {
   const list = [...(selectedRace.value?.primaryTraits || [])]
   // When varieties exist, each variety's ability line already states the full total
   // (base + variety), so we don't show a separate base ability card.
   if (baseAbility.value && !varietyItemSections.value.length) list.unshift(baseAbility.value)
+  const replaced = VARIETY_REPLACES_BASE_TRAIT[activeVariety.value?.title]
+  if (replaced) return list.filter(trait => !replaced.includes(trait.title))
   return list
 })
 
@@ -1038,7 +1046,14 @@ const RULE_LINKED_TITLES = new Set([
   'Страх для слабых',
   'Взращённый во льдах',
   'Ураганное тело',
-  'Воля Ветра'
+  'Воля Ветра',
+  'Озорной полуденный дух',
+  'Неугомонный',
+  'Пламя Изобретателя',
+  'Любознательное сердце',
+  'Грязные разговорчики',
+  'Питание отходами',
+  'Гнездо паразитов'
 ])
 function isRuleLinked(title) {
   return RULE_LINKED_TITLES.has(String(title || '').trim())
