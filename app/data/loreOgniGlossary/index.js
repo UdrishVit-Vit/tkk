@@ -7,8 +7,10 @@
 // Добавить сезон: импортировать файл и дописать его в SEASON_FILES.
 
 import season01 from './season-01.generated.json'
+import season02 from './season-02.generated.json'
+import season03 from './season-03.generated.json'
 
-const SEASON_FILES = [season01]
+const SEASON_FILES = [season01, season02, season03]
 
 export const LORE_OGNI_SOURCE = {
   id: 'ogni',
@@ -42,14 +44,33 @@ export const LORE_OGNI_CLAIM_STATUSES = [
 
 function mergeEntry(target, incoming) {
   const merged = { ...target }
+  const mergeSeasonChapters = (groups) => [...groups.reduce((map, group) => {
+    const chapters = new Set([...(map.get(group.season) || []), ...group.chapters])
+    map.set(group.season, [...chapters].sort((a, b) => a - b))
+    return map
+  }, new Map())].map(([season, chapters]) => ({ season, chapters }))
   merged.aliases = [...new Set([...target.aliases, ...incoming.aliases])]
   merged.sourceNames = [...new Set([...target.sourceNames, ...incoming.sourceNames])]
   merged.claims = [...target.claims, ...incoming.claims]
   merged.stub = target.stub && incoming.stub
   merged.hero = target.hero || incoming.hero
   merged.profile = { ...target.profile, ...incoming.profile }
-  merged.seasons = [...target.seasons, ...incoming.seasons]
-  merged.mentions = [...target.mentions, ...incoming.mentions]
+  merged.seasons = mergeSeasonChapters([...target.seasons, ...incoming.seasons])
+  merged.season = incoming.season
+  merged.chapters = target.season === incoming.season
+    ? [...new Set([...target.chapters, ...incoming.chapters])].sort((a, b) => a - b)
+    : incoming.chapters
+  merged.firstChapter = merged.chapters[0] ?? null
+  merged.lastChapter = merged.chapters.at(-1) ?? null
+  merged.mentions = target.season === incoming.season
+    ? [...new Set([...target.mentions, ...incoming.mentions])].sort((a, b) => a - b)
+    : incoming.mentions
+  merged.mentionsBySeason = mergeSeasonChapters([
+    ...target.mentionsBySeason,
+    ...incoming.mentionsBySeason,
+  ])
+  merged.summaries = [...target.summaries, ...incoming.summaries]
+  merged.summaryByChapter = [...target.summaryByChapter, ...incoming.summaryByChapter]
   merged.relations = [...target.relations, ...incoming.relations]
   // Атрибуты сходятся по виду: «Биография» из второго сезона продолжает первую.
   merged.facets = incoming.facets.reduce((acc, facet) => {
@@ -69,7 +90,11 @@ function buildEntries() {
     for (const entry of file.entries) {
       const shaped = {
         ...entry,
+        season: file.season,
         seasons: [{ season: file.season, chapters: entry.chapters }],
+        mentionsBySeason: [{ season: file.season, chapters: entry.mentions }],
+        summaryByChapter: entry.summaryByChapter.map(item => ({ ...item, season: file.season })),
+        relations: entry.relations.map(item => ({ ...item, season: file.season })),
       }
       const existing = byId.get(entry.id)
       byId.set(entry.id, existing ? mergeEntry(existing, shaped) : shaped)
@@ -105,20 +130,30 @@ export const LORE_OGNI_BY_ID = Object.fromEntries(
  */
 export function cutOgniPayload(ogni, cut) {
   if (!ogni || !cut) return ogni
-  const withinCut = chapter => chapter == null || chapter <= cut
+  const selectedSeason = typeof cut === 'number' ? ogni.season : cut.season
+  const selectedChapter = typeof cut === 'number' ? cut : cut.chapter
+  const withinCut = item => (
+    item?.season == null
+    || item.season < selectedSeason
+    || (item.season === selectedSeason && (item.chapter == null || item.chapter <= selectedChapter))
+  )
   const facets = ogni.facets
-    .map(facet => ({ ...facet, items: facet.items.filter(item => withinCut(item.chapter)) }))
+    .map(facet => ({ ...facet, items: facet.items.filter(withinCut) }))
     .filter(facet => facet.items.length)
-  const claims = ogni.claims.filter(claim => claim.chapter <= cut)
+  const claims = ogni.claims.filter(withinCut)
+  const seasonChapters = ogni.seasons.find(item => item.season === selectedSeason)?.chapters || []
+  const seasonMentions = ogni.mentionsBySeason
+    .find(item => item.season === selectedSeason)?.chapters || []
 
   return {
     ...ogni,
+    season: selectedSeason,
     facets,
     claims,
-    relations: ogni.relations.filter(relation => withinCut(relation.chapter)),
-    mentions: ogni.mentions.filter(chapter => chapter <= cut),
-    chapters: ogni.chapters.filter(chapter => chapter <= cut),
-    summary: (ogni.summaryByChapter.filter(item => item.chapter <= cut).pop() || {}).text || '',
+    relations: ogni.relations.filter(withinCut),
+    mentions: seasonMentions.filter(chapter => chapter <= selectedChapter),
+    chapters: seasonChapters.filter(chapter => chapter <= selectedChapter),
+    summary: (ogni.summaryByChapter.filter(withinCut).pop() || {}).text || '',
     withheld: ogni.claims.length - claims.length,
   }
 }
@@ -138,7 +173,7 @@ export function filterOgniEntries({ season, chapter, entries = LORE_OGNI_ENTRIES
         || (s.season === season && s.chapters.some(ch => ch <= limit)),
     )
     if (!seen) return acc
-    acc.push({ ...entry, ...cutOgniPayload(entry, limit) })
+    acc.push({ ...entry, ...cutOgniPayload(entry, { season, chapter: limit }) })
     return acc
   }, [])
 }

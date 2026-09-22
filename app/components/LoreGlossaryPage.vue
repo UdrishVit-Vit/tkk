@@ -80,30 +80,47 @@ function sourcesFor(term) {
   return sourceIdsFor(term).map(id => LORE_GLOSSARY_SOURCES[id]).filter(Boolean)
 }
 
-// Прогресс по сезону: 0 — весь сезон открыт, иначе номер главы, на которой
-// читатель остановился. Статья не должна знать больше него.
-const season = LORE_GLOSSARY_SEASONS[0] || null
-const chapterMax = season?.chapterCount || 0
+// Прогресс по кампании: выбранный сезон плюс глава внутри него. Все предыдущие
+// сезоны считаются прочитанными; следующие не раскрываются.
+const latestSeason = LORE_GLOSSARY_SEASONS.at(-1) || null
+const requestedSeason = Number.parseInt(route.query.season, 10)
+const seasonNumber = ref(
+  LORE_GLOSSARY_SEASONS.some(item => item.season === requestedSeason)
+    ? requestedSeason
+    : latestSeason?.season,
+)
+const season = computed(() => (
+  LORE_GLOSSARY_SEASONS.find(item => item.season === seasonNumber.value) || latestSeason
+))
+const chapterMax = computed(() => season.value?.chapterCount || 0)
 const requestedChapter = Number.parseInt(route.query.chapter, 10)
 const chapterCut = ref(
-  Number.isFinite(requestedChapter) && requestedChapter >= 1 && requestedChapter <= chapterMax
+  Number.isFinite(requestedChapter) && requestedChapter >= 1 && requestedChapter <= chapterMax.value
     ? requestedChapter
     : 0,
 )
 const chapterSlider = computed({
-  get: () => chapterCut.value || chapterMax,
-  set: (value) => { chapterCut.value = Number(value) >= chapterMax ? 0 : Number(value) },
+  get: () => chapterCut.value || chapterMax.value,
+  set: (value) => { chapterCut.value = Number(value) >= chapterMax.value ? 0 : Number(value) },
 })
 
+function chooseSeason(value) {
+  seasonNumber.value = Number(value)
+  chapterCut.value = 0
+}
+
 const glossary = computed(() => {
-  const cut = chapterCut.value
-  if (!cut) return LORE_GLOSSARY
+  if (!season.value) return LORE_GLOSSARY
+  const cut = chapterCut.value || Infinity
   return LORE_GLOSSARY.reduce((acc, term) => {
     if (!term.ogni) {
       acc.push(term)
       return acc
     }
-    const met = term.ogni.chapters.some(chapter => chapter <= cut)
+    const met = term.ogni.seasons.some(item => (
+      item.season < seasonNumber.value
+      || (item.season === seasonNumber.value && item.chapters.some(chapter => chapter <= cut))
+    ))
     const inArchive = sourceIdsFor(term).includes(LORE_GLOSSARY_DEFAULT_SOURCE)
     if (!met) {
       // Кампания эту сущность ещё не встретила: свод Башни Мафраш остаётся,
@@ -111,7 +128,7 @@ const glossary = computed(() => {
       if (inArchive) acc.push({ ...term, ogni: null, sources: [LORE_GLOSSARY_DEFAULT_SOURCE] })
       return acc
     }
-    const ogni = cutOgniPayload(term.ogni, cut)
+    const ogni = cutOgniPayload(term.ogni, { season: seasonNumber.value, chapter: cut })
     acc.push({
       ...term,
       definition: !inArchive && ogni.summary ? ogni.summary : term.definition,
@@ -153,6 +170,7 @@ const activeFilterCount = computed(() => [
   sortDirection.value !== 'asc',
   historyOnly.value,
   relatedOnly.value,
+  seasonNumber.value !== latestSeason?.season,
   chapterCut.value > 0,
 ].filter(Boolean).length)
 
@@ -410,6 +428,9 @@ function syncQuery(push = false) {
   else delete next.related
   if (chapterCut.value) next.chapter = String(chapterCut.value)
   else delete next.chapter
+  if (seasonNumber.value && seasonNumber.value !== latestSeason?.season) {
+    next.season = String(seasonNumber.value)
+  } else delete next.season
   // Термин теперь часть пути, а не запроса: фильтры остаются в адресе, статья
   // получает свой URL.
   delete next.term
@@ -481,6 +502,7 @@ function resetFilters() {
   activeLetter.value = 'all'
   historyOnly.value = false
   relatedOnly.value = false
+  seasonNumber.value = latestSeason?.season
   chapterCut.value = 0
   sourceQuery.value = ''
   sortDirection.value = 'asc'
@@ -728,7 +750,7 @@ function handleKeydown(event) {
   nextTick(() => document.querySelector(`[data-term-id="${next.id}"]`)?.scrollIntoView({ block: 'nearest' }))
 }
 
-watch([query, activeSource, activeLetter, sortDirection, historyOnly, relatedOnly, chapterCut], () => {
+watch([query, activeSource, activeLetter, sortDirection, historyOnly, relatedOnly, seasonNumber, chapterCut], () => {
   if (!filteredTerms.value.some(term => term.id === activeId.value)) activeId.value = ''
   syncQuery()
 })
@@ -913,9 +935,18 @@ onBeforeUnmount(() => {
               <div v-if="season" class="filter-section chapter-filter">
                 <div class="filter-section-title">
                   <span><i>04</i> Прогресс по сезону</span>
-                  <small>{{ chapterCut ? `Открыто до главы ${chapterCut}` : 'Весь сезон открыт' }}</small>
+                  <small>Сезон {{ seasonNumber }} · {{ chapterCut ? `до главы ${chapterCut}` : 'целиком' }}</small>
                 </div>
                 <p class="chapter-hint">Свод «Огни» не покажет того, чего вы ещё не прочли.</p>
+                <div class="season-options" aria-label="Сезон кампании">
+                  <button
+                    v-for="item in LORE_GLOSSARY_SEASONS"
+                    :key="item.season"
+                    :class="{ active: seasonNumber === item.season }"
+                    type="button"
+                    @click="chooseSeason(item.season)"
+                  >Сезон {{ item.season }}</button>
+                </div>
                 <div class="chapter-slider">
                   <input
                     v-model.number="chapterSlider"
@@ -955,7 +986,9 @@ onBeforeUnmount(() => {
 
         <div class="results-bar">
           <span>{{ categoryMap[activeCategory]?.title || 'Все понятия' }}</span>
-          <em v-if="chapterCut" class="chapter-badge">до главы {{ chapterCut }}</em>
+          <em v-if="chapterCut || seasonNumber !== latestSeason?.season" class="chapter-badge">
+            сезон {{ seasonNumber }}<template v-if="chapterCut"> · до главы {{ chapterCut }}</template>
+          </em>
           <button v-if="query || activeFilterCount" type="button" @click="resetFilters">Сбросить</button>
         </div>
 
@@ -1182,6 +1215,7 @@ onBeforeUnmount(() => {
 .history-link{display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:center;max-width:570px;margin-top:11px;border:1px solid rgba(var(--theme-accent-rgb),.18);background:rgba(var(--theme-surface-rgb),.28);padding:13px 15px;text-decoration:none;transition:border-color .2s}.history-link:hover{border-color:rgba(var(--theme-accent-strong-rgb),.48)}.history-link b{grid-row:2;font:600 16px/1.1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.78)}.history-link i{grid-row:1/3;grid-column:2;color:var(--gold-bright);font-style:normal}.related-block{max-width:570px;margin-top:29px;padding-top:19px;border-top:1px solid rgba(var(--theme-accent-rgb),.11)}.related-block>div{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}.related-block button{border:1px solid rgba(var(--theme-accent-rgb),.14);background:rgba(var(--theme-surface-rgb),.24);padding:8px 10px;color:rgba(var(--theme-text-rgb),.58);font:13px/1 'Cormorant Garamond',serif;cursor:pointer}.related-block button:hover{border-color:rgba(var(--theme-accent-rgb),.42);color:var(--gold-bright)}.related-block button i{display:inline-block;width:5px;height:5px;margin-right:7px;border:1px solid rgba(var(--theme-accent-rgb),.55);transform:rotate(45deg)}
 .detail-empty{display:grid;min-height:78%;place-content:center;text-align:center}.detail-empty>i{width:18px;height:18px;justify-self:center;margin-bottom:23px;border:1px solid rgba(var(--theme-accent-rgb),.42);box-shadow:0 0 20px rgba(var(--theme-accent-rgb),.08);transform:rotate(45deg)}.detail-empty span{font:600 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.21em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.48)}.detail-empty b{margin-top:11px;font:600 30px/1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.68)}.detail-empty p{max-width:310px;margin:10px auto 0;color:rgba(var(--theme-text-rgb),.34);font:italic 14px/1.35 'Cormorant Garamond',serif}.detail-expanded .detail-panel{position:fixed;z-index:200;inset:0;display:block;overflow-y:auto;padding:42px clamp(55px,12vw,210px) 80px;background:radial-gradient(ellipse 55% 42% at 60% 5%,#171923 0,#090a0f 58%,#040406 100%);box-shadow:0 0 80px #000;transform:none}.detail-expanded .detail-panel::before{position:fixed;inset:20px;border:1px solid rgba(var(--theme-accent-rgb),.15)}.detail-expanded .detail-actions{position:sticky;top:0;max-width:760px;margin:0 auto 22px;padding:8px 0;background:linear-gradient(90deg,transparent,rgba(9,10,15,.92) 20%,rgba(9,10,15,.92))}.detail-expanded .detail-meta,.detail-expanded .detail-panel h2,.detail-expanded .aliases,.detail-expanded .detail-divider,.detail-expanded .definition,.detail-expanded .provenance,.detail-expanded .history-link,.detail-expanded .related-block{max-width:760px;margin-right:auto;margin-left:auto}.detail-expanded .detail-panel h2{font-size:clamp(62px,7vw,104px)}.detail-expanded .definition{font-size:clamp(23px,2vw,31px)}
 .chapter-hint{margin:9px 0 0;color:rgba(var(--theme-text-rgb),.4);font:italic 12px/1.35 'Cormorant Garamond',serif}
+.season-options{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:11px}.season-options button{height:31px;border:1px solid rgba(var(--theme-accent-rgb),.14);border-radius:2px;background:rgba(var(--theme-surface-rgb),.18);color:rgba(var(--theme-text-rgb),.42);font:600 7px/1 'Hanken Grotesk',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}.season-options button:hover,.season-options button.active{border-color:rgba(var(--theme-accent-strong-rgb),.5);background:rgba(var(--theme-accent-rgb),.09);color:var(--gold-bright)}
 .chapter-slider{margin-top:11px;border:1px solid rgba(var(--theme-accent-rgb),.14);border-radius:2px;background:rgba(var(--theme-surface-rgb),.2);padding:13px 14px}
 .chapter-slider input{width:100%;height:3px;border-radius:2px;appearance:none;background:linear-gradient(90deg,rgba(var(--theme-accent-strong-rgb),.62),rgba(var(--theme-accent-rgb),.18));cursor:pointer}
 .chapter-slider input::-webkit-slider-thumb{width:15px;height:15px;border:1px solid var(--gold-bright);appearance:none;background:#0a0b11;box-shadow:0 0 10px rgba(244,224,170,.42);cursor:pointer;transform:rotate(45deg)}

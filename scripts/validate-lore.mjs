@@ -26,11 +26,14 @@ function loadGlossary() {
   cpSync(DATA, dir, { recursive: true })
 
   const ogni = join(dir, 'loreOgniGlossary', 'index.js')
-  const json = pathToFileURL(join(dir, 'loreOgniGlossary', 'season-01.generated.json')).href
-  writeFileSync(ogni, readFileSync(ogni, 'utf8').replace(
-    "from './season-01.generated.json'",
-    `from ${JSON.stringify(json)} with { type: 'json' }`,
-  ), 'utf8')
+  const source = readFileSync(ogni, 'utf8').replace(
+    /from '\.\/(season-\d+\.generated\.json)'/g,
+    (_, filename) => {
+      const json = pathToFileURL(join(dir, 'loreOgniGlossary', filename)).href
+      return `from ${JSON.stringify(json)} with { type: 'json' }`
+    },
+  )
+  writeFileSync(ogni, source, 'utf8')
 
   const glossary = pathToFileURL(join(dir, 'loreGlossary.js')).href
   return import(glossary).finally(() => rmSync(dir, { recursive: true, force: true }))
@@ -40,6 +43,7 @@ const {
   LORE_GLOSSARY,
   LORE_ENTITY_TYPES,
   LORE_GLOSSARY_SOURCES,
+  LORE_GLOSSARY_SEASONS,
   LORE_ENTITY_SCHEMA,
   SLUG_PATTERN,
   loreMatchKey,
@@ -84,7 +88,9 @@ for (const entry of LORE_GLOSSARY) {
 
 // ——— Связность ———
 const byId = new Map(LORE_GLOSSARY.map(entry => [entry.id, entry]))
-const seasonLength = new Map()
+const seasonLength = new Map(
+  LORE_GLOSSARY_SEASONS.map(item => [item.season, item.chapterCount]),
+)
 
 for (const entry of LORE_GLOSSARY) {
   for (const id of entry.related || []) {
@@ -107,19 +113,14 @@ for (const entry of LORE_GLOSSARY) {
       note('предупреждение', entry, `связь ведёт в никуда: ${relation.term} (${relation.id})`)
     }
   }
-  const season = entry.ogni?.season
-  if (season && entry.ogni?.chapters?.length) {
-    seasonLength.set(season, Math.max(seasonLength.get(season) || 0, ...entry.ogni.chapters))
-  }
 }
 
 for (const entry of LORE_GLOSSARY) {
-  const season = entry.ogni?.season
-  if (!season) continue
-  const limit = seasonLength.get(season) || 0
-  for (const claim of entry.ogni.claims || []) {
+  for (const claim of entry.ogni?.claims || []) {
+    const season = claim.season || entry.ogni?.season
+    const limit = seasonLength.get(season) || 0
     if (claim.chapter < 1 || claim.chapter > limit) {
-      note('ошибка', entry, `утверждение указывает на главу ${claim.chapter}, а в сезоне их ${limit}`)
+      note('ошибка', entry, `утверждение указывает на сезон ${season}, главу ${claim.chapter}, а в сезоне их ${limit}`)
     }
   }
 }

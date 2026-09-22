@@ -44,7 +44,12 @@ def main() -> int:
         return 1
 
     data = json.loads(data_file.read_text(encoding='utf-8'))
-    texts = chapter_texts(json.loads(BOOK_FILE.read_text(encoding='utf-8')))
+    book = json.loads(BOOK_FILE.read_text(encoding='utf-8'))
+    book['chapters'] = [
+        chapter for chapter in book.get('chapters', [])
+        if chapter.get('season', 1) == args.season
+    ]
+    texts = chapter_texts(book)
 
     absent, wrong_chapter, extra_chapter = [], [], []
     stats = Counter()

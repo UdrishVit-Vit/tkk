@@ -1,10 +1,12 @@
-"""Импорт литературной редакции сезона «Огни» из PDF в узел Lore.
+"""Импорт литературных редакций «Огней» из PDF в узел Lore.
 
-Источник: «ЭНОА - Кампания II - Сезон 1 - Огни - v0.09.3.pdf» (главы 01-32).
-Результат: app/data/loreUzlyOgni.generated.json - блоки текста для каждой главы.
+Результат: app/data/loreUzlyOgni.generated.json - блоки текста всех сезонов.
 
-Запуск:
-    python scripts/import-uzly-ogni.py "<путь к PDF>"
+Запуск без аргументов берёт три готовые редакции из C:\\EnoaTranscripts::
+    python scripts/import-uzly-ogni.py
+
+Пути можно передать явно (номер сезона извлекается из имени файла):
+    python scripts/import-uzly-ogni.py "<сезон 1.pdf>" "<сезон 2.pdf>" "<сезон 3.pdf>"
 
 Разметка исходника (по шрифтам):
     CormorantGaramond-SemiBold 27    - титул главы на полосе-разделителе;
@@ -19,6 +21,7 @@
 у авторской речи отступ на первой строке, а у реплик - на переносах.
 """
 
+import argparse
 import json
 import re
 import sys
@@ -45,16 +48,47 @@ NOTE_MARKER = 'Атмосферная хроника по сыгранной п�
 DASH_START = re.compile(r'^[-‐-―]\s')
 SENTENCE_END = re.compile(r'[.!?…»:"]$')
 
-SLUGS = [
-    'severnyy-veter', 'holmy-tishiny', 'les-rubyat-shchepki-letyat', 'stena-kostey',
-    'dela-poshli-ne-tak', 'gorod-v-ogne', 'provodnik', 'beglecy-i-yamy', 'ohota',
-    'pomestye-tashar', 'dobro-pozhalovat-v-migdash', 'plamya-belyh-sokolov',
-    'luchshiy-strelok-migdasha', 'svoboda-ot-grehov', 'sekret-druzhby',
-    's-ognem-ne-igrayut', 'karty-raskryty', 'vechnyy-ogon', 'beskonechnaya-voyna',
-    'po-goryachim-sledam', 'velikie-gonki', 'zhizn-smertnogo', 'kryshi-i-dedy',
-    'solnechnye-holmy', 'proklyatie-zemel', 'prizvanie', 'cena', 'zagadki-bogini',
-    'pozhiratel', 'sekrety-holmov', 'malahitovaya-gryada', 'solnce-hranit',
-]
+SEASONS = {
+    1: {
+        'start': 1,
+        'slugs': [
+            'severnyy-veter', 'holmy-tishiny', 'les-rubyat-shchepki-letyat', 'stena-kostey',
+            'dela-poshli-ne-tak', 'gorod-v-ogne', 'provodnik', 'beglecy-i-yamy', 'ohota',
+            'pomestye-tashar', 'dobro-pozhalovat-v-migdash', 'plamya-belyh-sokolov',
+            'luchshiy-strelok-migdasha', 'svoboda-ot-grehov', 'sekret-druzhby',
+            's-ognem-ne-igrayut', 'karty-raskryty', 'vechnyy-ogon', 'beskonechnaya-voyna',
+            'po-goryachim-sledam', 'velikie-gonki', 'zhizn-smertnogo', 'kryshi-i-dedy',
+            'solnechnye-holmy', 'proklyatie-zemel', 'prizvanie', 'cena', 'zagadki-bogini',
+            'pozhiratel', 'sekrety-holmov', 'malahitovaya-gryada', 'solnce-hranit',
+        ],
+    },
+    2: {
+        'start': 33,
+        'slugs': [
+            'sovet', 'put', 'pustota-i-holod', 'put-korolya', 'kto-ty', 'hram-krovi',
+            'novye-zemli-i-problemy', 'vybor-puti', 'dobro-pozhalovat-v-tikchik',
+            'kraby-i-rakushki', 'ogni-v-nochi', 'osvoboditsya-ot-sudby', 'na-grani-vuali',
+            'v-poiskah-rudnikov', 'razdelyay-i-vlastvuy', 'chernyy-kvadrat',
+            'vodovorot-sudby', 'strah-i-nenavist-v-daskare', 'put-meridirov',
+            'solncelikiy', 'spiral-vniz', 'komponent-zhizni', 'dogovor-glubin',
+            'taktika-ot-boga', 'vstrecha-v-spirali', 'grehi-predkov',
+            'dangunskiy-sovet', 'hurhonskaya-borba',
+        ],
+    },
+    3: {
+        'start': 61,
+        'slugs': [
+            'nachalo-igry', 'plany-v-nochi', 'pererozhdenie', 'zameshatelstvo', 'son',
+            '5-putey', 'postanovlenie', 'ohota-otkryta', 'ogon-spasenie', 'voyna',
+        ],
+    },
+}
+
+TITLE_OVERRIDES = {
+    'kto-ty': 'Кто ты?',
+}
+
+DEFAULT_SOURCE_DIR = Path('C:/EnoaTranscripts/Готовые версии')
 
 
 def clean(text):
@@ -211,32 +245,82 @@ def parse(pdf_path):
     return chapters
 
 
+def season_from_path(pdf_path):
+    match = re.search(r'Сезон\s+(\d+)', Path(pdf_path).name, re.I)
+    if not match:
+        raise SystemExit(f'Не удалось определить сезон из имени: {pdf_path}')
+    season = int(match.group(1))
+    if season not in SEASONS:
+        raise SystemExit(f'Сезон {season} не описан в SEASONS.')
+    return season
+
+
+def default_sources():
+    return [
+        DEFAULT_SOURCE_DIR / f'ЭНОА - Кампания II - Сезон {season} - Огни - v0.10.0.pdf'
+        for season in sorted(SEASONS)
+    ]
+
+
 def main():
-    if len(sys.argv) < 2:
-        raise SystemExit('Укажите путь к PDF первым аргументом.')
+    ap = argparse.ArgumentParser(description='Импорт литературных редакций «Огней».')
+    ap.add_argument('pdf', nargs='*', help='PDF сезонов; без аргументов берутся готовые v0.10.0')
+    args = ap.parse_args()
 
-    pdf_path = sys.argv[1]
-    chapters = parse(pdf_path)
-    if len(chapters) != len(SLUGS):
-        raise SystemExit(f'Ожидалось {len(SLUGS)} глав, найдено {len(chapters)}.')
+    sources = [Path(path) for path in args.pdf] or default_sources()
+    missing = [str(path) for path in sources if not path.exists()]
+    if missing:
+        raise SystemExit('Не найдены PDF:\n' + '\n'.join(missing))
 
-    notes = {chapter['note'] for chapter in chapters if chapter['note']}
-    if len(notes) > 1:
-        print(f'Внимание: вводных примечаний несколько ({len(notes)}), взято первое.')
+    all_chapters = []
+    season_meta = []
+    all_notes = []
+    seen_seasons = set()
+    for pdf_path in sources:
+        season = season_from_path(pdf_path)
+        if season in seen_seasons:
+            raise SystemExit(f'Сезон {season} передан дважды.')
+        seen_seasons.add(season)
 
-    payload = {
-        'source': Path(pdf_path).name,
-        'note': sorted(notes)[0] if notes else '',
-        'chapters': [
-            {
-                'slug': SLUGS[index],
+        parsed = parse(pdf_path)
+        config = SEASONS[season]
+        slugs = config['slugs']
+        if len(parsed) != len(slugs):
+            raise SystemExit(
+                f'Сезон {season}: ожидалось {len(slugs)} глав, найдено {len(parsed)}.'
+            )
+
+        notes = sorted({chapter['note'] for chapter in parsed if chapter['note']})
+        all_notes.extend(notes)
+        season_meta.append({
+            'season': season,
+            'title': f'Сезон {season}',
+            'source': pdf_path.name,
+            'chapterCount': len(parsed),
+            'firstChapter': config['start'],
+            'lastChapter': config['start'] + len(parsed) - 1,
+            'note': notes[0] if notes else '',
+        })
+        for index, chapter in enumerate(parsed):
+            slug = slugs[index]
+            all_chapters.append({
+                'slug': slug,
                 'number': index + 1,
-                'title': chapter['title'],
+                'globalNumber': config['start'] + index,
+                'season': season,
+                'title': TITLE_OVERRIDES.get(slug, chapter['title']),
+                'sourceTitle': chapter['title'],
                 'page': chapter['page'],
                 'blocks': chapter['blocks'],
-            }
-            for index, chapter in enumerate(chapters)
-        ],
+            })
+
+    season_meta.sort(key=lambda item: item['season'])
+    all_chapters.sort(key=lambda item: item['globalNumber'])
+    payload = {
+        'source': '; '.join(item['source'] for item in season_meta),
+        'sources': season_meta,
+        'note': all_notes[0] if all_notes else '',
+        'chapters': all_chapters,
     }
 
     OUT_PATH.write_text(
@@ -253,7 +337,8 @@ def main():
         1 for chapter in payload['chapters']
         for block in chapter['blocks'] if block['type'] == 'heading'
     )
-    print(f'Глав: {len(payload["chapters"])}, сцен: {headings}, абзацев: {paragraphs}')
+    print(f'Сезонов: {len(season_meta)}, глав: {len(payload["chapters"])}, '
+          f'сцен: {headings}, абзацев: {paragraphs}')
     print(f'Записано: {OUT_PATH.relative_to(ROOT)}')
 
 

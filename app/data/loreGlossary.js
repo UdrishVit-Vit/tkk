@@ -1645,7 +1645,7 @@ export const LORE_GLOSSARY_ARCHIVE = [
   {
     id: 'nicheynye-zemli', term: 'Ничейные земли', category: 'places', aliases: [],
     definition: 'Область, образовавшаяся от земель Фахата между десятью королевствами: настолько сожжённая насилием и пропитанная кровью, что там больше ничего не растёт. Там нет никого, кроме старых бастионов, — и там же, в долине с высохшим деревом, стояло логово Всадников. Позже «Золотой Симург» провёл сюда хорезы, и на холмах снова поднялись трава и кусты с инжиром.',
-    related: ['vremena-koroley', 'logovo-vsadnikov', 'bratstvo-simurga', 'horezy', 'fahat'], history: 'epoha-lyudey',
+    related: ['vremena-koroley', 'logovo-vsadnikov', 'bratstvo-simurga', 'kyarizy', 'fahat'], history: 'epoha-lyudey',
   },
   {
     id: 'logovo-vsadnikov', term: 'Логово Всадников', category: 'places', aliases: [],
@@ -1848,7 +1848,7 @@ export const loreMatchKey = value => String(value || '')
 
 function ogniPayload(entry) {
   return {
-    season: entry.seasons[0]?.season || 1,
+    season: entry.season || entry.seasons.at(-1)?.season || 1,
     seasons: entry.seasons,
     chapters: entry.chapters,
     firstChapter: entry.firstChapter,
@@ -1860,6 +1860,7 @@ function ogniPayload(entry) {
     facets: entry.facets,
     relations: entry.relations,
     mentions: entry.mentions,
+    mentionsBySeason: entry.mentionsBySeason,
     profile: entry.profile,
     hero: entry.hero,
     section: entry.section,
@@ -1871,6 +1872,11 @@ function ogniPayload(entry) {
 // Две записи кампании об одной сущности («морхор» и «мор’хоры») складываются,
 // а не вытесняют друг друга.
 function mergeOgni(a, b) {
+  const mergeSeasonChapters = groups => [...groups.reduce((map, group) => {
+    const chapters = new Set([...(map.get(group.season) || []), ...(group.chapters || [])])
+    map.set(group.season, [...chapters].sort((x, y) => x - y))
+    return map
+  }, new Map())].map(([season, chapters]) => ({ season, chapters }))
   const facets = b.facets.reduce((acc, facet) => {
     const existing = acc.find(item => item.id === facet.id)
     if (existing) existing.items = [...existing.items, ...facet.items]
@@ -1878,7 +1884,14 @@ function mergeOgni(a, b) {
     return acc
   }, a.facets.map(facet => ({ ...facet, items: [...facet.items] })))
 
-  const chapters = [...new Set([...a.chapters, ...b.chapters])].sort((x, y) => x - y)
+  const seasons = mergeSeasonChapters([...a.seasons, ...b.seasons])
+  const season = Math.max(...seasons.map(item => item.season))
+  const chapters = seasons.find(item => item.season === season)?.chapters || []
+  const mentionsBySeason = mergeSeasonChapters([
+    ...(a.mentionsBySeason || [{ season: a.season, chapters: a.mentions }]),
+    ...(b.mentionsBySeason || [{ season: b.season, chapters: b.mentions }]),
+  ])
+  const mentions = mentionsBySeason.find(item => item.season === season)?.chapters || []
   const relations = [...a.relations]
   for (const relation of b.relations) {
     if (!relations.some(item => item.id === relation.id)) relations.push(relation)
@@ -1886,12 +1899,16 @@ function mergeOgni(a, b) {
 
   return {
     ...a,
+    season,
+    seasons,
     facets,
     chapters,
     relations,
     claims: [...a.claims, ...b.claims],
-    mentions: [...new Set([...a.mentions, ...b.mentions])].sort((x, y) => x - y),
-    summaryByChapter: [...a.summaryByChapter, ...b.summaryByChapter].sort((x, y) => x.chapter - y.chapter),
+    mentions,
+    mentionsBySeason,
+    summaryByChapter: [...a.summaryByChapter, ...b.summaryByChapter]
+      .sort((x, y) => (x.season - y.season) || (x.chapter - y.chapter)),
     profile: { ...b.profile, ...a.profile },
     hero: a.hero || b.hero,
     stub: a.stub && b.stub,

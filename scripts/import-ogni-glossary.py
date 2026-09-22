@@ -157,10 +157,17 @@ class SlugRegistry:
         )
 
 
-def load_book():
+def load_book(season: int):
     if not UZLY_FILE.exists():
         return {}
-    return json.loads(UZLY_FILE.read_text(encoding='utf-8'))
+    data = json.loads(UZLY_FILE.read_text(encoding='utf-8'))
+    return {
+        **data,
+        'chapters': [
+            chapter for chapter in data.get('chapters', [])
+            if chapter.get('season', 1) == season
+        ],
+    }
 
 
 def attach_mentions(entries, book):
@@ -218,6 +225,7 @@ def attach_relations(entries, limit=14):
                     'term': other['term'],
                     'category': other['category'],
                     'chapter': min(known) if known else None,
+                    'season': entry.get('season'),
                     'weight': (current['weight'] + 1) if current else 1,
                 }
         entry['relations'] = sorted(
@@ -226,14 +234,15 @@ def attach_relations(entries, limit=14):
         )[:limit]
 
 
-def read_chapter_index():
+def read_chapter_index(season: int):
     """Главы узла «Огни»: номер, слаг и название — для ссылок из статьи в текст."""
     if not UZLY_FILE.exists():
         return []
     data = json.loads(UZLY_FILE.read_text(encoding='utf-8'))
     return [
         {'number': ch['number'], 'slug': ch['slug'], 'title': ch['title']}
-        for ch in data.get('chapters', []) if ch.get('number') and ch.get('slug')
+        for ch in data.get('chapters', [])
+        if ch.get('season', 1) == season and ch.get('number') and ch.get('slug')
     ]
 
 
@@ -320,6 +329,7 @@ def build_entry(raw: dict, slug: str, season: int, include_hidden: bool):
     entry = {
         'id': slug,
         'term': raw['name'],
+        'season': season,
         'category': CATEGORY_BY_SECTION.get(section, 'practices'),
         'siteSection': SITE_SECTION_BY_SECTION.get(section, 'Глоссарий'),
         'section': section,
@@ -462,7 +472,7 @@ def main() -> int:
 
     entries.sort(key=lambda e: e['term'].lower())
 
-    book = load_book()
+    book = load_book(season)
     attach_mentions(entries, book)
     attach_relations(entries)
     for entry in entries:
@@ -480,9 +490,9 @@ def main() -> int:
         'bookVersion': raw.get('book_version', ''),
         'spoilerPolicy': raw.get('spoiler_policy', ''),
         'generatedAt': generated_at,
-        'sourceFile': str(src),
+        'sourceFile': raw.get('source_file') or str(src),
         'chapterCount': chapter_count,
-        'chapterIndex': read_chapter_index(),
+        'chapterIndex': read_chapter_index(season),
         'counts': {
             'entries': len(entries),
             'claims': sum(len(e['claims']) for e in entries),
