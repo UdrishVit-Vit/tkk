@@ -1,6 +1,6 @@
 <script setup>
-import { TEAS_5E, TEA_TIERS, TEA_TIER_LABEL, TEA_LORE, TEA_BY_SIG } from '~/data/tea5e.js'
-import { TEAS_2024, TEA_LORE_2024, TEA_2024_BY_SIG } from '~/data/dnd55e/tools2024.js'
+import { TEAS_5E, TEA_TIERS, TEA_TIER_LABEL, TEA_LORE, TEA_STEPS, TEA_BY_SIG } from '~/data/tea5e.js'
+import { TEAS_2024, TEA_LORE_2024, TEA_STEPS_2024, TEA_2024_BY_SIG } from '~/data/dnd55e/tools2024.js'
 import { sigKey } from '~/utils/shagai5e.js'
 
 const props = defineProps({
@@ -10,6 +10,7 @@ const props = defineProps({
 const is2024 = computed(() => props.edition === '2024')
 const teas = computed(() => is2024.value ? TEAS_2024 : TEAS_5E)
 const teaLore = computed(() => is2024.value ? TEA_LORE_2024 : TEA_LORE)
+const teaSteps = computed(() => is2024.value ? TEA_STEPS_2024 : TEA_STEPS)
 const search = ref('')
 const open = ref(null)
 const showFilter = ref(false)
@@ -25,8 +26,8 @@ const query = computed(() => search.value.trim().toLowerCase())
 function matches(t) {
   if (active.tier.length && !active.tier.includes(t.tier)) return false
   if (!query.value) return true
-  const table = t.table ? t.table.rows.flat().join(' ') : ''
-  return [t.title, t.flavor, t.effect, t.success, t.fail, table].join(' ').toLowerCase().includes(query.value)
+  const table = t.table ? [t.table.note || '', ...t.table.rows.flat()].join(' ') : ''
+  return [t.title, t.flavor, t.nastoy, t.success, t.gorech, table].join(' ').toLowerCase().includes(query.value)
 }
 
 const groups = computed(() => Object.entries(TEA_TIERS).map(([id, title]) => ({
@@ -99,7 +100,11 @@ useSeoMeta({
           <div class="tea-lore-body">
             <p v-if="is2024"><b>Версия для D&D 2024.</b> Игровые термины, отдых и ссылки на заклинания приведены к редакции 2024; авторская механика броска 4к4 сохранена.</p>
             <p v-for="(p, i) in teaLore" :key="i">{{ p }}</p>
-            <p>Какой именно чай заварился, определяет знаменная кость <b>4к4</b>: по количеству выпавших граней (<b>1 — Бунти</b>, <b>2 — Аюр</b>, <b>3 — Додор</b>, <b>4 — Тахар</b>) находится один из 35 чаёв — так же, как у знамений. Чаи разбиты по <b>сложности заваривания</b>: простые (СЛ 10–13), изысканные (СЛ 14–16) и сложные (СЛ 17–20).</p>
+            <p><b>Порядок чаепития</b></p>
+            <ol class="tea-steps">
+              <li v-for="(s, i) in teaSteps" :key="i">{{ s }}</li>
+            </ol>
+            <p>Какой именно чай заварился, определяет знаменная кость <b>4к4</b>: по количеству выпавших граней (<b>1 — Бунти</b>, <b>2 — Аюр</b>, <b>3 — Додор</b>, <b>4 — Тахар</b>) находится один из 35 чаёв — так же, как у знамений. Чаи разбиты по <b>сложности заваривания</b>: простые (СЛ 10–14), изысканные (СЛ 15–19) и сложные (СЛ 20, 25 и 30).</p>
           </div>
         </details>
 
@@ -158,6 +163,15 @@ useSeoMeta({
 
 .tea-lore-body p{
   margin:0 0 10px;
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;
+  line-height:1.55;
+  color:rgba(var(--theme-text-rgb),.78);
+}
+
+.tea-steps{
+  margin:0 0 12px;
+  padding-left:22px;
   font-family:'Cormorant Garamond',serif;
   font-size:17px;
   line-height:1.55;

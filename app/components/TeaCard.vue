@@ -9,6 +9,7 @@ const props = defineProps({
 })
 
 const combo = computed(() => shagaiCombo(props.tea.sig || []))
+const instant = computed(() => props.tea.kind === 'instant')
 
 function tableFor(slot) {
   const t = props.tea.table
@@ -26,6 +27,7 @@ function tableFor(slot) {
     <div class="tea-badges">
       <span class="tea-pill"><span>Заваривание</span><b>СЛ {{ tea.dc }}</b></span>
       <span class="tea-tag">{{ TEA_TIER_LABEL[tea.tier] }}</span>
+      <span v-if="instant" class="tea-tag">мгновенный</span>
       <span v-if="combo" class="tea-tag tea-combo">4к4: {{ combo }}</span>
     </div>
 
@@ -34,6 +36,7 @@ function tableFor(slot) {
     <template v-if="tableFor('effect')">
       <div class="tea-table">
         <div class="tea-table-label">{{ tableFor('effect').label }}</div>
+        <p v-if="tableFor('effect').note" class="tea-table-note"><RuleRichText :text="tableFor('effect').note" :edition="edition" /></p>
         <div class="tea-table-grid" :style="{ '--cols': tableFor('effect').head.length }">
           <template v-for="(h, hi) in tableFor('effect').head" :key="'h' + hi">
             <span class="tea-th">{{ h }}</span>
@@ -48,22 +51,32 @@ function tableFor(slot) {
           </template>
         </div>
       </div>
+
+      <div v-if="tea.success" class="tea-block tea-success">
+        <h3>Удачный чай · до продолжительного отдыха</h3>
+        <p><RuleRichText :text="tea.success" :edition="edition" /></p>
+      </div>
+
+      <div v-if="tea.gorech" class="tea-block tea-fail">
+        <h3>Горечь · плохая заварка, до продолжительного отдыха</h3>
+        <p><RuleRichText :text="tea.gorech" :edition="edition" /></p>
+      </div>
     </template>
 
     <template v-else>
       <div class="tea-block tea-effect">
-        <h3>Эффект</h3>
-        <p><RuleRichText :text="tea.effect" :edition="edition" /></p>
+        <h3>{{ instant ? 'Сразу · каждому, кто пил' : 'Настой · общий эффект, до продолжительного отдыха' }}</h3>
+        <p><RuleRichText :text="tea.nastoy" :edition="edition" /></p>
       </div>
 
-      <div class="tea-block tea-success">
-        <h3>Успех</h3>
+      <div v-if="tea.success" class="tea-block tea-success">
+        <h3>Удачный чай · раскрытый настой, до продолжительного отдыха</h3>
         <p><RuleRichText :text="tea.success" :edition="edition" /></p>
       </div>
 
       <div class="tea-block tea-fail">
-        <h3>Провал</h3>
-        <p><RuleRichText :text="tea.fail" :edition="edition" /></p>
+        <h3>Горечь · плохая заварка, до продолжительного отдыха</h3>
+        <p><RuleRichText :text="tea.gorech" :edition="edition" /></p>
       </div>
     </template>
   </div>
@@ -105,6 +118,7 @@ function tableFor(slot) {
 
 .tea-table{ margin-top:14px; padding:12px 16px; border:1px solid rgba(var(--theme-accent-rgb),.18); border-radius:8px; background:rgba(var(--theme-accent-rgb),.04); overflow-x:auto; }
 .tea-table-label{ margin-bottom:10px; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(var(--theme-accent-rgb),.75); }
+.tea-table-note{ margin:0 0 12px; font-family:'Cormorant Garamond',serif; font-size:17px; line-height:1.5; color:rgba(var(--theme-text-rgb),.8); }
 .tea-table-grid{ display:grid; grid-template-columns:minmax(56px,auto) repeat(calc(var(--cols) - 1),minmax(0,1fr)); gap:1px; background:rgba(var(--theme-text-rgb),.07); border-radius:6px; overflow:hidden; }
 .tea-th{ padding:8px 12px; background:rgba(20,22,30,.96); font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:rgba(var(--theme-accent-rgb),.75); }
 .tea-td{ padding:9px 12px; background:rgba(14,16,23,.96); font-size:13.5px; line-height:1.5; color:rgba(var(--theme-text-rgb),.78); }

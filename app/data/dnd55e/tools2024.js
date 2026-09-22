@@ -1,4 +1,4 @@
-import { TEAS_5E, TEA_LORE } from '../tea5e.js'
+import { TEAS_5E, TEA_LORE, TEA_STEPS } from '../tea5e.js'
 import { OMENS_5E } from '../omens5e.js'
 import { WRATHS_5E, WRATH_FACE_SKILLS, WRATH_LORE } from '../wrath5e.js'
 
@@ -166,6 +166,7 @@ export const TEAS_2024 = adaptValue2024(TEAS_5E)
 export const OMENS_2024 = adaptValue2024(OMENS_5E)
 export const WRATHS_2024 = adaptValue2024(WRATHS_5E)
 export const TEA_LORE_2024 = adaptValue2024(TEA_LORE)
+export const TEA_STEPS_2024 = adaptValue2024(TEA_STEPS)
 export const WRATH_LORE_2024 = adaptValue2024(WRATH_LORE)
 export const WRATH_FACE_SKILLS_2024 = adaptValue2024(WRATH_FACE_SKILLS)
 
