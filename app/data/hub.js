@@ -19,7 +19,7 @@ export const SYSTEMS = [
       { name:'Мастерская',  sections:['Бестиарий','Глоссарий'] },
   ] },
   { id:'lore', name:'Lore',       tag:'Мир', sections:[
-      'Пантеон','Фракции','Гильдии','География',
+      'Пантеон','Фракции','Гильдии','Осколки','География',
       'Животные','Растения','Сказания','Узлы','Глоссарий','Нить Башни Мафраш'
   ] },
 ];
@@ -66,6 +66,7 @@ export function nodeImg(name, systemId = ''){
   if (systemId === 'lore' && name === 'Фракции') return '/assets/nodes/factions-lore.webp'
   if (systemId === 'lore' && name === 'Пантеон') return '/assets/nodes/pantheon-lore.webp'
   if (systemId === 'lore' && name === 'География') return '/assets/nodes/geography-lore.webp'
+  if (systemId === 'lore' && name === 'Осколки') return '/assets/nodes/shards-lore.svg'
   if (systemId === 'lore' && name === 'Гильдии') return '/assets/nodes/guilds-lore.webp'
   if (systemId === 'lore' && name === 'Сказания') return '/assets/nodes/tales-lore.webp'
   if (systemId === 'lore' && name === 'Узлы') return '/assets/nodes/uzly-lore.webp'

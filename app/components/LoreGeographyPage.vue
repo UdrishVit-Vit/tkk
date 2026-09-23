@@ -5,8 +5,11 @@ import { LORE_GLOSSARY } from '~/data/loreGlossary.js'
 defineProps({ theme: { type: Object, required: true } })
 defineEmits(['up'])
 
-const shardId = ref('daskar')
-const regionId = ref('north')
+const route = useRoute()
+const initialShard = GEOGRAPHY_SHARDS.some(item => item.id === route.query.shard) ? route.query.shard : 'daskar'
+const initialRegion = GEOGRAPHY_REGIONS.some(item => item.id === route.query.region) ? route.query.region : 'north'
+const shardId = ref(initialShard)
+const regionId = ref(initialRegion)
 const query = ref('')
 const selectedShard = computed(() => GEOGRAPHY_SHARDS.find(item => item.id === shardId.value))
 const selectedRegion = computed(() => GEOGRAPHY_REGIONS.find(item => item.id === regionId.value))
@@ -72,6 +75,7 @@ useHead({ title: 'География Эноа · Lore', meta: [{
           <p>АРХИВ МИРА ЭНОА · АТЛАС</p>
           <h1>География</h1>
           <span class="geo-intro">Три осколка мира. Карты, названия и дороги, вокруг которых складываются истории.</span>
+          <NuxtLink to="/lore/shards" class="geo-shards-link">Обзор осколков ↗</NuxtLink>
         </header>
 
         <div class="geo-branch">
@@ -199,5 +203,6 @@ useHead({ title: 'География Эноа · Lore', meta: [{
 .geo-item__name{display:block;min-width:0;flex:1;color:inherit;text-decoration:none}
 .geo-item__locate{flex:none;display:grid;place-items:center;width:31px;height:31px;padding:0;border:1px solid rgba(var(--theme-accent-rgb),.32);background:rgba(var(--theme-accent-rgb),.06);color:var(--gold-bright);cursor:pointer;font:25px/1 'Cormorant Garamond',serif}
 .geo-item__locate:hover,.geo-item__locate:focus-visible{border-color:var(--gold-bright);background:rgba(var(--theme-accent-rgb),.18);outline:none}
+.geo-shards-link{display:inline-block;margin-top:17px;padding:8px 14px;border:1px solid rgba(var(--theme-accent-rgb),.36);color:var(--gold-bright);text-decoration:none;font:600 10px 'Hanken Grotesk',sans-serif;letter-spacing:.11em;text-transform:uppercase}.geo-shards-link:hover,.geo-shards-link:focus-visible{border-color:var(--gold-bright);background:rgba(var(--theme-accent-rgb),.1)}
 @media(max-width:760px){.geo-item{display:flex;align-items:center}.geo-item__locate{width:29px;height:29px}}
 </style>

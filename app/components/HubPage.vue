@@ -297,6 +297,7 @@ const SECTION_ROUTES_BY_SYSTEM = {
   lore: {
     'Пантеон': '/lore/pantheon',
     'География': '/lore/geography',
+    'Осколки': '/lore/shards',
     'Фракции': '/lore/factions',
     'Гильдии': '/lore/guilds',
     'Животные': '/lore/animals',
@@ -650,7 +651,7 @@ const vm = computed(() => {
       // subject never leaves a gap or crowds a neighbour. Each route bends
       // once as it nears its node instead of radiating as a straight spoke,
       // so navigation still reads as one continuous ornament.
-      const loreRingSections = ['Пантеон', 'География', 'Фракции', 'Растения', 'Нить Башни Мафраш', 'Животные', 'Гильдии', 'Сказания', 'Узлы', 'Глоссарий']
+      const loreRingSections = ['Пантеон', 'Осколки', 'География', 'Фракции', 'Растения', 'Нить Башни Мафраш', 'Животные', 'Гильдии', 'Сказания', 'Узлы', 'Глоссарий']
       const loreRingRadius = 350
       function loreSpoke(angleDeg) {
         const rad = angleDeg * Math.PI / 180
@@ -785,6 +786,7 @@ const vm = computed(() => {
   const showLoreGlossary = S.active === 'lore' && S.section === 'Глоссарий'
   const showLorePantheon = S.active === 'lore' && S.section === 'Пантеон'
   const showLoreGeography = S.active === 'lore' && S.section === 'География'
+  const showLoreShards = S.active === 'lore' && S.section === 'Осколки'
   const showLoreFactions = S.active === 'lore' && S.section === 'Фракции'
   const showLoreTales = S.active === 'lore' && S.section === 'Сказания'
   const showLoreUzly = S.active === 'lore' && S.section === 'Узлы'
@@ -1103,11 +1105,12 @@ const vm = computed(() => {
     classInvocations: (cd.invocations||[]).map(f => ({ name:f[0], req:f[1]||'', hasReq:!!f[1], text:f[2] })),
     classHasInvocations: !!(cd.invocations && cd.invocations.length),
 
-    showCards: showSection && S.section !== 'Классы' && !showLoreHistory && !showLoreGlossary && !showLorePantheon && !showLoreGeography && !showLoreFactions && !showLoreTales && !showLoreUzly,
+    showCards: showSection && S.section !== 'Классы' && !showLoreHistory && !showLoreGlossary && !showLorePantheon && !showLoreGeography && !showLoreShards && !showLoreFactions && !showLoreTales && !showLoreUzly,
     showLoreHistory,
     showLoreGlossary,
     showLorePantheon,
     showLoreGeography,
+    showLoreShards,
     showLoreFactions,
     showLoreTales,
     showLoreUzly,
@@ -1159,7 +1162,7 @@ if (initialClass) await loadClassData()
     <canvas ref="canvasEl" class="tkk-canvas" />
     <div v-if="vm.isLoreMap" class="tkk-lore-carpet-bg" aria-hidden="true" />
 
-    <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary && !vm.showLorePantheon && !vm.showLoreGeography && !vm.showLoreFactions && !vm.showLoreTales && !vm.showLoreUzly" class="tkk-mobile" aria-label="Мобильная навигация">
+    <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary && !vm.showLorePantheon && !vm.showLoreGeography && !vm.showLoreShards && !vm.showLoreFactions && !vm.showLoreTales && !vm.showLoreUzly" class="tkk-mobile" aria-label="Мобильная навигация">
       <header class="tkk-mobile-head">
         <button class="tkk-mobile-back" :class="{ placeholder: !vm.isSystem }" type="button" :aria-label="vm.isSystem ? 'Назад к системам' : undefined" :tabindex="vm.isSystem ? 0 : -1" @click="vm.isSystem && goUp()">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
@@ -1397,6 +1400,7 @@ if (initialClass) await loadClassData()
     <LoreGlossaryPage v-if="vm.showLoreGlossary" :theme="vm.th" @up="closeLoreHistory" />
     <LorePantheonPage v-if="vm.showLorePantheon" :theme="vm.th" @up="closeLoreHistory" />
     <LoreGeographyPage v-if="vm.showLoreGeography" :theme="vm.th" @up="closeLoreHistory" />
+    <LoreShardsPage v-if="vm.showLoreShards" :theme="vm.th" @up="closeLoreHistory" />
     <LoreFactionsPage v-if="vm.showLoreFactions" :theme="vm.th" @up="closeLoreHistory" />
     <LoreTalesPage v-if="vm.showLoreTales" :theme="vm.th" @up="closeLoreHistory" />
     <LoreUzlyPage v-if="vm.showLoreUzly" :theme="vm.th" @up="closeLoreHistory" />
