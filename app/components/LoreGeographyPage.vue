@@ -41,12 +41,6 @@ function glossaryEntry(name) {
   return terms.get(key(name)) || aliases.get(key(name)) || null
 }
 
-const mappedIds = new Set([
-  ...GEOGRAPHY_SHARDS.map(item => item.glossaryId),
-  ...GEOGRAPHY_REGIONS.flatMap(region => region.groups.flatMap(group => group.names))
-    .map(name => glossaryEntry(name)?.id).filter(Boolean),
-])
-const otherPlaces = places.filter(item => !mappedIds.has(item.id))
 const needle = computed(() => query.value.toLocaleLowerCase('ru-RU').trim())
 function matches(name, entry) {
   return !needle.value || `${name} ${entry?.summary || ''}`.toLocaleLowerCase('ru-RU').includes(needle.value)
@@ -57,7 +51,6 @@ const visiblePlaces = computed(() => (selectedRegion.value?.groups || [])
   .map(name => ({ name, entry: glossaryEntry(name) }))
   .filter(item => matches(item.name, item.entry))
   .sort((a, b) => placeCollator.compare(a.name, b.name)))
-const visibleOtherPlaces = computed(() => otherPlaces.filter(item => matches(item.term, item)))
 
 useHead({ title: 'География Эноа · Lore', meta: [{
   name: 'description',
@@ -87,7 +80,7 @@ useHead({ title: 'География Эноа · Lore', meta: [{
             <button v-for="(shard, index) in GEOGRAPHY_SHARDS" :key="shard.id" type="button"
               :class="{ active: shardId === shard.id }" :aria-pressed="shardId === shard.id" @click="shardId = shard.id; query = ''">
               <i class="geo-shards__knot" aria-hidden="true" />
-              <small>0{{ index + 1 }} · {{ shard.kind }}</small><strong>{{ shard.title }}</strong><span>Открыть осколок ↗</span>
+              <small>ОСКОЛОК 0{{ index + 1 }}</small><strong>{{ shard.title }}</strong><span>{{ shard.id === 'daskar' ? '2 карты в атласе' : 'Нити свода' }}</span>
             </button>
           </nav>
         </div>
@@ -100,10 +93,10 @@ useHead({ title: 'География Эноа · Lore', meta: [{
 
           <template v-if="shardId === 'daskar'">
             <nav class="geo-regions" aria-label="Регионы Даскара">
-              <button v-for="region in GEOGRAPHY_REGIONS" :key="region.id" type="button"
+              <button v-for="(region, index) in GEOGRAPHY_REGIONS" :key="region.id" type="button"
                 :class="{ active: regionId === region.id }" :aria-pressed="regionId === region.id" @click="regionId = region.id; query = ''">
                 <i aria-hidden="true" />
-                <span>{{ region.short }}</span><strong>{{ region.title }}</strong>
+                <span>0{{ index + 1 }} · {{ region.short }}</span><strong>{{ region.id === 'central' ? 'Земли Ханидов' : region.title }}</strong><small>{{ region.map ? 'Карта и места' : 'Сведения свода' }}</small>
               </button>
             </nav>
 
@@ -136,13 +129,6 @@ useHead({ title: 'География Эноа · Lore', meta: [{
           </div>
         </section>
 
-        <section class="geo-archive">
-          <div><p>УКАЗАТЕЛЬ LORE</p><h2>Другие места свода</h2><span>Топонимы из глоссария, которые пока не привязаны к этим двум картам. Их регион не назначен без подтверждения источником.</span></div>
-          <div class="geo-archive__list">
-            <NuxtLink v-for="entry in visibleOtherPlaces" :key="entry.id" :to="`/lore/glossary/${entry.id}`">{{ entry.term }} <i>↗</i></NuxtLink>
-            <p v-if="!visibleOtherPlaces.length">По запросу ничего не найдено.</p>
-          </div>
-        </section>
       </div>
     </div>
   </main>
@@ -206,4 +192,39 @@ useHead({ title: 'География Эноа · Lore', meta: [{
 .geo-shards-link{display:inline-block;margin-top:17px;padding:8px 14px;border:1px solid rgba(var(--theme-accent-rgb),.36);color:var(--gold-bright);text-decoration:none;font:600 10px 'Hanken Grotesk',sans-serif;letter-spacing:.11em;text-transform:uppercase}.geo-shards-link:hover,.geo-shards-link:focus-visible{border-color:var(--gold-bright);background:rgba(var(--theme-accent-rgb),.1)}
 @media(max-width:760px){.geo-item{display:flex;align-items:center}.geo-item__locate{width:29px;height:29px}}
 @media(max-width:760px){.geo-index-list{grid-template-columns:1fr;column-gap:0}.geo-index-list .geo-item{min-height:60px}.geo-index-list .geo-item__name b{font-size:20px}}
+
+/* Осколки остаются узлами одной нити; части Даскара — компактными вкладками. */
+.geo-shell{padding-bottom:72px}
+.geo-shards{gap:8px;margin-bottom:36px}
+.geo-shards button{min-height:106px;padding:17px 20px 14px;border-color:rgba(var(--theme-accent-rgb),.25);background:rgba(var(--theme-surface-rgb),.3);box-shadow:none}
+.geo-shards button.active{border-color:rgba(var(--theme-accent-strong-rgb),.68);background:linear-gradient(180deg,rgba(var(--theme-accent-rgb),.13),rgba(var(--theme-surface-rgb),.4));box-shadow:inset 0 -2px 0 var(--gold-bright)}
+.geo-shards strong{font-size:31px;margin:6px 0 5px}
+.geo-shards button>span{font-size:8px;letter-spacing:.11em}
+.geo-chapter::before{top:-36px;height:36px}
+.geo-chapter__heading{padding-top:14px}
+.geo-regions{gap:0;margin:30px 0 34px;padding-top:21px}
+.geo-regions::after{top:-30px;height:30px}
+.geo-regions button{min-height:91px;padding:17px 18px 14px;border:0;border-top:1px solid rgba(var(--theme-accent-rgb),.25);border-bottom:1px solid rgba(var(--theme-accent-rgb),.25);background:transparent;transition:background .2s,border-color .2s}
+.geo-regions button+button{border-left:1px solid rgba(var(--theme-accent-rgb),.19)}
+.geo-regions button:hover{background:rgba(var(--theme-accent-rgb),.055)}
+.geo-regions button.active{border-top-color:rgba(var(--theme-accent-strong-rgb),.7);border-bottom:2px solid var(--gold-bright);background:linear-gradient(180deg,rgba(var(--theme-accent-rgb),.095),transparent)}
+.geo-regions button strong{font-size:25px;margin-top:6px}
+.geo-regions button small{display:block;margin-top:5px;color:rgba(var(--theme-text-rgb),.53);font:600 9px 'Hanken Grotesk',sans-serif;letter-spacing:.06em}
+.geo-region__heading{margin-bottom:24px}
+.geo-region__heading h3{font-size:clamp(39px,5vw,59px);margin:7px 0}
+@media(max-width:760px){
+  .geo-shell{padding-bottom:60px}
+  .geo-shards{gap:5px;margin-bottom:30px}
+  .geo-shards button{min-height:88px;padding:14px 8px 10px}
+  .geo-shards strong{font-size:clamp(19px,5vw,25px);margin:8px 0 0}
+  .geo-shards button>span{display:none}
+  .geo-chapter::before{top:-30px;height:30px}
+  .geo-regions{margin:25px 0 28px;padding-top:18px}
+  .geo-regions::after{top:-25px;height:25px}
+  .geo-regions button{min-height:72px;padding:11px 6px}
+  .geo-regions button::before{height:18px}
+  .geo-regions button strong{font-size:clamp(15px,4vw,19px);line-height:1.05}
+  .geo-regions button span{font-size:8px}
+  .geo-regions button small{font-size:7px;line-height:1.2}
+}
 </style>
