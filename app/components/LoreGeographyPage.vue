@@ -51,13 +51,12 @@ const needle = computed(() => query.value.toLocaleLowerCase('ru-RU').trim())
 function matches(name, entry) {
   return !needle.value || `${name} ${entry?.summary || ''}`.toLocaleLowerCase('ru-RU').includes(needle.value)
 }
-const visibleGroups = computed(() => (selectedRegion.value?.groups || [])
-  .map(group => ({
-    ...group,
-    items: group.names.map(name => ({ name, entry: glossaryEntry(name) }))
-      .filter(item => matches(item.name, item.entry)),
-  }))
-  .filter(group => group.items.length))
+const placeCollator = new Intl.Collator('ru-RU', { sensitivity: 'base' })
+const visiblePlaces = computed(() => (selectedRegion.value?.groups || [])
+  .flatMap(group => group.names)
+  .map(name => ({ name, entry: glossaryEntry(name) }))
+  .filter(item => matches(item.name, item.entry))
+  .sort((a, b) => placeCollator.compare(a.name, b.name)))
 const visibleOtherPlaces = computed(() => otherPlaces.filter(item => matches(item.term, item)))
 
 useHead({ title: 'География Эноа · Lore', meta: [{
@@ -118,20 +117,14 @@ useHead({ title: 'География Эноа · Lore', meta: [{
               <div class="geo-index-heading"><div><p>ТОПОНИМИЧЕСКИЙ УКАЗАТЕЛЬ</p><h4>{{ selectedRegion.map ? 'Места на карте' : 'Опорные места' }}</h4></div>
                 <label><span class="sr-only">Поиск географического названия</span><input v-model="query" type="search" placeholder="Найти место…"></label>
               </div>
-              <div v-if="visibleGroups.length" class="geo-groups">
-                <section v-for="group in visibleGroups" :key="group.title" class="geo-group" :class="{ 'geo-group--wide': group.items.length >= 6 }">
-                  <h5>{{ group.title }} <span>{{ group.items.length }}</span></h5>
-                  <div class="geo-items">
-                    <template v-for="item in group.items" :key="item.name">
-                    <div class="geo-item" :class="{ linked: item.entry }">
+              <ol v-if="visiblePlaces.length" class="geo-index-list" aria-label="Географические названия по алфавиту">
+                  <li v-for="(item, index) in visiblePlaces" :key="item.name" class="geo-item" :class="{ linked: item.entry }">
+                      <span class="geo-index-list__number" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
                       <NuxtLink v-if="item.entry" :to="`/lore/glossary/${item.entry.id}`" class="geo-item__name"><b>{{ item.name }}</b><small>Статья Lore ↗</small></NuxtLink>
                       <span v-else class="geo-item__name"><b>{{ item.name }}</b><small>На карте</small></span>
                       <button v-if="markerNames.has(item.name)" type="button" class="geo-item__locate" :aria-label="`Показать на карте: ${item.name}`" title="Показать на карте" @click="showOnMap(item.name)">⌖</button>
-                    </div>
-                    </template>
-                  </div>
-                </section>
-              </div>
+                  </li>
+              </ol>
               <p v-else class="geo-empty">По этому запросу названий на карте нет.</p>
             </section>
           </template>
@@ -205,12 +198,12 @@ useHead({ title: 'География Эноа · Lore', meta: [{
 .geo-item__name small{margin-top:5px}
 .geo-item__locate{flex:none;display:grid;place-items:center;width:31px;height:31px;padding:0;border:1px solid rgba(var(--theme-accent-rgb),.32);background:rgba(var(--theme-accent-rgb),.06);color:var(--gold-bright);cursor:pointer;font:25px/1 'Cormorant Garamond',serif}
 .geo-item__locate:hover,.geo-item__locate:focus-visible{border-color:var(--gold-bright);background:rgba(var(--theme-accent-rgb),.18);outline:none}
-.geo-groups{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.geo-group{min-width:0;padding:19px;border:1px solid rgba(var(--theme-accent-rgb),.17);background:rgba(var(--theme-surface-rgb),.13)}
-.geo-group--wide{grid-column:1/-1}
-.geo-group .geo-items{grid-template-columns:repeat(2,minmax(0,1fr))}
-.geo-group--wide .geo-items{grid-template-columns:repeat(3,minmax(0,1fr))}
+.geo-index-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:38px;list-style:none;margin:0;padding:0;border-top:1px solid rgba(var(--theme-accent-rgb),.24)}
+.geo-index-list .geo-item{min-width:0;min-height:70px;padding:13px 5px;border:0;border-bottom:1px solid rgba(var(--theme-accent-rgb),.18);background:transparent}
+.geo-index-list .geo-item.linked:hover{background:rgba(var(--theme-accent-rgb),.045)}
+.geo-index-list__number{width:31px;flex:none;color:rgba(var(--theme-accent-rgb),.48);font:600 10px 'Hanken Grotesk',sans-serif;letter-spacing:.04em}
+.geo-index-list .geo-item__name b{font-size:22px}
 .geo-shards-link{display:inline-block;margin-top:17px;padding:8px 14px;border:1px solid rgba(var(--theme-accent-rgb),.36);color:var(--gold-bright);text-decoration:none;font:600 10px 'Hanken Grotesk',sans-serif;letter-spacing:.11em;text-transform:uppercase}.geo-shards-link:hover,.geo-shards-link:focus-visible{border-color:var(--gold-bright);background:rgba(var(--theme-accent-rgb),.1)}
 @media(max-width:760px){.geo-item{display:flex;align-items:center}.geo-item__locate{width:29px;height:29px}}
-@media(max-width:760px){.geo-groups{grid-template-columns:1fr}.geo-group--wide{grid-column:auto}.geo-group .geo-items,.geo-group--wide .geo-items{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.geo-index-list{grid-template-columns:1fr;column-gap:0}.geo-index-list .geo-item{min-height:60px}.geo-index-list .geo-item__name b{font-size:20px}}
 </style>
