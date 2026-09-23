@@ -33,6 +33,9 @@ const SKIP = new Set([
   // «Круг», «Пустота», «Пламя», «Шепоты» и эпитет «Маг» из досье Ильбеша.
   'руки', 'старик', 'круг', 'пустота', 'пламя', 'шепоты', 'маг', 'мирна', 'рябь',
   'империя', 'наблюдатель',
+  // Эти синонимы совпадают с обычной речью: «гром» не всегда Ай’анга,
+  // «путник» не всегда Эркер, а «древние» не обязательно левиофаны.
+  'гром', 'путник', 'древние', 'мала',
 ])
 
 // Слово текста: апостроф внутри имени — часть слова («Ятх’У»), дефис — нет
@@ -72,7 +75,14 @@ function buildIndex() {
       // У короткого имени первая буква обязана быть прописной: «Ул», «Цам»,
       // «Ияр» — имена, а те же буквы строчными — обрывки чужих слов. Порог в
       // четыре буквы иначе отсекал главного героя сезона.
-      const item = { id: entry.id, term: entry.term, short: clean.length < 4 }
+      // У короткого имени с апострофом знак различает имя и обычное слово:
+      // Мал’аа нельзя узнавать по «мало» через общую основу «мал».
+      const item = {
+        id: entry.id,
+        term: entry.term,
+        short: clean.length < 4,
+        marked: clean.length <= 5 && /[’'`ʼ]/.test(name),
+      }
 
       // Одно имя может вести в несколько статей: народ вету и земли Вету.
       // Выбирать за читателя нельзя — храним всех и предложим выбор.
@@ -138,7 +148,8 @@ function matchAt(source, words, at, skipId) {
     const found = lookupWords(window.map(word => bare(word.raw)))
     if (!found) continue
     const hits = found.filter(item => item.id !== skipId
-      && (!item.short || CAPITAL.test(window[0].raw)))
+      && (!item.short || CAPITAL.test(window[0].raw))
+      && (!item.marked || /[’'`ʼ]/.test(source.slice(window[0].start, window[length - 1].end))))
     if (hits.length) return { hits, from: window[0].start, to: window[length - 1].end, skip: length }
   }
   return null

@@ -7,13 +7,14 @@
 //
 // Запуск: pnpm lore:check
 
-import { readFileSync, writeFileSync, mkdtempSync, rmSync, cpSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdtempSync, rmSync, cpSync, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const DATA = join(ROOT, 'app', 'data')
+const { GEOGRAPHY_SHARDS, GEOGRAPHY_REGIONS } = await import(pathToFileURL(join(DATA, 'loreGeography.js')).href)
 
 // Модули данных написаны для сборщика: JSON они импортируют без атрибута типа,
 // который требует голый Node. Копируем каталог данных целиком и правим только
@@ -88,6 +89,21 @@ for (const entry of LORE_GLOSSARY) {
 
 // ——— Связность ———
 const byId = new Map(LORE_GLOSSARY.map(entry => [entry.id, entry]))
+for (const shard of GEOGRAPHY_SHARDS) {
+  if (byId.get(shard.glossaryId)?.category !== 'places') {
+    note('ошибка', { id: shard.id }, `география ссылается на отсутствующее место: ${shard.glossaryId}`)
+  }
+  for (const thread of shard.threads || []) {
+    if (!byId.has(thread.glossaryId)) note('ошибка', { id: shard.id }, `география ссылается на отсутствующую статью: ${thread.glossaryId}`)
+  }
+}
+for (const region of GEOGRAPHY_REGIONS) {
+  if (region.map && !existsSync(join(ROOT, 'public', region.map.replace(/^\//, '')))) {
+    note('ошибка', { id: region.id }, `не найдена карта: ${region.map}`)
+  }
+  const names = region.groups.flatMap(group => group.names)
+  if (new Set(names).size !== names.length) note('ошибка', { id: region.id }, 'название места повторяется в регионе')
+}
 const seasonLength = new Map(
   LORE_GLOSSARY_SEASONS.map(item => [item.season, item.chapterCount]),
 )

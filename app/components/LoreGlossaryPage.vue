@@ -232,7 +232,7 @@ const selectedSource = computed(() => sourceFor(selected.value))
 const selectedSources = computed(() => sourcesFor(selected.value))
 const selectedAttribution = computed(() => selected.value?.attributedTo || selectedSource.value?.attributedTo)
 const relatedTerms = computed(() => (selected.value?.related || [])
-  .map(id => LORE_GLOSSARY_BY_ID[id])
+  .map(id => glossary.value.find(term => term.id === id))
   .filter(Boolean))
 // Позиция в текущей выборке, а не в полном своде: на телефоне карточки
 // листаются смахиванием, и счётчик показывает, где читатель находится.
@@ -366,15 +366,20 @@ const showLead = computed(() => {
 
 // Тридцать два номера подряд ничего не сообщают. Диапазон сообщает.
 const chapterSpan = computed(() => {
-  const chapters = selected.value?.ogni?.chapters || []
+  const ogni = selected.value?.ogni
+  const current = ogni?.chapters || []
+  const previous = ogni?.seasons?.filter(item => item.season < ogni.season && item.chapters.length).at(-1)
+  const chapters = current.length ? current : previous?.chapters || []
   if (!chapters.length) return null
+  const season = current.length ? ogni.season : previous.season
   const first = chapters[0]
   const last = chapters[chapters.length - 1]
-  if (chapters.length === 1) return { label: `глава ${first}`, chapter: first }
-  if (chapters.length <= 4) return { label: `главы ${chapters.join(', ')}`, chapter: first }
+  if (chapters.length === 1) return { label: `сезон ${season} · глава ${first}`, season, chapter: first }
+  if (chapters.length <= 4) return { label: `сезон ${season} · главы ${chapters.join(', ')}`, season, chapter: first }
   const solid = last - first + 1 === chapters.length
   return {
-    label: solid ? `главы ${first}—${last}` : `${chapters.length} глав, с ${first} по ${last}`,
+    label: solid ? `сезон ${season} · главы ${first}—${last}` : `сезон ${season} · ${chapters.length} глав, с ${first} по ${last}`,
+    season,
     chapter: first,
   }
 })
@@ -383,8 +388,9 @@ const chapterSpan = computed(() => {
 // поэтому ищем и по нему, и по исходному ключу кампании.
 const selectedRelations = computed(() => {
   const byOgniId = new Map(glossary.value.filter(term => term.ogniId).map(term => [term.ogniId, term]))
+  const byVisibleId = new Map(glossary.value.map(term => [term.id, term]))
   return (selected.value?.ogni?.relations || [])
-    .map(relation => ({ ...relation, target: byOgniId.get(relation.id) || LORE_GLOSSARY_BY_ID[relation.id] }))
+    .map(relation => ({ ...relation, target: byOgniId.get(relation.id) || byVisibleId.get(relation.id) }))
     .filter(relation => relation.target)
 })
 
@@ -1090,8 +1096,8 @@ onBeforeUnmount(() => {
               <NuxtLink
                 v-if="chapterSpan"
                 class="ogni-span"
-                :to="chapterLink(selected.ogni.season, chapterSpan.chapter)"
-                :title="chapterTitle(selected.ogni.season, chapterSpan.chapter)"
+                :to="chapterLink(chapterSpan.season, chapterSpan.chapter)"
+                :title="chapterTitle(chapterSpan.season, chapterSpan.chapter)"
               >{{ chapterSpan.label }}</NuxtLink>
             </header>
 
