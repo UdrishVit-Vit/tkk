@@ -66,12 +66,20 @@ useHead({ title: 'География Эноа · Lore', meta: [{
           <span class="geo-intro">Три осколка мира. Карты, названия и дороги, вокруг которых складываются истории.</span>
         </header>
 
-        <nav class="geo-shards" aria-label="Осколки мира">
-          <button v-for="(shard, index) in GEOGRAPHY_SHARDS" :key="shard.id" type="button"
-            :class="{ active: shardId === shard.id }" :aria-pressed="shardId === shard.id" @click="shardId = shard.id; query = ''">
-            <small>0{{ index + 1 }} · {{ shard.kind }}</small><strong>{{ shard.title }}</strong><span>Открыть осколок ↗</span>
-          </button>
-        </nav>
+        <div class="geo-branch">
+          <div class="geo-branch__stem" aria-hidden="true"><i /></div>
+          <div class="geo-branch__node" aria-hidden="true">
+            <img src="/assets/nodes/geography-lore.webp" width="128" height="128" alt="">
+          </div>
+          <div class="geo-branch__routes" aria-hidden="true"><i v-for="shard in GEOGRAPHY_SHARDS" :key="shard.id" /></div>
+          <nav class="geo-shards" aria-label="Осколки мира">
+            <button v-for="(shard, index) in GEOGRAPHY_SHARDS" :key="shard.id" type="button"
+              :class="{ active: shardId === shard.id }" :aria-pressed="shardId === shard.id" @click="shardId = shard.id; query = ''">
+              <i class="geo-shards__knot" aria-hidden="true" />
+              <small>0{{ index + 1 }} · {{ shard.kind }}</small><strong>{{ shard.title }}</strong><span>Открыть осколок ↗</span>
+            </button>
+          </nav>
+        </div>
 
         <section v-if="selectedShard" class="geo-chapter" aria-live="polite">
           <div class="geo-chapter__heading">
@@ -83,6 +91,7 @@ useHead({ title: 'География Эноа · Lore', meta: [{
             <nav class="geo-regions" aria-label="Регионы Даскара">
               <button v-for="region in GEOGRAPHY_REGIONS" :key="region.id" type="button"
                 :class="{ active: regionId === region.id }" :aria-pressed="regionId === region.id" @click="regionId = region.id; query = ''">
+                <i aria-hidden="true" />
                 <span>{{ region.short }}</span><strong>{{ region.title }}</strong>
               </button>
             </nav>
@@ -142,4 +151,42 @@ useHead({ title: 'География Эноа · Lore', meta: [{
 .geo-threads{margin-top:35px}.geo-threads>p{color:var(--gold-bright);font:600 10px 'Hanken Grotesk',sans-serif;letter-spacing:.2em}.geo-threads>div{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.geo-threads a{padding:22px;border:1px solid rgba(var(--theme-accent-rgb),.24);background:rgba(var(--theme-surface-rgb),.23);text-decoration:none;color:inherit}.geo-threads a:hover{border-color:var(--gold-bright)}.geo-threads small,.geo-threads span{display:block;color:var(--gold-bright);font:600 9px 'Hanken Grotesk',sans-serif;letter-spacing:.12em;text-transform:uppercase}.geo-threads strong{display:block;margin:13px 0;color:rgba(var(--theme-heading-rgb),.93);font:500 31px 'Cormorant Garamond',serif}
 @media(min-width:761px){.geo-shell{width:min(1120px,calc(100% - 160px));transform:translateX(34px)}}
 @media(max-width:760px){.geo-shell{width:calc(100% - 32px);padding:65px 0 100px}.geo-header{padding:22px 0 35px}.geo-back{top:-45px}.geo-header h1{font-size:68px}.geo-intro,.geo-chapter__heading span,.geo-region__heading span{font-size:17px}.geo-shards{gap:6px;margin:20px 0 35px}.geo-shards button{min-height:105px;padding:12px 8px}.geo-shards small{font-size:7px;line-height:1.4}.geo-shards strong{font-size:27px;margin:12px 0 4px}.geo-shards button>span{display:none}.geo-chapter__heading{display:block}.geo-text-link{display:inline-block;margin-top:18px}.geo-regions{gap:5px;margin:23px}.geo-regions button{padding:10px 8px}.geo-regions button strong{font-size:17px}.geo-map a>span{font-size:8px;padding:7px}.geo-index-heading{display:block;margin-top:37px}.geo-index-heading label{display:block;margin-top:15px}.geo-index-heading input{width:100%}.geo-items,.geo-threads>div{grid-template-columns:repeat(2,1fr)}.geo-item{display:block;padding:10px}.geo-item b{display:block}.geo-item small{display:block;margin-top:5px}.geo-archive{margin-top:60px}.geo-archive h2{font-size:46px}}
+
+/* Та же грамматика узлов, что в нитях истории: входящая нить, ромб и три исходящих пути. */
+.geo-header{padding-bottom:10px;border-bottom:0}
+.geo-header h1{margin-bottom:15px}
+.geo-branch{position:relative;isolation:isolate}
+.geo-branch__stem{position:relative;width:18px;height:50px;margin:auto}
+.geo-branch__stem::before{content:"";position:absolute;inset:0 auto 0 8px;width:2px;background:linear-gradient(transparent,rgba(var(--theme-accent-strong-rgb),.8));box-shadow:0 0 12px rgba(var(--theme-accent-rgb),.35)}
+.geo-branch__stem::after{content:"";position:absolute;inset:4px auto 2px 4px;width:10px;border-left:1px dashed rgba(var(--theme-accent-rgb),.36);border-right:1px dashed rgba(var(--theme-accent-rgb),.36)}
+.geo-branch__stem i{position:absolute;z-index:1;left:5px;top:13px;width:8px;height:8px;border:1px solid var(--gold-bright);background:rgb(var(--theme-surface-rgb));transform:rotate(45deg);box-shadow:0 0 13px rgba(var(--theme-accent-rgb),.55);animation:geo-spark 5s ease-in-out infinite}
+.geo-branch__node{position:relative;z-index:2;display:grid;place-items:center;width:138px;height:138px;margin:0 auto;background:radial-gradient(circle,rgba(var(--theme-accent-rgb),.14),transparent 68%)}
+.geo-branch__node::before{content:"";position:absolute;width:92px;height:92px;border:1px solid rgba(var(--theme-accent-rgb),.38);transform:rotate(45deg);box-shadow:0 0 0 10px rgba(var(--theme-accent-rgb),.025),0 0 26px rgba(var(--theme-accent-rgb),.12)}
+.geo-branch__node img{position:relative;width:128px;height:128px;object-fit:contain;filter:drop-shadow(0 0 15px rgba(var(--theme-accent-rgb),.3))}
+.geo-branch__routes{position:relative;height:83px;margin-top:-1px;pointer-events:none}
+.geo-branch__routes::before{content:"";position:absolute;left:50%;top:0;height:30px;width:2px;transform:translateX(-50%);background:rgba(var(--theme-accent-strong-rgb),.7);box-shadow:0 0 9px rgba(var(--theme-accent-rgb),.28)}
+.geo-branch__routes::after{content:"";position:absolute;left:16.666%;right:16.666%;top:29px;border-top:1px solid rgba(var(--theme-accent-strong-rgb),.6);box-shadow:0 0 9px rgba(var(--theme-accent-rgb),.3)}
+.geo-branch__routes i{position:absolute;top:29px;bottom:0;width:1px;background:linear-gradient(rgba(var(--theme-accent-strong-rgb),.65),rgba(var(--theme-accent-rgb),.72));box-shadow:0 0 8px rgba(var(--theme-accent-rgb),.2)}
+.geo-branch__routes i:nth-child(1){left:16.666%}.geo-branch__routes i:nth-child(2){left:50%}.geo-branch__routes i:nth-child(3){left:83.333%}
+.geo-shards{position:relative;margin:0 0 56px}
+.geo-shards button{position:relative;min-height:145px;overflow:visible;background:repeating-linear-gradient(45deg,rgba(var(--theme-accent-rgb),.016) 0 1px,transparent 1px 8px),linear-gradient(150deg,rgba(var(--theme-surface-rgb),.84),rgba(var(--theme-surface-rgb),.35));box-shadow:0 9px 24px rgba(0,0,0,.18)}
+.geo-shards button:focus-visible,.geo-regions button:focus-visible{outline:2px solid var(--gold-bright);outline-offset:3px}
+.geo-shards__knot{position:absolute;top:-7px;left:50%;width:13px;height:13px;transform:translateX(-50%) rotate(45deg);border:1px solid rgba(var(--theme-accent-strong-rgb),.8);background:rgb(var(--theme-surface-rgb));box-shadow:0 0 0 5px rgba(var(--theme-surface-rgb),.6)}
+.geo-shards button.active .geo-shards__knot,.geo-shards button:hover .geo-shards__knot{background:var(--gold-bright);box-shadow:0 0 0 5px rgba(var(--theme-surface-rgb),.6),0 0 17px var(--gold-bright)}
+.geo-shards button.active{background:radial-gradient(circle at 50% 0,rgba(var(--theme-accent-rgb),.12),transparent 67%),rgb(var(--theme-surface-rgb))}
+.geo-chapter{position:relative}
+.geo-chapter::before{content:"";position:absolute;left:50%;top:-56px;height:56px;border-left:1px solid rgba(var(--theme-accent-rgb),.36);pointer-events:none}
+.geo-chapter__heading{position:relative;padding-top:20px}
+.geo-chapter__heading::before{content:"";position:absolute;left:50%;top:-6px;width:11px;height:11px;transform:translateX(-50%) rotate(45deg);border:1px solid rgba(var(--theme-accent-strong-rgb),.65);background:rgb(var(--theme-surface-rgb))}
+.geo-regions{position:relative;margin-top:47px;padding-top:29px}
+.geo-regions::before{content:"";position:absolute;top:0;left:16.666%;right:16.666%;border-top:1px solid rgba(var(--theme-accent-rgb),.42)}
+.geo-regions::after{content:"";position:absolute;top:-47px;left:50%;height:47px;border-left:1px solid rgba(var(--theme-accent-rgb),.42)}
+.geo-regions button{position:relative;min-height:80px;background:repeating-linear-gradient(45deg,rgba(var(--theme-accent-rgb),.012) 0 1px,transparent 1px 7px),rgba(var(--theme-surface-rgb),.42)}
+.geo-regions button::before{content:"";position:absolute;left:50%;bottom:100%;height:29px;border-left:1px solid rgba(var(--theme-accent-rgb),.42)}
+.geo-regions button i{position:absolute;top:-7px;left:50%;width:12px;height:12px;transform:translateX(-50%) rotate(45deg);border:1px solid rgba(var(--theme-accent-rgb),.55);background:rgb(var(--theme-surface-rgb))}
+.geo-regions button.active i{background:var(--gold-bright);box-shadow:0 0 14px rgba(var(--theme-accent-rgb),.7)}
+.geo-group h5::before{content:"";display:inline-block;width:8px;height:8px;margin:0 13px 3px 2px;transform:rotate(45deg);border:1px solid rgba(var(--theme-accent-rgb),.65)}
+@keyframes geo-spark{0%,100%{top:4px;opacity:.35}50%{top:37px;opacity:1}}
+@media(max-width:760px){.geo-header{padding-bottom:5px}.geo-header h1{font-size:68px}.geo-branch__stem{height:33px}.geo-branch__node{width:108px;height:108px}.geo-branch__node::before{width:72px;height:72px}.geo-branch__node img{width:104px;height:104px}.geo-branch__routes{height:60px}.geo-branch__routes::before{height:21px}.geo-branch__routes::after{top:20px}.geo-branch__routes i{top:20px}.geo-shards{margin:0 0 40px}.geo-shards button{min-height:112px;padding:16px 8px 10px}.geo-shards strong{font-size:clamp(21px,5.8vw,27px)}.geo-chapter::before{top:-40px;height:40px}.geo-chapter__heading{padding-top:16px}.geo-regions{margin:30px 0 35px;padding-top:20px}.geo-regions::after{top:-30px;height:30px}.geo-regions button{min-height:74px}.geo-regions button::before{height:20px}}
+@media(prefers-reduced-motion:reduce){.geo-branch__stem i{animation:none}}
 </style>
