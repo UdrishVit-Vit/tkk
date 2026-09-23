@@ -103,6 +103,16 @@ for (const region of GEOGRAPHY_REGIONS) {
   }
   const names = region.groups.flatMap(group => group.names)
   if (new Set(names).size !== names.length) note('ошибка', { id: region.id }, 'название места повторяется в регионе')
+  if (region.areas) {
+    const areaNames = region.areas.flatMap(area => area.names)
+    if (new Set(areaNames).size !== areaNames.length) note('ошибка', { id: region.id }, 'место повторяется в географических областях')
+    for (const name of names) {
+      if (!areaNames.includes(name)) note('ошибка', { id: region.id }, `место не распределено по областям: ${name}`)
+    }
+    for (const name of areaNames) {
+      if (!names.includes(name)) note('ошибка', { id: region.id }, `в области указано неизвестное место: ${name}`)
+    }
+  }
   const markers = region.markers || []
   if (markers.length && !region.map) note('ошибка', { id: region.id }, 'отметки указаны без карты')
   if (new Set(markers.map(item => item.name)).size !== markers.length) note('ошибка', { id: region.id }, 'отметка на карте повторяется')
