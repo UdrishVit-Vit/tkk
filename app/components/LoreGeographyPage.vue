@@ -80,7 +80,7 @@ useHead({ title: 'География Эноа · Lore', meta: [{
             <button v-for="(shard, index) in GEOGRAPHY_SHARDS" :key="shard.id" type="button"
               :class="{ active: shardId === shard.id }" :aria-pressed="shardId === shard.id" @click="shardId = shard.id; query = ''">
               <i class="geo-shards__knot" aria-hidden="true" />
-              <small>ОСКОЛОК 0{{ index + 1 }}</small><strong>{{ shard.title }}</strong><span>{{ shard.id === 'daskar' ? '2 карты в атласе' : 'Нити свода' }}</span>
+              <small>ОСКОЛОК 0{{ index + 1 }}</small><strong>{{ shard.title }}</strong><span>{{ shard.id === 'daskar' ? '2 карты + фрагмент' : 'Нити свода' }}</span>
             </button>
           </nav>
         </div>
@@ -96,7 +96,7 @@ useHead({ title: 'География Эноа · Lore', meta: [{
               <button v-for="(region, index) in GEOGRAPHY_REGIONS" :key="region.id" type="button"
                 :class="{ active: regionId === region.id }" :aria-pressed="regionId === region.id" @click="regionId = region.id; query = ''">
                 <i aria-hidden="true" />
-                <span>0{{ index + 1 }} · {{ region.short }}</span><strong>{{ region.id === 'central' ? 'Земли Ханидов' : region.title }}</strong><small>{{ region.map ? 'Карта и места' : 'Сведения свода' }}</small>
+                <span>0{{ index + 1 }} · {{ region.short }}</span><strong>{{ region.id === 'central' ? 'Земли Ханидов' : region.title }}</strong><small>{{ region.id === 'south' ? 'Фрагмент карты' : region.map ? 'Карта и места' : 'Сведения свода' }}</small>
               </button>
             </nav>
 
@@ -107,7 +107,7 @@ useHead({ title: 'География Эноа · Lore', meta: [{
               </div>
               <div v-else class="geo-map-pending"><i aria-hidden="true">◇</i><span>Карта Южного Даскара ещё не добавлена</span></div>
 
-              <div class="geo-index-heading"><div><p>ТОПОНИМИЧЕСКИЙ УКАЗАТЕЛЬ</p><h4>{{ selectedRegion.map ? 'Места на карте' : 'Опорные места' }}</h4></div>
+              <div class="geo-index-heading"><div><p>ТОПОНИМИЧЕСКИЙ УКАЗАТЕЛЬ</p><h4>{{ selectedRegion.id === 'south' ? 'Места карты и свода' : selectedRegion.map ? 'Места на карте' : 'Опорные места' }}</h4></div>
                 <label><span class="sr-only">Поиск географического названия</span><input v-model="query" type="search" placeholder="Найти место…"></label>
               </div>
               <ol v-if="visiblePlaces.length" class="geo-index-list" aria-label="Географические названия по алфавиту">

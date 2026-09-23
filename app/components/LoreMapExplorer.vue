@@ -204,7 +204,7 @@ defineExpose({ focus })
       <div class="map-explorer__status" aria-live="polite"><b>{{ selected || 'Карта целиком' }}</b><span>{{ Math.round(scale * 100) }}% · {{ (region.markers || []).length }} отметок</span></div>
     </div>
     <figcaption>
-      <span>{{ region.id === 'central' ? 'Земли Ханидов · Центральный Даскар' : region.title }} · карта из архива пользователя</span>
+      <span>{{ region.mapCaption || (region.id === 'central' ? 'Земли Ханидов · Центральный Даскар' : region.title) }} · карта из архива пользователя</span>
       <a :href="region.map" target="_blank" rel="noopener noreferrer">Открыть исходную карту ↗</a>
     </figcaption>
   </figure>
