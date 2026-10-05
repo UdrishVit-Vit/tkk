@@ -2,6 +2,7 @@
 import { useThreadConstellation } from '~/composables/useThreadConstellation.js'
 import { loreLinkFor } from '~/utils/loreLink.js'
 import { equipmentUsedOn } from '~/utils/equipmentUsage.js'
+import { RACE_NAME_GENERATORS } from '~/data/raceNameGenerators.js'
 
 const route = useRoute()
 
@@ -1148,6 +1149,14 @@ const namesText = computed(() => {
 })
 const namesParagraphs = computed(() => namesText.value ? sectionParagraphs({ title: 'Имена', text: namesText.value }) : [])
 
+// Генератор имён 4к4 — один на все три редакции, поэтому ищется по пути
+// исходной 5e-страницы. У Вету свой блок (nameData), их в генераторе нет.
+const raceNameTables = computed(() => {
+  const slug = selectedAssetPath.value.split('/').filter(Boolean).at(-1) || ''
+  return RACE_NAME_GENERATORS[slug] || null
+})
+const activeVarietyShort = computed(() => activeVariety.value ? varietyShortTitle(activeVariety.value) : '')
+
 async function copyRaceLink() {
   if (!import.meta.client) return
   const url = new URL(route.fullPath, window.location.origin).toString()
@@ -1592,14 +1601,15 @@ function printRace() {
                 </div>
 
                 <!-- 2. race names (generic fallback; structured variety names are rendered below and reordered with CSS) -->
-                <div v-if="namesText && !activeNameData" class="rd-block rd-names-block">
+                <div v-if="(namesText || raceNameTables) && !activeNameData" class="rd-block rd-names-block">
                   <h2 class="rd-h2">Имена</h2>
-                  <div class="rd-names">
+                  <div v-if="namesText" class="rd-names">
                     <p v-for="(p, pi) in namesParagraphs" :key="pi">
                       <strong v-if="p.label" class="rd-names-label">{{ p.label }}:</strong>
                       {{ p.text }}
                     </p>
                   </div>
+                  <RaceNameGenerator v-if="raceNameTables" :tables="raceNameTables" :active-variety="activeVarietyShort" />
                 </div>
 
                 <!-- 3. unified rules block: summary + traits -->
@@ -1887,14 +1897,15 @@ function printRace() {
 
             <!-- races without varieties: plain summary + base features -->
             <section v-else class="rd-variety-section">
-            <div v-if="namesText" class="rd-block rd-names-block">
+            <div v-if="namesText || raceNameTables" class="rd-block rd-names-block">
               <h2 class="rd-h2">Имена</h2>
-              <div class="rd-names">
+              <div v-if="namesText" class="rd-names">
                 <p v-for="(p, pi) in namesParagraphs" :key="pi">
                   <strong v-if="p.label" class="rd-names-label">{{ p.label }}:</strong>
                   {{ p.text }}
                 </p>
               </div>
+              <RaceNameGenerator v-if="raceNameTables" :tables="raceNameTables" />
             </div>
             <div class="rd-block rd-summary-block rd-details-block">
               <h2 class="rd-h2">Особенности</h2>
