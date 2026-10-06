@@ -49,13 +49,13 @@ watch(search, () => { page.value = 1 })
         <p>{{ profile.formula.replace('name = null', 'Личного обрядового имени нет').replace('null', 'отсутствующим') }}</p>
         <details><summary>Культурный разбор</summary><p>{{ profile.analysis }}</p><p v-if="profile.exception">{{ profile.exception }}</p></details>
       </section>
-      <p class="name-guide-note">Авторские образцы и предложения имеют разный статус. Показанные имена не повторяются в открытом генераторе; после перезагрузки история сбрасывается. Для постоянной уникальности ведите реестр персонажей.</p>
+      <p class="name-guide-note">Авторские образцы и предложения имеют разный статус. Имена не повторяются внутри круга; когда варианты заканчиваются, генератор начинает новый круг. Для постоянной уникальности ведите реестр персонажей. Дополнительные предложения выбираются без броска 4к4.</p>
       <label class="name-guide-search">Найти в списке<input v-model="search" type="search" placeholder="Имя или часть имени"></label>
       <div class="name-guide-scroll">
         <table>
           <thead><tr><th>{{ table.worldPool ? '№' : table.cyclePool ? '1к13 + 4к4' : '4к4' }}</th><template v-if="table.names"><th>Имя</th></template><template v-else><th>{{ table.columnLabels?.m || 'Мужское' }}</th><th>{{ table.columnLabels?.f || 'Женское' }}</th></template></tr></thead>
           <tbody><tr v-for="row in rows" :key="row.index">
-            <td>{{ table.worldPool ? row.index + 1 : table.cyclePool ? `${Math.floor(row.index / 35) + 1} / ${table.rolls[row.index % 35]}` : NAME_ROLLS[row.index] }}</td>
+            <td>{{ table.worldPool ? row.index + 1 : table.cyclePool ? `${Math.floor(row.index / 35) + 1} / ${table.rolls[row.index % 35]}` : NAME_ROLLS[row.index] || 'Дополнительное' }}</td>
             <td v-for="name in (row.name ? [row.name] : [row.m, row.f])" :key="name">
               <span>{{ name }}</span><small>{{ status(name) }}</small>
               <a v-if="sourceFor(name)" :href="sourceFor(name).source" target="_blank" rel="noopener noreferrer">Источник · {{ sourceFor(name).original }}</a>

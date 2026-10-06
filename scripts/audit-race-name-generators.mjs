@@ -4,6 +4,8 @@ import { parse, compileScript, compileTemplate } from 'vue/compiler-sfc'
 import { NAME_ROLLS, RACE_NAME_GENERATORS, VETU_NAME_PARTS } from '../app/data/raceNameGenerators.js'
 import { nameKey, rowKeys, ROLL_WEIGHTS, drawNameRow, worldNameTable, isLostVetuName, LOST_VETU_KEYS } from '../app/data/raceNameRoll.js'
 import { knowledge, NAME_RACES, NAME_GUIDES, tablesForRace, profileForTable, evidenceForName, VETU_CYCLE_TABLE } from '../app/data/nameLibrary.js'
+import { NAME_ENRICHMENT, enrichedNameTable } from '../app/data/nameEnrichment.js'
+import { publicNamesForTable } from '../app/data/publicRaceNames.js'
 
 const markdown = readFileSync(new URL('../NAME_GENERATORS.md', import.meta.url), 'utf8')
 const tables = Object.values(RACE_NAME_GENERATORS).flat()
@@ -108,6 +110,42 @@ for (let i = 0; i < world.names.length; i++) {
   rowKeys(world, result.index).forEach(key => { assert.ok(!worldUsed.has(key)); worldUsed.add(key) })
 }
 assert.equal(drawNameRow(world, worldUsed), null)
+let extraNames = 0
+for (const table of tables) {
+  const addition = NAME_ENRICHMENT[table.label]
+  if (!addition) continue
+  assert.equal(addition.m.length, 4); assert.equal(addition.f.length, 4)
+  const expanded = enrichedNameTable(table)
+  assert.equal(expanded.m.length, 39); assert.equal(expanded.f.length, 39)
+  assert.deepEqual(enrichedNameTable(expanded), expanded)
+  for (let i = 35; i < 39; i++) for (const key of rowKeys(expanded, i)) {
+    assert.ok(!occupied.has(key), `New name collision: ${key}`)
+    occupied.set(key, table.label)
+  }
+  for (const name of [...addition.m, ...addition.f]) {
+    assert.ok(world.names.includes(name), `Not in Oyrdug pool: ${name}`)
+    assert.ok(!rejectedChotgorKeys.includes(nameKey(name)))
+    assert.ok(!knowledge.profiles.some(p => p.canon?.some(n => nameKey(n) === nameKey(name))))
+    if (table.label === 'Вирморождённые') assert.ok(!/[пбм]/i.test(name))
+    extraNames++
+  }
+  for (const random of [() => 0, () => 0.999999]) {
+    const used = new Set()
+    for (let i = 0; i < 39; i++) {
+      const result = drawNameRow(expanded, used, random)
+      assert.ok(result)
+      if (result.index >= 35) assert.deepEqual(result.dice, [])
+      else assert.equal([...result.dice].sort().join(' '), NAME_ROLLS[result.index])
+      rowKeys(expanded, result.index).forEach(key => { assert.ok(!used.has(key)); used.add(key) })
+    }
+    assert.equal(drawNameRow(expanded, used, random), null)
+  }
+  const guide = publicNamesForTable(expanded)
+  assert.equal(guide.m.length + guide.f.length, 6)
+  for (const gender of ['m', 'f']) for (const name of guide[gender]) assert.ok(expanded[gender].some(n => n === name || n.includes(`(${name})`)))
+}
+assert.equal(extraNames, 168)
+for (const name of ['Бразан', 'Мак’а', 'Меток', 'Чулуга']) assert.ok(!world.names.some(n => nameKey(n) === nameKey(name)))
 assert.equal(knowledge.profiles.length, 29)
 assert.equal(knowledge.realNames.length, 101)
 assert.ok(!knowledge.profiles.some(profile => ['meridir', 'ogre', 'dragons', 'colossus', 'vetu_exile'].includes(profile.id)))
@@ -117,6 +155,7 @@ for (const race of NAME_RACES) assert.ok(tablesForRace(race.slug).length)
 assert.equal(evidenceForName('Тхуч').status, 'Подтверждено автором')
 const published = JSON.parse(readFileSync(new URL('../public/name-library/names.json', import.meta.url), 'utf8'))
 assert.deepEqual(published.tables, RACE_NAME_GENERATORS, 'Site download has stale name tables; run names:sync')
+assert.deepEqual(published.additions, NAME_ENRICHMENT)
 assert.deepEqual(published.profiles, knowledge.profiles)
 assert.equal(published.vetuCycleRules.lost.entries.length, 9)
 assert.deepEqual(published.vetuCycleRules.d13.entries.map(entry => nameKey(entry.value)), VETU_NAME_PARTS.prefixes.map(nameKey))

@@ -1,5 +1,6 @@
 import { NAME_ROLLS, RACE_NAME_GENERATORS, VETU_NAME_PARTS } from './raceNameGenerators.js'
 import vetuCycleRules from './vetuCycleNames.json' with { type: 'json' }
+import { enrichedNameTable } from './nameEnrichment.js'
 
 export const nameKey = name => name.normalize('NFKC').toLowerCase().replaceAll('ё', 'е').replace(/[^\p{L}\p{N}]/gu, '')
 export const LOST_VETU_KEYS = new Set(vetuCycleRules.lost.entries.map(entry => nameKey(
@@ -20,7 +21,7 @@ export const availableRows = (table, used) => Array.from({ length: (table.names 
 
 // Oyrdug is compatible with every racial origin; examples are not its own ethnic pool.
 export function worldNameTable(table) {
-  if (!table.worldPool) return table
+  if (!table.worldPool) return enrichedNameTable(table)
   const seen = new Set()
   const names = []
   const add = name => {
@@ -29,7 +30,7 @@ export function worldNameTable(table) {
     keys.forEach(key => seen.add(key))
     names.push(name)
   }
-  Object.values(RACE_NAME_GENERATORS).flat().forEach(t => (t.names || [...t.m, ...t.f]).forEach(add))
+  Object.values(RACE_NAME_GENERATORS).flat().map(enrichedNameTable).forEach(t => (t.names || [...t.m, ...t.f]).forEach(add))
   VETU_NAME_PARTS.prefixes.forEach(prefix => VETU_NAME_PARTS.signs.forEach(sign => {
     if (!isLostVetuName(prefix + sign)) add(prefix + sign)
   }))
@@ -40,10 +41,11 @@ export function worldNameTable(table) {
 export function drawNameRow(table, used, random = Math.random) {
   const available = availableRows(table, used)
   if (!available.length) return null
-  const weight = index => table.worldPool ? 1 : ROLL_WEIGHTS[table.cyclePool ? NAME_ROLLS.indexOf(table.rolls[index % NAME_ROLLS.length]) : index]
+  const weight = index => table.worldPool ? 1 : ROLL_WEIGHTS[table.cyclePool ? NAME_ROLLS.indexOf(table.rolls[index % NAME_ROLLS.length]) : index] ?? 256 / NAME_ROLLS.length
   let remaining = random() * available.reduce((total, index) => total + weight(index), 0)
   const index = available.find(index => (remaining -= weight(index)) < 0) ?? available.at(-1)
   if (table.worldPool) return { index, dice: [], sorted: [] }
+  if (!table.cyclePool && index >= NAME_ROLLS.length) return { index, dice: [], sorted: [] }
   const sorted = (table.cyclePool ? table.rolls[index % NAME_ROLLS.length] : NAME_ROLLS[index]).split(' ').map(Number)
   const dice = [...sorted]
   for (let i = dice.length - 1; i > 0; i--) {

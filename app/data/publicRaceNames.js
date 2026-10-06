@@ -1,4 +1,5 @@
 // Короткие подсказки для игроков. Полный разбор остаётся в скрытом именнике.
+import { NAME_ENRICHMENT } from './nameEnrichment.js'
 const styles = {
   'Дангунцы': 'Сочетайте звучную основу с окончаниями -дин, -дар, -ан; для более мягкого звучания подойдут -а и -ина. В разных семьях встречаются разные формы.',
   'Бралльцы': 'Выбирайте короткое имя с отчётливым ритмом. Подойдут окончания -ар, -ур, -о или открытые, певучие -ала и -ава.',
@@ -35,13 +36,16 @@ const selections = {
 }
 
 export function publicNamesForTable(table) {
-  const formation = styles[table.label]
+  const addition = NAME_ENRICHMENT[table.label]
+  const formation = addition?.culture || styles[table.label]
   if (!formation) return null
   if (table.label === 'Вету Цикла') return {
     formation,
     names: ['Тз’Атл', 'Кти’Кухул', 'Тла’Апан', 'Тзо’Тун', 'Тех’Окот', 'Хут’Кинам'],
   }
-  const selection = selections[table.label] || table.recommended || table
+  const selection = table.label === 'Чотгоры'
+    ? { m: ['Тхуч', addition.m[0], addition.m[2]], f: addition.f }
+    : addition || selections[table.label] || table.recommended || table
   const shortName = name => table.label === 'Джабари' ? name.match(/\(([^)]+)\)/)?.[1] || name : name
   return {
     formation,
