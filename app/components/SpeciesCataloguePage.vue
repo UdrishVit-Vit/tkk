@@ -1,4 +1,5 @@
 <script setup>
+import RaceNameExamples from './RaceNameExamples.vue'
 import { useThreadConstellation } from '~/composables/useThreadConstellation.js'
 import { loreLinkFor } from '~/utils/loreLink.js'
 import { equipmentUsedOn } from '~/utils/equipmentUsage.js'
@@ -1603,7 +1604,7 @@ function printRace() {
                 <!-- 2. race names (generic fallback; structured variety names are rendered below and reordered with CSS) -->
                 <div v-if="(namesText || raceNameTables) && !activeNameData" class="rd-block rd-names-block">
                   <h2 class="rd-h2">Имена</h2>
-                  <div v-if="namesText" class="rd-names">
+                  <div v-if="namesText && !raceNameTables" class="rd-names">
                     <p v-for="(p, pi) in namesParagraphs" :key="pi">
                       <strong v-if="p.label" class="rd-names-label">{{ p.label }}:</strong>
                       {{ p.text }}
@@ -1739,11 +1740,7 @@ function printRace() {
                     <span class="rd-variety-badge">{{ varietyShortTitle(activeVariety) }}</span>
                   </h2>
 
-                  <p class="rd-nb-intro">{{ activeNameData.intro }}</p>
-
-                  <div v-if="activeNameData.examples" class="rd-nb-examples">
-                    <span class="rd-nb-examples-lbl">Примеры:</span> {{ activeNameData.examples }}
-                  </div>
+                  <RaceNameExamples :table="{ label: 'Вету Цикла' }" />
 
                   <!-- Generated name result -->
                   <transition name="rd-nb-result-fade">
@@ -1899,7 +1896,7 @@ function printRace() {
             <section v-else class="rd-variety-section">
             <div v-if="namesText || raceNameTables" class="rd-block rd-names-block">
               <h2 class="rd-h2">Имена</h2>
-              <div v-if="namesText" class="rd-names">
+              <div v-if="namesText && !raceNameTables" class="rd-names">
                 <p v-for="(p, pi) in namesParagraphs" :key="pi">
                   <strong v-if="p.label" class="rd-names-label">{{ p.label }}:</strong>
                   {{ p.text }}

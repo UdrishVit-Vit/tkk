@@ -1,4 +1,5 @@
 <script setup>
+import RaceNameExamples from './RaceNameExamples.vue'
 import { availableRows, drawNameRow, rowKeys, worldNameTable } from '~/data/raceNameRoll.js'
 
 // Генератор имён для раздела «Имена» на странице расы. Бросок 4к4 упорядочивается
@@ -77,6 +78,7 @@ function isLong(name = '') {
     </div>
 
     <p v-if="showResearch" class="rng-hint">{{ table.hint }}</p>
+    <RaceNameExamples v-else :table="table" />
 
     <transition name="rng-fade">
       <div v-if="result" class="rng-result" aria-live="polite">
