@@ -1,6 +1,8 @@
-// Генераторы имён для страниц рас (4к4 → 35 сочетаний).
-// Списки совпадают с таблицами в NAME_GENERATORS.md (корень репозитория): меняя имя здесь, поправьте и там. Порядок строк = NAME_ROLLS, по 35 имён на пол.
-// Вету сюда не входят: у них свой блок имён в nameData страницы расы.
+// Генераторы имён для страниц рас: 4к4, 35 упорядоченных сочетаний.
+// NAME_GENERATORS.md содержит те же строки. Удриши имеют мужские и женские списки; распределение новых форм редакторское.
+// examples — авторские ориентиры, не варианты для повторного наречения.
+// recommended — редакторский отбор; authored_setting_proposals не означает реальных носителей.
+// Имена Вету Цикла остаются в nameData страницы расы.
 
 export const NAME_ROLLS = ["1 1 1 1", "1 1 1 2", "1 1 1 3", "1 1 1 4", "1 1 2 2", "1 1 2 3", "1 1 2 4", "1 1 3 3", "1 1 3 4", "1 1 4 4", "1 2 2 2", "1 2 2 3", "1 2 2 4", "1 2 3 3", "1 2 3 4", "1 2 4 4", "1 3 3 3", "1 3 3 4", "1 3 4 4", "1 4 4 4", "2 2 2 2", "2 2 2 3", "2 2 2 4", "2 2 3 3", "2 2 3 4", "2 2 4 4", "2 3 3 3", "2 3 3 4", "2 3 4 4", "2 4 4 4", "3 3 3 3", "3 3 3 4", "3 3 4 4", "3 4 4 4", "4 4 4 4"]
 
@@ -9,7 +11,7 @@ export const RACE_NAME_GENERATORS = {
     {
       "variety": "Дангун",
       "label": "Дангунцы",
-      "hint": "Классические имена звучат как Изудин и Иярдар — на Из-, Ия-, -дин, -дар, — но дангунцы носят и самые разные имена караванного пути.",
+      "hint": "Имена разных семей и культур караванного пути. Изудин и Иярдар — отдельные образцы, а не обязательные приставки для всех дангунцев.",
       "m": [
         "Изумар",
         "Иялан",
@@ -42,7 +44,7 @@ export const RACE_NAME_GENERATORS = {
         "Абад",
         "Акил",
         "Авилан",
-        "Бабулор",
+        "Байсар",
         "Изфар",
         "Ир",
         "Иярдар"
@@ -83,7 +85,20 @@ export const RACE_NAME_GENERATORS = {
         "Изгала",
         "Ияджан",
         "Сайджан"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Мирзад",
+          "Акил",
+          "Авилан"
+        ],
+        "f": [
+          "Нарджан",
+          "Канза",
+          "Хазира"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     },
     {
       "variety": "Бралл",
@@ -162,7 +177,20 @@ export const RACE_NAME_GENERATORS = {
         "Нета",
         "Кисана",
         "Малава"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Тархо",
+          "Кандур",
+          "Кирро"
+        ],
+        "f": [
+          "Нимала",
+          "Рушма",
+          "Вессава"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     },
     {
       "variety": "Адаад",
@@ -241,7 +269,20 @@ export const RACE_NAME_GENERATORS = {
         "Ойла’са",
         "Кара’ла",
         "Тах’шай"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Аса’бек",
+          "Лай’дир",
+          "Кара’хаз"
+        ],
+        "f": [
+          "Шира’мия",
+          "Хаба’ина",
+          "Мара’зира"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     }
   ],
   "hudduliny": [
@@ -322,7 +363,20 @@ export const RACE_NAME_GENERATORS = {
         "Анхара",
         "Долорха",
         "Ойтара"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Олзун",
+          "Хорсун",
+          "Йерден"
+        ],
+        "f": [
+          "Сесен",
+          "Сангэ",
+          "Хулара"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     },
     {
       "variety": "Сар",
@@ -401,7 +455,20 @@ export const RACE_NAME_GENERATORS = {
         "Гатра’сар",
         "Хорла’сар",
         "Хурджа’сар"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Ургэн’сар",
+          "Тохтар’сар",
+          "Шуркэн’сар"
+        ],
+        "f": [
+          "Сэлма’сар",
+          "Кэрма’сар",
+          "Тэмра’сар"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     },
     {
       "variety": "Омор",
@@ -480,14 +547,27 @@ export const RACE_NAME_GENERATORS = {
         "Хавта",
         "Урва",
         "Холвэ"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Чагдар",
+          "Чоргон",
+          "Чомбур"
+        ],
+        "f": [
+          "Чунгэ",
+          "Чэлтара",
+          "Тэвка"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     }
   ],
   "marakiytsy": [
     {
       "variety": "Пепельный",
       "label": "Пепельные",
-      "hint": "Протяжные, «ветреные» имена с двойной гласной: Джамаар, Тамаари.",
+      "hint": "Певучие протяжные имена; долгие гласные — один из приёмов этой подборки, а не обязательное правило народа. Общие маракийские образцы: Шида (жен.), Саф'Харул и Тцафах (муж.); их подраса не уточнена.",
       "m": [
         "Джамаар",
         "Нахиим",
@@ -520,7 +600,7 @@ export const RACE_NAME_GENERATORS = {
         "Келаам",
         "Ниджаар",
         "Самуур",
-        "И’зар",
+        "Захаар",
         "Ка’иль",
         "Ну’ран",
         "Та’мир"
@@ -561,12 +641,35 @@ export const RACE_NAME_GENERATORS = {
         "Ши’ра",
         "А’ла",
         "Ну’ри"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Каэрим",
+          "Харуун",
+          "Дилаар"
+        ],
+        "f": [
+          "Ламиис",
+          "Мейра",
+          "Сурэя"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist",
+      "examples": [
+        "Шида",
+        "Саф'Харул",
+        "Тцафах"
+      ],
+      "exampleGenders": {
+        "Шида": "F",
+        "Саф'Харул": "M",
+        "Тцафах": "M"
+      }
     },
     {
       "variety": "Янтарный",
       "label": "Янтарные",
-      "hint": "Тяжёлые и твёрдые имена крови великанов: Тармак, Зейла.",
+      "hint": "Тяжёлые и твёрдые имена крови великанов: Тармак, Зейла. Общие маракийские образцы: Шида (жен.), Саф'Харул и Тцафах (муж.); их подраса не уточнена.",
       "m": [
         "Меток",
         "Тармак",
@@ -640,12 +743,35 @@ export const RACE_NAME_GENERATORS = {
         "Кадра",
         "Ярша",
         "Мазгра"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Бахтар",
+          "Мехтар",
+          "Зейгар"
+        ],
+        "f": [
+          "Зейла",
+          "Задрия",
+          "Зульма"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist",
+      "examples": [
+        "Шида",
+        "Саф'Харул",
+        "Тцафах"
+      ],
+      "exampleGenders": {
+        "Шида": "F",
+        "Саф'Харул": "M",
+        "Тцафах": "M"
+      }
     },
     {
       "variety": "Драгмирец",
       "label": "Драгмирцы",
-      "hint": "Осколки языка Колоссов. Мужские твёрдые, как Саргон и Ашур (Харгон, Таршир); женские мягче — на -ль, как Эль, с «х» в каменной сердцевине или на -йра, как имя Кайры (Ашэль, Тамхира, Дайра). Алый всегда называет семью: «с семьи Мехшир».",
+      "hint": "Осколки языка Колоссов. Мужские твёрдые, как Саргон и Ашур (Харгон, Таршир); женские мягче — на -ль, как Эль, с «х» в каменной сердцевине или на -йра, как имя Кайры (Ашэль, Тамхира, Дайра). Алый всегда называет семью: «с семьи Мехшир». Общие маракийские образцы: Шида (жен.), Саф'Харул и Тцафах (муж.); их подраса не уточнена.",
       "m": [
         "Ашур",
         "Харгон",
@@ -719,327 +845,1013 @@ export const RACE_NAME_GENERATORS = {
         "Кэль",
         "Харэль",
         "Ойра"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Дархум",
+          "Шуркан",
+          "Хорзин"
+        ],
+        "f": [
+          "Тамхира",
+          "Хешайра",
+          "Харзэна"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist",
+      "examples": [
+        "Шида",
+        "Саф'Харул",
+        "Тцафах"
+      ],
+      "exampleGenders": {
+        "Шида": "F",
+        "Саф'Харул": "M",
+        "Тцафах": "M"
+      }
     }
   ],
   "oyrdugi": [
     {
       "variety": "",
       "label": "Ойрдуги",
-      "hint": "Ойрдугом может родиться кто угодно, поэтому имя у него — любого народа Даскара.",
+      "hint": "Ойрдуг может быть представителем любой расы и носить любое имя мира. Генератор выбирает из общего пула всех включённых рас и дополнительных человеческих вариантов; собственного обязательного именника нет.",
       "m": [
-        "Изрен",
-        "Кирхул",
-        "Зура’дун",
-        "Йерден",
-        "Кашгул’сар",
-        "Чимбэр",
-        "Касаар",
-        "Зейгар",
-        "Дархум",
-        "Зизо",
-        "Пахуми",
-        "НилНул",
-        "Дрезнок",
-        "Гнук",
-        "Тор’ун",
-        "Кар",
-        "Рашдэр",
-        "Гарбал",
-        "Тамогаг",
-        "Вэр’Ош",
-        "Хаядар",
-        "Сухарто",
-        "Нума’зан",
-        "Кашбир",
-        "Хаштур’сар",
-        "Гурт’аш",
-        "Нузаар",
-        "Бахтар",
-        "Эшкар",
-        "Фуци",
-        "Тикафо",
-        "БенБан",
-        "Трелкар",
-        "Брязг",
-        "Талракс"
+        "Амир",
+        "Тапио",
+        "Нитин",
+        "Адриан",
+        "Хангай",
+        "Сонам",
+        "Серхат",
+        "Олави",
+        "Пиюш",
+        "Дамиан",
+        "Тэнүүн",
+        "Лобсанг",
+        "Гёкхан",
+        "Илмари",
+        "Арджун",
+        "Юлиан",
+        "Тогтуун",
+        "Сангай",
+        "Орхан",
+        "Матти",
+        "Амит",
+        "Сайлас",
+        "Түшиг",
+        "Дордже",
+        "Синан",
+        "Калеви",
+        "Джаянт",
+        "Элиас",
+        "Эрхэс",
+        "Церинг",
+        "Эртугрул",
+        "Эйно",
+        "Чираг",
+        "Энцо",
+        "Бат-Эрдэнэ"
       ],
       "f": [
-        "Нурина",
-        "Висала",
-        "Нума’ла",
-        "Мэнгэрха",
-        "Гудра’сар",
-        "Чунгэ",
-        "Леева",
-        "Ормаза",
-        "Ишгарэль",
-        "Пака",
-        "Кирафа",
-        "Зим’Зиш",
-        "Нордэша",
-        "Цвитти",
-        "Гур’а",
-        "Кайсэт",
-        "Мароха",
-        "Улла",
-        "Каэрагха",
-        "Тан’Ульнур",
-        "Тамала",
-        "Тасава",
-        "Сай’ра",
-        "Мэргул",
-        "Ялжа’сар",
-        "Чибра",
-        "Тииша",
-        "Хурзи",
-        "Ульхайра",
-        "Фэма",
-        "Нарафу",
-        "Дин’Диш",
-        "Вершэха",
-        "Квапси",
-        "Эзр’а"
-      ]
+        "Лейла",
+        "Лииса",
+        "Ануприя",
+        "Элена",
+        "Амин-Эрдэнэ",
+        "Пема",
+        "Элиф",
+        "Алия",
+        "Аннели",
+        "Нирмала",
+        "Лидия",
+        "Анхилуун",
+        "Хазал",
+        "Каарина",
+        "Киран",
+        "Ирис",
+        "Сондор",
+        "Селин",
+        "Анникки",
+        "Наоми",
+        "Мишээл",
+        "Джерен",
+        "Айно",
+        "Клара",
+        "Аялгуу",
+        "Ниса",
+        "Илона",
+        "Стелла",
+        "Назлы",
+        "Ева",
+        "Мелике",
+        "Майя",
+        "Бюшра",
+        "София",
+        "Айлин"
+      ],
+      "nameSources": {
+        "Амир": {
+          "original": "Amir",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "arabic_shared"
+        },
+        "Тапио": {
+          "original": "Tapio",
+          "source": "https://nimipalvelu.dvv.fi/suosituimmat-etunimet",
+          "source_id": "F1",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Нитин": {
+          "original": "Nitin",
+          "source": "https://www.pmindia.gov.in/en/assets-and-liabilities-of-the-union-council-of-ministers-2025-2026-as-on-31-03-2026/",
+          "source_id": "I1",
+          "attestation": "modern_personal_name",
+          "pool": "indic"
+        },
+        "Адриан": {
+          "original": "Adrian",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Хангай": {
+          "original": "Хангай",
+          "source": "https://montsame.mn/en/read/358531",
+          "source_id": "M1",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Сонам": {
+          "original": "Sonam",
+          "source": "https://www.dalailama.com/news/2016/monkey-year-tse-chu-ceremony-observed-at-tso-pema",
+          "source_id": "TB1",
+          "attestation": "modern_personal_name",
+          "pool": "tibetan"
+        },
+        "Серхат": {
+          "original": "Serhat",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Олави": {
+          "original": "Olavi",
+          "source": "https://nimipalvelu.dvv.fi/suosituimmat-etunimet",
+          "source_id": "F1",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Пиюш": {
+          "original": "Piyush",
+          "source": "https://www.pmindia.gov.in/en/assets-and-liabilities-of-the-union-council-of-ministers-2025-2026-as-on-31-03-2026/",
+          "source_id": "I1",
+          "attestation": "modern_personal_name",
+          "pool": "indic"
+        },
+        "Дамиан": {
+          "original": "Damian",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Тэнүүн": {
+          "original": "Тэнүүн",
+          "source": "https://montsame.mn/en/read/358531",
+          "source_id": "M1",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Лобсанг": {
+          "original": "Lobsang",
+          "source": "https://www.dalailama.com/news/2016/monkey-year-tse-chu-ceremony-observed-at-tso-pema",
+          "source_id": "TB1",
+          "attestation": "modern_personal_name",
+          "pool": "tibetan"
+        },
+        "Гёкхан": {
+          "original": "Gökhan",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Илмари": {
+          "original": "Ilmari",
+          "source": "https://nimipalvelu.dvv.fi/suosituimmat-etunimet",
+          "source_id": "F1",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Арджун": {
+          "original": "Arjun",
+          "source": "https://www.pmindia.gov.in/en/assets-and-liabilities-of-the-union-council-of-ministers-2025-2026-as-on-31-03-2026/",
+          "source_id": "I1",
+          "attestation": "modern_personal_name",
+          "pool": "indic"
+        },
+        "Юлиан": {
+          "original": "Julian",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Тогтуун": {
+          "original": "Тогтуун",
+          "source": "https://montsame.mn/en/read/358531",
+          "source_id": "M1",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Сангай": {
+          "original": "Sangay",
+          "source": "https://www.dalailama.com/news/2016/monkey-year-tse-chu-ceremony-observed-at-tso-pema",
+          "source_id": "TB1",
+          "attestation": "modern_personal_name",
+          "pool": "tibetan"
+        },
+        "Орхан": {
+          "original": "Orhan",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Матти": {
+          "original": "Matti",
+          "source": "https://nimipalvelu.dvv.fi/suosituimmat-etunimet",
+          "source_id": "F1",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Амит": {
+          "original": "Amit",
+          "source": "https://www.pmindia.gov.in/en/assets-and-liabilities-of-the-union-council-of-ministers-2025-2026-as-on-31-03-2026/",
+          "source_id": "I1",
+          "attestation": "modern_personal_name",
+          "pool": "indic"
+        },
+        "Сайлас": {
+          "original": "Silas",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Түшиг": {
+          "original": "Түшиг",
+          "source": "https://montsame.mn/en/read/358531",
+          "source_id": "M1",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Дордже": {
+          "original": "Dorji",
+          "source": "https://www.dalailama.com/news/2023/meeting-with-participants-in-tibet-houses-nalanda-courses",
+          "source_id": "TB2",
+          "attestation": "modern_personal_name",
+          "pool": "tibetan"
+        },
+        "Синан": {
+          "original": "Sinan",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Калеви": {
+          "original": "Kalevi",
+          "source": "https://nimipalvelu.dvv.fi/suosituimmat-etunimet",
+          "source_id": "F1",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Джаянт": {
+          "original": "Jayant",
+          "source": "https://www.pmindia.gov.in/en/assets-and-liabilities-of-the-union-council-of-ministers-2025-2026-as-on-31-03-2026/",
+          "source_id": "I1",
+          "attestation": "modern_personal_name",
+          "pool": "indic"
+        },
+        "Элиас": {
+          "original": "Elias",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Эрхэс": {
+          "original": "Эрхэс",
+          "source": "https://montsame.mn/en/read/358531",
+          "source_id": "M1",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Церинг": {
+          "original": "Tsering",
+          "source": "https://www.dalailama.com/news/2023/meeting-with-participants-in-tibet-houses-nalanda-courses",
+          "source_id": "TB2",
+          "attestation": "modern_personal_name",
+          "pool": "tibetan"
+        },
+        "Эртугрул": {
+          "original": "Ertuğrul",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Эйно": {
+          "original": "Eino",
+          "source": "https://dvv.fi/documents/16079645/21810437/2019_suosituimmat_nimet_fi_fi.pdf/b750a8f6-917d-3c0d-302a-8a82c917eb85/2019_suosituimmat_nimet_fi_fi.pdf",
+          "source_id": "F2",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Чираг": {
+          "original": "Chirag",
+          "source": "https://www.pmindia.gov.in/en/assets-and-liabilities-of-the-union-council-of-ministers-2025-2026-as-on-31-03-2026/",
+          "source_id": "I1",
+          "attestation": "modern_personal_name",
+          "pool": "indic"
+        },
+        "Энцо": {
+          "original": "Enzo",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Бат-Эрдэнэ": {
+          "original": "Бат-Эрдэнэ",
+          "source": "https://montsame.mn/mn/read/339903",
+          "source_id": "M2",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Лейла": {
+          "original": "Layla",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "arabic_shared"
+        },
+        "Лииса": {
+          "original": "Liisa",
+          "source": "https://nimipalvelu.dvv.fi/suosituimmat-etunimet",
+          "source_id": "F1",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Ануприя": {
+          "original": "Anupriya",
+          "source": "https://www.pmindia.gov.in/en/assets-and-liabilities-of-the-union-council-of-ministers-2025-2026-as-on-31-03-2026/",
+          "source_id": "I1",
+          "attestation": "modern_personal_name",
+          "pool": "indic"
+        },
+        "Элена": {
+          "original": "Elena",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Амин-Эрдэнэ": {
+          "original": "Амин-Эрдэнэ",
+          "source": "https://montsame.mn/en/read/358531",
+          "source_id": "M1",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Пема": {
+          "original": "Pema",
+          "source": "https://www.dalailama.com/news/2023/meeting-with-participants-in-tibet-houses-nalanda-courses",
+          "source_id": "TB2",
+          "attestation": "modern_personal_name",
+          "pool": "tibetan"
+        },
+        "Элиф": {
+          "original": "Elif",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Алия": {
+          "original": "Aaliyah",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "arabic_shared"
+        },
+        "Аннели": {
+          "original": "Anneli",
+          "source": "https://nimipalvelu.dvv.fi/suosituimmat-etunimet",
+          "source_id": "F1",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Нирмала": {
+          "original": "Nirmala",
+          "source": "https://robhopal.kvs.gov.in/en/staff-details/",
+          "source_id": "I3",
+          "attestation": "modern_personal_name",
+          "pool": "indic"
+        },
+        "Лидия": {
+          "original": "Lydia",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Анхилуун": {
+          "original": "Анхилуун",
+          "source": "https://montsame.mn/en/read/358531",
+          "source_id": "M1",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Хазал": {
+          "original": "Hazal",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Каарина": {
+          "original": "Kaarina",
+          "source": "https://nimipalvelu.dvv.fi/suosituimmat-etunimet",
+          "source_id": "F1",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Киран": {
+          "original": "Kiran",
+          "source": "https://robhopal.kvs.gov.in/en/staff-details/",
+          "source_id": "I3",
+          "attestation": "modern_personal_name",
+          "pool": "indic"
+        },
+        "Ирис": {
+          "original": "Iris",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Сондор": {
+          "original": "Сондор",
+          "source": "https://montsame.mn/en/read/358531",
+          "source_id": "M1",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Селин": {
+          "original": "Selin",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Анникки": {
+          "original": "Annikki",
+          "source": "https://nimipalvelu.dvv.fi/suosituimmat-etunimet",
+          "source_id": "F1",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Наоми": {
+          "original": "Naomi",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Мишээл": {
+          "original": "Мишээл",
+          "source": "https://montsame.mn/en/read/358531",
+          "source_id": "M1",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Джерен": {
+          "original": "Ceren",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Айно": {
+          "original": "Aino",
+          "source": "https://dvv.fi/documents/16079645/21810437/2019_suosituimmat_nimet_fi_fi.pdf/b750a8f6-917d-3c0d-302a-8a82c917eb85/2019_suosituimmat_nimet_fi_fi.pdf",
+          "source_id": "F2",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Клара": {
+          "original": "Clara",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Аялгуу": {
+          "original": "Аялгуу",
+          "source": "https://montsame.mn/en/read/358531",
+          "source_id": "M1",
+          "attestation": "modern_personal_name",
+          "pool": "mongolian"
+        },
+        "Ниса": {
+          "original": "Nisa",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Илона": {
+          "original": "Ilona",
+          "source": "https://dvv.fi/documents/16079645/21810437/2019_suosituimmat_nimet_fi_fi.pdf/b750a8f6-917d-3c0d-302a-8a82c917eb85/2019_suosituimmat_nimet_fi_fi.pdf",
+          "source_id": "F2",
+          "attestation": "modern_personal_name",
+          "pool": "finnic_optional"
+        },
+        "Стелла": {
+          "original": "Stella",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Назлы": {
+          "original": "Nazlı",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Ева": {
+          "original": "Eva",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Мелике": {
+          "original": "Melike",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "Майя": {
+          "original": "Maya",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Бюшра": {
+          "original": "Büşra",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        },
+        "София": {
+          "original": "Sofia",
+          "source": "https://www.ssa.gov/oact/babynames/decades/names2020s.html",
+          "source_id": "U1",
+          "attestation": "modern_personal_name",
+          "pool": "mediterranean_shared"
+        },
+        "Айлин": {
+          "original": "Aylin",
+          "source": "https://www.mfa.gov.tr/data/BAKANLIK/insankaynaklari/aday-kim-2022-yazili/K1.pdf",
+          "source_id": "T1",
+          "attestation": "modern_personal_name",
+          "pool": "turkish"
+        }
+      },
+      "reviewStatus": "world_pool_any_race",
+      "recommended": {
+        "m": [
+          "Талундо",
+          "Мирзад",
+          "Шторвак"
+        ],
+        "f": [
+          "Керна",
+          "Нимала",
+          "Хэнира"
+        ]
+      },
+      "worldPool": true
     }
   ],
   "udrishi": [
     {
       "variety": "Урма",
       "label": "Урма",
-      "hint": "Два открытых слога, часто с повтором, как Роро.",
+      "hint": "Урма: компактные имена по образцам Эрке, Арна, Млака. Короткие закрытые формы, открытые окончания и сочетания согласных сосуществуют; -ке/-ко/-ви и женское -на не обязательны. Мужские и женские новые варианты распределены редакторски.",
+      "examples": [
+        "Эрке",
+        "Арна",
+        "Млака"
+      ],
+      "reviewStatus": "authored_setting_proposals",
+      "recommended": {
+        "m": [
+          "Арви",
+          "Тарке",
+          "Рудд",
+          "Ишку",
+          "Валда",
+          "Дримо"
+        ],
+        "f": [
+          "Эмри",
+          "Ларка",
+          "Ивва",
+          "Ресси",
+          "Млэна",
+          "Шуви"
+        ]
+      },
       "m": [
-        "Тото",
-        "Туфи",
-        "Кихи",
-        "Пахо",
-        "Фухо",
-        "Зизо",
-        "Сусо",
-        "Дадо",
-        "Фуци",
-        "Цуки",
-        "Каро",
-        "Гоко",
-        "Тачи",
-        "Туцо",
-        "Пипо",
-        "Сахи",
-        "Кофо",
-        "Ракко",
-        "Чачо",
-        "Цоцо",
-        "Фико",
-        "Лэфи",
-        "Мохо",
-        "Сики",
-        "Тамо",
-        "Кури",
-        "Ноно",
-        "Хаци",
-        "Пуко",
-        "Цори",
-        "Гэфо",
-        "Чохи",
-        "Лоло",
-        "Гути",
-        "Рафи"
+        "Арви",
+        "Тарке",
+        "Варке",
+        "Лерко",
+        "Далке",
+        "Энри",
+        "Арден",
+        "Айлер",
+        "Орт",
+        "Грен",
+        "Мэк",
+        "Рудд",
+        "Эсси",
+        "Латто",
+        "Ишку",
+        "Валда",
+        "Пруна",
+        "Дримо",
+        "Клум",
+        "Вэс",
+        "Ярмо",
+        "Хальт",
+        "Усто",
+        "Келин",
+        "Маур",
+        "Нитто",
+        "Брэм",
+        "Савек",
+        "Овран",
+        "Илмо",
+        "Тэвик",
+        "Ондра",
+        "Арнет",
+        "Фальк",
+        "Эмбро"
       ],
       "f": [
-        "Кату",
-        "Ланна",
-        "Мима",
-        "Рума",
-        "Хоту",
-        "Нефу",
-        "Тэтту",
-        "Пиху",
-        "Сэнна",
-        "Чуччу",
-        "Мору",
-        "Шэру",
-        "Луфа",
-        "Нэша",
-        "Кэра",
-        "Нуну",
-        "Пака",
-        "Чафу",
-        "Миффу",
-        "Фэма",
-        "Коку",
-        "Хиса",
-        "Фаму",
-        "Шика",
-        "Цицу",
-        "Тукку",
-        "Таха",
-        "Лиму",
-        "Хофа",
-        "Гиру",
-        "Тута",
-        "Фифа",
-        "Хуна",
-        "Пуру",
-        "Сафа"
-      ]
+        "Эмри",
+        "Ларка",
+        "Керна",
+        "Шани",
+        "Тавра",
+        "Ирме",
+        "Элма",
+        "Мавра",
+        "Ивва",
+        "Ресси",
+        "Вэсса",
+        "Млэна",
+        "Олли",
+        "Шуви",
+        "Нимэ",
+        "Лаур",
+        "Сэлт",
+        "Тэс",
+        "Ярна",
+        "Увра",
+        "Мэлди",
+        "Киана",
+        "Дрэя",
+        "Райси",
+        "Нэлта",
+        "Усма",
+        "Эска",
+        "Брена",
+        "Хэйди",
+        "Алтэ",
+        "Урса",
+        "Эйри",
+        "Велт",
+        "Энди",
+        "Ринэ"
+      ],
+      "genderAssignment": "editorial_proposal_author_examples_sex_unspecified",
+      "diversityReview": {
+        "basis": "author_examples_plus_editorial_word_shapes",
+        "before": {
+          "m": {
+            "distinct_endings": 7,
+            "most_common_ending": [
+              "ке",
+              10
+            ],
+            "min_length": 4,
+            "max_length": 5
+          },
+          "f": {
+            "distinct_endings": 12,
+            "most_common_ending": [
+              "на",
+              16
+            ],
+            "min_length": 4,
+            "max_length": 5
+          }
+        },
+        "after": {
+          "m": {
+            "distinct_endings": 28,
+            "most_common_ending": [
+              "ке",
+              3
+            ],
+            "min_length": 3,
+            "max_length": 5
+          },
+          "f": {
+            "distinct_endings": 21,
+            "most_common_ending": [
+              "на",
+              5
+            ],
+            "min_length": 3,
+            "max_length": 5
+          }
+        }
+      }
     },
     {
       "variety": "Эрил",
       "label": "Эрил",
-      "hint": "Три открытых слога, как Агаси и Махону.",
+      "hint": "Эрил: короткие плотные формы, связанные носовые звуки, длинные имена с меняющимся ритмом и редкие внутренние границы по образцам Стафф, Дангудо, Гурурору, Ниам'Бу. Нет обязательного -до/-бо у мужчин или -ма у женщин; распределение пола редакторское.",
+      "examples": [
+        "Стафф",
+        "Дангудо",
+        "Гурурору",
+        "Ниам'Бу"
+      ],
+      "reviewStatus": "authored_setting_proposals",
+      "recommended": {
+        "m": [
+          "Керст",
+          "Кадумбо",
+          "Джуф",
+          "Шанду",
+          "Румадого",
+          "Джа’Рум"
+        ],
+        "f": [
+          "Налумба",
+          "Дэсс",
+          "Намби",
+          "Кимбара",
+          "Терумина",
+          "Наэ’Му"
+        ]
+      },
       "m": [
-        "Кофуни",
-        "Нафуко",
-        "Тахони",
-        "Талафо",
-        "Цафиро",
-        "Пахуми",
-        "Кумисо",
-        "Ромаки",
-        "Тикафо",
-        "Сунахи",
-        "Гарофу",
-        "Фуцаки",
-        "Масуфо",
-        "Нерику",
-        "Лахото",
-        "Хасуфи",
-        "Тамаху",
-        "Кироси",
-        "Фенаки",
-        "Сохару",
-        "Мифаро",
-        "Цукаси",
-        "Ракуфо",
-        "Пемахи",
-        "Хотафу",
-        "Синафо",
-        "Гурафи",
-        "Кунаси",
-        "Тофаки",
-        "Мафари",
-        "Нусахо",
-        "Цереку",
-        "Хирафо",
-        "Сокаму",
-        "Римахо"
+        "Кадумбо",
+        "Талундо",
+        "Керст",
+        "Лурт",
+        "Дагг",
+        "Джуф",
+        "Бост",
+        "Крамм",
+        "Гурд",
+        "Стэн",
+        "Мокаду",
+        "Бенору",
+        "Чамбо",
+        "Ундоро",
+        "Бурута",
+        "Шанду",
+        "Румадого",
+        "Джунарубо",
+        "Баругондо",
+        "Тунгарадо",
+        "Догаруно",
+        "Урамбодо",
+        "Гаруру",
+        "Нумуду",
+        "Оромбо",
+        "Гуррано",
+        "Бамура",
+        "Орогуру",
+        "Ганудар",
+        "Джа’Рум",
+        "Нгу’До",
+        "Ма’Гун",
+        "Роам’Бу",
+        "Там’Оро",
+        "Сурогам"
       ],
       "f": [
-        "Сифуна",
-        "Луфина",
-        "Рокафа",
-        "Кесума",
-        "Хафура",
-        "Рафуна",
-        "Цимара",
-        "Цуфара",
-        "Лонафу",
-        "Пахира",
-        "Гемуса",
-        "Фасиру",
-        "Нефаса",
-        "Тукафа",
-        "Хорума",
-        "Сумафу",
-        "Кирафа",
-        "Мофина",
-        "Цахура",
-        "Нарафу",
-        "Усаха",
-        "Тефуна",
-        "Хисафу",
-        "Ромаха",
-        "Кенафу",
-        "Фуруса",
-        "Писаха",
-        "Гофуна",
-        "Лусиха",
-        "Мекару",
-        "Сатофа",
-        "Ханаху",
-        "Ирафу",
-        "Цумака",
-        "Дефура"
-      ]
+        "Рондума",
+        "Налумба",
+        "Иру’Ма",
+        "Нейрума",
+        "Дунари",
+        "Дэсс",
+        "Вум",
+        "Гафи",
+        "Нумэ",
+        "Джуна",
+        "Бэши",
+        "Намби",
+        "Абумэ",
+        "Кимбара",
+        "Мусэни",
+        "Овамэ",
+        "Вамури",
+        "Кавиго",
+        "Терумина",
+        "Орамиду",
+        "Нарамуго",
+        "Банурима",
+        "Джумарэна",
+        "Огурамба",
+        "Тамуори",
+        "Мирари",
+        "Нагарара",
+        "Мумэри",
+        "Орурума",
+        "Дуруми",
+        "Наэ’Му",
+        "Иам’Ри",
+        "Воа’Нум",
+        "Ану’Би",
+        "Мэ’Руа"
+      ],
+      "genderAssignment": "editorial_proposal_author_examples_sex_unspecified",
+      "diversityReview": {
+        "basis": "author_examples_plus_editorial_word_shapes",
+        "before": {
+          "m": {
+            "distinct_endings": 12,
+            "most_common_ending": [
+              "до",
+              12
+            ],
+            "min_length": 4,
+            "max_length": 7
+          },
+          "f": {
+            "distinct_endings": 11,
+            "most_common_ending": [
+              "ма",
+              13
+            ],
+            "min_length": 5,
+            "max_length": 8
+          }
+        },
+        "after": {
+          "m": {
+            "distinct_endings": 21,
+            "most_common_ending": [
+              "до",
+              5
+            ],
+            "min_length": 4,
+            "max_length": 9
+          },
+          "f": {
+            "distinct_endings": 17,
+            "most_common_ending": [
+              "ри",
+              6
+            ],
+            "min_length": 3,
+            "max_length": 9
+          }
+        }
+      }
     },
     {
       "variety": "Пйюр-Пйюр",
       "label": "Пйюр-Пйюр",
-      "hint": "Два коротких, почти одинаковых слова, как МишМаш: Тим-Тум, ЛинЛан, Дав’Див.",
+      "hint": "МишМаш и Вит-Вит: две части с общим ритмом, точный повтор или перекличка гласных. Мужские и женские варианты распределены редакторски; авторские образцы остаются ориентирами.",
+      "examples": [
+        "МишМаш",
+        "Вит-Вит"
+      ],
+      "reviewStatus": "authored_setting_proposals",
+      "recommended": {
+        "m": [
+          "Ним-Ним",
+          "Рун-Рун",
+          "Нор-Нор",
+          "Рем-Рем"
+        ],
+        "f": [
+          "Шир-Шир",
+          "Тен-Тен",
+          "Лум-Лум",
+          "ШирШар"
+        ]
+      },
       "m": [
-        "ГимГиш",
-        "ФинФен",
-        "Дав’Див",
-        "ТолТал",
-        "РишПиш",
-        "НилНул",
-        "Сав’Сас",
-        "Миф’Зиф",
-        "БенБан",
-        "Миф-Мих",
-        "КешМеш",
-        "ЗукЗак",
-        "СавМав",
-        "ГинГан",
-        "Тим-Тум",
-        "Лим’Лиф",
-        "Лут’Лит",
-        "Нед-Ред",
-        "Нир-Нур",
-        "КирКин",
-        "Фин-Фих",
-        "Фен-Феф",
-        "Тиш-Тип",
-        "Лут-Бут",
-        "ДавДах",
-        "Сем-Сум",
-        "ФилБил",
-        "Зим-Тим",
-        "Виш’Сиш",
-        "Тол-Вол",
-        "ЛитЛет",
-        "ВишВуш",
-        "Мук’Мик",
-        "Гил-Гик",
-        "Ким-Ком"
+        "Ним-Ним",
+        "Рун-Рун",
+        "Нор-Нор",
+        "Рем-Рем",
+        "Тир-Тир",
+        "НимНам",
+        "РумРам",
+        "КирКур",
+        "НорНар",
+        "РинРун",
+        "ДинДан",
+        "ЗирЗар",
+        "МирМур",
+        "ДорДар",
+        "ГурГар",
+        "РунРон",
+        "ТурТар",
+        "Дар-Дар",
+        "Дум-Дум",
+        "Кер-Кер",
+        "Гир-Гир",
+        "Зун-Зун",
+        "Вор-Вор",
+        "Кун-Кун",
+        "Дур-Дур",
+        "Нер-Нер",
+        "Тум-Тум",
+        "Бур-Бур",
+        "КорКар",
+        "ДумДам",
+        "КерКар",
+        "ГирГар",
+        "ЗунЗан",
+        "ВорВар",
+        "КунКан"
       ],
       "f": [
-        "ТишФиш",
-        "Шив-Цив",
-        "Рем’Рум",
-        "Тав-Кав",
-        "Сил-Сол",
-        "Гим-Гам",
-        "ТекРек",
-        "Шил’Шал",
-        "ВинВан",
-        "Лим-Пим",
-        "Рин-Рен",
-        "ТавТив",
-        "Дир’Дур",
-        "Фис-Фес",
-        "ЛекЛеф",
-        "Нед’Нод",
-        "Зим’Зиш",
-        "Кир’Кар",
-        "Нед-Нек",
-        "Дин’Диш",
-        "Тиль-Таль",
-        "Ниль’Наль",
-        "Сив’Сув",
-        "Пим-Ким",
-        "Нок’Ник",
-        "ВилВал",
-        "ДильДаль",
-        "Гим-Дим",
-        "Мис-Мас",
-        "ФисБис",
-        "Зир’Зар",
-        "Риш-Раш",
-        "Гес’Гис",
+        "Шир-Шир",
+        "Тен-Тен",
+        "Лум-Лум",
+        "ШирШар",
+        "ТинТан",
+        "ЛирЛар",
+        "ТемТам",
+        "ШенШон",
+        "ФирФар",
+        "ЛемЛам",
+        "ВинВен",
+        "Нар-Нар",
+        "Рир-Рир",
+        "Лон-Лон",
+        "Тар-Тар",
+        "Шор-Шор",
+        "РелРал",
+        "ЛенЛон",
+        "Лин-Лин",
+        "Шен-Шен",
+        "Лир-Лир",
+        "Мел-Мел",
+        "Вен-Вен",
+        "Шим-Шим",
+        "Лем-Лем",
+        "Син-Син",
+        "Фен-Фен",
         "ЛинЛан",
-        "НисНас"
-      ]
+        "МелМал",
+        "ВенВан",
+        "ШимШам",
+        "СинСан",
+        "ФенФан",
+        "ЛунЛан",
+        "ШелШал"
+      ],
+      "genderAssignment": "editorial_proposal_author_examples_sex_unspecified"
     }
   ],
   "virmorozhdennye": [
@@ -1120,7 +1932,20 @@ export const RACE_NAME_GENERATORS = {
         "Лугэх",
         "Крештэ",
         "Дрогха"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Шторвак",
+          "Грентор",
+          "Гурштер"
+        ],
+        "f": [
+          "Гварха",
+          "Торнэш",
+          "Ворнэша"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     }
   ],
   "koboldy": [
@@ -1201,87 +2026,244 @@ export const RACE_NAME_GENERATORS = {
         "Игга",
         "Укша",
         "Ахтра"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Гнук",
+          "Цвирк",
+          "Дзык"
+        ],
+        "f": [
+          "Гридди",
+          "Цвитти",
+          "Грэтти"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     }
   ],
   "chotgory": [
     {
       "variety": "",
       "label": "Чотгоры",
-      "hint": "Не имя, а звук в темноте. Мужское — глухой оклик: один слог, вдох перед окликом или два слитых оклика (Тхуч, Отхур, Тхочхар); женское — шёпот, на который выходят заблудшие (Шиа’сэ, Ссаэль, Фиэсса).",
+      "hint": "Тхуч — первое подтверждённое создателем мужское имя чотгора. Остальные варианты — предложения: цельные звуковые обращения с разным ритмом. Мужские чаще плотнее, женские чаще шипящие и текучие; окончания -эль и искусственные сочетания вроде Вэ’Луна исключены. Апостроф не обязателен.",
       "m": [
         "Тхуч",
-        "Эчхэр",
-        "Тхочхар",
-        "Тхорч",
-        "Окхэр",
-        "Тхэчхок",
-        "Пхэк",
-        "Отхэш",
-        "Кхочхак",
-        "Чхэт",
-        "Отхур",
-        "Чхэпхут",
-        "Тхош",
-        "Утхук",
-        "Чхутхош",
-        "Пхурк",
-        "Окхут",
-        "Пхотхут",
-        "Кхэрч",
-        "Ачхор",
-        "Тхочхут",
-        "Тхэшт",
-        "Учхат",
-        "Пхатхот",
-        "Тхукт",
-        "Учхуш",
-        "Тхучхэш",
-        "Кхат",
-        "Опхак",
-        "Кхатхош",
-        "Пхач",
-        "Апхут",
-        "Чхэтхак",
-        "Кхуш",
-        "Тхэрк"
+        "Нэрх",
+        "Улх",
+        "Дрэх",
+        "Шорг",
+        "Хурт",
+        "Ухт",
+        "Урхум",
+        "Харух",
+        "Рэнух",
+        "Хоррэн",
+        "Нэхар",
+        "Рухан",
+        "Ирхун",
+        "Арх’Ун",
+        "Нор’Эш",
+        "Кэр’Ум",
+        "Ох’Тар",
+        "Ун’Рах",
+        "Тор’Эн",
+        "Эш’Ур",
+        "Эйрх",
+        "Арух",
+        "Хаур",
+        "Раух",
+        "Эрум",
+        "Нурэх",
+        "Хруэн",
+        "Тхавур",
+        "Шэхур",
+        "Кхорэн",
+        "Тхорум",
+        "Хэ’Рух",
+        "Охрун",
+        "Хэрмун"
       ],
       "f": [
-        "Шиа’сэ",
-        "Ссаэль",
-        "Хаа’иш",
-        "Фиэсса",
-        "Шуу’ли",
-        "Сэвиэ",
-        "Хиис",
-        "Вэ’шиа",
-        "Асшиэ",
-        "Шэллэ",
-        "Фаа’нэ",
-        "Ссуи",
-        "Ихшэ",
-        "Нэлиссэ",
-        "Шавэ’и",
-        "Хэсуа",
-        "Сии’фэ",
-        "Уашша",
-        "Фэлиш",
-        "Ниэс’ха",
-        "Шиэнь",
-        "Хау’ли",
-        "Сашви",
-        "Уйшэ",
-        "Виисэ",
-        "Шуэль",
-        "Фиа’ша",
-        "Лэсшиа",
-        "Ху’сиэ",
-        "Сэнэш",
-        "Ишаа",
-        "Вииль",
-        "Хууна",
-        "Нэфши",
-        "Хиэ’лэ"
+        "Вэши",
+        "Хисса",
+        "Суэна",
+        "Ойша",
+        "Илкэ",
+        "Шэни",
+        "Элуи",
+        "Шуэ",
+        "Хиэш",
+        "Лиэс",
+        "Умэ",
+        "Сэнха",
+        "Хэшуа",
+        "Нэши",
+        "Аур’Шен",
+        "Уш’Са",
+        "Хи’Сэ",
+        "Ши’Наэ",
+        "Эс’Шуа",
+        "Шэ’Уна",
+        "Сэй’Ри",
+        "Фэруа",
+        "Эссаи",
+        "Авиэс",
+        "Нэруи",
+        "Уэш",
+        "Фишэ",
+        "Вуэна",
+        "Хиусса",
+        "Шэрина",
+        "Шэсуа",
+        "Лахэя",
+        "Ушэна",
+        "Хэшуна",
+        "Шиуэ"
+      ],
+      "recommended": {
+        "m": [
+          "Тхуч",
+          "Нэрх",
+          "Урхум",
+          "Харух",
+          "Рухан",
+          "Шэхур",
+          "Тхавур"
+        ],
+        "f": [
+          "Хисса",
+          "Сэнха",
+          "Хэшуа",
+          "Нэши",
+          "Лиэс",
+          "Аур’Шен"
+        ]
+      },
+      "reviewStatus": "authored_chotgor_sound_addresses",
+      "columnLabels": {
+        "m": "Мужское",
+        "f": "Женское"
+      },
+      "nameForms": {
+        "m": [
+          "Короткий жест",
+          "Короткий жест",
+          "Короткий жест",
+          "Короткий жест",
+          "Короткий жест",
+          "Короткий жест",
+          "Короткий жест",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Развёртывание",
+          "Развёртывание",
+          "Развёртывание",
+          "Развёртывание",
+          "Развёртывание",
+          "Развёртывание",
+          "Развёртывание",
+          "Две опоры",
+          "Две опоры",
+          "Две опоры",
+          "Две опоры",
+          "Две опоры",
+          "Две опоры",
+          "Две опоры"
+        ],
+        "f": [
+          "Короткий жест",
+          "Короткий жест",
+          "Короткий жест",
+          "Короткий жест",
+          "Короткий жест",
+          "Короткий жест",
+          "Короткий жест",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Звучный отклик",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Перехват дыхания",
+          "Развёртывание",
+          "Развёртывание",
+          "Развёртывание",
+          "Развёртывание",
+          "Развёртывание",
+          "Развёртывание",
+          "Развёртывание",
+          "Две опоры",
+          "Две опоры",
+          "Две опоры",
+          "Две опоры",
+          "Две опоры",
+          "Две опоры",
+          "Две опоры"
+        ]
+      },
+      "examples": [
+        "Тхуч"
+      ],
+      "genderAssignment": "editorial_sound_registers_not_canonical_sex_rule",
+      "canonicalNames": {
+        "m": [
+          "Тхуч"
+        ],
+        "f": []
+      },
+      "nameStatusByName": {
+        "Тхуч": "creator_confirmed_first_canonical_male_name"
+      },
+      "rejectedByAuthor": [
+        "Нэйт",
+        "Нэсэль",
+        "Ируэль",
+        "Нувэль",
+        "Эй’Лун",
+        "Лэ’Ви",
+        "Вэ’Луна"
+      ],
+      "editoriallyRetired": [
+        "Гулх",
+        "Хэмр",
+        "Вуран",
+        "Хэлун",
+        "Нэвур",
+        "Мурэн",
+        "Вэрон",
+        "Тумэр",
+        "Вор’Аш",
+        "Ор’Вэн",
+        "Лиуна",
+        "Илэй",
+        "Хиэль",
+        "Умэй",
+        "Аэви",
+        "Фиэла",
+        "Сэлуна",
+        "Хавиэль",
+        "Хэ’Лиэн",
+        "Шайэль"
       ]
     }
   ],
@@ -1289,7 +2271,7 @@ export const RACE_NAME_GENERATORS = {
     {
       "variety": "",
       "label": "Морхоры",
-      "hint": "Мужские длинные и тяжёлые, как Абракс и Тимурзид; женские — корень и ’а, как Эдр’а.",
+      "hint": "Разнородные имена Спиралей. Короткие женские формы с ’а — предложение по образцу Эдр’а, а не установленное правило всех морхорок. Маль'Так — авторский образец с внутренней границей; пол отдельно не уточнён.",
       "m": [
         "Тимракс",
         "Анзур",
@@ -1363,6 +2345,22 @@ export const RACE_NAME_GENERATORS = {
         "Эрш’а",
         "Сарм’а",
         "Мурз’а"
+      ],
+      "recommended": {
+        "m": [
+          "Бразан",
+          "Ормазид",
+          "Мерахур"
+        ],
+        "f": [
+          "Вельд’а",
+          "Ард’а",
+          "Харз’а"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist",
+      "examples": [
+        "Маль'Так"
       ]
     }
   ],
@@ -1444,14 +2442,27 @@ export const RACE_NAME_GENERATORS = {
         "Тэзис",
         "Дэргэй",
         "Ясэт"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Нергар",
+          "Джарун",
+          "Кетар"
+        ],
+        "f": [
+          "Ирджай",
+          "Нушай",
+          "Хенис"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     }
   ],
   "borosy": [
     {
       "variety": "",
       "label": "Боросы",
-      "hint": "Язык низкорослых ящеров. Мужские — рокот из закрытых слогов (Нармандах, Тардэр); женские — певучий рокот с открытыми слогами (Нурая, Тохира) или две части через гортанный щелчок (Тэ’ри, Ну’хари).",
+      "hint": "Рокочущие имена по мужским образцам Нармандах и Тардэр. Певучие женские формы и формы со щелчком — рабочие предложения; женских канонических примеров пока недостаточно.",
       "m": [
         "Мармэнрах",
         "Тэнхардах",
@@ -1459,10 +2470,10 @@ export const RACE_NAME_GENERATORS = {
         "Тэнмандах",
         "Хэрдантар",
         "Рашдэр",
-        "Махрашрэн",
+        "Дармэн",
         "Дахтах",
         "Хэндэр",
-        "Нэррашрэн",
+        "Нархан",
         "Рэнтэр",
         "Тархэн",
         "Хэртар",
@@ -1525,14 +2536,27 @@ export const RACE_NAME_GENERATORS = {
         "Хамурая",
         "Ха’ду",
         "Митора"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Хэндэр",
+          "Тархэн",
+          "Мардэн"
+        ],
+        "f": [
+          "Хэнира",
+          "Рухина",
+          "Тэмира"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     }
   ],
   "jabari": [
     {
       "variety": "",
       "label": "Джабари",
-      "hint": "Длинное полное имя и короткое «имя для людей» в скобках: Барабалду-гуль-да-дар-гадар-дан (Барбан).",
+      "hint": "Полное имя составляется из именных частей. Четвёртая часть женского имени продолжает имя; буквальные русские названия природы не вставляются. В скобках — короткое обращение.",
       "m": [
         "Барогуль-гуль-дул-дан (Бардан)",
         "Боруддар-гур-бор-гадар-рум (Боррум)",
@@ -1567,46 +2591,59 @@ export const RACE_NAME_GENERATORS = {
         "Корангуль-бал-жул-дан (Кордан)",
         "Муражан-мун-ма-рах-рум (Муррум)",
         "Торогуль-дар-ган-гуль-дул-дур (Тордур)",
-        "Харуддар-дул-тар-дон (Хардон)",
+        "Харуддар-дул-тар-дан (Хардан)",
         "Урумбал-бор-гадар-ду-тан (Уртан)"
       ],
       "f": [
-        "Джабаррах’Тоатакаранг-Грабба Озеро-Карра’Апу (Тоа)",
-        "Груллмарах’Ковала-Рагулла Скала-Гарра’Эну (Ухла)",
-        "Коатарранг’Зутала-Груллама Гром-Варра’Оку (Груна)",
-        "Тоарах’Мароакуна-Зуббара Малахит-Барра’Ака (Апа)",
-        "Ухарранг’Аппатанга-Бурратоба Иней-Сарра’Ато (Коа)",
-        "Карраммах’Ухалума-Бохура Обвал-Дарра’Ону (Бохи)",
-        "Бохуррах’Рангатоа-Таббура Ливень-Нарра’Ову (Бурра)",
-        "Грабарранг’Коатамаранг-Тоббара Туман-Зарра’Ума (Тубба)",
-        "Апумарах’Тамаранг-Оммоба Камень-Марра’Ули (Ала)",
-        "Ланггаррах’Оккамаранг-Ковабба Ручей-Ларра’Ипу (Мару)",
-        "Оммарах’Гратаранг-Груллтоба Снег-Тарра’Иму (Онга)",
-        "Зуррах’Улумаранг-Гуллоба Ветер-Харра’Уми (Кува)",
-        "Джабаррах’Тоатакаранг-Грабба Озеро-Дарра’Ону (Бруна)",
-        "Груллмарах’Ковала-Рагулла Скала-Нарра’Ову (Тамма)",
-        "Коатарранг’Зутала-Груллама Гром-Зарра’Ума (Ори)",
-        "Тоарах’Мароакуна-Зуббара Малахит-Марра’Ули (Хука)",
-        "Ухарранг’Аппатанга-Бурратоба Иней-Ларра’Ипу (Улла)",
-        "Карраммах’Ухалума-Бохура Обвал-Тарра’Иму (Гарра)",
-        "Бохуррах’Рангатоа-Таббура Ливень-Харра’Уми (Лаху)",
-        "Грабарранг’Коатамаранг-Тоббара Туман-Карра’Апу (Нуба)",
-        "Апумарах’Тамаранг-Оммоба Камень-Гарра’Эну (Корра)",
-        "Ланггаррах’Оккамаранг-Ковабба Ручей-Варра’Оку (Дуура)",
-        "Оммарах’Гратаранг-Груллтоба Снег-Барра’Ака (Йоха)",
-        "Зуррах’Улумаранг-Гуллоба Ветер-Сарра’Ато (Зуна)",
-        "Джабаррах’Тоатакаранг-Грабба Озеро-Тарра’Иму (Мабу)",
-        "Груллмарах’Ковала-Рагулла Скала-Харра’Уми (Рахи)",
-        "Коатарранг’Зутала-Груллама Гром-Карра’Апу (Тобу)",
-        "Тоарах’Мароакуна-Зуббара Малахит-Гарра’Эну (Ухха)",
-        "Ухарранг’Аппатанга-Бурратоба Иней-Варра’Оку (Гоми)",
-        "Карраммах’Ухалума-Бохура Обвал-Барра’Ака (Аппу)",
-        "Бохуррах’Рангатоа-Таббура Ливень-Сарра’Ато (Лура)",
-        "Грабарранг’Коатамаранг-Тоббара Туман-Дарра’Ону (Хона)",
-        "Апумарах’Тамаранг-Оммоба Камень-Нарра’Ову (Буку)",
-        "Ланггаррах’Оккамаранг-Ковабба Ручей-Зарра’Ума (Натта)",
-        "Оммарах’Гратаранг-Груллтоба Снег-Марра’Ули (Кхаро)"
-      ]
+        "Джабаррах’Тоатакаранг-Грабба Уллама-Карра’Апу (Тоа)",
+        "Груллмарах’Ковала-Рагулла Грумма-Гарра’Эну (Ухла)",
+        "Коатарранг’Зутала-Груллама Тарум-Варра’Оку (Груна)",
+        "Тоарах’Мароакуна-Зуббара Маллар-Барра’Ака (Апа)",
+        "Ухарранг’Аппатанга-Бурратоба Иллума-Сарра’Ато (Коа)",
+        "Карраммах’Ухалума-Бохура Гарума-Дарра’Ону (Бохи)",
+        "Бохуррах’Рангатоа-Таббура Рамуга-Нарра’Ову (Бурра)",
+        "Грабарранг’Коатамаранг-Тоббара Хурума-Зарра’Ума (Тубба)",
+        "Апумарах’Тамаранг-Оммоба Арума-Марра’Ули (Алу)",
+        "Ланггаррах’Оккамаранг-Ковабба Лагума-Ларра’Ипу (Мару)",
+        "Оммарах’Гратаранг-Груллтоба Оммар-Тарра’Иму (Онга)",
+        "Зуррах’Улумаранг-Гуллоба Зарума-Харра’Уми (Кува)",
+        "Джабаррах’Тоатакаранг-Грабба Уллама-Дарра’Ону (Бруна)",
+        "Груллмарах’Ковала-Рагулла Грумма-Нарра’Ову (Тамма)",
+        "Коатарранг’Зутала-Груллама Тарум-Зарра’Ума (Ори)",
+        "Тоарах’Мароакуна-Зуббара Маллар-Марра’Ули (Хука)",
+        "Ухарранг’Аппатанга-Бурратоба Иллума-Ларра’Ипу (Улла)",
+        "Карраммах’Ухалума-Бохура Гарума-Тарра’Иму (Гарра)",
+        "Бохуррах’Рангатоа-Таббура Рамуга-Харра’Уми (Лаху)",
+        "Грабарранг’Коатамаранг-Тоббара Хурума-Карра’Апу (Нуба)",
+        "Апумарах’Тамаранг-Оммоба Арума-Гарра’Эну (Корра)",
+        "Ланггаррах’Оккамаранг-Ковабба Лагума-Варра’Оку (Дуура)",
+        "Оммарах’Гратаранг-Груллтоба Оммар-Барра’Ака (Йоха)",
+        "Зуррах’Улумаранг-Гуллоба Зарума-Сарра’Ато (Зуна)",
+        "Джабаррах’Тоатакаранг-Грабба Уллама-Тарра’Иму (Мабу)",
+        "Груллмарах’Ковала-Рагулла Грумма-Харра’Уми (Рахи)",
+        "Коатарранг’Зутала-Груллама Тарум-Карра’Апу (Тобу)",
+        "Тоарах’Мароакуна-Зуббара Маллар-Гарра’Эну (Ухха)",
+        "Ухарранг’Аппатанга-Бурратоба Иллума-Варра’Оку (Гоми)",
+        "Карраммах’Ухалума-Бохура Гарума-Барра’Ака (Аппу)",
+        "Бохуррах’Рангатоа-Таббура Рамуга-Сарра’Ато (Лура)",
+        "Грабарранг’Коатамаранг-Тоббара Хурума-Дарра’Ону (Хона)",
+        "Апумарах’Тамаранг-Оммоба Арума-Нарра’Ову (Буку)",
+        "Ланггаррах’Оккамаранг-Ковабба Лагума-Зарра’Ума (Натта)",
+        "Оммарах’Гратаранг-Груллтоба Оммар-Марра’Ули (Кхаро)"
+      ],
+      "recommended": {
+        "m": [
+          "Барогуль-гуль-дул-дан (Бардан)",
+          "Борадур-дар-ган-гуль-дон (Бордон)",
+          "Гарадур-ган-гуль-дул-тар-бал (Гарбал)"
+        ],
+        "f": [
+          "Груллмарах’Ковала-Рагулла Грумма-Гарра’Эну (Ухла)",
+          "Бохуррах’Рангатоа-Таббура Рамуга-Нарра’Ову (Бурра)",
+          "Груллмарах’Ковала-Рагулла Грумма-Нарра’Ову (Тамма)"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     }
   ],
   "samaghi": [
@@ -1620,35 +2657,35 @@ export const RACE_NAME_GENERATORS = {
         "Паратургаг",
         "Джалудинга",
         "Даргулгха",
-        "Тамогаг",
+        "Тирнагаг",
         "Кетрунга",
         "Сехаангха",
-        "Гарофугаг",
+        "Кадумбогаг",
         "Чагтэнга",
         "Зихогха",
         "Бабулоргаг",
         "Наранбашга",
-        "Карогха",
+        "Ларкагха",
         "Миджаргаг",
         "Вахаазга",
-        "Церекугха",
+        "Талундогха",
         "Чогтокгаг",
         "Хорчага",
         "Мирзадгха",
         "Бутгаг",
-        "Чохига",
+        "Эмрига",
         "Алтургха",
         "Шедаамгаг",
-        "Киросига",
+        "Рондумага",
         "Тепчагха",
         "Ияшаргаг",
         "Умхарга",
-        "Раккогха",
+        "Арвигха",
         "Кирджунгаг",
-        "Талафога",
+        "Далурога",
         "Мазудингха",
         "Олзунгаг",
-        "Пахога",
+        "Энрига",
         "Тугаргха"
       ],
       "f": [
@@ -1658,10 +2695,10 @@ export const RACE_NAME_GENERATORS = {
         "Нимага",
         "Диналагха",
         "Ойрхагаг",
-        "Цицуга",
+        "Уннага",
         "Ишэтгха",
         "Сурэягаг",
-        "Гемусага",
+        "Эйнага",
         "Чэлтарагха",
         "Даймагаг",
         "Ладинага",
@@ -1669,32 +2706,45 @@ export const RACE_NAME_GENERATORS = {
         "Моругаг",
         "Ризэтга",
         "Каэрагха",
-        "Ханахугаг",
+        "Ирмегаг",
         "Чуммэга",
         "Тинавагха",
         "Изминагаг",
         "Тумэрага",
-        "Фифагха",
+        "Таврагха",
         "Ирджайгаг",
-        "Мофинага",
+        "Налумбага",
         "Онтагха",
         "Дунагаг",
         "Нуралага",
         "Алайхэгха",
-        "Чафугаг",
+        "Нейрумагаг",
         "Затисга",
-        "Кесумагха",
+        "Мурудигха",
         "Чаймэгаг",
         "Бельнага",
         "Нарджангха"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Ларкагха",
+          "Талундогха",
+          "Чогтокгаг"
+        ],
+        "f": [
+          "Таврагха",
+          "Налумбага",
+          "Сомага"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     }
   ],
   "ehornur": [
     {
       "variety": "",
       "label": "Эхор’нуры",
-      "hint": "Две части через апостроф: мужская — короткая нота (Ятх’У), женская — певучая, на -нур (Ша’Эннур).",
+      "hint": "Предложения по образцам Ятх’У и Ша’Эннур: две слышимые части. Разница мужских и женских окончаний пока гипотеза.",
       "m": [
         "Сау’У",
         "Оан’У",
@@ -1768,7 +2818,75 @@ export const RACE_NAME_GENERATORS = {
         "Оэх’Иэннур",
         "Эхм’Ульнур",
         "Оль’Оннур"
-      ]
+      ],
+      "recommended": {
+        "m": [
+          "Сау’У",
+          "Оан’Ир",
+          "Тан’Ул"
+        ],
+        "f": [
+          "Ша’Ульнур",
+          "Оль’Арнур",
+          "Иш’Оннур"
+        ]
+      },
+      "reviewStatus": "existing_setting_drafts_with_curated_shortlist"
     }
+  ]
+}
+
+export const VETU_NAME_PARTS = {
+  "prefixes": [
+    "Тз’",
+    "Ч’",
+    "К’",
+    "Кса’",
+    "Ча’",
+    "Кти’",
+    "Тла’",
+    "Тзо’",
+    "Тех’",
+    "Хут’",
+    "Ао’",
+    "Тли’",
+    "Ти’"
+  ],
+  "signs": [
+    "Чан",
+    "Кухул",
+    "Кик",
+    "Сса",
+    "Мухул",
+    "Ич",
+    "Атл",
+    "Окот",
+    "Каб",
+    "Ачак",
+    "Апан",
+    "Кох",
+    "Тзиб",
+    "Аджакан",
+    "Акатл",
+    "Би",
+    "Мача",
+    "Кан",
+    "Пакал",
+    "Таан",
+    "Сут",
+    "Ок",
+    "Тун",
+    "Ханал",
+    "Кинам",
+    "Оточ",
+    "Шаакх",
+    "Не",
+    "Нен",
+    "Тлах",
+    "Чак",
+    "Каа",
+    "Бух",
+    "Хиса",
+    "Кимил"
   ]
 }

@@ -59,7 +59,7 @@ export const NODE_IMG = {
   'Бестиарий':'bestiariy','Знамения':'znameniya','Гнев Ильбеша':'gnev',
   'Инструменты':'instrumenty','Чай':'chay',
   'Ширма (справочник)':'shirma','Глоссарий':'shirma','Нить Башни Мафраш':'historia.webp',
-  'Наследия':'rasy','Архетипы':'osobennosti'
+    'Наследия':'rasy','Архетипы':'osobennosti'
 };
 export function nodeImg(name, systemId = ''){
   if (systemId === 'lore' && name === 'Глоссарий') return '/assets/nodes/glossary-lore.webp'

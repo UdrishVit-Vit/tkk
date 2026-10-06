@@ -1,0 +1,24 @@
+[
+  {
+    "name_ru": "Амин-Эрдэнэ",
+    "setting_full": "Амин-Эрдэнэ",
+    "profile": "boros",
+    "character": "техническая проверка",
+    "collision_keys": [
+      "аминэрдэнэ"
+    ],
+    "bank_id": "n006",
+    "authenticity": "unmodified_attested_personal_base"
+  },
+  {
+    "name_ru": "Мишээл",
+    "setting_full": "Мишээл",
+    "profile": "boros",
+    "character": "техническая проверка",
+    "collision_keys": [
+      "мишээл"
+    ],
+    "bank_id": "n009",
+    "authenticity": "unmodified_attested_personal_base"
+  }
+]

@@ -1,5 +1,5 @@
 <script setup>
-import { NAME_ROLLS } from '~/data/raceNameGenerators.js'
+import { availableRows, drawNameRow, rowKeys, worldNameTable } from '~/data/raceNameRoll.js'
 
 // Генератор имён для раздела «Имена» на странице расы. Бросок 4к4 упорядочивается
 // по возрастанию и даёт одно из 35 сочетаний — строку таблицы подрасы.
@@ -7,14 +7,16 @@ const props = defineProps({
   tables: { type: Array, required: true },
   // Короткое название выбранной разновидности на странице («Дангун», «Эрх»…):
   // генератор сам переключается на её таблицу, если такая есть.
-  activeVariety: { type: String, default: '' }
+  activeVariety: { type: String, default: '' },
+  showResearch: { type: Boolean, default: false }
 })
 
 const pickedLabel = ref(null)
 const roll = ref(null)
+const usedNames = ref(new Set())
 
 const matchedTable = computed(() => props.tables.find(t => t.variety && t.variety === props.activeVariety) || null)
-const table = computed(() => (
+const table = computed(() => worldNameTable(
   props.tables.find(t => t.label === pickedLabel.value)
   || matchedTable.value
   || props.tables[0]
@@ -35,18 +37,20 @@ function pickTable(label) {
   roll.value = null
 }
 
+const exhausted = computed(() => availableRows(table.value, usedNames.value).length === 0)
+
 function rollName() {
-  const dice = Array.from({ length: 4 }, () => 1 + Math.floor(Math.random() * 4))
-  const sorted = [...dice].sort((a, b) => a - b)
-  const index = NAME_ROLLS.indexOf(sorted.join(' '))
-  roll.value = { dice, sorted, index }
+  const next = drawNameRow(table.value, usedNames.value)
+  if (!next) return
+  roll.value = next
+  for (const key of rowKeys(table.value, next.index)) usedNames.value.add(key)
 }
 
 const result = computed(() => {
   if (!roll.value || roll.value.index < 0) return null
   const t = table.value
   const i = roll.value.index
-  if (t.names) return { neutral: t.names[i] }
+  if (t.names) return { neutral: t.isLostName?.(t.names[i]) ? 'Безымянный — утерянное имя Цикла' : t.names[i] }
   return { m: t.m[i], f: t.f[i] }
 })
 
@@ -64,19 +68,20 @@ function isLong(name = '') {
         type="button"
         role="tab"
         class="rng-tab"
-        :class="{ active: t === table }"
-        :aria-selected="t === table"
+        :class="{ active: t.label === table.label }"
+        :aria-selected="t.label === table.label"
         @click="pickTable(t.label)"
       >
         {{ t.label }}
       </button>
     </div>
 
-    <p class="rng-hint">{{ table.hint }}</p>
+    <p v-if="showResearch" class="rng-hint">{{ table.hint }}</p>
 
     <transition name="rng-fade">
       <div v-if="result" class="rng-result" aria-live="polite">
-        <div class="rng-dice" :aria-label="`Бросок 4к4: ${roll.dice.join(', ')}`">
+        <div v-if="roll.dice.length" class="rng-dice" :aria-label="`Бросок 4к4: ${roll.dice.join(', ')}`">
+          <span v-if="roll.prefixRoll" class="rng-die-tag">1к13: {{ roll.prefixRoll }}</span>
           <span class="rng-die-tag">4к4</span>
           <span class="rng-dice-values">{{ roll.dice.join(' · ') }}</span>
           <span class="rng-dice-sorted">→ {{ roll.sorted.join(' ') }}</span>
@@ -87,20 +92,22 @@ function isLong(name = '') {
         </div>
         <template v-else>
           <div class="rng-name-row">
-            <span class="rng-lbl">Мужское</span>
+            <span class="rng-lbl">{{ table.columnLabels?.m || 'Мужское' }}</span>
             <span class="rng-name" :class="{ long: isLong(result.m) }">{{ result.m }}</span>
           </div>
           <div class="rng-name-row">
-            <span class="rng-lbl">Женское</span>
+            <span class="rng-lbl">{{ table.columnLabels?.f || 'Женское' }}</span>
             <span class="rng-name" :class="{ long: isLong(result.f) }">{{ result.f }}</span>
           </div>
         </template>
       </div>
     </transition>
 
-    <button class="rng-roll" type="button" @click="rollName">
-      {{ result ? 'Придумать ещё' : 'Придумать имя' }}
+    <p v-if="exhausted" class="rng-hint" role="status">Все варианты этой таблицы уже показаны.<template v-if="tables.length > 1"> Можно выбрать другую таблицу.</template></p>
+    <button class="rng-roll" type="button" :disabled="exhausted" @click="rollName">
+      {{ exhausted ? 'Варианты закончились' : result ? 'Придумать ещё' : 'Придумать имя' }}
     </button>
+    <RaceNameGuide v-if="showResearch" :table="table" />
   </div>
 </template>
 
@@ -123,7 +130,8 @@ function isLong(name = '') {
 .rng-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;line-height:1.1;letter-spacing:.04em;color:rgba(var(--theme-accent-strong-rgb),.98);overflow-wrap:anywhere;min-width:0;flex:1}
 .rng-name.long{font-size:20px;letter-spacing:.02em;line-height:1.25}
 .rng-roll{display:block;width:100%;margin:14px 0 0;padding:13px 22px;border:1px solid rgba(var(--theme-accent-rgb),.5);border-radius:12px;background:rgba(var(--theme-accent-rgb),.1);color:rgba(var(--theme-accent-strong-rgb),.97);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:.06em;text-align:center;cursor:pointer;transition:all .2s}
-.rng-roll:hover{background:rgba(var(--theme-accent-rgb),.2);border-color:rgba(var(--theme-accent-rgb),.75);color:#f0d890}
+.rng-roll:disabled{opacity:.5;cursor:default}
+.rng-roll:not(:disabled):hover{background:rgba(var(--theme-accent-rgb),.2);border-color:rgba(var(--theme-accent-rgb),.75);color:#f0d890}
 .rng-roll:focus-visible,.rng-tab:focus-visible{outline:2px solid rgba(var(--theme-accent-rgb),.8);outline-offset:2px}
 .rng-fade-enter-active,.rng-fade-leave-active{transition:opacity .22s,transform .22s}
 .rng-fade-enter-from,.rng-fade-leave-to{opacity:0;transform:translateY(-5px)}

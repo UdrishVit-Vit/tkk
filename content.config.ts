@@ -122,6 +122,11 @@ const pf2eAncestryFeatSchema = z.object({
 
 export default defineContentConfig({
   collections: {
+    nameGuides: defineCollection({
+      type: 'page',
+      source: 'lore/names/**/*.md',
+      schema: z.object({ ...baseEntity })
+    }),
     content: defineCollection({
       type: 'page',
       source: 'index.md',
