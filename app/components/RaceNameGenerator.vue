@@ -1,6 +1,6 @@
 <script setup>
 import RaceNameExamples from './RaceNameExamples.vue'
-import { availableRows, drawNameRow, rowKeys, worldNameTable } from '~/data/raceNameRoll.js'
+import { drawNameRow, rowKeys, worldNameTable } from '~/data/raceNameRoll.js'
 
 // Генератор имён для раздела «Имена» на странице расы. Бросок 4к4 упорядочивается
 // по возрастанию и даёт одно из 35 сочетаний — строку таблицы подрасы.
@@ -38,10 +38,13 @@ function pickTable(label) {
   roll.value = null
 }
 
-const exhausted = computed(() => availableRows(table.value, usedNames.value).length === 0)
-
 function rollName() {
-  const next = drawNameRow(table.value, usedNames.value)
+  let next = drawNameRow(table.value, usedNames.value)
+  if (!next) {
+    // Все имена показаны — следующий клик начинает новый круг.
+    usedNames.value = new Set()
+    next = drawNameRow(table.value, usedNames.value)
+  }
   if (!next) return
   roll.value = next
   for (const key of rowKeys(table.value, next.index)) usedNames.value.add(key)
@@ -105,9 +108,8 @@ function isLong(name = '') {
       </div>
     </transition>
 
-    <p v-if="exhausted" class="rng-hint" role="status">Все варианты этой таблицы уже показаны.<template v-if="tables.length > 1"> Можно выбрать другую таблицу.</template></p>
-    <button class="rng-roll" type="button" :disabled="exhausted" @click="rollName">
-      {{ exhausted ? 'Варианты закончились' : result ? 'Придумать ещё' : 'Придумать имя' }}
+    <button class="rng-roll" type="button" @click="rollName">
+      {{ result ? 'Придумать ещё' : 'Придумать имя' }}
     </button>
     <RaceNameGuide v-if="showResearch" :table="table" />
   </div>
