@@ -17,6 +17,10 @@ const motifs = {
 // Designs are drawn in a square and rotated into the enclosing diamond.
 // All ribbons, including their underpass clearance, fit inside the 44-unit frame.
 const fittedKnots = {
+  labyrinth: {
+    paths: ['M-23-23H23V23H-23V-15H15V15H-15V-7H7V7H-7', 'M-23-7V23H-7V15M23 7V-23H7V-15'],
+    bridges: ['M-23 2V12', 'M23-12V-2']
+  },
   manu: {
     paths: ['M-21-21H3V-9H-9V9H3V21H-21Z', 'M-9-9H21V21H9V3H-9Z', 'M3-21H21V-3H9V-9H3Z'],
     bridges: ['M-9-14V-4', 'M-14 9H-4']
