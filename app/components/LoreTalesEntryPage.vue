@@ -157,10 +157,12 @@ onBeforeUnmount(() => {
     <section class="era-heading">
       <NuxtLink
         to="/lore/tales"
-        class="era-heading__knot"
+        class="era-heading__emblem"
         aria-label="Вернуться к сказаниям"
+        :title="section.emblemMeaning"
       >
-        <span>{{ String(index + 1).padStart(2, '0') }}</span>
+        <LoreEmblem :src="section.icon" />
+        <span class="era-heading__return" aria-hidden="true">←</span>
       </NuxtLink>
       <h1>{{ section.title }}</h1>
     </section>
@@ -264,4 +266,7 @@ onBeforeUnmount(() => {
 @media(max-width:900px){.era-stage{width:min(100% - 30px,780px);grid-template-columns:120px minmax(0,1fr) 120px}.era-direction{padding:24px 15px}.era-direction strong{font-size:17px}.era-reader{padding-inline:31px}}
 @media(max-width:680px){.era-page{padding-bottom:48px}.era-heading{min-height:126px;padding:24px 20px;gap:25px;text-align:left}.era-heading::before,.era-heading::after{display:none}.era-heading__knot{width:48px;height:48px}.era-heading h1{font-size:42px}.era-thread{padding:20px 15px;gap:15px 11px}.era-thread button{width:calc(50% - 6px);min-height:88px;padding:18px 12px}.era-thread button>strong{font-size:16px}.era-stage{width:100%;margin-top:28px;padding:0 16px 17px;grid-template-columns:1fr 1fr;border-bottom:1px solid rgba(var(--theme-accent-rgb),.13)}.era-reader{grid-column:1/-1;grid-row:1;min-height:330px;padding:38px 22px 23px;border-inline:0;border-bottom:1px solid rgba(var(--theme-accent-rgb),.13)}.era-reader__body{padding-top:30px}.era-reader__body>p{font-size:19px;line-height:1.62}.era-reader blockquote{margin:26px -2px;padding:27px 14px}.era-reader blockquote p{font-size:17px}.era-direction,.era-direction-placeholder{position:relative;top:auto;grid-row:2;min-height:116px;padding:23px 9px 12px}.era-direction--previous{grid-column:1}.era-direction--next{grid-column:2}.era-direction small{margin:9px 0 6px}.era-direction strong{font-size:16px}.era-direction__arrow{height:18px}.era-direction__arrow b{width:19px;height:19px;font-size:18px}.era-stage__swipe{display:block;grid-column:1/-1;grid-row:3;margin:10px 0 0;text-align:center;font:500 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.27)}.era-stage__swipe span{padding:0 8px;color:rgba(var(--theme-accent-rgb),.55)}}
 @media(prefers-reduced-motion:reduce){.era-reader,.era-thread button,.era-heading__knot,.era-heading__knot::before,.era-heading__knot::after,.page-forward-enter-active,.page-forward-leave-active,.page-backward-enter-active,.page-backward-leave-active{transition:none!important}}
+.era-heading__emblem{position:relative;display:block;width:96px;height:96px;flex:0 0 auto;text-decoration:none;transition:transform .3s,filter .3s}.era-heading__emblem:hover{transform:scale(1.085);filter:drop-shadow(0 0 8px rgba(var(--theme-accent-rgb),.28))}.era-heading__emblem:focus-visible{outline:1px solid rgba(var(--theme-accent-strong-rgb),.7);outline-offset:4px;border-radius:4px}.era-heading__return{position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);font-size:17px;color:rgba(var(--theme-accent-strong-rgb),.7)}
+@media(max-width:680px){.era-heading__emblem{width:60px;height:60px}}
+@media(prefers-reduced-motion:reduce){.era-heading__emblem{transition:none}}
 </style>

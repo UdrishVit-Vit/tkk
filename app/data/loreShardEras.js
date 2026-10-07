@@ -4,7 +4,7 @@ import { HISTORY_THREAD } from './loreHistory.js'
 // The date of Dayya's death is not established in the chronicle: the early
 // three-moon sky is an illustration, not a new dated event in the lore.
 const snapshots = [
-  { id: 'zhertva-purusha', summary: 'Пуруш создаёт Колыбель для Искры — начало мира.', suns: [], moons: [], split: false, tint: '174, 126, 73', note: 'Пуруш превращает собственное тело в Колыбель для Искры и разделяет себя на восемь первооснов — Садхияров. Это начало нити мира.' },
+  { id: 'zhertva-purusha', hiddenSuns: ['azrak', 'ula'], summary: 'Пуруш создаёт Колыбель для Искры — начало мира.', suns: ['shamas'], moons: ['manu', 'eri', 'dayya'], split: false, tint: '174, 126, 73', note: 'Пуруш превращает собственное тело в Колыбель для Искры и разделяет себя на восемь первооснов — Садхияров. Это начало нити мира.' },
   { id: 'epoha-rassveta', hiddenSuns: ['azrak', 'ula'], summary: 'Святилище вокруг Кузни Судьбы. Мир ещё един.', suns: ['shamas'], moons: ['manu', 'eri', 'dayya'], split: false, tint: '183, 139, 78', note: 'Святилище вокруг Кузни Судьбы. Мир ещё един, а солнца и луны свидетельствуют о первых нитях.' },
   { id: 'epoha-pererozhdeniya', hiddenSuns: ['azrak', 'ula'], summary: 'Улунгуры принимают Колыбель. В мире рождаются жизнь и выбор.', suns: ['shamas'], moons: ['manu', 'eri', 'dayya'], split: false, tint: '99, 145, 131', note: 'Улунгуры принимают Колыбель. Небо открывается новому миру, в котором рождаются жизнь и выбор.' },
   { id: 'epoha-sveta', hiddenSuns: ['azrak', 'ula'], summary: 'Золотой век единой Эноа. Азрак и Ула скрыты за Шамасом.', suns: ['shamas'], moons: ['manu', 'eri'], split: false, tint: '190, 158, 86', note: 'Единая Эноа в золотой век народов и городов. Азрак и Ула скрыты за Шамасом.' },

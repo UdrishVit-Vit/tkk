@@ -6,6 +6,8 @@ export const TALES_THREAD = {
   sections: [
     {
       slug: 'vsadnik-belogo-tahara',
+      icon: '/assets/nodes/tales/vsadnik-belogo-tahara.svg',
+      emblemMeaning: 'Лук Ша, стрела и два солнца: воля Даскара освобождает небо.',
       title: 'Всадник белого тахара',
       label: 'Как появился Даскар',
       summary: 'Безымянный мальчик и его белый тахар бросают вызов двум обезумевшим солнцам.',
@@ -13,6 +15,8 @@ export const TALES_THREAD = {
     },
     {
       slug: 'legenda-o-glupom-kobolde',
+      icon: '/assets/nodes/tales/legenda-o-glupom-kobolde.svg',
+      emblemMeaning: 'Чаша чая и нить-лабиринт: дружба Дагаги с Ададжайей открывает путь к тайной просьбе.',
       title: 'Легенда о глупом кобольде',
       label: 'Дагага, Большая Бошка',
       summary: 'Кобольд, изгнанный судьбой в Лабиринт, становится другом Владыки всех лабиринтов.',
@@ -20,6 +24,8 @@ export const TALES_THREAD = {
     },
     {
       slug: 'legenda-o-proroke-i-zvere',
+      icon: '/assets/nodes/tales/legenda-o-proroke-i-zvere.svg',
+      emblemMeaning: 'Пасть под знаком на лбу: Граар укрощает Бачангу словом и отнимает его имя.',
       title: 'Легенда о пророке и звере',
       label: 'Граар против Бачанги',
       summary: 'Молодой Белый Пророк укрощает древнего идола крови и костей на холме Северного Бралла.',
@@ -27,6 +33,8 @@ export const TALES_THREAD = {
     },
     {
       slug: 'skazka-o-fokusnike-i-ilbesh',
+      icon: '/assets/nodes/tales/skazka-o-fokusnike-i-ilbesh.svg',
+      emblemMeaning: 'Искра и четыре расходящиеся нити: фокусник растягивает Ильбеша в первые линии силы.',
       title: 'Сказка о фокуснике и Ильбеш',
       label: 'Рождение первого магуса',
       summary: 'Смертный фокусник обманом выманивает Ильбеша наружу — и этим рождает Линии Силы.',
@@ -34,6 +42,8 @@ export const TALES_THREAD = {
     },
     {
       slug: 'skazka-o-zapretnoy-lyubvi-eosa',
+      icon: '/assets/nodes/tales/skazka-o-zapretnoy-lyubvi-eosa.svg',
+      emblemMeaning: 'Две разлучённые нити и свет между ними: любовь Эоса и Еизы продолжается в ребёнке.',
       title: 'Сказка о запретной любви Эоса',
       label: 'Немая Еиза и улунгур',
       summary: 'Запретная любовь бога и смертной, закончившаяся преданным доверием и Обманом.',
@@ -41,6 +51,8 @@ export const TALES_THREAD = {
     },
     {
       slug: 'legenda-korolya-boli',
+      icon: '/assets/nodes/tales/legenda-korolya-boli.svg',
+      emblemMeaning: 'Корона и разрыв нижней нити: Аегус сам переступает огненный рубеж Хузана.',
       title: 'Легенда короля боли',
       label: 'Аегус и лёд Хузана',
       summary: 'Милосердный молодой король находит друга среди вирмов — и медленно превращается в тирана боли.',
@@ -48,6 +60,8 @@ export const TALES_THREAD = {
     },
     {
       slug: 'istoriya-bastarda-tashnagara',
+      icon: '/assets/nodes/tales/istoriya-bastarda-tashnagara.svg',
+      emblemMeaning: 'Молот из единой угловатой ленты: Круштервор обретает новое имя после гибели Ба’хасы.',
       title: 'История бастарда Таш’нагара',
       label: 'Круштервор и Ба’хаса',
       summary: 'Проклятый наследник огненного трона становится вором, а после — Молотом Мигдаша.',
@@ -55,6 +69,8 @@ export const TALES_THREAD = {
     },
     {
       slug: 'istoriya-broshennyh-detey',
+      icon: '/assets/nodes/tales/istoriya-broshennyh-detey.svg',
+      emblemMeaning: 'Расколотое сердце: Моно’хе ищет утраченное сердце, но её путь обрывается в пустыне.',
       title: 'История брошенных детей',
       label: 'Моно’хе и первое обо',
       summary: 'Серафим, опустошённая Дальними Чертогами, ищет своё сгоревшее сердце по всему Эноа.',
@@ -62,6 +78,8 @@ export const TALES_THREAD = {
     },
     {
       slug: 'istoriya-zolotogo-bryuha',
+      icon: '/assets/nodes/tales/istoriya-zolotogo-bryuha.svg',
+      emblemMeaning: 'Закрытое брюхо с дремлющей искрой: золотые Гайхи сохраняют воинов до исполнения обещания.',
       title: 'История золотого брюха',
       label: 'Семь золотых жаб',
       summary: 'Зарифы покупают своему роду будущее у голоса из глубин — и нарушают уговор в ту же ночь.',
@@ -69,6 +87,8 @@ export const TALES_THREAD = {
     },
     {
       slug: 'vechnaya-ohota',
+      icon: '/assets/nodes/tales/vechnaya-ohota.svg',
+      emblemMeaning: 'Две встречные линии погони: близнецы вечно преследуют недостижимого золотого тахара.',
       title: 'Вечная охота',
       label: 'Тай, Той и золотой тахар',
       summary: 'Охотники-близнецы, презревшие гадания на удачу, навсегда остаются в небесных лугах.',
@@ -76,6 +96,8 @@ export const TALES_THREAD = {
     },
     {
       slug: 'malchik-i-bagrovyy-bizon',
+      icon: '/assets/nodes/tales/malchik-i-bagrovyy-bizon.svg',
+      emblemMeaning: 'Рога бизона и искра: мальчик освобождает зверя силой мужества и памяти предков.',
       title: 'Мальчик и багровый бизон',
       label: 'Рождение обряда Худдсар',
       summary: 'Хрупкий мальчик приручает огнедышащего бизона и становится сархуддулином.',

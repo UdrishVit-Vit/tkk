@@ -188,10 +188,11 @@ onBeforeUnmount(() => {
             </NuxtLink>
             <NuxtLink
               :to="`/lore/tales/${section.slug}`"
-              class="history-node history-node--era"
+              class="history-node history-node--emblem"
               :aria-label="`Открыть ${section.title}`"
+              :title="section.emblemMeaning"
             >
-              <span>{{ String(index + 1).padStart(2, '0') }}</span>
+              <LoreEmblem :src="section.icon" />
             </NuxtLink>
           </div>
 
@@ -237,4 +238,8 @@ onBeforeUnmount(() => {
 @media(max-width:1000px){.lore-rail{display:none}.lore-viewport{left:0}.lore-history__texture{left:68px}.history-canvas{max-width:780px;padding-inline:24px}.timeline-row{grid-template-columns:0 64px minmax(0,1fr)}.history-thread{left:56px}.history-intro__copy,.history-era__title{grid-column:3;text-align:left}.history-intro aside{margin-left:0;margin-right:auto;padding-right:0;padding-left:18px;border-right:0;border-left:1px solid rgba(var(--theme-accent-rgb),.32)}.history-intro__sigil,.history-node--era{grid-column:2}.history-era__title p{margin-left:0;margin-right:auto}.history-entry--left .history-entry__card,.history-entry--right .history-entry__card{grid-column:3;text-align:left}.history-entry__node{grid-column:2}.history-entry__node::before,.history-entry--left .history-entry__node::before,.history-entry--right .history-entry__node::before{left:50%;right:auto;transform:none}.history-entry--left small{right:12px;left:auto}.history-end i{grid-column:2}.history-end span{left:56px;transform:translateX(-50%)}}
 @media(max-width:720px){.lore-history{left:0}.lore-viewport{top:0}.history-canvas{padding:58px 15px 68px}.timeline-row{grid-template-columns:0 48px minmax(0,1fr)}.history-thread{left:39px}.history-intro{min-height:260px}.history-intro h1{font-size:46px}.history-intro aside p{font-size:14px}.history-intro__sigil{width:72px;height:72px}.history-intro__sigil::after{inset:1px}.history-intro__sigil img{width:68px;height:68px}.history-era{padding:30px 0}.history-era__heading{min-height:150px}.history-era__title h2{font-size:36px}.history-era__title p{font-size:14px}.history-node--era{width:46px;height:46px}.history-entry{min-height:122px}.history-entry__card{min-height:90px;padding:22px 18px 18px}.history-entry__card strong{font-size:19px}.history-entry__card p{font-size:13px}.history-end span{left:39px}}
 @media(prefers-reduced-motion:reduce){.history-thread>i,.history-thread>b,.history-node--era,.history-intro__sigil img{animation:none}.history-intro__sigil,.history-era,.history-entry,.history-entry__card{transition:none}}
+.history-node--emblem{position:relative;grid-column:2;display:grid;width:92px;height:92px;place-self:center;place-items:center;text-decoration:none;transition:transform .3s,filter .3s}.history-node--emblem:hover{transform:scale(1.085);filter:drop-shadow(0 0 8px rgba(var(--theme-accent-rgb),.28))}.history-node--emblem:focus-visible{outline:1px solid rgba(var(--theme-accent-strong-rgb),.7);outline-offset:4px;border-radius:4px;transform:scale(1.085)}
+@media(max-width:1000px){.history-node--emblem{width:64px;height:64px}}
+@media(max-width:720px){.history-node--emblem{width:48px;height:48px}}
+@media(prefers-reduced-motion:reduce){.history-node--emblem{transition:none}}
 </style>
