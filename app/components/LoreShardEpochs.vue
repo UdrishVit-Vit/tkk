@@ -25,17 +25,20 @@ const worldNodes = computed(() => {
     const [x,y] = era.value.bodyPositions?.[id] || positions[id]
     return {id,...SHARD_CELESTIAL_BODIES[id],x,y:hasCentralSpark.value && id === 'dayya' && !isOrigin.value ? 530 : y,color:era.value.bodyColors?.[id] || SHARD_CELESTIAL_BODIES[id].color,type:SHARD_CELESTIAL_BODIES[id].sun?'sun':'moon'}
   })
-  const lands = hasCentralSpark.value ? [{id:'spark',title:'Искра',kind:centerLayers.value.map(layer=>layer.title).join(', '),x:atlasCenter.value.x,y:atlasCenter.value.y,type:'spark',color:'#e0c291'}]
-    : era.value.split ? [{id:'daskar',title:'Даскар',kind:'Крупнейший осколок',x:500,y:440,type:'land',color:'#e0c291'}, {id:'azar',title:'Азар',kind:'Замёрзший осколок',x:550,y:610,type:'land',color:'#b5d9e5'}, {id:'var-elor',title:'Вар’Элор',kind:'Тёмный осколок',x:500,y:770,type:'land',color:'#b8a1d9'}]
-    : [{id:'enoa',title:'Эноа',kind:'До Раскола',x:500,y:era.value.moons.includes('dayya') ? 530 : 390,type:'land',color:'#e0c291'}]
-  const minor = (era.value.minorShards || []).map(id=>({id,title:"Осколок Иш'Кашим",kind:'Малый осколок',x:335,y:505,type:'land',scale:.6,color:'#d7c19a'}))
-  const center = era.value.centralNode ? [{id:era.value.centralNode,title:'Лабиринт',kind:'Сохранившийся слой мира',x:atlasCenter.value.x,y:atlasCenter.value.y,type:'center',color:'#a6bcad'}] : []
+  const center = hasCentralSpark.value ? [{id:'spark',title:'Искра',kind:centerLayers.value.map(layer=>layer.title).join(', '),x:atlasCenter.value.x,y:atlasCenter.value.y,type:'spark',color:'#e0c291'}] : []
+  const lands = era.value.split ? [
+    {id:'daskar',title:'Даскар',kind:'Крупнейший осколок',type:'land',color:'#e0c291'},
+    {id:'azar',title:'Азар',kind:'Замёрзший осколок',type:'land',color:'#b5d9e5'},
+    {id:'var-elor',title:'Вар’Элор',kind:'Тёмный осколок',type:'land',color:'#b8a1d9'}
+  ].map(node=>{const [x,y]=era.value.shardPositions?.[node.id] || {daskar:[500,440],azar:[550,610],'var-elor':[500,770]}[node.id];return {...node,x,y}})
+    : hasCentralSpark.value ? [] : [{id:'enoa',title:'Эноа',kind:'До Раскола',x:500,y:390,type:'land',color:'#e0c291'}]
+  const minor = (era.value.minorShards || []).map(id=>{const [x,y]=era.value.shardPositions?.[id] || [335,505];return {id,title:"Осколок Иш'Кашим",kind:'Малый осколок',x,y,type:'land',scale:.6,color:'#d7c19a'}})
   return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y)]
 })
 function connection(node) {
-  const origin = era.value.split && node.type === 'land' && node.id !== 'daskar'
-    ? node.id === 'var-elor' ? [550,610] : [500,440]
-    : [atlasCenter.value.x,atlasCenter.value.y]
+  const parentId = era.value.bodyParents?.[node.id] || era.value.shardParents?.[node.id]
+  const parent = parentId ? worldNodes.value.find(item=>item.id === parentId) : undefined
+  const origin = parent ? [parent.x,parent.y] : [atlasCenter.value.x,atlasCenter.value.y]
   const dx = node.x - origin[0]
   const dy = node.y - origin[1]
   if (!dx || !dy) return `M${origin[0]} ${origin[1]} L${node.x} ${node.y}`
@@ -87,7 +90,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
     <div class="epoch-world" role="group" :aria-label="`${era.title}: ${sunCount} ${sunCount === 1 ? 'солнце' : 'солнца'}, ${moonCount} луны; ${hasCentralSpark ? `Искра в центре, ${centerLayers.map(layer=>layer.title).join(', ')}` : era.split ? 'мир разделён на осколки' : 'мир един'}`">
       <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split,'epoch-sky--origin':isOrigin,'epoch-sky--stacked':era.verticalSky}" :viewBox="`0 0 1000 ${skyHeight}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
         <title :id="`${uid}-title`">{{era.title}} — мандала узлов Эноа</title>
-        <desc :id="`${uid}-desc`">{{era.note}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? 'Эри скрыта за Ману.' : ''}} {{isOrigin ? 'Над Искрой, снизу вверх: Дайя, оранжевая Эри, Ману; над лунами — три совмещённых солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
+        <desc :id="`${uid}-desc`">{{era.note}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? 'Эри скрыта за Ману.' : ''}} {{isOrigin ? 'Над Искрой Дайя; выше неё ответвляются Ману слева и оранжевая Эри справа. Над лунами — три совмещённых солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
         <g v-if="era.verticalSky" class="mandala-frame" fill="none" aria-hidden="true">
           <path :d="`M500 24 796 195 796 ${skyHeight-220} 500 ${skyHeight-40} 204 ${skyHeight-220} 204 195Z`"/>
           <path :d="`M500 60 760 130 870 320 760 ${skyHeight-200} 500 ${skyHeight-60} 240 ${skyHeight-200} 130 320 240 130Z`"/>
