@@ -1,6 +1,7 @@
 <script setup>
 import { SHARD_ERAS, SHARD_CELESTIAL_BODIES } from '~/data/loreShardEras.js'
 import { shardThreadPoints, threadPath } from '~/utils/loreShardThreads.js'
+import { SHARD_ERA_STORIES, SHARD_NODE_STORIES } from '~/data/loreShardStories.js'
 
 const props = defineProps({ selectedShard: { type: String, required: true } })
 const emit = defineEmits(['era-change'])
@@ -36,6 +37,28 @@ const worldNodes = computed(() => {
   const minor = (era.value.minorShards || []).map(id=>{const [x,y]=era.value.shardPositions?.[id] || [335,505];return {id,title:"Осколок Иш'Кашим",kind:'Малый осколок',x,y,type:'land',scale:.6,color:'#d7c19a'}})
   return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y)]
 })
+const inspectedId = ref('')
+const nodeStoryRef = ref(null)
+const eraStory = computed(() => SHARD_ERA_STORIES[era.value.id] || era.value.summary)
+const inspectionNodes = computed(() => {
+  const nodes = [...worldNodes.value.filter(node=>node.id === 'spark'),...centerLayers.value.toReversed(),...worldNodes.value.filter(node=>node.id !== 'spark'),...hiddenMoons.value,...hiddenSuns.value]
+  return nodes.filter((node,index)=>SHARD_NODE_STORIES[node.id] && nodes.findIndex(item=>item.id === node.id) === index)
+})
+const selectedNodeId = computed(() => inspectionNodes.value.some(node=>node.id === inspectedId.value) ? inspectedId.value : era.value.split ? props.selectedShard : 'spark')
+const selectedNode = computed(() => inspectionNodes.value.find(node=>node.id === selectedNodeId.value) || inspectionNodes.value[0])
+const selectedStory = computed(() => SHARD_NODE_STORIES[selectedNode.value?.id])
+const selectedMoment = computed(() => selectedStory.value?.moments?.[era.value.id])
+watch(() => era.value.id, () => { inspectedId.value = '' })
+watch(() => props.selectedShard, () => { if(era.value.split) inspectedId.value = props.selectedShard })
+async function selectNode(node, reveal = false) {
+  inspectedId.value = node.id
+  if(isShard(node)) await navigateTo(shardLink(node))
+  if(reveal) {
+    await nextTick()
+    nodeStoryRef.value?.focus({preventScroll:true})
+    nodeStoryRef.value?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',block:'nearest'})
+  }
+}
 function connection(node) {
   if (era.value.split && node.type === 'land') return threadPath(shardThreadPoints(node, atlasCenter.value))
   const parentId = era.value.bodyParents?.[node.id] || era.value.shardParents?.[node.id]
@@ -52,9 +75,8 @@ function shardLink(node) {
 }
 function isShard(node) { return era.value.split && ['daskar','var-elor','azar'].includes(node.id) }
 function selectWorldNode(node,event) {
-  if(!isShard(node)) return
   event.preventDefault()
-  navigateTo(shardLink(node))
+  selectNode(node,true)
 }
 function timeKeyboard(event) {
   if(event.altKey || event.ctrlKey || event.metaKey) return
@@ -92,7 +114,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
     <div class="epoch-world" role="group" :aria-label="`${era.title}: ${sunCount} ${sunCount === 1 ? 'солнце' : 'солнца'}, ${moonCount} луны; ${hasCentralSpark ? `Искра в центре, ${centerLayers.map(layer=>layer.title).join(', ')}` : era.split ? 'мир разделён на осколки' : 'мир един'}`">
       <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split,'epoch-sky--origin':isOrigin,'epoch-sky--stacked':era.verticalSky}" :viewBox="`0 0 1000 ${skyHeight}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
         <title :id="`${uid}-title`">{{era.title}} — мандала узлов Эноа</title>
-        <desc :id="`${uid}-desc`">{{era.note}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? 'Эри скрыта за Ману.' : ''}} {{isOrigin ? 'Над Искрой Дайя; выше неё ответвляются Ману слева и оранжевая Эри справа. Над лунами — три совмещённых солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
+        <desc :id="`${uid}-desc`">{{eraStory}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? 'Эри скрыта за Ману.' : ''}} {{isOrigin ? 'Над Искрой Дайя; выше неё ответвляются Ману слева и оранжевая Эри справа. Над лунами — три совмещённых солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
         <g v-if="era.verticalSky" class="mandala-frame" fill="none" aria-hidden="true">
           <path :d="`M500 24 796 195 796 ${skyHeight-220} 500 ${skyHeight-40} 204 ${skyHeight-220} 204 195Z`"/>
           <path :d="`M500 60 760 130 870 320 760 ${skyHeight-200} 500 ${skyHeight-60} 240 ${skyHeight-200} 130 320 240 130Z`"/>
@@ -127,7 +149,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
         </TransitionGroup>
 
         <TransitionGroup name="celestial" tag="g">
-          <a v-for="node in worldNodes" :key="node.id" :href="isShard(node) ? router.resolve(shardLink(node)).href : undefined" :aria-label="isShard(node) ? `Выбрать осколок ${node.title}` : undefined" :aria-current="isShard(node) && selectedShard === node.id ? 'true' : undefined" :class="{'is-selectable':isShard(node),'is-selected':isShard(node) && selectedShard === node.id}" @click="selectWorldNode(node,$event)" :transform="`translate(${node.x} ${node.y})`" :style="{color:node.color}" class="mandala-node">
+          <a v-for="node in worldNodes" :key="node.id" :href="isShard(node) ? router.resolve(shardLink(node)).href : `#${uid}-node-story`" :aria-label="`История узла ${node.title}`" :aria-current="selectedNodeId === node.id ? 'true' : undefined" :class="{'is-selectable':true,'is-selected':selectedNodeId === node.id}" @click="selectWorldNode(node,$event)" :transform="`translate(${node.x} ${node.y})`" :style="{color:node.color}" class="mandala-node">
             <TransitionGroup v-if="node.id === 'manu'" name="celestial" tag="g" class="hidden-moons">
               <g v-for="moon in hiddenMoons" :key="moon.id" :style="{color:moon.color}" :aria-label="`${moon.title} скрыта за Ману`">
                 <g :transform="`scale(${moon.scale})`" class="hidden-moon__mark"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="moon.id"/></g>
@@ -155,9 +177,20 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
       <div class="epoch-world__stats" aria-live="polite"><span><b>{{ sunCount }}</b>{{ sunCount === 1 ? 'солнце' : 'солнца' }}</span><span><b>{{ moonCount }}</b>луны</span><span v-if="!isOrigin"><b>{{ String(shardCount).padStart(2,'0') }}</b>{{ era.split ? 'осколка' : 'единый мир' }}</span></div>
     </div>
 
-    <div class="epoch-story" aria-live="polite"><p>{{era.summary}}</p><NuxtLink :to="`/lore/history/${era.history}`">Летопись ↗</NuxtLink></div>
+    <div class="epoch-story" aria-live="polite"><p>{{eraStory}}</p><NuxtLink :to="`/lore/history/${era.history}`">Летопись ↗</NuxtLink></div>
     <p v-if="era.moons.includes('dayya')" class="epoch-draft-note">Раннее небо условно: время гибели Дайи ещё не установлено.</p>
-    <div class="epoch-detail"><slot/></div>
+    <section v-if="selectedStory" :id="`${uid}-node-story`" ref="nodeStoryRef" tabindex="-1" class="epoch-node-story" aria-label="Истории узлов эпохи">
+      <p class="epoch-node-hint">Выберите узел, чтобы узнать его историю</p>
+      <nav class="epoch-node-picker" aria-label="Выберите узел, чтобы прочитать его историю">
+        <button v-for="node in inspectionNodes" :key="node.id" type="button" :aria-pressed="selectedNodeId === node.id" :style="{'--node-color':node.color}" @click="selectNode(node)">{{node.title}}</button>
+      </nav>
+      <div class="epoch-node-reading" aria-live="polite" aria-atomic="true">
+        <div class="epoch-node-heading"><h3>{{selectedNode.title}}</h3><NuxtLink v-if="selectedStory.glossaryId" :to="`/lore/glossary/${selectedStory.glossaryId}`">Статья ↗</NuxtLink><NuxtLink v-if="selectedStory.geographyId" :to="`/lore/geography?shard=${selectedStory.geographyId}`">Карта ↗</NuxtLink></div>
+        <p>{{selectedStory.text}}</p>
+        <p v-if="selectedMoment" class="epoch-node-moment"><span>{{era.title}}</span>{{selectedMoment}}</p>
+      </div>
+    </section>
+    <div class="epoch-detail"><slot :node-id="selectedNodeId"/></div>
   </section>
 </template>
 
@@ -167,11 +200,12 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 .epoch-titles{display:grid}.epoch-title{position:relative;display:flex;align-items:center;gap:22px;min-height:60px;color:rgba(var(--theme-text-rgb),.67);text-decoration:none;padding-left:0;transition:color .3s,translate .55s cubic-bezier(.2,.8,.2,1)}.epoch-title.is-past{color:rgba(var(--theme-text-rgb),.55);translate:0 0}.epoch-title.is-future{translate:0 0}.epoch-title.is-current{color:rgba(var(--theme-heading-rgb),.98);translate:0 0}.epoch-title__node{position:absolute;left:-72px;width:23px;height:23px;flex-shrink:0;border:1px solid rgba(var(--theme-accent-rgb),.4);background:var(--theme-bg);transform:translateX(-50%) rotate(45deg);box-shadow:0 0 0 4px var(--theme-bg);transition:scale .4s,border-color .3s}.epoch-title__node i{position:absolute;inset:4px;border:1px dashed #c4a16a25}.epoch-title__node b{display:grid;height:100%;place-items:center;transform:rotate(-45deg);font:10px 'Cormorant Garamond',serif;color:var(--gold-bright)}.epoch-title__name{position:relative;background:none;font:500 21px/1.05 'Cormorant Garamond',serif}.epoch-title__name small{display:block;margin-top:8px;color:var(--gold-bright);font:6px 'Hanken Grotesk',sans-serif;letter-spacing:.18em}.epoch-title.is-current .epoch-title__node{transform:translateX(-50%) rotate(45deg) scale(1.3);border-color:var(--gold-bright);box-shadow:0 0 0 4px var(--theme-bg),0 0 20px #c4a16a35}.epoch-title:hover{color:var(--gold-bright)}.epoch-title:hover .epoch-title__node{border-color:var(--gold-bright)}
 .epoch-controls{display:flex;justify-content:space-between;gap:12px;margin-top:24px;padding:16px 0 0 48px;border-top:1px solid #c4a16a20}.epoch-controls a,.epoch-controls>span{font:10px 'Hanken Grotesk',sans-serif;color:#cbb68f;text-decoration:none;padding:10px 0}.epoch-controls>span{opacity:.3}.epoch-controls a:hover{color:var(--gold-bright)}
 .epoch-world{grid-column:2;z-index:1;grid-row:1;position:relative;background:radial-gradient(ellipse at 50% 42%,rgba(var(--era-tint),.11),transparent 68%)}.epoch-sky{display:block;width:100%;max-height:590px;overflow:visible}.epoch-sky--vertical,.epoch-sky--stacked{max-height:none}.epoch-world__stats{display:flex;justify-content:center;gap:25px;margin:5px 0 22px}.epoch-world__stats span{display:flex;align-items:baseline;gap:7px;font:italic 14px 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.4)}.epoch-world__stats b{font:400 23px 'Cormorant Garamond',serif;color:#cbb68f}
-.mandala-frame{stroke:#c4a16a;stroke-opacity:.13;stroke-width:1}.mandala-weave{stroke-opacity:.07}.mandala-connections path{fill:none;stroke:currentColor;stroke-opacity:.35;stroke-width:1.2}.mandala-connections .mandala-flow{stroke-opacity:.65;stroke-dasharray:4 24;animation:mandala-weave 8s linear infinite}.mandala-heart path{fill:#08090f;stroke:#c4a16a;stroke-width:1.2}.mandala-node{transition:opacity .3s;filter:drop-shadow(0 0 10px #c4a16a15);text-decoration:none}.mandala-node__halo{fill:none;stroke:currentColor;stroke-opacity:.13;stroke-dasharray:3 7;transition:stroke-opacity .3s}.mandala-node__outer{fill:#08090f;stroke:currentColor;stroke-opacity:.75;stroke-width:1.4}.mandala-node__inner{fill:none;stroke:currentColor;stroke-opacity:.25;stroke-dasharray:3 5}.mandala-node__glyph{fill:none;stroke:currentColor;stroke-width:1.3}.hidden-sun__surface{fill:#08090f;stroke:currentColor;stroke-width:1;stroke-opacity:.65}.hidden-sun__mark :deep(.celestial-knot){opacity:.7}.hidden-moon__mark :deep(.celestial-knot){opacity:.45}.hidden-moon__mark .hidden-sun__surface{stroke-opacity:.4}.mandala-node .hidden-moons text{font-size:20px;letter-spacing:.03em;opacity:.55}.hidden-sun__leader{fill:none;stroke:currentColor;stroke-opacity:.4;stroke-width:1}.hidden-suns text,.hidden-moons text{fill:currentColor;opacity:.55;font:20px 'Cormorant Garamond',serif;letter-spacing:.03em}.mandala-node text{fill:currentColor;font:26px 'Cormorant Garamond',serif;letter-spacing:.04em}.mandala-node .mandala-node__minor-label{font-size:22px}.origin-cradle{color:#bca783}.origin-cradle :deep(.celestial-knot){opacity:.6}.mandala-node .origin-cradle text{font-size:22px;opacity:.7}.mandala-node.is-selectable{cursor:pointer}.mandala-node.is-selectable:hover .mandala-node__halo,.mandala-node.is-selected .mandala-node__halo{stroke-opacity:.8}.mandala-node.is-selectable:hover .mandala-node__outer,.mandala-node.is-selected .mandala-node__outer{stroke-width:2.4;stroke-opacity:1}.mandala-note{fill:#c4a16a60;font:7px 'Hanken Grotesk',sans-serif;letter-spacing:.18em}.mandala-link-enter-active,.mandala-link-leave-active{transition:opacity .6s}.mandala-link-enter-from,.mandala-link-leave-to{opacity:0}.celestial-enter-active,.celestial-leave-active{transition:opacity .6s}.celestial-enter-from,.celestial-leave-to{opacity:0}
+.mandala-frame{stroke:#c4a16a;stroke-opacity:.13;stroke-width:1}.mandala-weave{stroke-opacity:.07}.mandala-connections path{fill:none;stroke:currentColor;stroke-opacity:.35;stroke-width:1.2}.mandala-connections .mandala-flow{stroke-opacity:.65;stroke-dasharray:4 24;animation:mandala-weave 8s linear infinite}.mandala-heart path{fill:#08090f;stroke:#c4a16a;stroke-width:1.2}.mandala-node{pointer-events:bounding-box;transition:opacity .3s;filter:drop-shadow(0 0 10px #c4a16a15);text-decoration:none}.mandala-node__halo{fill:none;stroke:currentColor;stroke-opacity:.13;stroke-dasharray:3 7;transition:stroke-opacity .3s}.mandala-node__outer{fill:#08090f;stroke:currentColor;stroke-opacity:.75;stroke-width:1.4}.mandala-node__inner{fill:none;stroke:currentColor;stroke-opacity:.25;stroke-dasharray:3 5}.mandala-node__glyph{fill:none;stroke:currentColor;stroke-width:1.3}.hidden-sun__surface{fill:#08090f;stroke:currentColor;stroke-width:1;stroke-opacity:.65}.hidden-sun__mark :deep(.celestial-knot){opacity:.7}.hidden-moon__mark :deep(.celestial-knot){opacity:.45}.hidden-moon__mark .hidden-sun__surface{stroke-opacity:.4}.mandala-node .hidden-moons text{font-size:20px;letter-spacing:.03em;opacity:.55}.hidden-sun__leader{fill:none;stroke:currentColor;stroke-opacity:.4;stroke-width:1}.hidden-suns text,.hidden-moons text{fill:currentColor;opacity:.55;font:20px 'Cormorant Garamond',serif;letter-spacing:.03em}.mandala-node text{fill:currentColor;font:26px 'Cormorant Garamond',serif;letter-spacing:.04em}.mandala-node .mandala-node__minor-label{font-size:22px}.origin-cradle{color:#bca783}.origin-cradle :deep(.celestial-knot){opacity:.6}.mandala-node .origin-cradle text{font-size:22px;opacity:.7}.mandala-node.is-selectable{cursor:pointer}.mandala-node.is-selectable:hover .mandala-node__halo,.mandala-node.is-selected .mandala-node__halo{stroke-opacity:.8}.mandala-node.is-selectable:hover .mandala-node__outer,.mandala-node.is-selected .mandala-node__outer{stroke-width:2.4;stroke-opacity:1}.mandala-note{fill:#c4a16a60;font:7px 'Hanken Grotesk',sans-serif;letter-spacing:.18em}.mandala-link-enter-active,.mandala-link-leave-active{transition:opacity .6s}.mandala-link-enter-from,.mandala-link-leave-to{opacity:0}.celestial-enter-active,.celestial-leave-active{transition:opacity .6s}.celestial-enter-from,.celestial-leave-to{opacity:0}
 .epoch-story{grid-column:2;display:flex;align-items:flex-start;gap:22px;padding:0 0 22px}.epoch-story p{flex:1;max-width:700px;margin:0;font:italic 20px/1.55 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.72)}.epoch-story a{flex-shrink:0;margin-top:7px;color:#cbb68f;text-decoration:none;font:10px 'Hanken Grotesk',sans-serif}.epoch-draft-note{grid-column:2;margin:0 0 22px;font:10px/1.6 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.4)}.epoch-detail{grid-column:2}
+.epoch-node-story{grid-column:2;scroll-margin-top:36px;border-top:1px solid #c4a16a25;padding:20px 0 24px}.epoch-node-hint{margin:0 0 12px;font:9px 'Hanken Grotesk',sans-serif;letter-spacing:.08em;color:rgba(var(--theme-text-rgb),.45)}.epoch-node-story:focus{outline:none}.epoch-node-picker{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:24px}.epoch-node-picker button{display:flex;align-items:center;gap:8px;border:0;background:none;padding:6px 0;color:rgba(var(--theme-text-rgb),.6);font:16px 'Cormorant Garamond',serif;cursor:pointer}.epoch-node-picker button::before{content:'';width:5px;height:5px;border:1px solid var(--node-color,#c4a16a);transform:rotate(45deg);opacity:.45}.epoch-node-picker button[aria-pressed='true']{color:var(--gold-bright)}.epoch-node-picker button[aria-pressed='true']::before{background:var(--node-color,#c4a16a);opacity:1}.epoch-node-picker button:hover{color:var(--gold-bright)}.epoch-node-picker button:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.epoch-node-heading{display:flex;flex-wrap:wrap;align-items:baseline;gap:18px}.epoch-node-heading h3{flex:1;margin:0;font:500 34px/1.1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.95)}.epoch-node-heading a{font:10px 'Hanken Grotesk',sans-serif;color:var(--gold-bright);text-decoration:none}.epoch-node-reading>p{max-width:700px;margin:14px 0 0;font:19px/1.55 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.76)}.epoch-node-reading .epoch-node-moment{font-style:italic;color:rgba(var(--theme-text-rgb),.6)}.epoch-node-moment span{display:block;margin-bottom:5px;font:8px 'Hanken Grotesk',sans-serif;color:var(--gold-bright);letter-spacing:.12em}.epoch-detail:empty{display:none}
 a:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.mandala-node:focus-visible{outline:none}.mandala-node:focus-visible .mandala-node__halo{stroke-opacity:1;stroke-width:2}
 @keyframes weave-y{to{background-position:0 24px}}@keyframes mandala-weave{to{stroke-dashoffset:-56}}
 @media(max-width:1050px){.epoch-atlas{grid-template-columns:210px minmax(0,1fr);gap:0 28px}.epoch-title__name{font-size:19px}.epoch-controls{gap:8px;padding-left:0}.epoch-controls a,.epoch-controls>span{font-size:8px}.epoch-story{flex-wrap:wrap;gap:10px}.epoch-story a{margin-top:0}.mandala-node text{font-size:30px}}
-@media(max-width:760px){.epoch-atlas{display:flex;flex-direction:column;gap:0}.epoch-time{position:relative;padding-top:0;width:100%;padding-bottom:22px}.epoch-bookmark{margin:0 0 12px;height:12px}.epoch-titles{display:grid}.epoch-title{min-height:46px;gap:24px;padding-left:0;translate:0 0!important}.epoch-title__name{font-size:18px}.epoch-title__node{left:-44px;width:18px;height:18px}.epoch-title__node b{font-size:8px}.epoch-title.is-current .epoch-title__node{transform:translateX(-50%) rotate(45deg) scale(1.35)}.epoch-controls{margin:14px 0 0;padding:8px 0 0}.epoch-controls a,.epoch-controls>span{font-size:10px;padding:15px 0}.epoch-world,.epoch-story,.epoch-detail,.epoch-draft-note{width:100%}.epoch-world__stats{gap:20px;margin:0 0 22px}.mandala-node text{font-size:34px}.mandala-note{font-size:11px}.epoch-story p{font-size:19px}.epoch-story{padding-bottom:20px}}
+@media(max-width:760px){.epoch-atlas{display:flex;flex-direction:column;gap:0}.epoch-time{position:relative;padding-top:0;width:100%;padding-bottom:22px}.epoch-bookmark{margin:0 0 12px;height:12px}.epoch-titles{display:grid}.epoch-title{min-height:46px;gap:24px;padding-left:0;translate:0 0!important}.epoch-title__name{font-size:18px}.epoch-title__node{left:-44px;width:18px;height:18px}.epoch-title__node b{font-size:8px}.epoch-title.is-current .epoch-title__node{transform:translateX(-50%) rotate(45deg) scale(1.35)}.epoch-controls{margin:14px 0 0;padding:8px 0 0}.epoch-controls a,.epoch-controls>span{font-size:10px;padding:15px 0}.epoch-world,.epoch-story,.epoch-detail,.epoch-draft-note,.epoch-node-story{width:100%}.epoch-world__stats{gap:20px;margin:0 0 22px}.mandala-node text{font-size:34px}.mandala-note{font-size:11px}.epoch-story p{font-size:19px}.epoch-story{padding-bottom:20px}}
 @media(prefers-reduced-motion:reduce){*,*::before{transition:none!important;animation:none!important}}
 </style>
