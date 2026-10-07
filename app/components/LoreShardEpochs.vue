@@ -1,5 +1,6 @@
 <script setup>
 import { SHARD_ERAS, SHARD_CELESTIAL_BODIES } from '~/data/loreShardEras.js'
+import { shardThreadPoints, threadPath } from '~/utils/loreShardThreads.js'
 
 const props = defineProps({ selectedShard: { type: String, required: true } })
 const emit = defineEmits(['era-change'])
@@ -36,6 +37,7 @@ const worldNodes = computed(() => {
   return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y)]
 })
 function connection(node) {
+  if (era.value.split && node.type === 'land') return threadPath(shardThreadPoints(node, atlasCenter.value))
   const parentId = era.value.bodyParents?.[node.id] || era.value.shardParents?.[node.id]
   const parent = parentId ? worldNodes.value.find(item=>item.id === parentId) : undefined
   const origin = parent ? [parent.x,parent.y] : [atlasCenter.value.x,atlasCenter.value.y]
