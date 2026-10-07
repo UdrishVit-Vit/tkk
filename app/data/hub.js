@@ -66,7 +66,7 @@ export function nodeImg(name, systemId = ''){
   if (systemId === 'lore' && name === 'Фракции') return '/assets/nodes/factions-lore.webp'
   if (systemId === 'lore' && name === 'Пантеон') return '/assets/nodes/pantheon-lore.webp'
   if (systemId === 'lore' && name === 'География') return '/assets/nodes/geography-lore.webp'
-  if (systemId === 'lore' && name === 'Осколки') return '/assets/nodes/shards-lore.svg'
+  if (systemId === 'lore' && name === 'Осколки') return '/assets/nodes/shards-lore.svg?v=2'
   if (systemId === 'lore' && name === 'Гильдии') return '/assets/nodes/guilds-lore.webp'
   if (systemId === 'lore' && name === 'Сказания') return '/assets/nodes/tales-lore.webp'
   if (systemId === 'lore' && name === 'Узлы') return '/assets/nodes/uzly-lore.webp'

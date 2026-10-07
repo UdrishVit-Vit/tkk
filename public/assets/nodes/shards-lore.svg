@@ -1,14 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
-  <path d="M64 4 124 64 64 124 4 64Z" fill="#08090f" stroke="#c4a16a" stroke-opacity=".45"/>
-  <path d="M64 13 115 64 64 115 13 64Z" stroke="#e0c291" stroke-width="1.5"/>
-  <path d="M64 23 105 64 64 105 23 64Z" stroke="#c4a16a" stroke-opacity=".35" stroke-dasharray="3 5"/>
-  <g stroke="#e0c291" stroke-width="2" stroke-linejoin="miter">
-    <path d="m64 29 21 21-21 21-21-21Z" fill="#101017"/>
-    <path d="m43 57 21 21-21 21-21-21Z" fill="#101017"/>
-    <path d="m85 57 21 21-21 21-21-21Z" fill="#101017"/>
-    <path d="M43 43 29 57 43 71 64 50 85 71 99 57 85 43M29 85 43 99 64 78 85 99 99 85"/>
-  </g>
-  <path d="m64 38 12 12-12 12-12-12Zm-21 28 12 12-12 12-12-12Zm42 0 12 12-12 12-12-12Z" stroke="#b98e53"/>
-  <path d="M64 4v18m60 42h-18M64 124v-18M4 64h18" stroke="#efd5ad"/>
-  <path d="m64 66 7 7-7 7-7-7Z" fill="#e0c291"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+ <defs><linearGradient id="ivory" x2="1" y2="1"><stop stop-color="#faf4df"/><stop offset=".5" stop-color="#cabb91"/><stop offset="1" stop-color="#f2e7c9"/></linearGradient></defs>
+ <g stroke="#39352b" stroke-width="14" stroke-linejoin="miter">
+  <path id="knot" d="M128 12 158 42 128 72 98 42 128 12ZM128 72V110M128 146V184M128 184 158 214 128 244 98 214 128 184ZM12 128 42 98 72 128 42 158 12 128ZM72 128H110M146 128H184M184 128 214 98 244 128 214 158 184 128ZM128 110 146 128 128 146 110 128 128 110ZM91 55 55 91 91 127 109 109 73 73 91 55ZM165 55 201 91 165 127 147 109 183 73 165 55ZM91 201 55 165 91 129 109 147 73 183 91 201ZM165 201 201 165 165 129 147 147 183 183 165 201Z"/>
+ </g>
+ <use href="#knot" stroke="url(#ivory)" stroke-width="10"/>
+ <use href="#knot" stroke="#fff9e6" stroke-opacity=".7" stroke-width="1.2"/>
+ <path d="M128 86 170 128 128 170 86 128Z" stroke="#0b0c10" stroke-width="15"/>
+ <path d="M128 86 170 128 128 170 86 128Z" stroke="url(#ivory)" stroke-width="10"/>
+ <path d="m128 101 12 12-12 12-12-12Zm-15 27 12 12-12 12-12-12Zm30 0 12 12-12 12-12-12Z" stroke="#eee3c2" stroke-width="3"/>
+ <path d="M128 12v26M244 128h-26M128 244v-26M12 128h26" stroke="#fff5db" stroke-width="2"/>
 </svg>

@@ -28,8 +28,8 @@ export const GEOGRAPHY_SHARDS = [
 
 export const GEOGRAPHY_REGIONS = [
   {
-    id: 'north', title: 'Северный Даскар', short: 'Север', map: '/assets/lore/geography/north-daskar.webp',
-    mapRatio: '5658 / 4000',
+    id: 'north', title: 'Северный Даскар', short: 'Север', map: '/assets/lore/geography/north-daskar-hd.webp',
+    mapRatio: '14032 / 9920',
     markers: [
       { name: 'Меранг', x: 26.5, y: 39.4 },
       { name: 'Марак', x: 22.9, y: 59.2 },

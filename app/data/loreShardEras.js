@@ -4,13 +4,13 @@ import { HISTORY_THREAD } from './loreHistory.js'
 // The date of Dayya's death is not established in the chronicle: the early
 // three-moon sky is an illustration, not a new dated event in the lore.
 const snapshots = [
-  { id: 'zhertva-purusha', suns: [], moons: [], split: false, tint: '174, 126, 73', note: 'Пуруш превращает собственное тело в Колыбель для Искры и разделяет себя на восемь первооснов — Садхияров. Это начало нити мира.' },
-  { id: 'epoha-rassveta', suns: ['shamas'], moons: ['manu', 'eri', 'dayya'], split: false, tint: '183, 139, 78', note: 'Святилище вокруг Кузни Судьбы. Мир ещё един, а солнца и луны свидетельствуют о первых нитях.' },
-  { id: 'epoha-pererozhdeniya', suns: ['shamas'], moons: ['manu', 'eri', 'dayya'], split: false, tint: '99, 145, 131', note: 'Улунгуры принимают Колыбель. Небо открывается новому миру, в котором рождаются жизнь и выбор.' },
-  { id: 'epoha-sveta', suns: ['shamas'], moons: ['manu', 'eri'], split: false, tint: '190, 158, 86', note: 'Единая Эноа в золотой век народов и городов. Азрак и Ула скрыты за Шамасом.' },
-  { id: 'epoha-lyudey', suns: ['azrak', 'shamas', 'ula'], moons: ['manu', 'eri'], split: true, tint: '191, 92, 65', note: 'Эпоха царств, войны и Раскола. Здесь показан её поздний облик — Лето Трёх Солнц: земли уже разделены, а Шамас, Азрак и Ула вместе выжигают мир.' },
-  { id: 'epoha-vosstanovleniya', suns: ['shamas'], moons: ['manu', 'eri'], split: true, tint: '111, 143, 156', note: 'Одно солнце остаётся над Даскаром. Осколки обретают собственные истории, города и союзы.' },
-  { id: 'vremya-vetrov', suns: ['shamas'], moons: ['manu', 'eri'], split: true, tint: '104, 126, 169', note: 'Нынешний облик мира. Даскар, Вар’Элор и Азар дрейфуют порознь, а над Эноа сгущается Тёмная Нить.' },
+  { id: 'zhertva-purusha', summary: 'Пуруш создаёт Колыбель для Искры — начало мира.', suns: [], moons: [], split: false, tint: '174, 126, 73', note: 'Пуруш превращает собственное тело в Колыбель для Искры и разделяет себя на восемь первооснов — Садхияров. Это начало нити мира.' },
+  { id: 'epoha-rassveta', hiddenSuns: ['azrak', 'ula'], summary: 'Святилище вокруг Кузни Судьбы. Мир ещё един.', suns: ['shamas'], moons: ['manu', 'eri', 'dayya'], split: false, tint: '183, 139, 78', note: 'Святилище вокруг Кузни Судьбы. Мир ещё един, а солнца и луны свидетельствуют о первых нитях.' },
+  { id: 'epoha-pererozhdeniya', hiddenSuns: ['azrak', 'ula'], summary: 'Улунгуры принимают Колыбель. В мире рождаются жизнь и выбор.', suns: ['shamas'], moons: ['manu', 'eri', 'dayya'], split: false, tint: '99, 145, 131', note: 'Улунгуры принимают Колыбель. Небо открывается новому миру, в котором рождаются жизнь и выбор.' },
+  { id: 'epoha-sveta', hiddenSuns: ['azrak', 'ula'], summary: 'Золотой век единой Эноа. Азрак и Ула скрыты за Шамасом.', suns: ['shamas'], moons: ['manu', 'eri'], split: false, tint: '190, 158, 86', note: 'Единая Эноа в золотой век народов и городов. Азрак и Ула скрыты за Шамасом.' },
+  { id: 'epoha-lyudey', minorShards: ['ish-kashim'], summary: 'После Раскола три солнца выжигают разделённые земли.', suns: ['azrak', 'shamas', 'ula'], moons: ['manu', 'eri'], split: true, tint: '191, 92, 65', note: 'Эпоха царств, войны и Раскола. Здесь показан её поздний облик — Лето Трёх Солнц: земли уже разделены, а Шамас, Азрак и Ула вместе выжигают мир.' },
+  { id: 'epoha-vosstanovleniya', minorShards: ['ish-kashim'], summary: 'Осколки обретают собственные истории, города и союзы.', suns: ['shamas'], moons: ['manu', 'eri'], split: true, tint: '111, 143, 156', note: 'Одно солнце остаётся над Даскаром. Осколки обретают собственные истории, города и союзы.' },
+  { id: 'vremya-vetrov', minorShards: ['ish-kashim'], summary: 'Осколки дрейфуют порознь. Над Эноа сгущается Тёмная Нить.', suns: ['shamas'], moons: ['manu', 'eri'], split: true, tint: '104, 126, 169', note: 'Нынешний облик мира. Даскар, Вар’Элор и Азар дрейфуют порознь, а над Эноа сгущается Тёмная Нить.' },
 ]
 
 export const SHARD_ERAS = snapshots.map(snapshot => {
