@@ -436,7 +436,7 @@ function mkNode(o, th) {
       transition:'filter .45s, color .5s, transform .45s cubic-bezier(.34,1.4,.5,1)',
       backgroundImage: hasImg ? ('url("'+src+'")') : 'none',
       backgroundSize:'contain', backgroundRepeat:'no-repeat', backgroundPosition:'center',
-      animation: hasImg ? (shimmer ? ('knotTwinkle '+(o.active?2.8:4.8)+'s ease-in-out infinite') : 'none') : ('knotSpin '+(o.active?70:150)+'s linear infinite') },
+      animation: !o.onClick ? 'none' : hasImg ? (shimmer ? ('knotTwinkle '+(o.active?2.8:4.8)+'s ease-in-out infinite') : 'none') : ('knotSpin '+(o.active?70:150)+'s linear infinite') },
     discStyle: { position:'absolute', left:'0', top:'0', transform:'translate(-50%,-50%)',
       width:Math.round(o.knot*discScale)+'px', height:Math.round(o.knot*discScale)+'px', borderRadius:'50%',
       background:th.discBg || 'radial-gradient(circle, rgba('+dc+',1) 44%, rgba('+dc+',0) 74%)',
@@ -1290,7 +1290,7 @@ if (initialClass) await loadClassData()
     </svg>
 
     <div class="tkk-nodes" :style="{ transform: `scale(${fit})` }">
-      <div v-for="(node, i) in vm.nodes" :key="'n'+i" class="tkk-node" :style="node.boxStyle" @click="node.onClick?.()">
+      <div v-for="(node, i) in vm.nodes" :key="'n'+i" class="tkk-node" :class="{ 'is-interactive': !!node.onClick }" :style="node.boxStyle" @click="node.onClick?.()">
         <div :style="node.discStyle" />
         <div v-if="node.hasMantraFrame" class="tkk-mantra-frame tkk-mantra-frame-outer" :style="node.frameOuterStyle" />
         <div v-if="node.hasFrame" :style="node.frameStyle" />
@@ -1454,13 +1454,13 @@ if (initialClass) await loadClassData()
 .tkk-halo-lore rect{stroke:rgba(var(--theme-accent-rgb),.11);stroke-width:.7}
 .tkk-halo-lore rect:first-child{stroke:rgba(var(--theme-accent-rgb),.18)}
 .tkk.is-lore-map .tkk-knot{filter:drop-shadow(0 0 5px rgba(var(--theme-accent-rgb),.16))!important}
-.tkk.is-lore-map .tkk-node:hover .tkk-knot{transform:translate(-50%,-50%) scale(1.12)!important;filter:drop-shadow(0 0 11px rgba(var(--theme-accent-rgb),.34))!important}
+.tkk.is-lore-map .tkk-node.is-interactive:hover .tkk-knot{transform:translate(-50%,-50%) scale(1.12)!important;filter:drop-shadow(0 0 11px rgba(var(--theme-accent-rgb),.34))!important}
 .tkk.is-lore-map .tkk-mantra-frame{transition:transform .5s ease,border-color .35s,opacity .35s}
-.tkk.is-lore-map .tkk-node:hover .tkk-mantra-frame-outer{transform:translate(-50%,-50%) rotate(45deg) scale(1.04)!important;border-color:rgba(var(--theme-accent-strong-rgb),.34)!important}
-.tkk.is-lore-map .tkk-node:hover .tkk-mantra-frame-inner{transform:translate(-50%,-50%) rotate(45deg) scale(.94)!important;border-color:rgba(var(--theme-accent-strong-rgb),.5)!important}
+.tkk.is-lore-map .tkk-node.is-interactive:hover .tkk-mantra-frame-outer{transform:translate(-50%,-50%) rotate(45deg) scale(1.04)!important;border-color:rgba(var(--theme-accent-strong-rgb),.34)!important}
+.tkk.is-lore-map .tkk-node.is-interactive:hover .tkk-mantra-frame-inner{transform:translate(-50%,-50%) rotate(45deg) scale(.94)!important;border-color:rgba(var(--theme-accent-strong-rgb),.5)!important}
 .tkk-nodes{position:absolute;inset:0;z-index:4;pointer-events:none;transform-origin:calc(50% + 34px) 50%}
 .tkk-node{cursor:default}
-.tkk-knot:hover{transform:translate(-50%,-50%) scale(1.2) !important}
+.tkk-node.is-interactive .tkk-knot:hover{transform:translate(-50%,-50%) scale(1.2) !important}
 .tkk-wordmark{position:absolute;top:24px;left:92px;z-index:30;pointer-events:none}
 .tkk-wordmark-eyebrow{font-family:'Hanken Grotesk';font-size:9.5px;letter-spacing:.42em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.42)}
 .tkk-wordmark-title{font-family:'Cormorant Garamond',serif;font-size:21px;letter-spacing:.32em;color:rgba(var(--theme-heading-rgb),.92);margin-top:3px}
