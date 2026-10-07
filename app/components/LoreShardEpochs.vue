@@ -7,15 +7,16 @@ const route = useRoute()
 const router = useRouter()
 const era = computed(() => SHARD_ERAS.find(item => item.id === (route.query.era === 'leto-treh-solnts' ? 'epoha-lyudey' : route.query.era)) || SHARD_ERAS.at(-1))
 const isOrigin = computed(() => era.value.id === 'zhertva-purusha')
-const atlasCenter = { x: 500, y: 320 }
+const atlasCenter = computed(() => era.value.worldCenter || { x: 500, y: 320 })
+const skyHeight = computed(() => era.value.skyHeight || (era.value.split ? 900 : 660))
 const centerLayers = computed(() => era.value.centerLayers || [])
 const hasCentralSpark = computed(() => centerLayers.value.length > 0)
 const eraIndex = computed(() => SHARD_ERAS.indexOf(era.value))
 const uid = useId().replace(/:/g, '')
 const futureCount = computed(() => SHARD_ERAS.length - eraIndex.value - 1)
 const positions = { shamas:[500,110], azrak:[320,170], ula:[680,170], manu:[240,320], eri:[240,320], dayya:[500,390] }
-const hiddenSuns = computed(() => (era.value.hiddenSuns || []).map((id,index)=>({id,...SHARD_CELESTIAL_BODIES[id],x:500,y:110,scale:index ? 1.5 : 2.05})))
-const hiddenMoons = computed(() => (era.value.hiddenMoons || []).map(id=>({id,...SHARD_CELESTIAL_BODIES[id],x:positions.manu[0],y:positions.manu[1],scale:1.7})))
+const hiddenSuns = computed(() => (era.value.hiddenSuns || []).map((id,index)=>({id,...SHARD_CELESTIAL_BODIES[id],x:(era.value.bodyPositions?.shamas || positions.shamas)[0],y:(era.value.bodyPositions?.shamas || positions.shamas)[1],scale:index ? 1.5 : 2.05})))
+const hiddenMoons = computed(() => (era.value.hiddenMoons || []).map(id=>({id,...SHARD_CELESTIAL_BODIES[id],x:(era.value.bodyPositions?.manu || positions.manu)[0],y:(era.value.bodyPositions?.manu || positions.manu)[1],scale:1.7})))
 const moonCount = computed(()=>era.value.moons.length + hiddenMoons.value.length)
 const sunCount = computed(()=>era.value.suns.length + hiddenSuns.value.length)
 const shardCount = computed(()=>era.value.split ? 3+(era.value.minorShards?.length || 0) : 1)
@@ -24,17 +25,17 @@ const worldNodes = computed(() => {
     const [x,y] = era.value.bodyPositions?.[id] || positions[id]
     return {id,...SHARD_CELESTIAL_BODIES[id],x,y:hasCentralSpark.value && id === 'dayya' && !isOrigin.value ? 530 : y,color:era.value.bodyColors?.[id] || SHARD_CELESTIAL_BODIES[id].color,type:SHARD_CELESTIAL_BODIES[id].sun?'sun':'moon'}
   })
-  const lands = hasCentralSpark.value ? [{id:'spark',title:'Искра',kind:centerLayers.value.map(layer=>layer.title).join(', '),x:atlasCenter.x,y:atlasCenter.y,type:'spark',color:'#e0c291'}]
+  const lands = hasCentralSpark.value ? [{id:'spark',title:'Искра',kind:centerLayers.value.map(layer=>layer.title).join(', '),x:atlasCenter.value.x,y:atlasCenter.value.y,type:'spark',color:'#e0c291'}]
     : era.value.split ? [{id:'daskar',title:'Даскар',kind:'Крупнейший осколок',x:500,y:440,type:'land',color:'#e0c291'}, {id:'azar',title:'Азар',kind:'Замёрзший осколок',x:550,y:610,type:'land',color:'#b5d9e5'}, {id:'var-elor',title:'Вар’Элор',kind:'Тёмный осколок',x:500,y:770,type:'land',color:'#b8a1d9'}]
     : [{id:'enoa',title:'Эноа',kind:'До Раскола',x:500,y:era.value.moons.includes('dayya') ? 530 : 390,type:'land',color:'#e0c291'}]
   const minor = (era.value.minorShards || []).map(id=>({id,title:"Осколок Иш'Кашим",kind:'Малый осколок',x:335,y:505,type:'land',scale:.6,color:'#d7c19a'}))
-  const center = era.value.centralNode ? [{id:era.value.centralNode,title:'Лабиринт',kind:'Сохранившийся слой мира',x:atlasCenter.x,y:atlasCenter.y,type:'center',color:'#a6bcad'}] : []
+  const center = era.value.centralNode ? [{id:era.value.centralNode,title:'Лабиринт',kind:'Сохранившийся слой мира',x:atlasCenter.value.x,y:atlasCenter.value.y,type:'center',color:'#a6bcad'}] : []
   return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y)]
 })
 function connection(node) {
   const origin = era.value.split && node.type === 'land' && node.id !== 'daskar'
     ? node.id === 'var-elor' ? [550,610] : [500,440]
-    : [atlasCenter.x,atlasCenter.y]
+    : [atlasCenter.value.x,atlasCenter.value.y]
   const dx = node.x - origin[0]
   const dy = node.y - origin[1]
   if (!dx || !dy) return `M${origin[0]} ${origin[1]} L${node.x} ${node.y}`
@@ -84,10 +85,17 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
     </aside>
 
     <div class="epoch-world" role="group" :aria-label="`${era.title}: ${sunCount} ${sunCount === 1 ? 'солнце' : 'солнца'}, ${moonCount} луны; ${hasCentralSpark ? `Искра в центре, ${centerLayers.map(layer=>layer.title).join(', ')}` : era.split ? 'мир разделён на осколки' : 'мир един'}`">
-      <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split,'epoch-sky--origin':isOrigin}" :viewBox="`0 0 1000 ${era.split ? 900 : 660}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
+      <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split,'epoch-sky--origin':isOrigin,'epoch-sky--stacked':era.verticalSky}" :viewBox="`0 0 1000 ${skyHeight}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
         <title :id="`${uid}-title`">{{era.title}} — мандала узлов Эноа</title>
-        <desc :id="`${uid}-desc`">{{era.note}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? 'Эри скрыта за Ману.' : ''}} {{isOrigin ? 'Вокруг Искры отдельные узлы: ближе всего Дайя, дальше оранжевая Эри и Ману, на внешнем ярусе три солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
-        <g v-if="!era.split" class="mandala-frame" fill="none" aria-hidden="true">
+        <desc :id="`${uid}-desc`">{{era.note}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? 'Эри скрыта за Ману.' : ''}} {{isOrigin ? 'Над Искрой, снизу вверх: Дайя, оранжевая Эри, Ману; над лунами — три совмещённых солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
+        <g v-if="era.verticalSky" class="mandala-frame" fill="none" aria-hidden="true">
+          <path :d="`M500 24 796 195 796 ${skyHeight-220} 500 ${skyHeight-40} 204 ${skyHeight-220} 204 195Z`"/>
+          <path :d="`M500 60 760 130 870 320 760 ${skyHeight-200} 500 ${skyHeight-60} 240 ${skyHeight-200} 130 320 240 130Z`"/>
+          <path :d="`M500 ${atlasCenter.y-160} 660 ${atlasCenter.y} 500 ${atlasCenter.y+160} 340 ${atlasCenter.y}Z`"/>
+          <path :d="`M500 24 796 ${skyHeight-220} 204 ${skyHeight-220}Z M500 ${skyHeight-40} 796 195 204 195Z`" class="mandala-weave"/>
+          <path :d="`M500 0V${skyHeight-20}`" stroke-dasharray="3 9"/>
+        </g>
+        <g v-else-if="!era.split" class="mandala-frame" fill="none" aria-hidden="true">
           <path d="M500 24 796 195 796 445 500 616 204 445 204 195Z"/>
           <path d="M500 60 760 130 870 320 760 510 500 580 240 510 130 320 240 130Z"/>
           <path d="M500 60 760 320 500 580 240 320Z M500 130 690 320 500 510 310 320Z"/>
@@ -129,13 +137,14 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
               </g>
             </TransitionGroup>
             <g :transform="`scale(${node.scale || 1})`"><path v-if="node.id !== 'spark'" class="mandala-node__halo" d="M0-58 58 0 0 58-58 0Z"/><path class="mandala-node__outer" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="node.id"/></g>
-            <text v-if="isOrigin && node.id === 'spark'" x="0" y="-100" text-anchor="middle">{{node.title}}</text>
+            <text v-if="isOrigin && node.id === 'spark'" x="98" y="8" text-anchor="start">{{node.title}}</text>
             <text v-else-if="((era.split && node.type === 'land' && !node.scale) || node.id === 'spark' || node.type === 'center')" :x="node.id === 'spark' ? Math.max(...centerLayers.map(layer=>layer.scale))*44+24 : 76" y="8" text-anchor="start">{{node.title}}</text>
             <text v-else-if="node.id === 'shamas' && hiddenSuns.length" x="115" y="74" text-anchor="start">{{node.title}}</text>
+            <text v-else-if="era.verticalSky && node.type === 'moon'" x="104" y="8" text-anchor="start">{{node.title}}</text>
             <text v-else :class="{'mandala-node__minor-label':node.scale}" :y="node.id === 'shamas' && hiddenSuns.length ? 114 : node.id === 'manu' && hiddenMoons.length ? 104 : node.scale ? 53 : 78" text-anchor="middle">{{node.title}}</text>
           </a>
         </TransitionGroup>
-        <text x="500" :y="era.split ? 888 : 648" text-anchor="middle" class="mandala-note">РАСПОЛОЖЕНИЕ УСЛОВНОЕ</text>
+        <text x="500" :y="skyHeight-12" text-anchor="middle" class="mandala-note">РАСПОЛОЖЕНИЕ УСЛОВНОЕ</text>
       </svg>
       <div class="epoch-world__stats" aria-live="polite"><span><b>{{ sunCount }}</b>{{ sunCount === 1 ? 'солнце' : 'солнца' }}</span><span><b>{{ moonCount }}</b>луны</span><span v-if="!isOrigin"><b>{{ String(shardCount).padStart(2,'0') }}</b>{{ era.split ? 'осколка' : 'единый мир' }}</span></div>
     </div>
@@ -151,7 +160,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 .epoch-time{grid-column:1;grid-row:1/span 4;position:relative;padding-top:0;padding-bottom:18px}.epoch-bookmark{display:flex;justify-content:space-between;margin:0 0 18px;font:600 8px 'Hanken Grotesk',sans-serif;letter-spacing:.2em;color:var(--gold-bright)}.epoch-bookmark span{color:rgba(var(--theme-text-rgb),.35)}
 .epoch-titles{display:grid}.epoch-title{position:relative;display:flex;align-items:center;gap:22px;min-height:60px;color:rgba(var(--theme-text-rgb),.67);text-decoration:none;padding-left:0;transition:color .3s,translate .55s cubic-bezier(.2,.8,.2,1)}.epoch-title.is-past{color:rgba(var(--theme-text-rgb),.55);translate:0 0}.epoch-title.is-future{translate:0 0}.epoch-title.is-current{color:rgba(var(--theme-heading-rgb),.98);translate:0 0}.epoch-title__node{position:absolute;left:-72px;width:23px;height:23px;flex-shrink:0;border:1px solid rgba(var(--theme-accent-rgb),.4);background:var(--theme-bg);transform:translateX(-50%) rotate(45deg);box-shadow:0 0 0 4px var(--theme-bg);transition:scale .4s,border-color .3s}.epoch-title__node i{position:absolute;inset:4px;border:1px dashed #c4a16a25}.epoch-title__node b{display:grid;height:100%;place-items:center;transform:rotate(-45deg);font:10px 'Cormorant Garamond',serif;color:var(--gold-bright)}.epoch-title__name{position:relative;background:none;font:500 21px/1.05 'Cormorant Garamond',serif}.epoch-title__name small{display:block;margin-top:8px;color:var(--gold-bright);font:6px 'Hanken Grotesk',sans-serif;letter-spacing:.18em}.epoch-title.is-current .epoch-title__node{transform:translateX(-50%) rotate(45deg) scale(1.3);border-color:var(--gold-bright);box-shadow:0 0 0 4px var(--theme-bg),0 0 20px #c4a16a35}.epoch-title:hover{color:var(--gold-bright)}.epoch-title:hover .epoch-title__node{border-color:var(--gold-bright)}
 .epoch-controls{display:flex;justify-content:space-between;gap:12px;margin-top:24px;padding:16px 0 0 48px;border-top:1px solid #c4a16a20}.epoch-controls a,.epoch-controls>span{font:10px 'Hanken Grotesk',sans-serif;color:#cbb68f;text-decoration:none;padding:10px 0}.epoch-controls>span{opacity:.3}.epoch-controls a:hover{color:var(--gold-bright)}
-.epoch-world{grid-column:2;z-index:1;grid-row:1;position:relative;background:radial-gradient(ellipse at 50% 42%,rgba(var(--era-tint),.11),transparent 68%)}.epoch-sky{display:block;width:100%;max-height:590px;overflow:visible}.epoch-sky--vertical{max-height:none}.epoch-world__stats{display:flex;justify-content:center;gap:25px;margin:5px 0 22px}.epoch-world__stats span{display:flex;align-items:baseline;gap:7px;font:italic 14px 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.4)}.epoch-world__stats b{font:400 23px 'Cormorant Garamond',serif;color:#cbb68f}
+.epoch-world{grid-column:2;z-index:1;grid-row:1;position:relative;background:radial-gradient(ellipse at 50% 42%,rgba(var(--era-tint),.11),transparent 68%)}.epoch-sky{display:block;width:100%;max-height:590px;overflow:visible}.epoch-sky--vertical,.epoch-sky--stacked{max-height:none}.epoch-world__stats{display:flex;justify-content:center;gap:25px;margin:5px 0 22px}.epoch-world__stats span{display:flex;align-items:baseline;gap:7px;font:italic 14px 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.4)}.epoch-world__stats b{font:400 23px 'Cormorant Garamond',serif;color:#cbb68f}
 .mandala-frame{stroke:#c4a16a;stroke-opacity:.13;stroke-width:1}.mandala-weave{stroke-opacity:.07}.mandala-connections path{fill:none;stroke:currentColor;stroke-opacity:.35;stroke-width:1.2}.mandala-connections .mandala-flow{stroke-opacity:.65;stroke-dasharray:4 24;animation:mandala-weave 8s linear infinite}.mandala-heart path{fill:#08090f;stroke:#c4a16a;stroke-width:1.2}.mandala-node{transition:opacity .3s;filter:drop-shadow(0 0 10px #c4a16a15);text-decoration:none}.mandala-node__halo{fill:none;stroke:currentColor;stroke-opacity:.13;stroke-dasharray:3 7;transition:stroke-opacity .3s}.mandala-node__outer{fill:#08090f;stroke:currentColor;stroke-opacity:.75;stroke-width:1.4}.mandala-node__inner{fill:none;stroke:currentColor;stroke-opacity:.25;stroke-dasharray:3 5}.mandala-node__glyph{fill:none;stroke:currentColor;stroke-width:1.3}.hidden-sun__surface{fill:#08090f;stroke:currentColor;stroke-width:1;stroke-opacity:.65}.hidden-sun__mark :deep(.celestial-knot){opacity:.7}.hidden-sun__leader{fill:none;stroke:currentColor;stroke-opacity:.4;stroke-width:1}.hidden-suns text,.hidden-moons text{fill:currentColor;opacity:.55;font:20px 'Cormorant Garamond',serif;letter-spacing:.03em}.mandala-node text{fill:currentColor;font:26px 'Cormorant Garamond',serif;letter-spacing:.04em}.mandala-node .mandala-node__minor-label{font-size:22px}.origin-cradle{color:#bca783}.origin-cradle :deep(.celestial-knot){opacity:.6}.mandala-node .origin-cradle text{font-size:22px;opacity:.7}.mandala-node.is-selectable{cursor:pointer}.mandala-node.is-selectable:hover .mandala-node__halo,.mandala-node.is-selected .mandala-node__halo{stroke-opacity:.8}.mandala-node.is-selectable:hover .mandala-node__outer,.mandala-node.is-selected .mandala-node__outer{stroke-width:2.4;stroke-opacity:1}.mandala-note{fill:#c4a16a60;font:7px 'Hanken Grotesk',sans-serif;letter-spacing:.18em}.mandala-link-enter-active,.mandala-link-leave-active{transition:opacity .6s}.mandala-link-enter-from,.mandala-link-leave-to{opacity:0}.celestial-enter-active,.celestial-leave-active{transition:opacity .6s}.celestial-enter-from,.celestial-leave-to{opacity:0}
 .epoch-story{grid-column:2;display:flex;align-items:flex-start;gap:22px;padding:0 0 22px}.epoch-story p{flex:1;max-width:700px;margin:0;font:italic 20px/1.55 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.72)}.epoch-story a{flex-shrink:0;margin-top:7px;color:#cbb68f;text-decoration:none;font:10px 'Hanken Grotesk',sans-serif}.epoch-draft-note{grid-column:2;margin:0 0 22px;font:10px/1.6 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.4)}.epoch-detail{grid-column:2}
 a:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.mandala-node:focus-visible{outline:none}.mandala-node:focus-visible .mandala-node__halo{stroke-opacity:1;stroke-width:2}
