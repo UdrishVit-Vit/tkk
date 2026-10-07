@@ -7,6 +7,9 @@ const route = useRoute()
 const router = useRouter()
 const era = computed(() => SHARD_ERAS.find(item => item.id === (route.query.era === 'leto-treh-solnts' ? 'epoha-lyudey' : route.query.era)) || SHARD_ERAS.at(-1))
 const isOrigin = computed(() => era.value.id === 'zhertva-purusha')
+const atlasCenter = { x: 500, y: 320 }
+const centerLayers = computed(() => era.value.centerLayers || [])
+const hasCentralSpark = computed(() => centerLayers.value.length > 0)
 const eraIndex = computed(() => SHARD_ERAS.indexOf(era.value))
 const uid = useId().replace(/:/g, '')
 const futureCount = computed(() => SHARD_ERAS.length - eraIndex.value - 1)
@@ -15,8 +18,8 @@ const hiddenSuns = computed(() => (era.value.hiddenSuns || []).map((id,index)=>(
 const sunCount = computed(()=>era.value.suns.length + hiddenSuns.value.length)
 const shardCount = computed(()=>era.value.split ? 3+(era.value.minorShards?.length || 0) : 1)
 const worldNodes = computed(() => {
-  const lights = [...era.value.suns,...era.value.moons].map(id => ({id,...SHARD_CELESTIAL_BODIES[id], x:positions[id][0],y:isOrigin.value && id === 'dayya' ? 530 : positions[id][1],type:SHARD_CELESTIAL_BODIES[id].sun?'sun':'moon'}))
-  const lands = isOrigin.value ? [{id:'spark',title:'Искра',kind:'В Колыбели Искры',x:500,y:320,type:'spark',color:'#e0c291'}]
+  const lights = [...era.value.suns,...era.value.moons].map(id => ({id,...SHARD_CELESTIAL_BODIES[id], x:positions[id][0],y:hasCentralSpark.value && id === 'dayya' ? 530 : positions[id][1],type:SHARD_CELESTIAL_BODIES[id].sun?'sun':'moon'}))
+  const lands = hasCentralSpark.value ? [{id:'spark',title:'Искра',kind:centerLayers.value.map(layer=>layer.title).join(', '),x:atlasCenter.x,y:atlasCenter.y,type:'spark',color:'#e0c291'}]
     : era.value.split ? [{id:'daskar',title:'Даскар',kind:'Крупнейший осколок',x:500,y:390,type:'land',color:'#e0c291'}, {id:'azar',title:'Азар',kind:'Замёрзший осколок',x:550,y:610,type:'land',color:'#b5d9e5'}, {id:'var-elor',title:'Вар’Элор',kind:'Тёмный осколок',x:500,y:770,type:'land',color:'#b8a1d9'}]
     : [{id:'enoa',title:'Эноа',kind:'До Раскола',x:500,y:era.value.moons.includes('dayya') ? 530 : 390,type:'land',color:'#e0c291'}]
   const minor = (era.value.minorShards || []).map(id=>({id,title:"Осколок Иш'Кашим",kind:'Малый осколок',x:335,y:505,type:'land',scale:.6,color:'#d7c19a'}))
@@ -25,7 +28,7 @@ const worldNodes = computed(() => {
 function connection(node) {
   const origin = era.value.split && node.type === 'land' && node.id !== 'daskar'
     ? node.id === 'var-elor' ? [550,610] : [500,390]
-    : [500,320]
+    : [atlasCenter.x,atlasCenter.y]
   const dx = node.x - origin[0]
   const dy = node.y - origin[1]
   const diagonal = Math.min(Math.abs(dx),Math.abs(dy))
@@ -73,10 +76,10 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
       </nav>
     </aside>
 
-    <div class="epoch-world" role="group" :aria-label="`${era.title}: ${sunCount} ${sunCount === 1 ? 'солнце' : 'солнца'}, ${era.moons.length} луны; ${isOrigin ? 'Искра в Колыбели Искры, начало мира' : era.split ? 'мир разделён на осколки' : 'мир един'}`">
+    <div class="epoch-world" role="group" :aria-label="`${era.title}: ${sunCount} ${sunCount === 1 ? 'солнце' : 'солнца'}, ${era.moons.length} луны; ${hasCentralSpark ? `Искра в центре, ${centerLayers.map(layer=>layer.title).join(', ')}` : era.split ? 'мир разделён на осколки' : 'мир един'}`">
       <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split}" :viewBox="`0 0 1000 ${era.split ? 900 : 660}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
         <title :id="`${uid}-title`">{{era.title}} — мандала узлов Эноа</title>
-        <desc :id="`${uid}-desc`">{{era.note}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{isOrigin ? 'Искра показана перед Колыбелью Искры.' : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
+        <desc :id="`${uid}-desc`">{{era.note}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
         <g v-if="!era.split" class="mandala-frame" fill="none" aria-hidden="true">
           <path d="M500 24 796 195 796 445 500 616 204 445 204 195Z"/>
           <path d="M500 60 760 130 870 320 760 510 500 580 240 510 130 320 240 130Z"/>
@@ -92,9 +95,9 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
           <path d="M500 0V870" stroke-dasharray="3 9"/>
         </g>
         <TransitionGroup name="mandala-link" tag="g" class="mandala-connections" aria-hidden="true">
-          <g v-for="node in worldNodes" :key="node.id" :style="{color:node.color}"><path :d="connection(node)"/><path :d="connection(node)" class="mandala-flow"/></g>
+          <g v-for="node in worldNodes.filter(item=>item.id !== 'spark')" :key="node.id" :style="{color:node.color}"><path :d="connection(node)"/><path :d="connection(node)" class="mandala-flow"/></g>
         </TransitionGroup>
-        <g v-if="!isOrigin" class="mandala-heart" transform="translate(500 320)" aria-hidden="true"><path d="M0-25 25 0 0 25-25 0Z M0-15 15 0 0 15-15 0Z"/><path d="M0-5 5 0 0 5-5 0Z" fill="#e0c291"/></g>
+        <g v-if="!hasCentralSpark" class="mandala-heart" transform="translate(500 320)" aria-hidden="true"><path d="M0-25 25 0 0 25-25 0Z M0-15 15 0 0 15-15 0Z"/><path d="M0-5 5 0 0 5-5 0Z" fill="#e0c291"/></g>
         <TransitionGroup name="celestial" tag="g" class="hidden-suns">
           <g v-for="(sun,index) in hiddenSuns" :key="sun.id" :transform="`translate(${sun.x} ${sun.y})`" :style="{color:sun.color}" :aria-label="`${sun.title} скрыт за Шамасом`">
             <g :transform="`scale(${sun.scale})`" class="hidden-sun__mark"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="sun.id"/></g>
@@ -104,12 +107,14 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
         </TransitionGroup>
         <TransitionGroup name="celestial" tag="g">
           <a v-for="node in worldNodes" :key="node.id" :href="isShard(node) ? router.resolve(shardLink(node)).href : undefined" :aria-label="isShard(node) ? `Выбрать осколок ${node.title}` : undefined" :aria-current="isShard(node) && selectedShard === node.id ? 'true' : undefined" :class="{'is-selectable':isShard(node),'is-selected':isShard(node) && selectedShard === node.id}" @click="selectWorldNode(node,$event)" :transform="`translate(${node.x} ${node.y})`" :style="{color:node.color}" class="mandala-node">
-            <g v-if="node.id === 'spark'" class="origin-cradle" aria-label="Колыбель Искры позади Искры">
-              <g transform="scale(1.7)"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot id="cradle"/></g>
-              <text y="113" text-anchor="middle">Колыбель Искры</text>
-            </g>
+            <TransitionGroup v-if="node.id === 'spark'" name="celestial" tag="g" class="origin-cradle">
+              <g v-for="layer in centerLayers" :key="layer.id" :style="{color:layer.color}" :aria-label="`${layer.title} позади Искры`">
+                <g :transform="`scale(${layer.scale})`"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="layer.id"/></g>
+                <text :x="layer.labelX" :y="layer.labelY" :text-anchor="layer.anchor">{{layer.title}}</text>
+              </g>
+            </TransitionGroup>
             <g :transform="`scale(${node.scale || 1})`"><path v-if="node.id !== 'spark'" class="mandala-node__halo" d="M0-58 58 0 0 58-58 0Z"/><path class="mandala-node__outer" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="node.id"/></g>
-            <text v-if="(era.split && node.type === 'land' && !node.scale) || node.id === 'spark'" :x="node.id === 'spark' ? 98 : 76" y="8" text-anchor="start">{{node.title}}</text>
+            <text v-if="(era.split && node.type === 'land' && !node.scale) || node.id === 'spark'" :x="node.id === 'spark' ? (centerLayers.length > 1 ? 118 : 98) : 76" y="8" text-anchor="start">{{node.title}}</text>
             <text v-else :class="{'mandala-node__minor-label':node.scale}" :y="node.id === 'shamas' && hiddenSuns.length ? 114 : node.scale ? 53 : 78" text-anchor="middle">{{node.title}}</text>
           </a>
         </TransitionGroup>
