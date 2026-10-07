@@ -300,8 +300,6 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Осколки': '/lore/shards',
     'Фракции': '/lore/factions',
     'Гильдии': '/lore/guilds',
-    'Животные': '/lore/animals',
-    'Растения': '/lore/plants',
     'Сказания': '/lore/tales',
     'Узлы': '/lore/uzly',
     'Глоссарий': '/lore/glossary',
@@ -651,7 +649,7 @@ const vm = computed(() => {
       // subject never leaves a gap or crowds a neighbour. Each route bends
       // once as it nears its node instead of radiating as a straight spoke,
       // so navigation still reads as one continuous ornament.
-      const loreRingSections = ['Пантеон', 'Осколки', 'География', 'Фракции', 'Растения', 'Нить Башни Мафраш', 'Животные', 'Гильдии', 'Сказания', 'Узлы', 'Глоссарий']
+      const loreRingSections = ['Пантеон', 'Осколки', 'География', 'Фракции', 'Нить Башни Мафраш', 'Гильдии', 'Сказания', 'Узлы', 'Глоссарий']
       const loreRingRadius = 350
       function loreSpoke(angleDeg) {
         const rad = angleDeg * Math.PI / 180

@@ -1,4 +1,9 @@
 <script setup>
+// Temporarily hidden; retain the page for later restoration.
+definePageMeta({
+  middleware: () => navigateTo('/lore', { replace: true, redirectCode: 302 }),
+})
+
 useHead({
   title: 'Животные Эноа · Lore',
   meta: [
