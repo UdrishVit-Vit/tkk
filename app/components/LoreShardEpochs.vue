@@ -169,7 +169,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
               </g>
             </TransitionGroup>
             <TransitionGroup v-if="node.id === 'spark'" name="celestial" tag="g" class="origin-cradle">
-              <g v-for="layer in centerLayers" :key="layer.id" :class="{'noa-layer':layer.id === 'noa','world-layer':['enoa','sanctuary'].includes(layer.id)}" :style="{color:layer.color}" :aria-label="`${layer.title} позади Искры`" @click.stop.prevent="selectNode(layer)">
+              <g v-for="layer in centerLayers" :key="layer.id" :data-node-id="layer.id" :class="{'noa-layer':layer.id === 'noa','tingir-layer':layer.id === 'tingir','world-layer':['enoa','sanctuary'].includes(layer.id)}" :style="{color:layer.color,'--node-glow':layer.color}" :aria-label="`${layer.title} позади Искры`" @click.stop.prevent="selectNode(layer)">
                 <g :transform="`scale(${layer.scale})`"><g :key="animationKey(layer.id)" :class="{'node-pulse':animatedNodeId === layer.id,'node-highlight':selectedNodeId === layer.id}"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="layer.id"/></g></g>
                 <path v-if="isOrigin" class="hidden-sun__leader" d="M-53-53-86-86H-95"/>
                 <text :x="layer.labelX" :y="layer.labelY" :text-anchor="layer.anchor" class="node-label" :class="{'node-label--link':layer.id === 'noa'}" role="button" tabindex="0" @click.stop.prevent="selectNode(layer)" @keydown.enter.prevent.stop="selectNode(layer)" @keydown.space.prevent.stop="selectNode(layer)">{{layer.title}}</text>
@@ -207,6 +207,11 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 </template>
 
 <style scoped>
+.origin-cradle .noa-layer{--node-glow:#e59a58}.origin-cradle .tingir-layer{--node-glow:#b5b1d7}
+.origin-cradle .node-highlight{filter:drop-shadow(0 0 8px var(--node-glow))}.origin-cradle .node-highlight .hidden-sun__surface{stroke:var(--node-glow)}
+.noa-layer .node-pulse{animation:noa-awaken 1100ms ease-out}.tingir-layer .node-pulse{animation:tingir-awaken 950ms ease-in-out}
+@keyframes noa-awaken{0%{transform:scale(1);filter:drop-shadow(0 0 0 #e59a5800)}40%{transform:scale(1.055);filter:drop-shadow(0 0 14px #e59a58)}70%{transform:scale(1.02);filter:drop-shadow(0 0 7px #e59a58)}100%{transform:scale(1);filter:drop-shadow(0 0 8px #e59a58)}}
+@keyframes tingir-awaken{0%{transform:rotate(0) scale(1);filter:drop-shadow(0 0 0 #b5b1d700)}30%{transform:rotate(-3deg) scale(1.025);filter:drop-shadow(0 0 10px #b5b1d7)}65%{transform:rotate(2deg) scale(1.025);filter:drop-shadow(0 0 6px #b5b1d7)}100%{transform:rotate(0) scale(1);filter:drop-shadow(0 0 8px #b5b1d7)}}
 .origin-cradle .world-layer .hidden-sun__surface{stroke-width:1.8;stroke-opacity:.85}.origin-cradle .world-layer :deep(.celestial-knot){opacity:.85}.origin-cradle>g{cursor:pointer}
 .mandala-node .dream-realm-alias{font-size:17px;font-style:italic;opacity:.65}
 .node-label--link{text-decoration:underline;text-decoration-thickness:.7px;text-underline-offset:4px}
