@@ -2,6 +2,7 @@
 const props = defineProps({ id: { type: String, required: true } })
 // Continuous ribbons share a woven core; their outer loops identify each body.
 const motifs = {
+  'spirit-pockets': ['M0-35 35 0 0 35-35 0Z', 'M0-28 14-14 0 0-14-14Z M28 0 14 14 0 0 14-14Z M0 28-14 14 0 0 14 14Z M-28 0-14-14 0 0-14 14Z'],
   'dalnie-chertogi': ['M0-35 35 0 0 35-35 0Z', 'M-24-11-11-24M11-24 24-11M24 11 11 24M-11 24-24 11', 'M0-27 9-18 0-9-9-18Z M27 0 18 9 9 0 18-9Z M0 27-9 18 0 9 9 18Z M-27 0-18-9-9 0-18 9Z'],
   shamas: ['M0-34 12-22 0-10-12-22Z M34 0 22 12 10 0 22-12Z M0 34-12 22 0 10 12 22Z M-34 0-22-12-10 0-22 12Z'],
   ula: ['M0-35C18-28 28-18 35 0 28 18 18 28 0 35-18 28-28 18-35 0-28-18-18-28 0-35Z', 'M0-35 0-24M35 0H24M0 35V24M-35 0H-24'],
@@ -40,7 +41,7 @@ const fittedKnots = {
   }
 }
 const fittedKnot = computed(() => fittedKnots[props.id])
-const loops = computed(() => motifs[props.id] || motifs.enoa)
+const loops = computed(() => motifs[props.id === 'noa' ? 'cradle' : props.id] || motifs.enoa)
 const coreScale = computed(() => ['daskar', 'ish-kashim', 'manu'].includes(props.id) ? .65 : .8)
 const weave = ['M-18-6H6V18H18V6H-6V-18H-18Z', 'M-6-18H18V-6H-18V18H6V-18Z']
 </script>

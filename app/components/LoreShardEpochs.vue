@@ -36,7 +36,8 @@ const worldNodes = computed(() => {
     : hasCentralSpark.value ? [] : [{id:'enoa',title:'Эноа',kind:'До Раскола',x:500,y:390,type:'land',color:'#e0c291'}]
   const minor = (era.value.minorShards || []).map(id=>{const [x,y]=era.value.shardPositions?.[id] || [335,505];return {id,title:"Осколок Иш'Кашим",kind:'Малый осколок',x,y,type:'land',scale:.6,color:'#d7c19a'}})
   const distant = isOrigin.value ? [] : [{id:'dalnie-chertogi',title:'Дальние Чертоги',kind:'За гранью мира',x:900,y:-130,type:'distant',scale:.55,color:'#9299b3'}]
-  return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y),...distant]
+  const spirits = era.value.spiritPockets ? [{id:'spirit-pockets',title:'Карманы мира духов',kind:'Области мира духов',x:170,y:560,type:'spirit',scale:.8,color:'#99b9b0'}] : []
+  return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y),...distant,...spirits]
 })
 const inspectedId = ref('')
 const animatedNodeId = ref('')
