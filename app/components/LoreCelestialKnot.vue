@@ -2,6 +2,7 @@
 const props = defineProps({ id: { type: String, required: true } })
 // Continuous ribbons share a woven core; their outer loops identify each body.
 const motifs = {
+  choku: ['M0-35 35 0 0 35-35 0Z', 'M-21 12V-12L0-27 21-12V12L0 27Z', 'M-12 17V-7L0-19 12-7V17'],
   'spirit-pockets': ['M0-35 35 0 0 35-35 0Z', 'M0-28 14-14 0 0-14-14Z M28 0 14 14 0 0 14-14Z M0 28-14 14 0 0 14 14Z M-28 0-14-14 0 0-14 14Z'],
   'dalnie-chertogi': ['M0-35 35 0 0 35-35 0Z', 'M-24-11-11-24M11-24 24-11M24 11 11 24M-11 24-24 11', 'M0-27 9-18 0-9-9-18Z M27 0 18 9 9 0 18-9Z M0 27-9 18 0 9 9 18Z M-27 0-18-9-9 0-18 9Z'],
   shamas: ['M0-34 12-22 0-10-12-22Z M34 0 22 12 10 0 22-12Z M0 34-12 22 0 10 12 22Z M-34 0-22-12-10 0-22 12Z'],
@@ -48,6 +49,10 @@ const weave = ['M-18-6H6V18H18V6H-6V-18H-18Z', 'M-6-18H18V-6H-18V18H6V-18Z']
 
 <template>
   <g class="celestial-knot" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <g v-if="id === 'noa'" class="noa-boundary" stroke="currentColor">
+      <path d="M0-38 38 0 0 38-38 0Z" stroke-width="1.2"/>
+      <path v-for="angle in [0,90,180,270]" :key="angle" :transform="`rotate(${angle})`" d="M0-43 7-36 7-32 11-32 19-24 19-20 23-20 31-12 31-8 35-8 43 0" stroke-width="1.3"/>
+    </g>
     <g v-for="(path,index) in (fittedKnot ? [] : loops)" :key="index">
       <path :d="path" stroke="#08090f" stroke-width="7.4"/>
       <path :d="path" stroke="currentColor" stroke-width="3.6"/>

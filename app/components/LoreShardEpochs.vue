@@ -37,7 +37,9 @@ const worldNodes = computed(() => {
   const minor = (era.value.minorShards || []).map(id=>{const [x,y]=era.value.shardPositions?.[id] || [335,505];return {id,title:"Осколок Иш'Кашим",kind:'Малый осколок',x,y,type:'land',scale:.6,color:'#d7c19a'}})
   const distant = isOrigin.value ? [] : [{id:'dalnie-chertogi',title:'Дальние Чертоги',kind:'За гранью мира',x:900,y:-130,type:'distant',scale:.55,color:'#9299b3'}]
   const spirits = era.value.spiritPockets ? [{id:'spirit-pockets',title:'Карманы мира духов',kind:'Области мира духов',x:170,y:560,type:'spirit',scale:.8,color:'#99b9b0'}] : []
-  return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y),...distant,...spirits]
+  const manu = lights.find(node=>node.id === 'manu')
+  const dreams = manu ? [{id:'choku',title:'Царство Чоку',kind:'Царство Мечтателя',x:Math.max(120,manu.x-260),y:manu.y-100,parentId:'manu',type:'dream',scale:.7,color:'#aab4d7'}] : []
+  return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y),...distant,...spirits,...dreams]
 })
 const inspectedId = ref('')
 const animatedNodeId = ref('')
@@ -70,7 +72,7 @@ async function selectNode(node, reveal = false) {
 function connection(node) {
   if(node.type === 'distant') return `M${atlasCenter.value.x} ${atlasCenter.value.y} L${node.x} ${atlasCenter.value.y-(node.x-atlasCenter.value.x)} V${node.y}`
   if (era.value.split && node.type === 'land') return threadPath(shardThreadPoints(node, atlasCenter.value))
-  const parentId = era.value.bodyParents?.[node.id] || era.value.shardParents?.[node.id]
+  const parentId = node.parentId || era.value.bodyParents?.[node.id] || era.value.shardParents?.[node.id]
   const parent = parentId ? worldNodes.value.find(item=>item.id === parentId) : undefined
   const origin = parent ? [parent.x,parent.y] : [atlasCenter.value.x,atlasCenter.value.y]
   const dx = node.x - origin[0]
@@ -167,10 +169,10 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
               </g>
             </TransitionGroup>
             <TransitionGroup v-if="node.id === 'spark'" name="celestial" tag="g" class="origin-cradle">
-              <g v-for="layer in centerLayers" :key="layer.id" :style="{color:layer.color}" :aria-label="`${layer.title} позади Искры`">
+              <g v-for="layer in centerLayers" :key="layer.id" :class="{'noa-layer':layer.id === 'noa'}" :style="{color:layer.color}" :aria-label="`${layer.title} позади Искры`">
                 <g :transform="`scale(${layer.scale})`"><g :key="animationKey(layer.id)" :class="{'node-pulse':animatedNodeId === layer.id,'node-highlight':selectedNodeId === layer.id}"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="layer.id"/></g></g>
                 <path v-if="isOrigin" class="hidden-sun__leader" d="M-53-53-86-86H-95"/>
-                <text :x="layer.labelX" :y="layer.labelY" :text-anchor="layer.anchor" class="node-label" role="button" tabindex="0" @click.stop.prevent="selectNode(layer)" @keydown.enter.prevent.stop="selectNode(layer)" @keydown.space.prevent.stop="selectNode(layer)">{{layer.title}}</text>
+                <text :x="layer.labelX" :y="layer.labelY" :text-anchor="layer.anchor" class="node-label" :class="{'node-label--link':layer.id === 'noa'}" role="button" tabindex="0" @click.stop.prevent="selectNode(layer, layer.id === 'noa')" @keydown.enter.prevent.stop="selectNode(layer, layer.id === 'noa')" @keydown.space.prevent.stop="selectNode(layer, layer.id === 'noa')">{{layer.title}}</text>
               </g>
             </TransitionGroup>
             <g :transform="`scale(${node.scale || 1})`"><g :key="animationKey(node.id)" :class="{'node-pulse':animatedNodeId === node.id}"><path v-if="node.id !== 'spark'" class="mandala-node__halo" d="M0-58 58 0 0 58-58 0Z"/><path class="mandala-node__outer" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="node.id"/></g></g>
@@ -178,6 +180,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
             <text @click.stop.prevent="selectNode(node)" v-else-if="((era.split && node.type === 'land' && !node.scale) || node.id === 'spark' || node.type === 'center')" :x="node.id === 'spark' ? Math.max(...centerLayers.map(layer=>layer.scale))*44+24 : 76" y="8" text-anchor="start">{{node.title}}</text>
             <text @click.stop.prevent="selectNode(node)" v-else-if="node.id === 'shamas' && hiddenSuns.length" x="115" y="74" text-anchor="start">{{node.title}}</text>
             <text @click.stop.prevent="selectNode(node)" v-else-if="era.verticalSky && node.type === 'moon'" x="104" y="8" text-anchor="start">{{node.title}}</text>
+            <text v-else-if="node.id === 'choku'" @click.stop.prevent="selectNode(node)" y="53" text-anchor="middle" class="mandala-node__minor-label">{{node.title}}<tspan x="0" dy="24" class="dream-realm-alias">{{node.kind}}</tspan></text>
             <text @click.stop.prevent="selectNode(node)" v-else :class="{'mandala-node__minor-label':node.scale}" :y="node.id === 'shamas' && hiddenSuns.length ? 114 : node.id === 'manu' && hiddenMoons.length ? 104 : node.scale ? 53 : 78" text-anchor="middle">{{node.title}}</text>
           </a>
         </TransitionGroup>
@@ -204,6 +207,9 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 </template>
 
 <style scoped>
+.mandala-node .dream-realm-alias{font-size:17px;font-style:italic;opacity:.65}
+.node-label--link{text-decoration:underline;text-decoration-thickness:.7px;text-underline-offset:4px}
+.origin-cradle .noa-layer :deep(.celestial-knot){opacity:.9}.origin-cradle .noa-layer .hidden-sun__surface{stroke-opacity:.9}
 .mandala-connections .distant-thread path{stroke-opacity:.22;stroke-dasharray:3 9}.mandala-connections .distant-thread .mandala-flow{stroke-opacity:.32;stroke-dasharray:2 32;animation-duration:14s}
 .mandala-node.distant-node{opacity:.65}.mandala-node.distant-node:hover,.mandala-node.distant-node.is-selected{opacity:1}.mandala-node.distant-node text{font-size:18px;letter-spacing:.05em}
 .epoch-atlas text,.epoch-node-picker button,.epoch-node-heading button,.epoch-node-reading{user-select:text;-webkit-user-select:text}
