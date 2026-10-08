@@ -18,14 +18,14 @@ const uid = useId().replace(/:/g, '')
 const futureCount = computed(() => SHARD_ERAS.length - eraIndex.value - 1)
 const positions = { shamas:[500,110], azrak:[320,170], ula:[680,170], manu:[240,320], eri:[240,320], dayya:[500,390] }
 const hiddenSuns = computed(() => (era.value.hiddenSuns || []).map((id,index)=>({id,...SHARD_CELESTIAL_BODIES[id],x:(era.value.bodyPositions?.shamas || positions.shamas)[0],y:(era.value.bodyPositions?.shamas || positions.shamas)[1],scale:index ? 1.5 : 2.05})))
-const hiddenMoons = computed(() => (era.value.hiddenMoons || []).map(id=>({id,...SHARD_CELESTIAL_BODIES[id],scale:1.7})))
+const hiddenMoons = computed(() => (era.value.hiddenMoons || []).map(id=>({id,...SHARD_CELESTIAL_BODIES[id],scale:1.5})))
 const moonCount = computed(()=>era.value.moons.length + hiddenMoons.value.length)
 const sunCount = computed(()=>era.value.suns.length + hiddenSuns.value.length)
 const shardCount = computed(()=>era.value.split ? 3+(era.value.minorShards?.length || 0) : 1)
 const worldNodes = computed(() => {
   const lights = [...era.value.suns,...era.value.moons].map(id => {
     const [x,y] = era.value.bodyPositions?.[id] || positions[id]
-    return {id,...SHARD_CELESTIAL_BODIES[id],x,y:hasCentralSpark.value && id === 'dayya' && !isOrigin.value ? 530 : y,color:era.value.bodyColors?.[id] || SHARD_CELESTIAL_BODIES[id].color,type:SHARD_CELESTIAL_BODIES[id].sun?'sun':'moon'}
+    return {id,...SHARD_CELESTIAL_BODIES[id],x,y:hasCentralSpark.value && id === 'dayya' && !isOrigin.value ? 530 : y,scale:id === 'manu' && !isOrigin.value ? 0.9045 : undefined,color:era.value.bodyColors?.[id] || SHARD_CELESTIAL_BODIES[id].color,type:SHARD_CELESTIAL_BODIES[id].sun?'sun':'moon'}
   })
   const center = hasCentralSpark.value ? [{id:'spark',title:'Искра',kind:centerLayers.value.map(layer=>layer.title).join(', '),x:atlasCenter.value.x,y:atlasCenter.value.y,type:'spark',color:'#e0c291'}] : []
   const lands = era.value.split ? [
@@ -38,6 +38,9 @@ const worldNodes = computed(() => {
   return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y)]
 })
 const inspectedId = ref('')
+const animatedNodeId = ref('')
+const animationVersion = ref(0)
+const animationKey = id => `${id}-${animatedNodeId.value === id ? animationVersion.value : 0}`
 const nodeStoryRef = ref(null)
 const eraStory = computed(() => SHARD_ERA_STORIES[era.value.id] || era.value.summary)
 const inspectionNodes = computed(() => {
@@ -48,10 +51,13 @@ const selectedNodeId = computed(() => inspectionNodes.value.some(node=>node.id =
 const selectedNode = computed(() => inspectionNodes.value.find(node=>node.id === selectedNodeId.value) || inspectionNodes.value[0])
 const selectedStory = computed(() => SHARD_NODE_STORIES[selectedNode.value?.id])
 const selectedMoment = computed(() => selectedStory.value?.moments?.[era.value.id])
-watch(() => era.value.id, () => { inspectedId.value = '' })
+watch(() => era.value.id, () => { inspectedId.value = ''; animatedNodeId.value = '' })
 watch(() => props.selectedShard, () => { if(era.value.split) inspectedId.value = props.selectedShard })
 async function selectNode(node, reveal = false) {
+  if(import.meta.client && !window.getSelection()?.isCollapsed) return
   inspectedId.value = node.id
+  animatedNodeId.value = node.id
+  animationVersion.value++
   if(isShard(node)) await navigateTo(shardLink(node))
   if(reveal) {
     await nextTick()
@@ -142,9 +148,9 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
         <g v-if="!hasCentralSpark && !era.centralNode" class="mandala-heart" transform="translate(500 320)" aria-hidden="true"><path d="M0-25 25 0 0 25-25 0Z M0-15 15 0 0 15-15 0Z"/><path d="M0-5 5 0 0 5-5 0Z" fill="#e0c291"/></g>
         <TransitionGroup name="celestial" tag="g" class="hidden-suns">
           <g v-for="(sun,index) in hiddenSuns" :key="sun.id" :transform="`translate(${sun.x} ${sun.y})`" :style="{color:sun.color}" :aria-label="`${sun.title} скрыт за Шамасом`">
-            <g :transform="`scale(${sun.scale})`" class="hidden-sun__mark"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="sun.id"/></g>
+            <g :transform="`scale(${sun.scale})`" class="hidden-sun__mark"><g :key="animationKey(sun.id)" :class="{'node-pulse':animatedNodeId === sun.id,'node-highlight':selectedNodeId === sun.id}"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="sun.id"/></g></g>
             <path class="hidden-sun__leader" :d="index ? 'M69 0H103' : 'M-94 0H-125'"/>
-            <text :x="index ? 115 : -137" y="6" :text-anchor="index ? 'start' : 'end'">{{sun.title}}</text>
+            <text :x="index ? 115 : -137" y="6" :text-anchor="index ? 'start' : 'end'" class="node-label" role="button" tabindex="0" @click.stop="selectNode(sun)" @keydown.enter.prevent.stop="selectNode(sun)" @keydown.space.prevent.stop="selectNode(sun)">{{sun.title}}</text>
           </g>
         </TransitionGroup>
 
@@ -152,24 +158,24 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
           <a v-for="node in worldNodes" :key="node.id" :href="isShard(node) ? router.resolve(shardLink(node)).href : `#${uid}-node-story`" :aria-label="`История узла ${node.title}`" :aria-current="selectedNodeId === node.id ? 'true' : undefined" :class="{'is-selectable':true,'is-selected':selectedNodeId === node.id}" @click="selectWorldNode(node,$event)" :transform="`translate(${node.x} ${node.y})`" :style="{color:node.color}" class="mandala-node">
             <TransitionGroup v-if="node.id === 'manu'" name="celestial" tag="g" class="hidden-moons">
               <g v-for="moon in hiddenMoons" :key="moon.id" :style="{color:moon.color}" :aria-label="`${moon.title} скрыта за Ману`">
-                <g :transform="`scale(${moon.scale})`" class="hidden-moon__mark"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="moon.id"/></g>
-                <path class="hidden-sun__leader" d="M-78 0H-101"/>
-                <text x="-113" y="8" text-anchor="end">{{moon.title}}</text>
+                <g :transform="`scale(${moon.scale})`" class="hidden-moon__mark"><g :key="animationKey(moon.id)" :class="{'node-pulse':animatedNodeId === moon.id,'node-highlight':selectedNodeId === moon.id}"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="moon.id"/></g></g>
+                <path class="hidden-sun__leader" d="M-68 0H-91"/>
+                <text x="-103" y="8" text-anchor="end" class="node-label" role="button" tabindex="0" @click.stop.prevent="selectNode(moon)" @keydown.enter.prevent.stop="selectNode(moon)" @keydown.space.prevent.stop="selectNode(moon)">{{moon.title}}</text>
               </g>
             </TransitionGroup>
             <TransitionGroup v-if="node.id === 'spark'" name="celestial" tag="g" class="origin-cradle">
               <g v-for="layer in centerLayers" :key="layer.id" :style="{color:layer.color}" :aria-label="`${layer.title} позади Искры`">
-                <g :transform="`scale(${layer.scale})`"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="layer.id"/></g>
+                <g :transform="`scale(${layer.scale})`"><g :key="animationKey(layer.id)" :class="{'node-pulse':animatedNodeId === layer.id,'node-highlight':selectedNodeId === layer.id}"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="layer.id"/></g></g>
                 <path v-if="isOrigin" class="hidden-sun__leader" d="M-53-53-86-86H-95"/>
-                <text :x="layer.labelX" :y="layer.labelY" :text-anchor="layer.anchor">{{layer.title}}</text>
+                <text :x="layer.labelX" :y="layer.labelY" :text-anchor="layer.anchor" class="node-label" role="button" tabindex="0" @click.stop.prevent="selectNode(layer)" @keydown.enter.prevent.stop="selectNode(layer)" @keydown.space.prevent.stop="selectNode(layer)">{{layer.title}}</text>
               </g>
             </TransitionGroup>
-            <g :transform="`scale(${node.scale || 1})`"><path v-if="node.id !== 'spark'" class="mandala-node__halo" d="M0-58 58 0 0 58-58 0Z"/><path class="mandala-node__outer" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="node.id"/></g>
-            <text v-if="isOrigin && node.id === 'spark'" x="98" y="8" text-anchor="start">{{node.title}}</text>
-            <text v-else-if="((era.split && node.type === 'land' && !node.scale) || node.id === 'spark' || node.type === 'center')" :x="node.id === 'spark' ? Math.max(...centerLayers.map(layer=>layer.scale))*44+24 : 76" y="8" text-anchor="start">{{node.title}}</text>
-            <text v-else-if="node.id === 'shamas' && hiddenSuns.length" x="115" y="74" text-anchor="start">{{node.title}}</text>
-            <text v-else-if="era.verticalSky && node.type === 'moon'" x="104" y="8" text-anchor="start">{{node.title}}</text>
-            <text v-else :class="{'mandala-node__minor-label':node.scale}" :y="node.id === 'shamas' && hiddenSuns.length ? 114 : node.id === 'manu' && hiddenMoons.length ? 104 : node.scale ? 53 : 78" text-anchor="middle">{{node.title}}</text>
+            <g :transform="`scale(${node.scale || 1})`"><g :key="animationKey(node.id)" :class="{'node-pulse':animatedNodeId === node.id}"><path v-if="node.id !== 'spark'" class="mandala-node__halo" d="M0-58 58 0 0 58-58 0Z"/><path class="mandala-node__outer" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="node.id"/></g></g>
+            <text @click.stop.prevent="selectNode(node)" v-if="isOrigin && node.id === 'spark'" x="98" y="8" text-anchor="start">{{node.title}}</text>
+            <text @click.stop.prevent="selectNode(node)" v-else-if="((era.split && node.type === 'land' && !node.scale) || node.id === 'spark' || node.type === 'center')" :x="node.id === 'spark' ? Math.max(...centerLayers.map(layer=>layer.scale))*44+24 : 76" y="8" text-anchor="start">{{node.title}}</text>
+            <text @click.stop.prevent="selectNode(node)" v-else-if="node.id === 'shamas' && hiddenSuns.length" x="115" y="74" text-anchor="start">{{node.title}}</text>
+            <text @click.stop.prevent="selectNode(node)" v-else-if="era.verticalSky && node.type === 'moon'" x="104" y="8" text-anchor="start">{{node.title}}</text>
+            <text @click.stop.prevent="selectNode(node)" v-else :class="{'mandala-node__minor-label':node.scale}" :y="node.id === 'shamas' && hiddenSuns.length ? 114 : node.id === 'manu' && hiddenMoons.length ? 104 : node.scale ? 53 : 78" text-anchor="middle">{{node.title}}</text>
           </a>
         </TransitionGroup>
         <text x="500" :y="skyHeight-12" text-anchor="middle" class="mandala-note">РАСПОЛОЖЕНИЕ УСЛОВНОЕ</text>
@@ -185,7 +191,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
         <button v-for="node in inspectionNodes" :key="node.id" type="button" :aria-pressed="selectedNodeId === node.id" :style="{'--node-color':node.color}" @click="selectNode(node)">{{node.title}}</button>
       </nav>
       <div class="epoch-node-reading" aria-live="polite" aria-atomic="true">
-        <div class="epoch-node-heading"><h3>{{selectedNode.title}}</h3><NuxtLink v-if="selectedStory.glossaryId" :to="`/lore/glossary/${selectedStory.glossaryId}`">Статья ↗</NuxtLink><NuxtLink v-if="selectedStory.geographyId" :to="`/lore/geography?shard=${selectedStory.geographyId}`">Карта ↗</NuxtLink></div>
+        <div class="epoch-node-heading"><h3><button type="button" :aria-label="`Подсветить ${selectedNode.title}`" @click="selectNode(selectedNode)">{{selectedNode.title}}</button></h3><NuxtLink v-if="selectedStory.glossaryId" :to="`/lore/glossary/${selectedStory.glossaryId}`">Статья ↗</NuxtLink><NuxtLink v-if="selectedStory.geographyId" :to="`/lore/geography?shard=${selectedStory.geographyId}`">Карта ↗</NuxtLink></div>
         <p>{{selectedStory.text}}</p>
         <p v-if="selectedMoment" class="epoch-node-moment"><span>{{era.title}}</span>{{selectedMoment}}</p>
       </div>
@@ -195,6 +201,13 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 </template>
 
 <style scoped>
+.epoch-atlas text,.epoch-node-picker button,.epoch-node-heading button,.epoch-node-reading{user-select:text;-webkit-user-select:text}
+.node-label{cursor:pointer}.node-label:hover,.node-label:focus-visible{opacity:1;fill:var(--gold-bright)}
+.node-highlight{filter:drop-shadow(0 0 8px currentColor)}.node-highlight .hidden-sun__surface{stroke-opacity:1;stroke-width:2}
+.node-pulse{transform-box:view-box;transform-origin:0 0;animation:node-awaken 900ms ease-out}
+.epoch-node-heading button{color:inherit;font:inherit;background:none;border:0;padding:0;text-align:left;cursor:pointer}
+.epoch-node-heading button:focus-visible,.node-label:focus-visible{outline:1px solid var(--gold-bright);outline-offset:5px}
+@keyframes node-awaken{0%{transform:scale(1);filter:drop-shadow(0 0 0 transparent)}35%{transform:scale(1.045);filter:drop-shadow(0 0 12px currentColor)}100%{transform:scale(1);filter:drop-shadow(0 0 0 transparent)}}
 .epoch-atlas{--thread-gold:#c4a16a;position:relative;display:grid;grid-template-columns:250px minmax(0,1fr);gap:0 40px;align-items:start;color:rgba(var(--theme-text-rgb),.8)}
 .epoch-time{grid-column:1;grid-row:1/span 4;position:relative;padding-top:0;padding-bottom:18px}.epoch-bookmark{display:flex;justify-content:space-between;margin:0 0 18px;font:600 8px 'Hanken Grotesk',sans-serif;letter-spacing:.2em;color:var(--gold-bright)}.epoch-bookmark span{color:rgba(var(--theme-text-rgb),.35)}
 .epoch-titles{display:grid}.epoch-title{position:relative;display:flex;align-items:center;gap:22px;min-height:60px;color:rgba(var(--theme-text-rgb),.67);text-decoration:none;padding-left:0;transition:color .3s,translate .55s cubic-bezier(.2,.8,.2,1)}.epoch-title.is-past{color:rgba(var(--theme-text-rgb),.55);translate:0 0}.epoch-title.is-future{translate:0 0}.epoch-title.is-current{color:rgba(var(--theme-heading-rgb),.98);translate:0 0}.epoch-title__node{position:absolute;left:-72px;width:23px;height:23px;flex-shrink:0;border:1px solid rgba(var(--theme-accent-rgb),.4);background:var(--theme-bg);transform:translateX(-50%) rotate(45deg);box-shadow:0 0 0 4px var(--theme-bg);transition:scale .4s,border-color .3s}.epoch-title__node i{position:absolute;inset:4px;border:1px dashed #c4a16a25}.epoch-title__node b{display:grid;height:100%;place-items:center;transform:rotate(-45deg);font:10px 'Cormorant Garamond',serif;color:var(--gold-bright)}.epoch-title__name{position:relative;background:none;font:500 21px/1.05 'Cormorant Garamond',serif}.epoch-title__name small{display:block;margin-top:8px;color:var(--gold-bright);font:6px 'Hanken Grotesk',sans-serif;letter-spacing:.18em}.epoch-title.is-current .epoch-title__node{transform:translateX(-50%) rotate(45deg) scale(1.3);border-color:var(--gold-bright);box-shadow:0 0 0 4px var(--theme-bg),0 0 20px #c4a16a35}.epoch-title:hover{color:var(--gold-bright)}.epoch-title:hover .epoch-title__node{border-color:var(--gold-bright)}
