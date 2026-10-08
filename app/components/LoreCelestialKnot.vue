@@ -2,6 +2,7 @@
 const props = defineProps({ id: { type: String, required: true } })
 // Continuous ribbons share a woven core; their outer loops identify each body.
 const motifs = {
+  'dalnie-chertogi': ['M0-35 35 0 0 35-35 0Z', 'M-24-11-11-24M11-24 24-11M24 11 11 24M-11 24-24 11', 'M0-27 9-18 0-9-9-18Z M27 0 18 9 9 0 18-9Z M0 27-9 18 0 9 9 18Z M-27 0-18-9-9 0-18 9Z'],
   shamas: ['M0-34 12-22 0-10-12-22Z M34 0 22 12 10 0 22-12Z M0 34-12 22 0 10 12 22Z M-34 0-22-12-10 0-22 12Z'],
   ula: ['M0-35C18-28 28-18 35 0 28 18 18 28 0 35-18 28-28 18-35 0-28-18-18-28 0-35Z', 'M0-35 0-24M35 0H24M0 35V24M-35 0H-24'],
   azrak: ['M0-37 8-24 0-11-8-24Z M37 0 24 8 11 0 24-8Z M0 37-8 24 0 11 8 24Z M-37 0-24-8-11 0-24 8Z', 'M-25-25-17-17M25-25 17-17M25 25 17 17M-25 25-17 17'],

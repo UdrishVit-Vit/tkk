@@ -25,7 +25,7 @@ const shardCount = computed(()=>era.value.split ? 3+(era.value.minorShards?.leng
 const worldNodes = computed(() => {
   const lights = [...era.value.suns,...era.value.moons].map(id => {
     const [x,y] = era.value.bodyPositions?.[id] || positions[id]
-    return {id,...SHARD_CELESTIAL_BODIES[id],x,y:hasCentralSpark.value && id === 'dayya' && !isOrigin.value ? 530 : y,scale:id === 'manu' && !isOrigin.value ? 0.9045 : undefined,color:era.value.bodyColors?.[id] || SHARD_CELESTIAL_BODIES[id].color,type:SHARD_CELESTIAL_BODIES[id].sun?'sun':'moon'}
+    return {id,...SHARD_CELESTIAL_BODIES[id],x,y:hasCentralSpark.value && id === 'dayya' && !isOrigin.value ? 530 : y,scale:id === 'manu' && !isOrigin.value ? 1.10349 : undefined,color:era.value.bodyColors?.[id] || SHARD_CELESTIAL_BODIES[id].color,type:SHARD_CELESTIAL_BODIES[id].sun?'sun':'moon'}
   })
   const center = hasCentralSpark.value ? [{id:'spark',title:'Искра',kind:centerLayers.value.map(layer=>layer.title).join(', '),x:atlasCenter.value.x,y:atlasCenter.value.y,type:'spark',color:'#e0c291'}] : []
   const lands = era.value.split ? [
@@ -35,7 +35,8 @@ const worldNodes = computed(() => {
   ].map(node=>{const [x,y]=era.value.shardPositions?.[node.id] || {daskar:[500,440],azar:[550,610],'var-elor':[500,770]}[node.id];return {...node,x,y}})
     : hasCentralSpark.value ? [] : [{id:'enoa',title:'Эноа',kind:'До Раскола',x:500,y:390,type:'land',color:'#e0c291'}]
   const minor = (era.value.minorShards || []).map(id=>{const [x,y]=era.value.shardPositions?.[id] || [335,505];return {id,title:"Осколок Иш'Кашим",kind:'Малый осколок',x,y,type:'land',scale:.6,color:'#d7c19a'}})
-  return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y)]
+  const distant = isOrigin.value ? [] : [{id:'dalnie-chertogi',title:'Дальние Чертоги',kind:'За гранью мира',x:900,y:-130,type:'distant',scale:.55,color:'#9299b3'}]
+  return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y),...distant]
 })
 const inspectedId = ref('')
 const animatedNodeId = ref('')
@@ -66,6 +67,7 @@ async function selectNode(node, reveal = false) {
   }
 }
 function connection(node) {
+  if(node.type === 'distant') return `M${atlasCenter.value.x} ${atlasCenter.value.y} L${node.x} ${atlasCenter.value.y-(node.x-atlasCenter.value.x)} V${node.y}`
   if (era.value.split && node.type === 'land') return threadPath(shardThreadPoints(node, atlasCenter.value))
   const parentId = era.value.bodyParents?.[node.id] || era.value.shardParents?.[node.id]
   const parent = parentId ? worldNodes.value.find(item=>item.id === parentId) : undefined
@@ -118,7 +120,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
     </aside>
 
     <div class="epoch-world" role="group" :aria-label="`${era.title}: ${sunCount} ${sunCount === 1 ? 'солнце' : 'солнца'}, ${moonCount} луны; ${hasCentralSpark ? `Искра в центре, ${centerLayers.map(layer=>layer.title).join(', ')}` : era.split ? 'мир разделён на осколки' : 'мир един'}`">
-      <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split,'epoch-sky--origin':isOrigin,'epoch-sky--stacked':era.verticalSky}" :viewBox="`0 0 1000 ${skyHeight}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
+      <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split,'epoch-sky--origin':isOrigin,'epoch-sky--stacked':era.verticalSky}" :viewBox="`0 ${isOrigin ? 0 : -200} 1000 ${skyHeight+(isOrigin ? 0 : 200)}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
         <title :id="`${uid}-title`">{{era.title}} — мандала узлов Эноа</title>
         <desc :id="`${uid}-desc`">{{eraStory}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? 'Эри скрыта за Ману.' : ''}} {{isOrigin ? 'Над Искрой Дайя; выше неё ответвляются Ману слева и оранжевая Эри справа. Над лунами — три совмещённых солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
         <g v-if="era.verticalSky" class="mandala-frame" fill="none" aria-hidden="true">
@@ -143,7 +145,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
           <path d="M500 0V870" stroke-dasharray="3 9"/>
         </g>
         <TransitionGroup name="mandala-link" tag="g" class="mandala-connections" aria-hidden="true">
-          <g v-for="node in worldNodes.filter(item=>item.id !== 'spark' && item.type !== 'center')" :key="node.id" :style="{color:node.color}"><path :d="connection(node)"/><path :d="connection(node)" class="mandala-flow"/></g>
+          <g v-for="node in worldNodes.filter(item=>item.id !== 'spark' && item.type !== 'center')" :key="node.id" :class="{'distant-thread':node.type === 'distant'}" :style="{color:node.color}"><path :d="connection(node)"/><path :d="connection(node)" class="mandala-flow"/></g>
         </TransitionGroup>
         <g v-if="!hasCentralSpark && !era.centralNode" class="mandala-heart" transform="translate(500 320)" aria-hidden="true"><path d="M0-25 25 0 0 25-25 0Z M0-15 15 0 0 15-15 0Z"/><path d="M0-5 5 0 0 5-5 0Z" fill="#e0c291"/></g>
         <TransitionGroup name="celestial" tag="g" class="hidden-suns">
@@ -155,7 +157,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
         </TransitionGroup>
 
         <TransitionGroup name="celestial" tag="g">
-          <a v-for="node in worldNodes" :key="node.id" :href="isShard(node) ? router.resolve(shardLink(node)).href : `#${uid}-node-story`" :aria-label="`История узла ${node.title}`" :aria-current="selectedNodeId === node.id ? 'true' : undefined" :class="{'is-selectable':true,'is-selected':selectedNodeId === node.id}" @click="selectWorldNode(node,$event)" :transform="`translate(${node.x} ${node.y})`" :style="{color:node.color}" class="mandala-node">
+          <a v-for="node in worldNodes" :key="node.id" :href="isShard(node) ? router.resolve(shardLink(node)).href : `#${uid}-node-story`" :aria-label="`История узла ${node.title}`" :aria-current="selectedNodeId === node.id ? 'true' : undefined" :class="{'is-selectable':true,'is-selected':selectedNodeId === node.id,'distant-node':node.type === 'distant'}" @click="selectWorldNode(node,$event)" :transform="`translate(${node.x} ${node.y})`" :style="{color:node.color}" class="mandala-node">
             <TransitionGroup v-if="node.id === 'manu'" name="celestial" tag="g" class="hidden-moons">
               <g v-for="moon in hiddenMoons" :key="moon.id" :style="{color:moon.color}" :aria-label="`${moon.title} скрыта за Ману`">
                 <g :transform="`scale(${moon.scale})`" class="hidden-moon__mark"><g :key="animationKey(moon.id)" :class="{'node-pulse':animatedNodeId === moon.id,'node-highlight':selectedNodeId === moon.id}"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="moon.id"/></g></g>
@@ -201,6 +203,8 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 </template>
 
 <style scoped>
+.mandala-connections .distant-thread path{stroke-opacity:.22;stroke-dasharray:3 9}.mandala-connections .distant-thread .mandala-flow{stroke-opacity:.32;stroke-dasharray:2 32;animation-duration:14s}
+.mandala-node.distant-node{opacity:.65}.mandala-node.distant-node:hover,.mandala-node.distant-node.is-selected{opacity:1}.mandala-node.distant-node text{font-size:18px;letter-spacing:.05em}
 .epoch-atlas text,.epoch-node-picker button,.epoch-node-heading button,.epoch-node-reading{user-select:text;-webkit-user-select:text}
 .node-label{cursor:pointer}.node-label:hover,.node-label:focus-visible{opacity:1;fill:var(--gold-bright)}
 .node-highlight{filter:drop-shadow(0 0 8px currentColor)}.node-highlight .hidden-sun__surface{stroke-opacity:1;stroke-width:2}
