@@ -43,23 +43,34 @@ const fittedKnots = {
 }
 const fittedKnot = computed(() => fittedKnots[props.id])
 const loops = computed(() => motifs[props.id === 'noa' ? 'cradle' : props.id] || motifs.enoa)
+const worldBoundaryPattern = computed(() => props.id === 'sanctuary'
+  ? 'M0-40 5-37 10-30 5-33Z M10-30 15-27 20-20 15-23Z M20-20 25-17 30-10 25-13Z M30-10 35-7 40 0 35-3Z'
+  : 'M0-43 7-36 7-32 11-32 19-24 19-20 23-20 31-12 31-8 35-8 43 0')
 const coreScale = computed(() => ['daskar', 'ish-kashim', 'manu'].includes(props.id) ? .65 : .8)
 const weave = ['M-18-6H6V18H18V6H-6V-18H-18Z', 'M-6-18H18V-6H-18V18H6V-18Z']
 </script>
 
 <template>
   <g class="celestial-knot" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <g v-if="id === 'labyrinth'" class="labyrinth-boundary" stroke="currentColor">
+      <path d="M0-38 38 0 0 38-38 0Z M0-42 42 0 0 42-42 0Z" stroke-width="1.1"/>
+      <path v-for="angle in [0,90,180,270]" :key="angle" :transform="`rotate(${angle})`" d="M0-42 8-34 5-31 13-23 16-26 24-18 21-15 29-7 32-10 42 0" stroke-width="1.6"/>
+    </g>
+    <g v-if="id === 'tingir'" class="tingir-boundary" stroke="currentColor">
+      <path d="M0-41 41 0 0 41-41 0Z" stroke-width="1.2"/>
+      <path v-for="angle in [0,90,180,270]" :key="angle" :transform="`rotate(${angle})`" d="M0-41Q13-34 0-27Q-13-34 0-41 M0-37 5-32 0-27-5-32Z" stroke-width="2.5"/>
+    </g>
     <g v-if="['enoa','sanctuary'].includes(id)" class="world-boundary" stroke="currentColor">
       <path d="M0-38 38 0 0 38-38 0Z" stroke-width="1.8"/>
       <g v-for="angle in [0,90,180,270]" :key="angle" :transform="`rotate(${angle})`">
-        <path d="M0-43 7-36 7-32 11-32 19-24 19-20 23-20 31-12 31-8 35-8 43 0" stroke="#08090f" stroke-width="3.4"/>
-        <path d="M0-43 7-36 7-32 11-32 19-24 19-20 23-20 31-12 31-8 35-8 43 0" stroke-width="2"/>
-        <path d="M0-43 7-36 7-32 11-32 19-24 19-20 23-20 31-12 31-8 35-8 43 0" stroke="#fff4d8" stroke-opacity=".4" stroke-width=".5"/>
+        <path :d="worldBoundaryPattern" stroke="#08090f" stroke-width="3.4"/>
+        <path :d="worldBoundaryPattern" stroke-width="1.25"/>
+        <path :d="worldBoundaryPattern" stroke="#fff4d8" stroke-opacity=".4" stroke-width=".5"/>
       </g>
     </g>
     <g v-if="id === 'noa'" class="noa-boundary" stroke="currentColor">
       <path d="M0-38 38 0 0 38-38 0Z" stroke-width="1.2"/>
-      <path v-for="angle in [0,90,180,270]" :key="angle" :transform="`rotate(${angle})`" d="M0-43 7-36 7-32 11-32 19-24 19-20 23-20 31-12 31-8 35-8 43 0" stroke-width="1.3"/>
+      <path v-for="angle in [0,90,180,270]" :key="angle" :transform="`rotate(${angle})`" d="M0-42 6-31 12-30 18-19 24-18 30-7 36-6 42 0" stroke-width="1.9"/>
     </g>
     <g v-for="(path,index) in (fittedKnot ? [] : loops)" :key="index">
       <path :d="path" stroke="#08090f" stroke-width="7.4"/>
