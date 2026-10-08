@@ -49,6 +49,14 @@ const weave = ['M-18-6H6V18H18V6H-6V-18H-18Z', 'M-6-18H18V-6H-18V18H6V-18Z']
 
 <template>
   <g class="celestial-knot" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <g v-if="['enoa','sanctuary'].includes(id)" class="world-boundary" stroke="currentColor">
+      <path d="M0-38 38 0 0 38-38 0Z" stroke-width="1.8"/>
+      <g v-for="angle in [0,90,180,270]" :key="angle" :transform="`rotate(${angle})`">
+        <path d="M0-43 7-36 7-32 11-32 19-24 19-20 23-20 31-12 31-8 35-8 43 0" stroke="#08090f" stroke-width="3.4"/>
+        <path d="M0-43 7-36 7-32 11-32 19-24 19-20 23-20 31-12 31-8 35-8 43 0" stroke-width="2"/>
+        <path d="M0-43 7-36 7-32 11-32 19-24 19-20 23-20 31-12 31-8 35-8 43 0" stroke="#fff4d8" stroke-opacity=".4" stroke-width=".5"/>
+      </g>
+    </g>
     <g v-if="id === 'noa'" class="noa-boundary" stroke="currentColor">
       <path d="M0-38 38 0 0 38-38 0Z" stroke-width="1.2"/>
       <path v-for="angle in [0,90,180,270]" :key="angle" :transform="`rotate(${angle})`" d="M0-43 7-36 7-32 11-32 19-24 19-20 23-20 31-12 31-8 35-8 43 0" stroke-width="1.3"/>

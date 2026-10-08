@@ -45,7 +45,6 @@ const inspectedId = ref('')
 const animatedNodeId = ref('')
 const animationVersion = ref(0)
 const animationKey = id => `${id}-${animatedNodeId.value === id ? animationVersion.value : 0}`
-const nodeStoryRef = ref(null)
 const eraStory = computed(() => SHARD_ERA_STORIES[era.value.id] || era.value.summary)
 const inspectionNodes = computed(() => {
   const nodes = [...worldNodes.value.filter(node=>node.id === 'spark'),...centerLayers.value.toReversed(),...worldNodes.value.filter(node=>node.id !== 'spark'),...hiddenMoons.value,...hiddenSuns.value]
@@ -57,19 +56,20 @@ const selectedStory = computed(() => SHARD_NODE_STORIES[selectedNode.value?.id])
 const selectedMoment = computed(() => selectedStory.value?.moments?.[era.value.id])
 watch(() => era.value.id, () => { inspectedId.value = ''; animatedNodeId.value = '' })
 watch(() => props.selectedShard, () => { if(era.value.split) inspectedId.value = props.selectedShard })
-async function selectNode(node, reveal = false) {
+async function selectNode(node) {
   if(import.meta.client && !window.getSelection()?.isCollapsed) return
   inspectedId.value = node.id
   animatedNodeId.value = node.id
   animationVersion.value++
   if(isShard(node)) await navigateTo(shardLink(node))
-  if(reveal) {
-    await nextTick()
-    nodeStoryRef.value?.focus({preventScroll:true})
-    nodeStoryRef.value?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',block:'nearest'})
-  }
 }
 function connection(node) {
+  if(era.value.id === 'epoha-lyudey' && ['azrak','ula'].includes(node.id)) {
+    const top = atlasCenter.value.y-44
+    const side = Math.sign(node.x-atlasCenter.value.x)
+    const corridor = atlasCenter.value.x+side*15
+    return `M${atlasCenter.value.x} ${top} L${corridor} ${top-15} V${node.y+Math.abs(node.x-corridor)} L${node.x} ${node.y}`
+  }
   if(node.type === 'distant') return `M${atlasCenter.value.x} ${atlasCenter.value.y} L${node.x} ${atlasCenter.value.y-(node.x-atlasCenter.value.x)} V${node.y}`
   if (era.value.split && node.type === 'land') return threadPath(shardThreadPoints(node, atlasCenter.value))
   const parentId = node.parentId || era.value.bodyParents?.[node.id] || era.value.shardParents?.[node.id]
@@ -87,7 +87,7 @@ function shardLink(node) {
 function isShard(node) { return era.value.split && ['daskar','var-elor','azar'].includes(node.id) }
 function selectWorldNode(node,event) {
   event.preventDefault()
-  selectNode(node,true)
+  selectNode(node)
 }
 function timeKeyboard(event) {
   if(event.altKey || event.ctrlKey || event.metaKey) return
@@ -169,10 +169,10 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
               </g>
             </TransitionGroup>
             <TransitionGroup v-if="node.id === 'spark'" name="celestial" tag="g" class="origin-cradle">
-              <g v-for="layer in centerLayers" :key="layer.id" :class="{'noa-layer':layer.id === 'noa'}" :style="{color:layer.color}" :aria-label="`${layer.title} позади Искры`">
+              <g v-for="layer in centerLayers" :key="layer.id" :class="{'noa-layer':layer.id === 'noa','world-layer':['enoa','sanctuary'].includes(layer.id)}" :style="{color:layer.color}" :aria-label="`${layer.title} позади Искры`" @click.stop.prevent="selectNode(layer)">
                 <g :transform="`scale(${layer.scale})`"><g :key="animationKey(layer.id)" :class="{'node-pulse':animatedNodeId === layer.id,'node-highlight':selectedNodeId === layer.id}"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="layer.id"/></g></g>
                 <path v-if="isOrigin" class="hidden-sun__leader" d="M-53-53-86-86H-95"/>
-                <text :x="layer.labelX" :y="layer.labelY" :text-anchor="layer.anchor" class="node-label" :class="{'node-label--link':layer.id === 'noa'}" role="button" tabindex="0" @click.stop.prevent="selectNode(layer, layer.id === 'noa')" @keydown.enter.prevent.stop="selectNode(layer, layer.id === 'noa')" @keydown.space.prevent.stop="selectNode(layer, layer.id === 'noa')">{{layer.title}}</text>
+                <text :x="layer.labelX" :y="layer.labelY" :text-anchor="layer.anchor" class="node-label" :class="{'node-label--link':layer.id === 'noa'}" role="button" tabindex="0" @click.stop.prevent="selectNode(layer)" @keydown.enter.prevent.stop="selectNode(layer)" @keydown.space.prevent.stop="selectNode(layer)">{{layer.title}}</text>
               </g>
             </TransitionGroup>
             <g :transform="`scale(${node.scale || 1})`"><g :key="animationKey(node.id)" :class="{'node-pulse':animatedNodeId === node.id}"><path v-if="node.id !== 'spark'" class="mandala-node__halo" d="M0-58 58 0 0 58-58 0Z"/><path class="mandala-node__outer" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="node.id"/></g></g>
@@ -191,7 +191,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 
     <div class="epoch-story" aria-live="polite"><p>{{eraStory}}</p><NuxtLink :to="`/lore/history/${era.history}`">Летопись ↗</NuxtLink></div>
     <p v-if="era.moons.includes('dayya')" class="epoch-draft-note">Раннее небо условно: время гибели Дайи ещё не установлено.</p>
-    <section v-if="selectedStory" :id="`${uid}-node-story`" ref="nodeStoryRef" tabindex="-1" class="epoch-node-story" aria-label="Истории узлов эпохи">
+    <section v-if="selectedStory" :id="`${uid}-node-story`" tabindex="-1" class="epoch-node-story" aria-label="Истории узлов эпохи">
       <p class="epoch-node-hint">Выберите узел, чтобы узнать его историю</p>
       <nav class="epoch-node-picker" aria-label="Выберите узел, чтобы прочитать его историю">
         <button v-for="node in inspectionNodes" :key="node.id" type="button" :aria-pressed="selectedNodeId === node.id" :style="{'--node-color':node.color}" @click="selectNode(node)">{{node.title}}</button>
@@ -207,6 +207,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 </template>
 
 <style scoped>
+.origin-cradle .world-layer .hidden-sun__surface{stroke-width:1.8;stroke-opacity:.85}.origin-cradle .world-layer :deep(.celestial-knot){opacity:.85}.origin-cradle>g{cursor:pointer}
 .mandala-node .dream-realm-alias{font-size:17px;font-style:italic;opacity:.65}
 .node-label--link{text-decoration:underline;text-decoration-thickness:.7px;text-underline-offset:4px}
 .origin-cradle .noa-layer :deep(.celestial-knot){opacity:.9}.origin-cradle .noa-layer .hidden-sun__surface{stroke-opacity:.9}
