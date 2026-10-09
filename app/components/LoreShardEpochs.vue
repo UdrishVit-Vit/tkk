@@ -2,6 +2,7 @@
 import { SHARD_ERAS, SHARD_CELESTIAL_BODIES } from '~/data/loreShardEras.js'
 import { shardThreadPoints, threadPath } from '~/utils/loreShardThreads.js'
 import { SHARD_ERA_STORIES, SHARD_NODE_STORIES } from '~/data/loreShardStories.js'
+import { SHARD_ERA_CHANGES, shardEraReading, shardNodeTimeline } from '~/data/loreShardExperience.js'
 
 const props = defineProps({ selectedShard: { type: String, required: true } })
 const emit = defineEmits(['era-change'])
@@ -16,6 +17,12 @@ const hasCentralSpark = computed(() => centerLayers.value.length > 0)
 const eraIndex = computed(() => SHARD_ERAS.indexOf(era.value))
 const uid = useId().replace(/:/g, '')
 const futureCount = computed(() => SHARD_ERAS.length - eraIndex.value - 1)
+const showChanges = ref(true)
+const expandedWorld = ref(false)
+const drawing = ref(null)
+const expandButton = ref(null)
+const eraChange = computed(() => SHARD_ERA_CHANGES[era.value.id])
+const changedNode = id => showChanges.value && eraChange.value.nodes.includes(id)
 const positions = { shamas:[500,110], azrak:[320,170], ula:[680,170], manu:[240,320], eri:[240,320], dayya:[500,390] }
 const hiddenSuns = computed(() => (era.value.hiddenSuns || []).map((id,index)=>({id,...SHARD_CELESTIAL_BODIES[id],x:(era.value.bodyPositions?.shamas || positions.shamas)[0],y:(era.value.bodyPositions?.shamas || positions.shamas)[1],scale:index ? 1.5 : 2.05})))
 const hiddenMoons = computed(() => (era.value.hiddenMoons || []).map(id=>({id,...SHARD_CELESTIAL_BODIES[id],scale:1.5})))
@@ -33,14 +40,14 @@ const worldNodes = computed(() => {
     {id:'var-elor',title:'Вар’Элор',kind:'Тёмный осколок',type:'land',color:'#b8a1d9'}
   ].map(node=>{const [x,y]=era.value.shardPositions?.[node.id] || {daskar:[500,440],azar:[550,610],'var-elor':[500,770]}[node.id];return {...node,x,y}})
     : hasCentralSpark.value ? [] : [{id:'enoa',title:'Эноа',kind:'До Раскола',x:500,y:390,type:'land',color:'#e0c291'}]
-  const minor = (era.value.minorShards || []).map(id=>{const [x,y]=era.value.shardPositions?.[id] || [335,505];return {id,title:"Осколок Иш'Кашим",kind:'Малый осколок',x,y,type:'land',scale:.6,color:'#d7c19a'}})
+  const minor = (era.value.minorShards || []).map(id=>{const [x,y]=era.value.shardPositions?.[id] || [335,505];return {id,title:'Осколок Иш’Кашим',kind:'Малый осколок',x,y,type:'land',scale:.6,color:'#d7c19a'}})
   const distant = isOrigin.value ? [] : [{id:'dalnie-chertogi',title:'Дальние Чертоги',kind:'За гранью мира',x:900,y:-130,type:'distant',scale:.55,color:'#9299b3'}]
   const spirits = era.value.spiritPockets ? [{id:'spirit-pockets',title:'Карманы мира духов',kind:'Области мира духов',x:170,y:560,type:'spirit',scale:.8,color:'#99b9b0'}] : []
   const manu = lights.find(node=>node.id === 'manu')
   const dreams = manu ? [{id:'choku',title:'Царство Чоку',kind:'Царство Мечтателя',x:Math.max(120,manu.x-260),y:manu.y-100,parentId:'manu',type:'dream',scale:.7,color:'#aab4d7'}] : []
   return [...lights,...center,...[...lands,...minor].sort((a,b)=>a.y-b.y),...distant,...spirits,...dreams]
 })
-const inspectedId = ref('')
+const inspectedId = ref(route.query.node || '')
 const animatedNodeId = ref('')
 const animationVersion = ref(0)
 const animationKey = id => `${id}-${animatedNodeId.value === id ? animationVersion.value : 0}`
@@ -49,18 +56,62 @@ const inspectionNodes = computed(() => {
   const nodes = [...worldNodes.value.filter(node=>node.id === 'spark'),...centerLayers.value.toReversed(),...worldNodes.value.filter(node=>node.id !== 'spark'),...hiddenMoons.value,...hiddenSuns.value]
   return nodes.filter((node,index)=>SHARD_NODE_STORIES[node.id] && nodes.findIndex(item=>item.id === node.id) === index)
 })
-const selectedNodeId = computed(() => inspectionNodes.value.some(node=>node.id === inspectedId.value) ? inspectedId.value : era.value.split ? props.selectedShard : 'spark')
+const requestedNodeId = computed(() => route.query.node || inspectedId.value)
+const selectedNodeId = computed(() => inspectionNodes.value.some(node=>node.id === requestedNodeId.value) ? requestedNodeId.value : requestedNodeId.value ? 'spark' : era.value.split ? props.selectedShard : 'spark')
 const selectedNode = computed(() => inspectionNodes.value.find(node=>node.id === selectedNodeId.value) || inspectionNodes.value[0])
 const selectedStory = computed(() => SHARD_NODE_STORIES[selectedNode.value?.id])
-const selectedMoment = computed(() => selectedStory.value?.moments?.[era.value.id])
-watch(() => era.value.id, () => { inspectedId.value = ''; animatedNodeId.value = '' })
-watch(() => props.selectedShard, () => { if(era.value.split) inspectedId.value = props.selectedShard })
+const selectedReading = computed(() => shardEraReading(selectedNodeId.value, era.value))
+const selectedTimeline = computed(() => shardNodeTimeline(selectedNodeId.value))
+const nodeUnavailable = computed(() => requestedNodeId.value && !inspectionNodes.value.some(node => node.id === requestedNodeId.value))
+const requestedTitle = computed(() => {
+  for(const item of SHARD_ERAS) {
+    const layer = item.centerLayers.find(node => node.id === requestedNodeId.value)
+    if(layer) return layer.title
+  }
+  return SHARD_CELESTIAL_BODIES[requestedNodeId.value]?.title || {daskar:'Даскар',azar:'Азар','var-elor':'Вар’Элор','ish-kashim':"Осколок Иш’Кашим"}[requestedNodeId.value] || 'Выбранный узел'
+})
+watch(() => era.value.id, () => { animatedNodeId.value = '' })
+watch(() => route.query.node, id => { inspectedId.value = id || '' })
+watch(() => props.selectedShard, () => { if(era.value.split && !route.query.node) inspectedId.value = props.selectedShard })
+function selectEra(event) {
+  const index = SHARD_ERAS.findIndex(item => item.id === event.target.value)
+  if(index >= 0) navigateTo(eraLink(index))
+}
+async function toggleWorld() {
+  expandedWorld.value = !expandedWorld.value
+  await nextTick()
+  const element = drawing.value
+  if(!element?.clientWidth) return
+  element.scrollLeft = expandedWorld.value ? Math.max(0,atlasCenter.value.x*.76-element.clientWidth/2) : 0
+  element.scrollTop = expandedWorld.value ? Math.max(0,(atlasCenter.value.y+(isOrigin.value ? 0 : 200))*.76-element.clientHeight/2) : 0
+  if(expandedWorld.value) element.focus({preventScroll:true})
+  else expandButton.value?.focus({preventScroll:true})
+}
+function worldEscape(event) {
+  if(!expandedWorld.value) return
+  event.stopPropagation()
+  event.preventDefault()
+  toggleWorld()
+}
+function layerLeader(layer) {
+  const radius = layer.scale * 44
+  if(layer.anchor === 'middle') return `M0 ${radius} V${layer.labelY-18}`
+  const side = layer.anchor === 'start' ? 1 : -1
+  const y = Math.max(-radius*.7,Math.min(radius*.7,layer.labelY-6))
+  const x = side*(radius-Math.abs(y))
+  return `M${x} ${y} L${layer.labelX-side*16} ${layer.labelY-6}`
+}
+function timelineLink(id) {
+  const link = eraLink(SHARD_ERAS.findIndex(item=>item.id === id))
+  link.query.node = selectedNodeId.value
+  return link
+}
 async function selectNode(node) {
   if(import.meta.client && !window.getSelection()?.isCollapsed) return
   inspectedId.value = node.id
   animatedNodeId.value = node.id
   animationVersion.value++
-  if(isShard(node)) await navigateTo(shardLink(node))
+  if(route.query.node !== node.id) await navigateTo(nodeLink(node))
 }
 function connection(node) {
   if(era.value.id === 'epoha-lyudey' && ['azrak','ula'].includes(node.id)) {
@@ -80,8 +131,8 @@ function connection(node) {
   const diagonal = Math.min(Math.abs(dx),Math.abs(dy))
   return `M${origin[0]} ${origin[1]} L${origin[0] + Math.sign(dx)*diagonal} ${origin[1] + Math.sign(dy)*diagonal} L${node.x} ${node.y}`
 }
-function shardLink(node) {
-  return {path:route.path,query:{...route.query,shard:node.id},hash:''}
+function nodeLink(node) {
+  return {path:route.path,query:{...route.query,node:node.id,...(isShard(node) ? {shard:node.id} : {})},hash:''}
 }
 function isShard(node) { return era.value.split && ['daskar','var-elor','azar'].includes(node.id) }
 function selectWorldNode(node,event) {
@@ -97,7 +148,7 @@ function timeKeyboard(event) {
 }
 
 function eraLink(index) {
-  return { path: route.path, query: { ...route.query, ...(route.hash ? { shard: props.selectedShard } : {}), era: SHARD_ERAS[index].id }, hash: '' }
+  return { path: route.path, query: { ...route.query, node:requestedNodeId.value || selectedNodeId.value, era: SHARD_ERAS[index].id }, hash: '' }
 }
 watch(() => era.value.split, split => emit('era-change', split), { immediate: true })
 </script>
@@ -106,12 +157,13 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
   <section class="epoch-atlas" :style="{ '--era-tint': era.tint }" aria-label="Облик Эноа в разные эпохи">
     <aside class="epoch-time" @keydown="timeKeyboard">
       <p class="epoch-bookmark">ЭПОХИ <span>{{String(eraIndex+1).padStart(2,'0')}} / 07</span></p>
+      <label class="epoch-mobile-select">Эпоха<select :value="era.id" @change="selectEra"><option v-for="item in SHARD_ERAS" :key="item.id" :value="item.id" :selected="item.id === era.id">{{item.title}}</option></select></label>
       <nav class="epoch-titles" aria-label="Выбор эпохи; стрелки влево и вправо — переход во времени">
         <NuxtLink v-for="(item,index) in SHARD_ERAS" :key="item.id" :to="eraLink(index)" class="epoch-title"
           :class="{'is-past':index < eraIndex,'is-current':index === eraIndex,'is-future':index > eraIndex}"
           :aria-current="index === eraIndex ? 'date' : undefined">
           <span class="epoch-title__node" aria-hidden="true"><i/><b>{{String(index+1).padStart(2,'0')}}</b></span>
-          <span class="epoch-title__name" :role="index === eraIndex ? 'heading' : undefined" :aria-level="index === eraIndex ? 2 : undefined">{{item.title}}<small v-if="index === eraIndex && !futureCount">НАСТОЯЩЕЕ</small></span>
+          <span class="epoch-title__name">{{item.title}}<small v-if="index === eraIndex && !futureCount">НАСТОЯЩЕЕ</small></span>
         </NuxtLink>
       </nav>
       <nav class="epoch-controls" aria-label="Переход во времени">
@@ -121,7 +173,12 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
       </nav>
     </aside>
 
-    <div class="epoch-world" role="group" :aria-label="`${era.title}: ${sunCount} ${sunCount === 1 ? 'солнце' : 'солнца'}, ${moonCount} луны; ${hasCentralSpark ? `Искра в центре, ${centerLayers.map(layer=>layer.title).join(', ')}` : era.split ? 'мир разделён на осколки' : 'мир един'}`">
+    <div class="epoch-world" :class="{'is-expanded':expandedWorld}" @keydown.esc="worldEscape" role="group" :aria-label="`${era.title}: ${sunCount} ${sunCount === 1 ? 'солнце' : 'солнца'}, ${moonCount} луны; ${hasCentralSpark ? `Искра в центре, ${centerLayers.map(layer=>layer.title).join(', ')}` : era.split ? 'мир разделён на осколки' : 'мир един'}`">
+      <div class="epoch-world-caption" aria-live="polite"><h2>{{era.title}}</h2><p v-if="era.id === 'epoha-lyudey'" class="epoch-period">Поздняя эпоха · после Раскола · Лето Трёх Солнц</p><p class="epoch-change"><span>Что изменилось</span>{{eraChange.text}}</p></div>
+      <div class="epoch-world-tools"><button type="button" :aria-pressed="showChanges" @click="showChanges=!showChanges">{{showChanges ? 'Изменения выделены' : 'Показать изменения'}}</button><button type="button" ref="expandButton" class="epoch-expand" :aria-expanded="expandedWorld" @click="toggleWorld">{{expandedWorld ? 'Свернуть схему' : 'Развернуть схему'}}</button><details class="epoch-legend"><summary>Как читать мандалу</summary><p>Искра — общий центр. Вложенные ромбы обозначают границы окружающих миров. Узоры и цвета помогают различать их. Пунктир выделяет изменения относительно предыдущей эпохи.</p><p>Нити показывают связь узлов, а не дороги. Отдельная нить от Ману ведёт к Царству Чоку. Фоновый узор объединяет композицию; расстояния условны.</p><p>Совмещённые ромбы показывают скрытые светила. Подпись или узел можно нажать, чтобы выделить его и прочитать историю.</p></details></div>
+      <p v-if="expandedWorld" class="epoch-pan-hint">Сдвигайте схему в стороны, чтобы рассмотреть узлы. Названия доступны и в списке под ней.</p>
+      <p v-if="nodeUnavailable" class="epoch-unavailable" role="status">{{requestedTitle}} не показан в этой эпохе. Выделена Искра; при возвращении в подходящую эпоху ваш выбор сохранится.</p>
+      <div ref="drawing" class="epoch-drawing" :tabindex="expandedWorld ? 0 : -1" :aria-label="expandedWorld ? `Подробная мандала: ${era.title}` : undefined">
       <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split,'epoch-sky--origin':isOrigin,'epoch-sky--stacked':era.verticalSky}" :viewBox="`0 ${isOrigin ? 0 : -200} 1000 ${skyHeight+(isOrigin ? 0 : 200)}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
         <title :id="`${uid}-title`">{{era.title}} — мандала узлов Эноа</title>
         <desc :id="`${uid}-desc`">{{eraStory}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? 'Эри скрыта за Ману.' : ''}} {{isOrigin ? 'Над Искрой Дайя; выше неё ответвляются Ману слева и оранжевая Эри справа. Над лунами — три совмещённых солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
@@ -147,7 +204,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
           <path d="M500 0V870" stroke-dasharray="3 9"/>
         </g>
         <TransitionGroup name="mandala-link" tag="g" class="mandala-connections" aria-hidden="true">
-          <g v-for="node in worldNodes.filter(item=>item.id !== 'spark' && item.type !== 'center')" :key="node.id" :class="{'distant-thread':node.type === 'distant'}" :style="{color:node.color}"><path :d="connection(node)"/><path :d="connection(node)" class="mandala-flow"/></g>
+          <g v-for="node in worldNodes.filter(item=>item.id !== 'spark' && item.type !== 'center')" :key="node.id" :class="{'distant-thread':node.type === 'distant','thread-is-selected':selectedNodeId === node.id}" :style="{color:node.color}"><path :d="connection(node)"/><path :d="connection(node)" class="mandala-flow"/></g>
         </TransitionGroup>
         <g v-if="!hasCentralSpark && !era.centralNode" class="mandala-heart" transform="translate(500 320)" aria-hidden="true"><path d="M0-25 25 0 0 25-25 0Z M0-15 15 0 0 15-15 0Z"/><path d="M0-5 5 0 0 5-5 0Z" fill="#e0c291"/></g>
         <TransitionGroup name="celestial" tag="g" class="hidden-suns">
@@ -159,7 +216,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
         </TransitionGroup>
 
         <TransitionGroup name="celestial" tag="g">
-          <a v-for="node in worldNodes" :key="node.id" :href="isShard(node) ? router.resolve(shardLink(node)).href : `#${uid}-node-story`" :aria-label="`История узла ${node.title}`" :aria-current="selectedNodeId === node.id ? 'true' : undefined" :class="{'is-selectable':true,'is-selected':selectedNodeId === node.id,'distant-node':node.type === 'distant','has-layers':node.id === 'spark'}" @click="selectWorldNode(node,$event)" :transform="`translate(${node.x} ${node.y})`" :style="{color:node.color}" class="mandala-node">
+          <a v-for="node in worldNodes" :key="node.id" :href="router.resolve(nodeLink(node)).href" :aria-label="`История узла ${node.title}`" :aria-current="selectedNodeId === node.id ? 'true' : undefined" :class="{'is-selectable':true,'is-selected':selectedNodeId === node.id,'distant-node':node.type === 'distant','has-layers':node.id === 'spark'}" @click="selectWorldNode(node,$event)" :transform="`translate(${node.x} ${node.y})`" :style="{color:node.color}" class="mandala-node">
             <TransitionGroup v-if="node.id === 'manu'" name="celestial" tag="g" class="hidden-moons">
               <g v-for="moon in hiddenMoons" :key="moon.id" :style="{color:moon.color}" :aria-label="`${moon.title} скрыта за Ману`">
                 <g :transform="`scale(${moon.scale})`" class="hidden-moon__mark"><g :key="animationKey(moon.id)" :class="{'node-pulse':animatedNodeId === moon.id,'node-highlight':selectedNodeId === moon.id}"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="moon.id"/></g></g>
@@ -169,12 +226,13 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
             </TransitionGroup>
             <TransitionGroup v-if="node.id === 'spark'" name="celestial" tag="g" class="origin-cradle">
               <g v-for="layer in centerLayers" :key="layer.id" :data-node-id="layer.id" :class="{'noa-layer':layer.id === 'noa','tingir-layer':layer.id === 'tingir','labyrinth-layer':layer.id === 'labyrinth','enoa-layer':layer.id === 'enoa','sanctuary-layer':layer.id === 'sanctuary','world-layer':['enoa','sanctuary'].includes(layer.id)}" :style="{color:layer.color,'--node-glow':layer.color}" :aria-label="`${layer.title} позади Искры`" @click.stop.prevent="selectNode(layer)">
-                <g :transform="`scale(${layer.scale})`"><LoreShardBoundary :id="layer.id" :color="layer.color" :active="selectedNodeId === layer.id" :pulse="animatedNodeId === layer.id ? animationVersion : 0"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="layer.id"/></LoreShardBoundary></g>
+                <g :transform="`scale(${layer.scale})`"><LoreShardBoundary :id="layer.id" :color="layer.color" :active="selectedNodeId === layer.id" :changed="changedNode(layer.id)" :pulse="animatedNodeId === layer.id ? animationVersion : 0"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="layer.id"/></LoreShardBoundary></g>
                 <path v-if="isOrigin" class="hidden-sun__leader" d="M-53-53-86-86H-95"/>
+                <path class="layer-label-leader" :d="layerLeader(layer)" aria-hidden="true"/>
                 <text :x="layer.labelX" :y="layer.labelY" :text-anchor="layer.anchor" class="node-label" :class="{'node-label--link':layer.id === 'noa'}" role="button" tabindex="0" @click.stop.prevent="selectNode(layer)" @keydown.enter.prevent.stop="selectNode(layer)" @keydown.space.prevent.stop="selectNode(layer)">{{layer.title}}</text>
               </g>
             </TransitionGroup>
-            <g :transform="`scale(${node.scale || 1})`"><LoreShardBoundary :id="node.id" :color="node.color" :active="selectedNodeId === node.id" :pulse="animatedNodeId === node.id ? animationVersion : 0"><path v-if="node.id !== 'spark'" class="mandala-node__halo" d="M0-58 58 0 0 58-58 0Z"/><path class="mandala-node__outer" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="node.id"/></LoreShardBoundary></g>
+            <g :transform="`scale(${node.scale || 1})`"><LoreShardBoundary :id="node.id" :color="node.color" :active="selectedNodeId === node.id" :changed="changedNode(node.id)" :pulse="animatedNodeId === node.id ? animationVersion : 0"><path v-if="node.id !== 'spark'" class="mandala-node__halo" d="M0-58 58 0 0 58-58 0Z"/><path class="mandala-node__outer" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="node.id"/></LoreShardBoundary></g>
             <text @click.stop.prevent="selectNode(node)" v-if="isOrigin && node.id === 'spark'" x="98" y="8" text-anchor="start">{{node.title}}</text>
             <text @click.stop.prevent="selectNode(node)" v-else-if="((era.split && node.type === 'land' && !node.scale) || node.id === 'spark' || node.type === 'center')" :x="node.id === 'spark' ? Math.max(...centerLayers.map(layer=>layer.scale))*44+24 : 76" y="8" text-anchor="start">{{node.title}}</text>
             <text @click.stop.prevent="selectNode(node)" v-else-if="node.id === 'shamas' && hiddenSuns.length" x="115" y="74" text-anchor="start">{{node.title}}</text>
@@ -185,19 +243,21 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
         </TransitionGroup>
         <text x="500" :y="skyHeight-12" text-anchor="middle" class="mandala-note">РАСПОЛОЖЕНИЕ УСЛОВНОЕ</text>
       </svg>
+      </div>
     </div>
 
     <div class="epoch-story" aria-live="polite"><p>{{eraStory}}</p><NuxtLink :to="`/lore/history/${era.history}`">Летопись ↗</NuxtLink></div>
     <p v-if="era.moons.includes('dayya')" class="epoch-draft-note">Раннее небо условно: время гибели Дайи ещё не установлено.</p>
     <section v-if="selectedStory" :id="`${uid}-node-story`" tabindex="-1" class="epoch-node-story" aria-label="Истории узлов эпохи">
-      <p class="epoch-node-hint">Выберите узел, чтобы узнать его историю</p>
+      <p class="epoch-node-hint">Узлы эпохи · выберите название или ромб</p>
       <nav class="epoch-node-picker" aria-label="Выберите узел, чтобы прочитать его историю">
         <button v-for="node in inspectionNodes" :key="node.id" type="button" :aria-pressed="selectedNodeId === node.id" :style="{'--node-color':node.color}" @click="selectNode(node)">{{node.title}}</button>
       </nav>
       <div class="epoch-node-reading" aria-live="polite" aria-atomic="true">
         <div class="epoch-node-heading"><h3><button type="button" :aria-label="`Подсветить ${selectedNode.title}`" @click="selectNode(selectedNode)">{{selectedNode.title}}</button></h3><NuxtLink v-if="selectedStory.glossaryId" :to="`/lore/glossary/${selectedStory.glossaryId}`">Статья ↗</NuxtLink><NuxtLink v-if="selectedStory.geographyId" :to="`/lore/geography?shard=${selectedStory.geographyId}`">Карта ↗</NuxtLink></div>
-        <p>{{selectedStory.text}}</p>
-        <p v-if="selectedMoment" class="epoch-node-moment"><span>{{era.title}}</span>{{selectedMoment}}</p>
+        <p class="epoch-node-current"><span>{{era.title}}</span>{{selectedReading}}</p>
+        <details v-if="selectedReading !== selectedStory.text" class="epoch-node-more"><summary>Об узле · общая история</summary><p>{{selectedStory.text}}</p></details>
+        <details v-if="selectedTimeline.length > 1" class="epoch-node-more"><summary>История узла во времени</summary><ol class="epoch-node-timeline"><li v-for="moment in selectedTimeline" :key="moment.id"><NuxtLink :to="timelineLink(moment.id)" :aria-current="moment.id === era.id ? 'date' : undefined">{{moment.title}}</NuxtLink><p>{{moment.text}}</p></li></ol></details>
       </div>
     </section>
     <div class="epoch-detail"><slot :node-id="selectedNodeId"/></div>
@@ -205,6 +265,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 </template>
 
 <style scoped>
+.epoch-atlas{--gold-bright:var(--theme-accent-strong,#f4e0aa)}
 /* Nested SVG groups must not capture clicks in empty space over another world's label. */
 .mandala-node.has-layers{filter:none}
 .origin-cradle .labyrinth-layer{--node-glow:#82b398}.origin-cradle .labyrinth-layer .hidden-sun__surface{stroke-width:1.9;stroke-opacity:.95}.origin-cradle .labyrinth-layer :deep(.celestial-knot),.origin-cradle .tingir-layer :deep(.celestial-knot){opacity:.95}
@@ -215,7 +276,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 .mandala-connections .distant-thread path{stroke-opacity:.22;stroke-dasharray:3 9}.mandala-connections .distant-thread .mandala-flow{stroke-opacity:.32;stroke-dasharray:2 32;animation-duration:14s}
 .mandala-node.distant-node{opacity:.65}.mandala-node.distant-node:hover,.mandala-node.distant-node.is-selected{opacity:1}.mandala-node.distant-node text{font-size:18px;letter-spacing:.05em}
 .epoch-atlas text,.epoch-node-picker button,.epoch-node-heading button,.epoch-node-reading{user-select:text;-webkit-user-select:text}
-.node-label{pointer-events:bounding-box;cursor:pointer}.node-label:hover,.node-label:focus-visible{opacity:1;fill:var(--gold-bright)}
+.node-label{pointer-events:bounding-box;cursor:pointer}.node-label:hover,.node-label:focus-visible{opacity:1;fill:currentColor}
 .node-highlight{filter:drop-shadow(0 0 8px currentColor)}.node-highlight .hidden-sun__surface{stroke-opacity:1;stroke-width:2}
 .node-pulse{transform-box:view-box;transform-origin:0 0;animation:node-awaken 900ms ease-out}
 .epoch-node-heading button{color:inherit;font:inherit;background:none;border:0;padding:0;text-align:left;cursor:pointer}
@@ -234,4 +295,50 @@ a:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.mandala-node:focus
 @media(max-width:1050px){.epoch-atlas{grid-template-columns:210px minmax(0,1fr);gap:0 28px}.epoch-title__name{font-size:19px}.epoch-controls{gap:8px;padding-left:0}.epoch-controls a,.epoch-controls>span{font-size:8px}.epoch-story{flex-wrap:wrap;gap:10px}.epoch-story a{margin-top:0}.mandala-node text{font-size:30px}}
 @media(max-width:760px){.epoch-atlas{display:flex;flex-direction:column;gap:0}.epoch-time{position:relative;padding-top:0;width:100%;padding-bottom:22px}.epoch-bookmark{margin:0 0 12px;height:12px}.epoch-titles{display:grid}.epoch-title{min-height:46px;gap:24px;padding-left:0;translate:0 0!important}.epoch-title__name{font-size:18px}.epoch-title__node{left:-44px;width:18px;height:18px}.epoch-title__node b{font-size:8px}.epoch-title.is-current .epoch-title__node{transform:translateX(-50%) rotate(45deg) scale(1.35)}.epoch-controls{margin:14px 0 0;padding:8px 0 0}.epoch-controls a,.epoch-controls>span{font-size:10px;padding:15px 0}.epoch-world,.epoch-story,.epoch-detail,.epoch-draft-note,.epoch-node-story{width:100%}.mandala-node text{font-size:34px}.mandala-note{font-size:11px}.epoch-story p{font-size:19px}.epoch-story{padding-bottom:20px}}
 @media(prefers-reduced-motion:reduce){*,*::before{transition:none!important;animation:none!important}}
+.epoch-mobile-select,.epoch-expand{display:none}
+.epoch-world-caption{padding:0 0 12px;border-bottom:1px solid #c4a16a30}
+.epoch-world-caption h2{margin:0;font:500 32px/1.1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.98)}
+.epoch-period{margin:8px 0;color:var(--gold-bright);font:11px/1.6 'Hanken Grotesk',sans-serif}
+.epoch-change{margin:12px 0 0;max-width:620px;font:20px/1.4 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.88)}
+.epoch-change span,.epoch-node-current>span{display:block;margin-bottom:5px;font:10px/1.5 'Hanken Grotesk',sans-serif;letter-spacing:.1em;color:var(--gold-bright)}
+.epoch-world-tools{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 20px;padding:12px 0 0}
+.epoch-world-tools button,.epoch-legend summary{color:rgba(var(--theme-text-rgb),.85);font:11px/1.5 'Hanken Grotesk',sans-serif;cursor:pointer;padding:10px 0;background:none;border:0;text-align:left}
+.epoch-world-tools button[aria-pressed='true']{color:var(--gold-bright)}
+.epoch-world-tools button[aria-pressed='true']::before{content:'◇';margin-right:7px}
+.epoch-world-tools button:focus-visible,.epoch-legend summary:focus-visible,.epoch-node-more summary:focus-visible{outline:1px solid var(--gold-bright);outline-offset:4px}
+.epoch-legend{flex:1;min-width:170px}.epoch-legend[open]{flex-basis:100%;padding-bottom:10px}
+.epoch-legend p,.epoch-unavailable,.epoch-pan-hint{max-width:660px;font:16px/1.55 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.8)}
+.epoch-legend p{margin:8px 0}.epoch-unavailable{border-left:2px solid var(--gold-bright);padding-left:12px;font-size:13px}
+.epoch-pan-hint{font-size:12px}
+.epoch-time{position:sticky;top:16px;align-self:start;z-index:2}
+.epoch-sky .mandala-frame{stroke-opacity:.08}.epoch-sky .mandala-weave{stroke-opacity:.035}
+.mandala-connections .thread-is-selected path{stroke-width:2;stroke-opacity:.85}
+.mandala-node text,.hidden-suns text,.hidden-moons text{opacity:.85}
+.mandala-node .origin-cradle text{opacity:.95}
+.mandala-node .hidden-moons text{opacity:.8}
+.layer-label-leader{fill:none;stroke:currentColor;stroke-width:1;stroke-opacity:.65;pointer-events:none}
+.mandala-node:focus-visible .boundary-visual :deep(.mandala-node__outer),.mandala-node:hover .boundary-visual :deep(.mandala-node__outer){stroke-opacity:1;stroke-width:2}
+.epoch-node-picker{gap:4px 12px}.epoch-node-picker button{min-height:36px;padding:6px 4px}
+.epoch-node-picker button[aria-pressed='true']{color:var(--node-color)}
+.epoch-node-more{margin-top:16px}.epoch-node-more summary{width:fit-content;padding:10px 0;cursor:pointer;font:12px/1.5 'Hanken Grotesk',sans-serif;color:var(--gold-bright)}
+.epoch-node-more p{max-width:700px;font:19px/1.5 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.78)}
+.epoch-node-timeline{margin:12px 0;padding:0 0 0 18px;border-left:1px solid #c4a16a50;list-style:none}
+.epoch-node-timeline li{position:relative;margin-bottom:18px}.epoch-node-timeline li::before{content:'';position:absolute;left:-22px;top:6px;width:6px;height:6px;transform:rotate(45deg);border:1px solid var(--gold-bright);background:var(--theme-bg)}
+.epoch-node-timeline a{font:17px 'Cormorant Garamond',serif;color:var(--gold-bright)}.epoch-node-timeline a[aria-current]{text-decoration:underline;text-underline-offset:4px}.epoch-node-timeline p{margin:8px 0}
+@media(max-width:760px){
+  .epoch-time{position:sticky;top:0;background:var(--theme-bg);z-index:5;padding:12px 0;border-bottom:1px solid #c4a16a30}
+  .epoch-titles{display:none}.epoch-mobile-select{display:flex;align-items:center;gap:12px;font:10px 'Hanken Grotesk',sans-serif;color:var(--gold-bright)}
+  .epoch-mobile-select select{flex:1;min-width:0;min-height:44px;padding:8px;border:1px solid #c4a16a50;background:var(--theme-bg);color:rgba(var(--theme-heading-rgb),.98);font:19px 'Cormorant Garamond',serif}
+  .epoch-controls{display:flex;justify-content:space-between;gap:8px;margin-top:6px;padding:0;border:0}.epoch-controls a,.epoch-controls>span{min-height:44px;display:flex;align-items:center;font-size:11px;padding:0 4px}
+  .epoch-world{margin-top:18px}.epoch-world-caption h2{font-size:28px}.epoch-change{font-size:19px}
+  .epoch-expand{display:inline-block}.epoch-world-tools{gap:6px 16px}.epoch-world-tools button,.epoch-legend summary{min-height:44px}
+  .epoch-world:not(.is-expanded) .mandala-frame{display:none}
+  .epoch-world:not(.is-expanded) .epoch-drawing{overflow:hidden}
+  .epoch-world.is-expanded .epoch-drawing{overflow:auto;max-height:70vh;border:1px solid #c4a16a30;overscroll-behavior:contain}
+  .epoch-world.is-expanded .epoch-sky{width:760px;max-width:none;max-height:none}
+  .epoch-world:not(.is-expanded) .epoch-sky .mandala-node text,.epoch-world:not(.is-expanded) .epoch-sky .hidden-suns text{font-size:36px}.epoch-world:not(.is-expanded) .mandala-note{display:none}
+  .epoch-node-picker button{min-height:44px;font-size:18px;padding:8px 4px}
+  .epoch-node-reading>p{font-size:21px}.epoch-node-hint{font-size:11px;line-height:1.6}
+  .epoch-story{padding-top:18px}.epoch-legend p{font-size:14px}
+}
 </style>

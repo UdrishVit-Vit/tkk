@@ -5,6 +5,7 @@ const props = defineProps({
   id: { type:String, required:true },
   color: { type:String, required:true },
   active: Boolean,
+  changed: Boolean,
   pulse: { type:Number, default:0 },
 })
 const visual = ref(null)
@@ -36,7 +37,7 @@ onBeforeUnmount(stop)
 </script>
 
 <template>
-  <g ref="visual" class="boundary-visual" :class="{'boundary-is-active':active}" :data-animation-node="id" :style="{color,filter:active ? `drop-shadow(0 0 8px ${color})` : 'none'}">
+  <g ref="visual" class="boundary-visual" :class="{'boundary-is-active':active,'boundary-has-changed':changed}" :data-animation-node="id" :style="{color,filter:active ? `drop-shadow(0 0 8px ${color})` : 'none'}">
     <slot/>
   </g>
 </template>
@@ -44,4 +45,8 @@ onBeforeUnmount(stop)
 <style scoped>
 .boundary-visual{transform-box:view-box;transform-origin:0 0}
 .boundary-is-active :deep(.hidden-sun__surface){stroke-opacity:1;stroke-width:2}
+.boundary-has-changed :deep(.hidden-sun__surface),.boundary-has-changed :deep(.mandala-node__outer){stroke-dasharray:4 3;animation:boundary-arrival 1.4s ease-out}
+.boundary-is-active :deep(.hidden-sun__surface),.boundary-is-active :deep(.mandala-node__outer){stroke-dasharray:none}
+@keyframes boundary-arrival{0%,60%{stroke-opacity:1;stroke-width:2.7}100%{stroke-width:1.5}}
+@media(prefers-reduced-motion:reduce){.boundary-has-changed :deep(path){animation:none}}
 </style>
