@@ -15,7 +15,7 @@ const snapshots = [
 
 export const SHARD_ERAS = snapshots.map(snapshot => {
   const section = HISTORY_THREAD.sections.find(item => item.slug === (snapshot.history || snapshot.id))
-  return { title: section.title, label: section.label, ...snapshot, history: snapshot.history || snapshot.id }
+  return { title: section.title, label: section.label, emblem: section.emblem, ...snapshot, history: snapshot.history || snapshot.id }
 })
 
 export const SHARD_CELESTIAL_BODIES = {

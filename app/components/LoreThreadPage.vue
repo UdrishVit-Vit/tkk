@@ -16,7 +16,6 @@ defineEmits(['up'])
         <header class="lore-thread-intro">
           <button class="lore-thread-home" type="button" aria-label="Вернуться к миру Эноа" title="Вернуться к миру Эноа" @click="$emit('up')">
             <img :src="icon" width="112" height="112" alt="">
-            <span aria-hidden="true">←</span>
           </button>
           <div class="lore-thread-copy">
             <p class="lore-thread-eyebrow">{{ eyebrow }}</p>
@@ -44,7 +43,10 @@ defineEmits(['up'])
 .lore-thread-intro{position:relative;min-height:240px;padding:20px 0 48px calc(var(--body-x) - 42px)}
 .lore-thread-home{position:absolute;left:calc(var(--thread-x) - 42px);top:34px;transform:translateX(-50%);display:grid;place-items:center;width:112px;height:112px;padding:0;border:0;background:transparent;color:var(--gold-bright);cursor:pointer}
 .lore-thread-home img{width:100%;height:100%;object-fit:contain;animation:thread-glow 6s ease-in-out infinite;transition:transform .34s ease}
-.lore-thread-home:hover img,.lore-thread-home:focus-visible img{transform:scale(1.085)}.lore-thread-home span{position:absolute;bottom:-15px;padding:1px 5px;background:var(--theme-bg);font:18px/1 'Hanken Grotesk',sans-serif}
+.lore-thread-home{z-index:2;isolation:isolate}
+.lore-thread-home::before{content:'';position:absolute;inset:4%;z-index:0;background:var(--theme-bg);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);pointer-events:none}
+.lore-thread-home img{position:relative;z-index:1}
+.lore-thread-home:hover img,.lore-thread-home:focus-visible img{transform:scale(1.085)}
 .lore-thread-eyebrow{margin:0 0 17px;color:rgba(var(--theme-accent-rgb),.62);font:600 9px/1.4 'Hanken Grotesk',sans-serif;letter-spacing:.25em;text-transform:uppercase}
 .lore-thread-copy h1{margin:0;font:600 clamp(51px,5.2vw,76px)/.95 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.98)}
 .lore-thread-note{max-width:650px;margin:26px 0 0;padding-left:20px;border-left:1px solid rgba(var(--theme-accent-rgb),.42);font:italic 19px/1.55 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.65)}

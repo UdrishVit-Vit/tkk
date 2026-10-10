@@ -27,7 +27,7 @@ useHead({
 </script>
 
 <template>
-  <LoreThreadPage :theme="theme" title="Осколки" eyebrow="Архив Башни · Облик мира" icon="/assets/nodes/shards-lore.svg?v=2" @up="$emit('up')">
+  <LoreThreadPage class="shards-page" :theme="theme" title="Осколки" eyebrow="Архив Башни · Облик мира" icon="/assets/nodes/shards-lore.svg?v=2" @up="$emit('up')">
     <template #intro>
       <p>Мир сквозь эпохи. Солнца, луны и осколки Эноа, связанные одной нитью времени.</p>
       <NuxtLink to="/lore/geography">Атлас мира ↗</NuxtLink>
@@ -45,5 +45,15 @@ useHead({
 </template>
 
 <style scoped>
+@media(max-width:760px){
+  .shards-page :deep(.lore-thread-canvas){--thread-x:24px;--body-x:70px;padding:16px 12px 96px}
+  .shards-page :deep(.lore-thread-intro){min-height:0;padding:8px 0 18px 58px}
+  .shards-page :deep(.lore-thread-home){left:12px;top:6px;width:48px;height:48px}
+  .shards-page :deep(.lore-thread-eyebrow){margin-bottom:8px;font-size:6px}
+  .shards-page :deep(.lore-thread-copy h1){font-size:36px}
+  .shards-page :deep(.lore-thread-note){display:none}
+  .shards-page :deep(.lore-thread-body){padding-left:0}
+  .shards-page :deep(.epoch-story),.shards-page :deep(.epoch-draft-note),.shards-page :deep(.epoch-node-story),.shards-page :deep(.epoch-detail){box-sizing:border-box;padding-left:40px}
+}
 .shard-detail{padding-bottom:12px}.shard-detail a{color:var(--gold-bright);text-decoration:none;font:9px 'Hanken Grotesk',sans-serif}.shard-detail a:hover{text-decoration:underline}.shard-detail__more{font:10px 'Hanken Grotesk',sans-serif;color:var(--gold-bright)}.shard-detail__more summary{cursor:pointer;width:fit-content;padding:8px 0}.shard-detail__more nav{display:flex;flex-wrap:wrap;gap:18px;padding:14px 0}a:focus-visible,summary:focus-visible{outline:1px solid var(--gold-bright);outline-offset:5px}
 </style>
