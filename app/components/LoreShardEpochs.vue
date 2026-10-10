@@ -272,7 +272,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
       <div ref="drawing" class="epoch-drawing" @touchstart.passive="startSwipe" @touchmove="trackSwipe" @touchend.passive="endSwipe" @touchcancel="touchOrigin=null;pinchOrigin=null" :tabindex="expandedWorld ? 0 : -1" :aria-label="`Карта эпохи: ${era.title}`">
       <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split,'epoch-sky--origin':isOrigin,'epoch-sky--stacked':era.verticalSky}" :viewBox="`-60 ${isOrigin ? 0 : -200} 1120 ${skyHeight+(isOrigin ? 0 : 200)}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
         <title :id="`${uid}-title`">{{era.title}} — мандала узлов Эноа</title>
-        <desc :id="`${uid}-desc`">{{eraStory}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? 'Ману скрыт за Эри.' : ''}} {{era.moons.includes('dayya') ? 'Над Искрой Дайя; выше неё ответвляются оранжевая Эри слева и Ману справа. Над лунами — три совмещённых солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
+        <desc :id="`${uid}-desc`">{{eraStory}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? (era.hiddenMoons.includes('manu') ? 'Ману выглядывает из-за Эри.' : 'Эри скрыта за Ману.') : ''}} {{era.moons.includes('dayya') ? 'Над Искрой Дайя; выше неё оранжевая Эри; позади её ромба выглядывает Ману. Над лунами — три совмещённых солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
         <g v-if="era.verticalSky" class="mandala-frame" fill="none" aria-hidden="true">
           <path :d="`M500 24 796 195 796 ${skyHeight-220} 500 ${skyHeight-40} 204 ${skyHeight-220} 204 195Z`"/>
           <path :d="`M500 60 760 130 870 320 760 ${skyHeight-200} 500 ${skyHeight-60} 240 ${skyHeight-200} 130 320 240 130Z`"/>
@@ -308,7 +308,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
 
         <TransitionGroup name="celestial" tag="g">
           <a v-for="node in worldNodes" :key="node.id" :href="router.resolve(nodeLink(node)).href" :aria-label="`История узла ${node.title}`" :aria-current="selectedNodeId === node.id ? 'true' : undefined" :class="{'is-selectable':true,'is-selected':selectedNodeId === node.id,'distant-node':node.type === 'distant','has-layers':node.id === 'spark'}" @click="selectWorldNode(node,$event)" :transform="`translate(${node.x} ${node.y})`" :style="{color:node.color}" class="mandala-node">
-            <TransitionGroup v-if="node.type === 'moon' && hiddenMoons.length" name="celestial" tag="g" class="hidden-moons">
+            <TransitionGroup v-if="node.id === (era.hiddenMoons?.includes('manu') ? 'eri' : 'manu') && hiddenMoons.length" name="celestial" tag="g" class="hidden-moons">
               <g v-for="moon in hiddenMoons" :key="moon.id" :style="{color:moon.color}" :aria-label="`${moon.title} ${moon.id === 'manu' ? 'скрыт' : 'скрыта'} за ${node.id === 'eri' ? 'Эри' : 'Ману'}`">
                 <g :transform="`scale(${moon.scale})`" class="hidden-moon__mark"><g :key="animationKey(moon.id)" :class="{'node-pulse':animatedNodeId === moon.id,'node-highlight':selectedNodeId === moon.id}"><path class="hidden-sun__surface" d="M0-44 44 0 0 44-44 0Z"/><LoreCelestialKnot :id="moon.id"/></g></g>
                 <path class="hidden-sun__leader" d="M-68 0H-91"/>
@@ -340,7 +340,7 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
     </div>
 
     <div class="epoch-story" aria-live="polite"><div class="epoch-story-copy"><span class="epoch-story-label">Об эпохе</span><p>{{eraStory}}</p></div><NuxtLink :to="`/lore/history/${era.history}`">Читать летопись ↗</NuxtLink></div>
-    <p v-if="era.id === 'epoha-pererozhdeniya'" class="epoch-draft-note">Дайя ещё в небе. К переходу в Эпоху Света она погибает, а Эри становится Кровавой Луной. На схеме Ману показан позади неё.</p>
+    <p v-if="era.id === 'epoha-pererozhdeniya'" class="epoch-draft-note">Дайя ещё в небе. К переходу в Эпоху Света она погибает, а Эри становится Кровавой Луной и скрывается за Ману.</p>
     <section v-if="selectedStory" :id="`${uid}-node-story`" tabindex="-1" class="epoch-node-story" aria-label="Истории узлов эпохи">
       <p class="epoch-node-hint">Истории узлов</p>
       <p v-if="nodeUnavailable" class="epoch-unavailable" role="status">{{requestedTitle}} не показан в этой эпохе. Сейчас выделена Искра. Ваш выбор сохранён.</p>
