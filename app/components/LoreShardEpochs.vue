@@ -211,14 +211,12 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
       <div class="epoch-world-caption" aria-live="polite"><h2>{{era.title}}</h2><p v-if="era.id === 'epoha-lyudey'" class="epoch-period">Поздняя эпоха · после Раскола · Лето Трёх Солнц</p></div>
       <nav class="epoch-mobile-nav" aria-label="Переключение эпох" @keydown="timeKeyboard">
         <button type="button" :disabled="!eraIndex" :aria-label="eraIndex ? `Предыдущая эпоха: ${SHARD_ERAS[eraIndex-1].title}` : 'Начало временной нити'" @click="moveEra(-1)">←</button>
-        <div class="epoch-mobile-era" aria-live="polite"><img :src="era.emblem" width="32" height="32" alt=""><span>{{era.title}}<small>{{String(eraIndex+1).padStart(2,'0')}} / 07</small></span></div>
+        <div class="epoch-mobile-era" aria-live="polite"><img :src="era.emblem" width="36" height="36" alt=""><div><small>ЭПОХА {{String(eraIndex+1).padStart(2,'0')}} / 07</small><h2>{{era.title}}</h2></div></div>
         <button type="button" :disabled="!futureCount" :aria-label="futureCount ? `Следующая эпоха: ${SHARD_ERAS[eraIndex+1].title}` : 'Последняя эпоха'" @click="moveEra(1)">→</button>
         <div class="epoch-mobile-dots"><button v-for="(item,index) in SHARD_ERAS" :key="item.id" type="button" :aria-label="item.title" :aria-current="index === eraIndex ? 'date' : undefined" @click="goToEra(index)"><i/></button></div>
-        <p>Листайте схему влево и вправо</p>
       </nav>
-      <div class="epoch-world-tools"><button type="button" ref="expandButton" class="epoch-expand" :aria-expanded="expandedWorld" @click="toggleWorld">{{expandedWorld ? 'Свернуть схему' : 'Рассмотреть ближе'}}</button></div>
-      <p v-if="expandedWorld" class="epoch-pan-hint">Сдвигайте схему в стороны, чтобы рассмотреть узлы. Названия доступны и в списке под ней.</p>
-      <p v-if="nodeUnavailable" class="epoch-unavailable" role="status">{{requestedTitle}} не показан в этой эпохе. Выделена Искра; при возвращении в подходящую эпоху ваш выбор сохранится.</p>
+      <div class="epoch-world-tools"><span class="epoch-swipe-hint">{{expandedWorld ? 'Перемещайте схему пальцем' : 'Свайп — сменить эпоху'}}</span><button type="button" ref="expandButton" class="epoch-expand" :aria-expanded="expandedWorld" @click="toggleWorld">{{expandedWorld ? 'Свернуть' : 'Увеличить'}} <span aria-hidden="true">{{expandedWorld ? '−' : '+'}}</span></button></div>
+      <p v-if="expandedWorld" class="epoch-pan-hint">Нажмите ромб или название, чтобы открыть историю узла.</p>
       <div ref="drawing" class="epoch-drawing" @touchstart.passive="startSwipe" @touchmove.passive="trackSwipe" @touchend.passive="endSwipe" @touchcancel="touchOrigin=null" :tabindex="expandedWorld ? 0 : -1" :aria-label="expandedWorld ? `Подробная мандала: ${era.title}` : undefined">
       <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split,'epoch-sky--origin':isOrigin,'epoch-sky--stacked':era.verticalSky}" :viewBox="`-60 ${isOrigin ? 0 : -200} 1120 ${skyHeight+(isOrigin ? 0 : 200)}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
         <title :id="`${uid}-title`">{{era.title}} — мандала узлов Эноа</title>
@@ -287,18 +285,19 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
       </div>
     </div>
 
-    <div class="epoch-story" aria-live="polite"><p>{{eraStory}}</p><NuxtLink :to="`/lore/history/${era.history}`">Летопись ↗</NuxtLink></div>
+    <div class="epoch-story" aria-live="polite"><div class="epoch-story-copy"><span class="epoch-story-label">Об эпохе</span><p>{{eraStory}}</p></div><NuxtLink :to="`/lore/history/${era.history}`">Читать летопись ↗</NuxtLink></div>
     <p v-if="era.moons.includes('dayya')" class="epoch-draft-note">Раннее небо условно: время гибели Дайи ещё не установлено.</p>
     <section v-if="selectedStory" :id="`${uid}-node-story`" tabindex="-1" class="epoch-node-story" aria-label="Истории узлов эпохи">
-      <p class="epoch-node-hint">Узлы эпохи · выберите название или ромб</p>
+      <p class="epoch-node-hint">Истории узлов</p>
+      <p v-if="nodeUnavailable" class="epoch-unavailable" role="status">{{requestedTitle}} не показан в этой эпохе. Сейчас выделена Искра. Ваш выбор сохранён.</p>
       <nav class="epoch-node-picker" aria-label="Выберите узел, чтобы прочитать его историю">
         <button v-for="node in inspectionNodes" :key="node.id" type="button" :aria-pressed="selectedNodeId === node.id" :style="{'--node-color':node.color}" @click="selectNode(node)">{{node.title}}</button>
       </nav>
       <div class="epoch-node-reading" aria-live="polite" aria-atomic="true">
-        <div class="epoch-node-heading"><h3><button type="button" :aria-label="`Подсветить ${selectedNode.title}`" @click="selectNode(selectedNode)">{{selectedNode.title}}</button></h3><NuxtLink v-if="selectedStory.glossaryId" :to="`/lore/glossary/${selectedStory.glossaryId}`">Статья ↗</NuxtLink><NuxtLink v-if="selectedStory.geographyId" :to="`/lore/geography?shard=${selectedStory.geographyId}`">Карта ↗</NuxtLink></div>
+        <div class="epoch-node-heading"><h3><button type="button" :aria-label="`Подсветить узел «${selectedNode.title}»`" @click="selectNode(selectedNode)">{{selectedNode.title}}</button></h3><NuxtLink v-if="selectedStory.glossaryId" :to="`/lore/glossary/${selectedStory.glossaryId}`">Статья ↗</NuxtLink><NuxtLink v-if="selectedStory.geographyId" :to="`/lore/geography?shard=${selectedStory.geographyId}`">Карта ↗</NuxtLink></div>
         <p class="epoch-node-current"><span>{{era.title}}</span>{{selectedReading}}</p>
-        <details v-if="selectedReading !== selectedStory.text" class="epoch-node-more"><summary>Об узле · общая история</summary><p>{{selectedStory.text}}</p></details>
-        <details v-if="selectedTimeline.length > 1" class="epoch-node-more"><summary>История узла во времени</summary><ol class="epoch-node-timeline"><li v-for="moment in selectedTimeline" :key="moment.id"><NuxtLink :to="timelineLink(moment.id)" :aria-current="moment.id === era.id ? 'date' : undefined">{{moment.title}}</NuxtLink><p>{{moment.text}}</p></li></ol></details>
+        <details v-if="selectedReading !== selectedStory.text" class="epoch-node-more"><summary>Происхождение узла</summary><p>{{selectedStory.text}}</p></details>
+        <details v-if="selectedTimeline.length > 1" class="epoch-node-more"><summary>Как менялся узел</summary><ol class="epoch-node-timeline"><li v-for="moment in selectedTimeline" :key="moment.id"><NuxtLink :to="timelineLink(moment.id)" :aria-current="moment.id === era.id ? 'date' : undefined">{{moment.title}}</NuxtLink><p>{{moment.text}}</p></li></ol></details>
       </div>
     </section>
     <div class="epoch-detail"><slot :node-id="selectedNodeId"/></div>
@@ -339,7 +338,8 @@ a:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.mandala-node:focus
 @media(max-width:1050px){.epoch-atlas{grid-template-columns:210px minmax(0,1fr);gap:0 28px}.epoch-title__name{font-size:19px}.epoch-controls{gap:8px;padding-left:0}.epoch-controls a,.epoch-controls>span{font-size:8px}.epoch-story{flex-wrap:wrap;gap:10px}.epoch-story a{margin-top:0}.mandala-node text{font-size:30px}}
 @media(max-width:760px){.epoch-atlas{display:flex;flex-direction:column;gap:0}.epoch-time{position:relative;padding-top:0;width:100%;padding-bottom:22px}.epoch-bookmark{margin:0 0 12px;height:12px}.epoch-titles{display:grid}.epoch-title{min-height:46px;gap:24px;padding-left:0;translate:0 0!important}.epoch-title__name{font-size:18px}.epoch-title__node{left:-44px;width:32px;height:32px}.epoch-title.is-current .epoch-title__node{transform:translateX(-50%) scale(1.14);filter:drop-shadow(0 0 7px rgba(var(--theme-accent-rgb),.45))}.epoch-controls{margin:14px 0 0;padding:8px 0 0}.epoch-controls a,.epoch-controls>span{font-size:10px;padding:15px 0}.epoch-world,.epoch-story,.epoch-detail,.epoch-draft-note,.epoch-node-story{width:100%}.mandala-node text{font-size:34px}.mandala-note{font-size:11px}.epoch-story p{font-size:19px}.epoch-story{padding-bottom:20px}}
 @media(prefers-reduced-motion:reduce){*,*::before{transition:none!important;animation:none!important}}
-.epoch-mobile-nav,.epoch-expand{display:none}
+.epoch-mobile-nav,.epoch-expand,.epoch-swipe-hint,.epoch-story-label{display:none}
+.epoch-story-copy{flex:1;min-width:0}
 .epoch-world-caption{padding:0 0 12px;border-bottom:1px solid #c4a16a30}
 .epoch-world-caption h2{margin:0;font:500 32px/1.1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.98)}
 .epoch-period{margin:8px 0;color:var(--gold-bright);font:11px/1.6 'Hanken Grotesk',sans-serif}
@@ -374,15 +374,37 @@ a:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.mandala-node:focus
   .epoch-time{display:none}
   .epoch-controls{display:flex;justify-content:space-between;gap:8px;margin-top:6px;padding:0;border:0}.epoch-controls a,.epoch-controls>span{min-height:44px;display:flex;align-items:center;font-size:11px;padding:0 4px}
   .epoch-world{display:flex;flex-direction:column;margin-top:0;overflow:hidden}.epoch-drawing{order:0;touch-action:pan-y}.epoch-world-caption{order:2;padding:0;border:0}.epoch-world-caption h2{display:none}.epoch-world-caption .epoch-period{margin:10px 0;font-size:10px}.epoch-world-tools{order:3;justify-content:center;padding:0}.epoch-pan-hint,.epoch-unavailable{order:4}
-  .epoch-mobile-nav{order:1;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:2px 8px;padding:6px 0 0}.epoch-mobile-nav>button{min-width:44px;min-height:44px;padding:0;border:1px solid rgba(var(--theme-accent-rgb),.25);background:transparent;color:var(--gold-bright);font-size:22px}.epoch-mobile-nav button:disabled{opacity:.25;cursor:default}.epoch-mobile-nav button:focus-visible{outline:1px solid var(--gold-bright);outline-offset:2px}.epoch-mobile-era{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;color:rgba(var(--theme-heading-rgb),.98);font:24px/1.05 'Cormorant Garamond',serif}.epoch-mobile-era img{width:32px;height:32px;flex-shrink:0;object-fit:contain}.epoch-mobile-era small{display:block;margin-top:6px;font:8px 'Hanken Grotesk',sans-serif;letter-spacing:.18em;color:var(--gold-bright)}.epoch-mobile-dots{grid-column:1/-1;display:flex;justify-content:center}.epoch-mobile-dots button{display:grid;place-items:center;width:34px;height:44px;padding:0;border:0;background:none;cursor:pointer}.epoch-mobile-dots i{width:6px;height:6px;transform:rotate(45deg);border:1px solid rgba(var(--theme-accent-rgb),.5)}.epoch-mobile-dots [aria-current] i{background:var(--gold-bright);border-color:var(--gold-bright);box-shadow:0 0 9px rgba(var(--theme-accent-rgb),.4)}.epoch-mobile-nav>p{grid-column:1/-1;margin:0 0 4px;text-align:center;font:9px 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.5)}
-  .epoch-expand{display:inline-block}.epoch-world-tools{gap:6px 16px}.epoch-world-tools button{min-height:44px}
+  .epoch-mobile-nav{order:1;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px 4px;margin:4px 0 0 32px;padding:12px 0 0;border-top:1px solid rgba(var(--theme-accent-rgb),.18)}
+  .epoch-mobile-era{grid-row:1;grid-column:1/-1;display:flex;align-items:center;gap:12px;min-width:0;text-align:left;color:rgba(var(--theme-heading-rgb),.98)}
+  .epoch-mobile-era img{width:36px;height:36px;flex-shrink:0;object-fit:contain}.epoch-mobile-era>div{min-width:0}
+  .epoch-mobile-era h2{margin:4px 0 0;font:500 clamp(25px,7vw,29px)/1.08 'Cormorant Garamond',serif;text-wrap:balance;overflow-wrap:normal}
+  .epoch-mobile-era small{display:block;color:var(--gold-bright);font:9px/1.4 'Hanken Grotesk',sans-serif;letter-spacing:.12em}
+  .epoch-mobile-nav>button{grid-row:2;display:grid;place-items:center;min-width:44px;min-height:44px;padding:0;border:1px solid rgba(var(--theme-accent-rgb),.2);border-radius:3px;background:var(--theme-bg);color:var(--gold-bright);font-size:23px;cursor:pointer}.epoch-mobile-nav>button:first-child{grid-column:1}.epoch-mobile-nav>button:nth-of-type(2){grid-column:3}
+  .epoch-mobile-nav button:disabled{opacity:.25;cursor:default}.epoch-mobile-nav button:focus-visible{outline:1px solid var(--gold-bright);outline-offset:2px}
+  .epoch-mobile-dots{grid-column:2;grid-row:2;display:grid;grid-template-columns:repeat(7,minmax(24px,1fr));align-items:center}
+  .epoch-mobile-dots button{display:grid;place-items:center;min-width:24px;height:44px;padding:0;border:0;background:none;cursor:pointer}.epoch-mobile-dots i{width:5px;height:5px;transform:rotate(45deg);border:1px solid rgba(var(--theme-accent-rgb),.55)}.epoch-mobile-dots [aria-current] i{width:7px;height:7px;background:var(--gold-bright);border-color:var(--gold-bright);box-shadow:0 0 9px rgba(var(--theme-accent-rgb),.4)}
+  .epoch-expand{display:inline-flex;align-items:center;gap:10px}.epoch-world-tools{justify-content:space-between;gap:8px;margin-left:32px;padding:0 0 8px;border-bottom:1px solid rgba(var(--theme-accent-rgb),.18)}.epoch-world-tools button{min-height:44px;font-size:12px;color:var(--gold-bright)}.epoch-world-tools button>span{font-size:18px}.epoch-swipe-hint{display:block;font:11px/1.4 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.6)}
+  .epoch-pan-hint{margin:10px 0 14px 32px;font-size:12px;line-height:1.5}
+  .epoch-unavailable{box-sizing:border-box;border:0;border-radius:3px;padding:10px 12px;margin:0 0 16px;background:rgba(var(--theme-accent-rgb),.07);color:rgba(var(--theme-text-rgb),.7);font:12px/1.5 'Hanken Grotesk',sans-serif}
   .epoch-world:not(.is-expanded) .epoch-sky{height:min(58svh,calc((100vw - 24px)*var(--sky-ratio)));max-height:none;width:100%}
   .epoch-world:not(.is-expanded) .epoch-drawing{overflow:hidden}
   .epoch-world.is-expanded .epoch-drawing{touch-action:pan-x pan-y;overflow:auto;max-height:70vh;border:1px solid #c4a16a30;overscroll-behavior:contain}
   .epoch-world.is-expanded .epoch-sky{height:auto;width:760px;max-width:none;max-height:none}
   .epoch-world:not(.is-expanded) .epoch-sky .mandala-node text,.epoch-world:not(.is-expanded) .epoch-sky .hidden-suns text{font-size:36px}.epoch-world:not(.is-expanded) .mandala-note{display:none}
-  .epoch-node-picker button{min-height:44px;font-size:18px;padding:8px 4px}
-  .epoch-node-reading>p{font-size:21px}.epoch-node-hint{font-size:11px;line-height:1.6}
-  .epoch-story{padding-top:18px}
+  .epoch-node-story{margin-top:24px;padding-top:20px;border-color:rgba(var(--theme-accent-rgb),.18)}
+  .epoch-node-hint,.epoch-story-label{display:block;margin:0 0 10px;font:600 10px/1.4 'Hanken Grotesk',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-bright)}
+  .epoch-node-picker{flex-wrap:nowrap;gap:8px;overflow-x:auto;margin:0 0 20px;padding:0 2px 10px;scrollbar-width:thin;scrollbar-color:rgba(var(--theme-accent-rgb),.3) transparent;overscroll-behavior-x:contain}
+  .epoch-node-picker button{flex:0 0 auto;min-height:44px;padding:8px 12px;border:1px solid rgba(var(--theme-accent-rgb),.18);border-radius:3px;white-space:nowrap;font:13px/1.4 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.8)}
+  .epoch-node-picker button[aria-pressed='true']{border-color:var(--node-color);background:color-mix(in srgb,var(--node-color) 9%,transparent)}
+  .epoch-node-heading{gap:6px 16px;align-items:center}.epoch-node-heading h3{font-size:32px}.epoch-node-heading a{display:inline-flex;align-items:center;min-height:44px;font-size:12px}
+  .epoch-node-reading>p,.epoch-node-more p,.epoch-node-timeline p{font:17px/1.65 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.84);overflow-wrap:anywhere}
+  .epoch-node-current>span{font-size:10px;line-height:1.5;letter-spacing:.04em;margin-bottom:10px;color:rgba(var(--theme-text-rgb),.6)}
+  .epoch-node-more{margin-top:12px;border-top:1px solid rgba(var(--theme-accent-rgb),.15)}.epoch-node-more summary{display:flex;align-items:center;min-height:44px;padding:6px 0;font-size:13px}.epoch-node-more summary::after{content:'+';margin-left:12px;font-size:18px}.epoch-node-more[open] summary::after{content:'−'}
+  .epoch-story{flex-direction:column;align-items:stretch;gap:8px;padding-top:20px;padding-bottom:0}
+  .epoch-story p{font:17px/1.65 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.84);text-wrap:pretty}
+  .epoch-story a{display:inline-flex;align-items:center;align-self:flex-start;min-height:44px;margin:0;font:12px/1.4 'Hanken Grotesk',sans-serif;color:var(--gold-bright)}
+  .epoch-draft-note{margin-top:12px;font-size:12px;line-height:1.5}
+  .epoch-world:not(.is-expanded) .epoch-sky .mandala-node.distant-node text{font-size:26px}.epoch-world:not(.is-expanded) .epoch-sky .mandala-node .mandala-node__minor-label{font-size:30px}
 }
+@media(max-width:360px){.epoch-mobile-nav{grid-template-columns:40px minmax(0,1fr) 40px}.epoch-mobile-nav>button{min-width:40px}}
 </style>
