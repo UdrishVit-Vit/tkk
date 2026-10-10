@@ -17,21 +17,44 @@ const hasCentralSpark = computed(() => centerLayers.value.length > 0)
 const eraIndex = computed(() => SHARD_ERAS.indexOf(era.value))
 const uid = useId().replace(/:/g, '')
 const futureCount = computed(() => SHARD_ERAS.length - eraIndex.value - 1)
-const expandedWorld = ref(false)
+const mapZoom = ref(1)
+const expandedWorld = computed(() => mapZoom.value > 1)
 const drawing = ref(null)
-const expandButton = ref(null)
 let touchOrigin = null
+let pinchOrigin = null
 let suppressClickUntil = 0
 let slideAnimation = null
 let slideDirection = 1
 function startSwipe(event) {
+  if(event.touches.length === 2) {
+    touchOrigin = null
+    const [a,b] = event.touches
+    pinchOrigin = {distance:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),zoom:mapZoom.value}
+    suppressClickUntil = Date.now()+400
+    return
+  }
+  pinchOrigin = null
   touchOrigin = !expandedWorld.value && event.touches.length === 1
     ? { x:event.touches[0].clientX, y:event.touches[0].clientY, time:Date.now() } : null
 }
 function trackSwipe(event) {
+  if(event.touches.length === 2 && pinchOrigin?.distance > 0) {
+    event.preventDefault()
+    const [a,b] = event.touches
+    const bounds = drawing.value?.getBoundingClientRect()
+    if(bounds) setMapZoom(pinchOrigin.zoom*Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)/pinchOrigin.distance,
+      {x:(a.clientX+b.clientX)/2-bounds.left,y:(a.clientY+b.clientY)/2-bounds.top})
+    suppressClickUntil = Date.now()+400
+  }
   if(event.touches.length !== 1) touchOrigin = null
 }
 function endSwipe(event) {
+  if(pinchOrigin) {
+    pinchOrigin = null
+    touchOrigin = null
+    suppressClickUntil = Date.now()+400
+    return
+  }
   const start = touchOrigin
   touchOrigin = null
   const end = event.changedTouches[0]
@@ -110,22 +133,44 @@ const requestedTitle = computed(() => {
 watch(() => era.value.id, () => { animatedNodeId.value = '' })
 watch(() => route.query.node, id => { inspectedId.value = id || '' })
 watch(() => props.selectedShard, () => { if(era.value.split && !route.query.node) inspectedId.value = props.selectedShard })
-async function toggleWorld() {
-  expandedWorld.value = !expandedWorld.value
+async function setMapZoom(value,point) {
+  const previous = mapZoom.value
+  const next = Math.max(1,Math.min(4,value))
+  if(!Number.isFinite(next) || next === previous) return
+  const element = drawing.value
+  const anchor = point || {x:(element?.clientWidth || 0)/2,y:(element?.clientHeight || 0)/2}
+  const left = element?.scrollLeft || 0
+  const top = element?.scrollTop || 0
+  mapZoom.value = next
   await nextTick()
+  if(!element?.clientWidth) return
+  element.scrollLeft = Math.max(0,(left+anchor.x)*next/previous-anchor.x)
+  element.scrollTop = Math.max(0,(top+anchor.y)*next/previous-anchor.y)
+}
+async function resetMap() {
+  mapZoom.value = 1
+  touchOrigin = null
+  pinchOrigin = null
+  await nextTick()
+  if(drawing.value) { drawing.value.scrollLeft = 0; drawing.value.scrollTop = 0 }
+}
+async function centerSpark() {
+  await setMapZoom(Math.max(2,mapZoom.value))
   const element = drawing.value
   if(!element?.clientWidth) return
-  const scale = 760/1120
-  element.scrollLeft = expandedWorld.value ? Math.max(0,(atlasCenter.value.x+60)*scale-element.clientWidth/2) : 0
-  element.scrollTop = expandedWorld.value ? Math.max(0,(atlasCenter.value.y+(isOrigin.value ? 0 : 200))*scale-element.clientHeight/2) : 0
-  if(expandedWorld.value) element.focus({preventScroll:true})
-  else expandButton.value?.focus({preventScroll:true})
+  const height = skyHeight.value+(isOrigin.value ? 0 : 200)
+  const fit = Math.min(element.clientWidth/1120,element.clientHeight/height)
+  const x = (element.clientWidth-1120*fit)/2+(atlasCenter.value.x+60)*fit
+  const y = (element.clientHeight-height*fit)/2+(atlasCenter.value.y+(isOrigin.value ? 0 : 200))*fit
+  element.scrollLeft = Math.max(0,x*mapZoom.value-element.clientWidth/2)
+  element.scrollTop = Math.max(0,y*mapZoom.value-element.clientHeight/2)
 }
+watch(() => era.value.id,resetMap)
 function worldEscape(event) {
   if(!expandedWorld.value) return
   event.stopPropagation()
   event.preventDefault()
-  toggleWorld()
+  resetMap()
 }
 function layerLeader(layer) {
   const radius = layer.scale * 44
@@ -215,9 +260,15 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
         <button type="button" :disabled="!futureCount" :aria-label="futureCount ? `Следующая эпоха: ${SHARD_ERAS[eraIndex+1].title}` : 'Последняя эпоха'" @click="moveEra(1)">→</button>
         <div class="epoch-mobile-dots"><button v-for="(item,index) in SHARD_ERAS" :key="item.id" type="button" :aria-label="item.title" :aria-current="index === eraIndex ? 'date' : undefined" @click="goToEra(index)"><i/></button></div>
       </nav>
-      <div class="epoch-world-tools"><span class="epoch-swipe-hint">{{expandedWorld ? 'Перемещайте схему пальцем' : 'Свайп — сменить эпоху'}}</span><button type="button" ref="expandButton" class="epoch-expand" :aria-expanded="expandedWorld" @click="toggleWorld">{{expandedWorld ? 'Свернуть' : 'Увеличить'}} <span aria-hidden="true">{{expandedWorld ? '−' : '+'}}</span></button></div>
-      <p v-if="expandedWorld" class="epoch-pan-hint">Нажмите ромб или название, чтобы открыть историю узла.</p>
-      <div ref="drawing" class="epoch-drawing" @touchstart.passive="startSwipe" @touchmove.passive="trackSwipe" @touchend.passive="endSwipe" @touchcancel="touchOrigin=null" :tabindex="expandedWorld ? 0 : -1" :aria-label="expandedWorld ? `Подробная мандала: ${era.title}` : undefined">
+      <div class="epoch-map-frame" :class="{'is-zoomed':expandedWorld}" :style="{'--map-zoom':mapZoom}">
+      <div class="epoch-map-controls" role="group" aria-label="Управление картой">
+        <button type="button" :disabled="mapZoom <= 1" aria-label="Отдалить карту" title="Отдалить" @click="setMapZoom(mapZoom-.5)">−</button>
+        <output aria-label="Масштаб карты">{{Math.round(mapZoom*100)}}%</output>
+        <button type="button" :disabled="mapZoom >= 4" aria-label="Приблизить карту" title="Приблизить" @click="setMapZoom(mapZoom+.5)">+</button>
+        <button type="button" aria-label="Показать всю схему" title="Вся схема" @click="resetMap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4V9M15 4H20V9M4 15V20H9M20 15V20H15M8 12H16M12 8V16"/></svg></button>
+        <button type="button" aria-label="К центру Искры" title="К Искре" @click="centerSpark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3V7M12 17V21M3 12H7M17 12H21M12 6 18 12 12 18 6 12Z"/></svg></button>
+      </div>
+      <div ref="drawing" class="epoch-drawing" @touchstart.passive="startSwipe" @touchmove="trackSwipe" @touchend.passive="endSwipe" @touchcancel="touchOrigin=null;pinchOrigin=null" :tabindex="expandedWorld ? 0 : -1" :aria-label="`Карта эпохи: ${era.title}`">
       <svg class="epoch-sky" :class="{'epoch-sky--vertical':era.split,'epoch-sky--origin':isOrigin,'epoch-sky--stacked':era.verticalSky}" :viewBox="`-60 ${isOrigin ? 0 : -200} 1120 ${skyHeight+(isOrigin ? 0 : 200)}`" role="group" :aria-labelledby="`${uid}-title ${uid}-desc`">
         <title :id="`${uid}-title`">{{era.title}} — мандала узлов Эноа</title>
         <desc :id="`${uid}-desc`">{{eraStory}} {{hiddenSuns.length ? 'Азрак и Ула скрыты за Шамасом.' : ''}} {{hiddenMoons.length ? 'Эри скрыта за Ману.' : ''}} {{isOrigin ? 'Над Искрой Дайя; выше неё ответвляются Ману слева и оранжевая Эри справа. Над лунами — три совмещённых солнца.' : ''}} {{hasCentralSpark ? `В центре Искра; за ней: ${[...centerLayers].reverse().map(layer=>layer.title).join(', ')}. Нити исходят из Искры.` : ''}} Связанные узлы: {{worldNodes.map(node=>node.title).join(', ')}}. Расположение условное.</desc>
@@ -283,6 +334,8 @@ watch(() => era.value.split, split => emit('era-change', split), { immediate: tr
         <text x="500" :y="skyHeight-12" text-anchor="middle" class="mandala-note">РАСПОЛОЖЕНИЕ УСЛОВНОЕ</text>
       </svg>
       </div>
+      <p class="epoch-map-hint">{{expandedWorld ? 'Перемещайте карту пальцем · Нажмите узел' : 'Свайп — другая эпоха · Два пальца — масштаб'}}</p>
+      </div>
     </div>
 
     <div class="epoch-story" aria-live="polite"><div class="epoch-story-copy"><span class="epoch-story-label">Об эпохе</span><p>{{eraStory}}</p></div><NuxtLink :to="`/lore/history/${era.history}`">Читать летопись ↗</NuxtLink></div>
@@ -338,19 +391,18 @@ a:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.mandala-node:focus
 @media(max-width:1050px){.epoch-atlas{grid-template-columns:210px minmax(0,1fr);gap:0 28px}.epoch-title__name{font-size:19px}.epoch-controls{gap:8px;padding-left:0}.epoch-controls a,.epoch-controls>span{font-size:8px}.epoch-story{flex-wrap:wrap;gap:10px}.epoch-story a{margin-top:0}.mandala-node text{font-size:30px}}
 @media(max-width:760px){.epoch-atlas{display:flex;flex-direction:column;gap:0}.epoch-time{position:relative;padding-top:0;width:100%;padding-bottom:22px}.epoch-bookmark{margin:0 0 12px;height:12px}.epoch-titles{display:grid}.epoch-title{min-height:46px;gap:24px;padding-left:0;translate:0 0!important}.epoch-title__name{font-size:18px}.epoch-title__node{left:-44px;width:32px;height:32px}.epoch-title.is-current .epoch-title__node{transform:translateX(-50%) scale(1.14);filter:drop-shadow(0 0 7px rgba(var(--theme-accent-rgb),.45))}.epoch-controls{margin:14px 0 0;padding:8px 0 0}.epoch-controls a,.epoch-controls>span{font-size:10px;padding:15px 0}.epoch-world,.epoch-story,.epoch-detail,.epoch-draft-note,.epoch-node-story{width:100%}.mandala-node text{font-size:34px}.mandala-note{font-size:11px}.epoch-story p{font-size:19px}.epoch-story{padding-bottom:20px}}
 @media(prefers-reduced-motion:reduce){*,*::before{transition:none!important;animation:none!important}}
-.epoch-mobile-nav,.epoch-expand,.epoch-swipe-hint,.epoch-story-label{display:none}
+.epoch-mobile-nav,.epoch-map-controls,.epoch-map-hint,.epoch-story-label{display:none}
 .epoch-story-copy{flex:1;min-width:0}
 .epoch-world-caption{padding:0 0 12px;border-bottom:1px solid #c4a16a30}
 .epoch-world-caption h2{margin:0;font:500 32px/1.1 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.98)}
 .epoch-period{margin:8px 0;color:var(--gold-bright);font:11px/1.6 'Hanken Grotesk',sans-serif}
 .epoch-node-current>span{display:block;margin-bottom:5px;font:10px/1.5 'Hanken Grotesk',sans-serif;letter-spacing:.1em;color:var(--gold-bright)}
-.epoch-world-tools{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 20px;padding:12px 0 0}
-.epoch-world-tools button{color:rgba(var(--theme-text-rgb),.85);font:11px/1.5 'Hanken Grotesk',sans-serif;cursor:pointer;padding:10px 0;background:none;border:0;text-align:left}
-.epoch-world-tools button:focus-visible,.epoch-node-more summary:focus-visible{outline:1px solid var(--gold-bright);outline-offset:4px}
 
-.epoch-unavailable,.epoch-pan-hint{max-width:660px;font:16px/1.55 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.8)}
+.epoch-node-more summary:focus-visible{outline:1px solid var(--gold-bright);outline-offset:4px}
+
+.epoch-unavailable{max-width:660px;font:13px/1.55 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.8)}
 .epoch-unavailable{border-left:2px solid var(--gold-bright);padding-left:12px;font-size:13px}
-.epoch-pan-hint{font-size:12px}
+
 .epoch-time{position:sticky;top:16px;align-self:start;z-index:2}
 .epoch-sky .mandala-frame{stroke-opacity:.08}.epoch-sky .mandala-weave{stroke-opacity:.035}
 .mandala-connections .thread-is-selected path{stroke-width:2;stroke-opacity:.85}
@@ -373,7 +425,7 @@ a:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.mandala-node:focus
 @media(max-width:760px){
   .epoch-time{display:none}
   .epoch-controls{display:flex;justify-content:space-between;gap:8px;margin-top:6px;padding:0;border:0}.epoch-controls a,.epoch-controls>span{min-height:44px;display:flex;align-items:center;font-size:11px;padding:0 4px}
-  .epoch-world{display:flex;flex-direction:column;margin-top:0;overflow:hidden}.epoch-drawing{order:0;touch-action:pan-y}.epoch-world-caption{order:2;padding:0;border:0}.epoch-world-caption h2{display:none}.epoch-world-caption .epoch-period{margin:10px 0;font-size:10px}.epoch-world-tools{order:3;justify-content:center;padding:0}.epoch-pan-hint,.epoch-unavailable{order:4}
+  .epoch-world{display:flex;flex-direction:column;margin-top:0;overflow:hidden}.epoch-drawing{order:0;touch-action:pan-y}.epoch-world-caption{order:2;padding:0;border:0}.epoch-world-caption h2{display:none}.epoch-world-caption .epoch-period{margin:10px 0;font-size:10px}.epoch-unavailable{order:4}
   .epoch-mobile-nav{order:1;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px 4px;margin:4px 0 0 32px;padding:12px 0 0;border-top:1px solid rgba(var(--theme-accent-rgb),.18)}
   .epoch-mobile-era{grid-row:1;grid-column:1/-1;display:flex;align-items:center;gap:12px;min-width:0;text-align:left;color:rgba(var(--theme-heading-rgb),.98)}
   .epoch-mobile-era img{width:36px;height:36px;flex-shrink:0;object-fit:contain}.epoch-mobile-era>div{min-width:0}
@@ -383,14 +435,10 @@ a:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.mandala-node:focus
   .epoch-mobile-nav button:disabled{opacity:.25;cursor:default}.epoch-mobile-nav button:focus-visible{outline:1px solid var(--gold-bright);outline-offset:2px}
   .epoch-mobile-dots{grid-column:2;grid-row:2;display:grid;grid-template-columns:repeat(7,minmax(24px,1fr));align-items:center}
   .epoch-mobile-dots button{display:grid;place-items:center;min-width:24px;height:44px;padding:0;border:0;background:none;cursor:pointer}.epoch-mobile-dots i{width:5px;height:5px;transform:rotate(45deg);border:1px solid rgba(var(--theme-accent-rgb),.55)}.epoch-mobile-dots [aria-current] i{width:7px;height:7px;background:var(--gold-bright);border-color:var(--gold-bright);box-shadow:0 0 9px rgba(var(--theme-accent-rgb),.4)}
-  .epoch-expand{display:inline-flex;align-items:center;gap:10px}.epoch-world-tools{justify-content:space-between;gap:8px;margin-left:32px;padding:0 0 8px;border-bottom:1px solid rgba(var(--theme-accent-rgb),.18)}.epoch-world-tools button{min-height:44px;font-size:12px;color:var(--gold-bright)}.epoch-world-tools button>span{font-size:18px}.epoch-swipe-hint{display:block;font:11px/1.4 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.6)}
-  .epoch-pan-hint{margin:10px 0 14px 32px;font-size:12px;line-height:1.5}
-  .epoch-unavailable{box-sizing:border-box;border:0;border-radius:3px;padding:10px 12px;margin:0 0 16px;background:rgba(var(--theme-accent-rgb),.07);color:rgba(var(--theme-text-rgb),.7);font:12px/1.5 'Hanken Grotesk',sans-serif}
-  .epoch-world:not(.is-expanded) .epoch-sky{height:min(58svh,calc((100vw - 24px)*var(--sky-ratio)));max-height:none;width:100%}
-  .epoch-world:not(.is-expanded) .epoch-drawing{overflow:hidden}
-  .epoch-world.is-expanded .epoch-drawing{touch-action:pan-x pan-y;overflow:auto;max-height:70vh;border:1px solid #c4a16a30;overscroll-behavior:contain}
-  .epoch-world.is-expanded .epoch-sky{height:auto;width:760px;max-width:none;max-height:none}
-  .epoch-world:not(.is-expanded) .epoch-sky .mandala-node text,.epoch-world:not(.is-expanded) .epoch-sky .hidden-suns text{font-size:36px}.epoch-world:not(.is-expanded) .mandala-note{display:none}
+
+.epoch-unavailable{box-sizing:border-box;border:0;border-radius:3px;padding:10px 12px;margin:0 0 16px;background:rgba(var(--theme-accent-rgb),.07);color:rgba(var(--theme-text-rgb),.7);font:12px/1.5 'Hanken Grotesk',sans-serif}
+
+.epoch-world .epoch-sky .mandala-node text,.epoch-world .epoch-sky .hidden-suns text{font-size:36px}.epoch-world .mandala-note{display:none}
   .epoch-node-story{margin-top:24px;padding-top:20px;border-color:rgba(var(--theme-accent-rgb),.18)}
   .epoch-node-hint,.epoch-story-label{display:block;margin:0 0 10px;font:600 10px/1.4 'Hanken Grotesk',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-bright)}
   .epoch-node-picker{flex-wrap:nowrap;gap:8px;overflow-x:auto;margin:0 0 20px;padding:0 2px 10px;scrollbar-width:thin;scrollbar-color:rgba(var(--theme-accent-rgb),.3) transparent;overscroll-behavior-x:contain}
@@ -404,7 +452,19 @@ a:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.mandala-node:focus
   .epoch-story p{font:17px/1.65 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.84);text-wrap:pretty}
   .epoch-story a{display:inline-flex;align-items:center;align-self:flex-start;min-height:44px;margin:0;font:12px/1.4 'Hanken Grotesk',sans-serif;color:var(--gold-bright)}
   .epoch-draft-note{margin-top:12px;font-size:12px;line-height:1.5}
-  .epoch-world:not(.is-expanded) .epoch-sky .mandala-node.distant-node text{font-size:26px}.epoch-world:not(.is-expanded) .epoch-sky .mandala-node .mandala-node__minor-label{font-size:30px}
+  .epoch-world .epoch-sky .mandala-node.distant-node text{font-size:26px}.epoch-world .epoch-sky .mandala-node .mandala-node__minor-label{font-size:30px}
 }
 @media(max-width:360px){.epoch-mobile-nav{grid-template-columns:40px minmax(0,1fr) 40px}.epoch-mobile-nav>button{min-width:40px}}
+@media(max-width:760px){
+  .epoch-map-frame{--map-height:min(52svh,calc((100vw - 28px)*var(--sky-ratio)));order:0;display:flex;flex-direction:column;min-width:0;position:relative;border:1px solid rgba(var(--theme-accent-rgb),.32);border-radius:4px;background:radial-gradient(ellipse at 50% 45%,rgba(var(--era-tint),.1),transparent 75%),var(--theme-bg);box-shadow:inset 0 0 0 3px rgba(var(--theme-accent-rgb),.035);overflow:hidden}
+  .epoch-map-frame .epoch-drawing{order:0;width:100%;height:var(--map-height);overflow:auto;overscroll-behavior:auto;scrollbar-width:none;touch-action:pan-y}.epoch-map-frame .epoch-drawing::-webkit-scrollbar{display:none}
+  .epoch-map-frame.is-zoomed .epoch-drawing{touch-action:pan-x pan-y;overscroll-behavior:contain}
+  .epoch-map-frame .epoch-sky{width:calc(100% * var(--map-zoom));height:calc(var(--map-height) * var(--map-zoom));max-width:none;max-height:none}
+  .epoch-map-controls{order:2;display:flex;align-items:center;justify-content:center;gap:2px;flex-shrink:0;padding:4px 8px;border-top:1px solid rgba(var(--theme-accent-rgb),.15);background:var(--theme-bg)}
+  .epoch-map-controls button{display:grid;place-items:center;min-width:44px;min-height:44px;padding:0;border:0;border-radius:3px;background:transparent;color:var(--gold-bright);font:24px/1 'Hanken Grotesk',sans-serif;cursor:pointer;touch-action:manipulation}
+  .epoch-map-controls button:disabled{opacity:.25;cursor:default}.epoch-map-controls button:active{background:rgba(var(--theme-accent-rgb),.12)}.epoch-map-controls button:focus-visible{outline:1px solid var(--gold-bright);outline-offset:-2px}
+  .epoch-map-controls svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}.epoch-map-controls output{min-width:48px;text-align:center;font:11px/1 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.75);font-variant-numeric:tabular-nums}
+  .epoch-map-hint{order:1;display:block;margin:0;padding:8px 6px;text-align:center;flex-shrink:0;background:var(--theme-bg);color:rgba(var(--theme-text-rgb),.6);font:10px/1.5 'Hanken Grotesk',sans-serif}
+  .epoch-mobile-nav{margin-top:16px;padding-top:0;border-top:0}
+}
 </style>
