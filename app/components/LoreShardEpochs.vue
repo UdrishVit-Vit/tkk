@@ -456,7 +456,7 @@ a:focus-visible{outline:1px solid #d5b589;outline-offset:5px}.mandala-node:focus
 }
 @media(max-width:360px){.epoch-mobile-nav{grid-template-columns:40px minmax(0,1fr) 40px}.epoch-mobile-nav>button{min-width:40px}}
 @media(max-width:760px){
-  .epoch-map-frame{--map-height:min(52svh,calc((100vw - 28px)*var(--sky-ratio)));order:0;display:flex;flex-direction:column;min-width:0;position:relative;border:1px solid rgba(var(--theme-accent-rgb),.32);border-radius:4px;background:radial-gradient(ellipse at 50% 45%,rgba(var(--era-tint),.1),transparent 75%),var(--theme-bg);box-shadow:inset 0 0 0 3px rgba(var(--theme-accent-rgb),.035);overflow:hidden}
+  .epoch-map-frame{--map-height:min(52svh,calc((100vw - 60px)*var(--sky-ratio)));order:0;display:flex;flex-direction:column;box-sizing:border-box;width:calc(100% - 32px);margin-left:32px;min-width:0;position:relative;border:1px solid rgba(var(--theme-accent-rgb),.32);border-radius:4px;background:radial-gradient(ellipse at 50% 45%,rgba(var(--era-tint),.1),transparent 75%),var(--theme-bg);box-shadow:inset 0 0 0 3px rgba(var(--theme-accent-rgb),.035);overflow:hidden}
   .epoch-map-frame .epoch-drawing{order:0;width:100%;height:var(--map-height);overflow:auto;overscroll-behavior:auto;scrollbar-width:none;touch-action:pan-y}.epoch-map-frame .epoch-drawing::-webkit-scrollbar{display:none}
   .epoch-map-frame.is-zoomed .epoch-drawing{touch-action:pan-x pan-y;overscroll-behavior:contain}
   .epoch-map-frame .epoch-sky{width:calc(100% * var(--map-zoom));height:calc(var(--map-height) * var(--map-zoom));max-width:none;max-height:none}
