@@ -295,6 +295,7 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Глоссарий': '/pf2e/glossary'
   },
   lore: {
+    'Календарь': '/lore/calendar',
     'Пантеон': '/lore/pantheon',
     'География': '/lore/geography',
     'Осколки': '/lore/shards',
@@ -649,7 +650,7 @@ const vm = computed(() => {
       // subject never leaves a gap or crowds a neighbour. Each route bends
       // once as it nears its node instead of radiating as a straight spoke,
       // so navigation still reads as one continuous ornament.
-      const loreRingSections = ['Пантеон', 'Осколки', 'География', 'Фракции', 'Нить Башни Мафраш', 'Гильдии', 'Сказания', 'Узлы', 'Глоссарий']
+      const loreRingSections = ['Пантеон', 'Осколки', 'География', 'Фракции', 'Нить Башни Мафраш', 'Гильдии', 'Сказания', 'Узлы', 'Глоссарий', 'Календарь']
       const loreRingRadius = 350
       function loreSpoke(angleDeg) {
         const rad = angleDeg * Math.PI / 180
@@ -780,6 +781,7 @@ const vm = computed(() => {
   }
 
   const showSection = !!S.section && !!sysObj
+  const showLoreCalendar = S.active === 'lore' && S.section === 'Календарь'
   const showLoreHistory = S.active === 'lore' && S.section === 'Нить Башни Мафраш'
   const showLoreGlossary = S.active === 'lore' && S.section === 'Глоссарий'
   const showLorePantheon = S.active === 'lore' && S.section === 'Пантеон'
@@ -1103,7 +1105,8 @@ const vm = computed(() => {
     classInvocations: (cd.invocations||[]).map(f => ({ name:f[0], req:f[1]||'', hasReq:!!f[1], text:f[2] })),
     classHasInvocations: !!(cd.invocations && cd.invocations.length),
 
-    showCards: showSection && S.section !== 'Классы' && !showLoreHistory && !showLoreGlossary && !showLorePantheon && !showLoreGeography && !showLoreShards && !showLoreFactions && !showLoreTales && !showLoreUzly,
+    showCards: showSection && S.section !== 'Классы' && !showLoreHistory && !showLoreGlossary && !showLorePantheon && !showLoreGeography && !showLoreShards && !showLoreFactions && !showLoreTales && !showLoreUzly && !showLoreCalendar,
+    showLoreCalendar,
     showLoreHistory,
     showLoreGlossary,
     showLorePantheon,
@@ -1160,7 +1163,7 @@ if (initialClass) await loadClassData()
     <canvas ref="canvasEl" class="tkk-canvas" />
     <div v-if="vm.isLoreMap" class="tkk-lore-carpet-bg" aria-hidden="true" />
 
-    <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary && !vm.showLorePantheon && !vm.showLoreGeography && !vm.showLoreShards && !vm.showLoreFactions && !vm.showLoreTales && !vm.showLoreUzly" class="tkk-mobile" aria-label="Мобильная навигация">
+    <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary && !vm.showLorePantheon && !vm.showLoreGeography && !vm.showLoreShards && !vm.showLoreFactions && !vm.showLoreTales && !vm.showLoreUzly && !vm.showLoreCalendar" class="tkk-mobile" aria-label="Мобильная навигация">
       <header class="tkk-mobile-head">
         <button class="tkk-mobile-back" :class="{ placeholder: !vm.isSystem }" type="button" :aria-label="vm.isSystem ? 'Назад к системам' : undefined" :tabindex="vm.isSystem ? 0 : -1" @click="vm.isSystem && goUp()">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
@@ -1395,6 +1398,7 @@ if (initialClass) await loadClassData()
 
     <LazyClassPage v-if="vm.showClassPage" :vm="vm" :state="state" @up="closeClass" />
     <LoreHistoryPage v-if="vm.showLoreHistory" :theme="vm.th" @up="closeLoreHistory" />
+    <LoreCalendarPage v-if="vm.showLoreCalendar" :theme="vm.th" @up="closeLoreHistory" />
     <LoreGlossaryPage v-if="vm.showLoreGlossary" :theme="vm.th" @up="closeLoreHistory" />
     <LorePantheonPage v-if="vm.showLorePantheon" :theme="vm.th" @up="closeLoreHistory" />
     <LoreGeographyPage v-if="vm.showLoreGeography" :theme="vm.th" @up="closeLoreHistory" />

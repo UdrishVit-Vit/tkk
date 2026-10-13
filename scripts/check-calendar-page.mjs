@@ -1,0 +1,64 @@
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { pathToFileURL } from 'node:url'
+import { resolve } from 'node:path'
+import { createRenderer, nextTick, reactive } from 'vue'
+import { parse, compileScript } from 'vue/compiler-sfc'
+
+const require = createRequire(import.meta.url)
+const route = reactive({ query: {} })
+const saved = new Map([['enoa-calendar-v1', JSON.stringify({ date: { year: 2, month: 0, day: 1 }, note: 'Старая заметка' })]])
+globalThis.useRoute = () => route
+globalThis.useHead = () => {}
+globalThis.localStorage = { getItem: key => saved.get(key) || null, setItem: (key, value) => saved.set(key, value) }
+const filename = resolve('app/components/LoreCalendarPage.vue')
+const { descriptor } = parse(readFileSync(filename, 'utf8'), { filename })
+let source = compileScript(descriptor, { id: 'calendar-runtime-check' }).content
+source = `import {ref,computed,onMounted,watch} from '${pathToFileURL(require.resolve('vue')).href}';\n` + source.replace(/from '(~\/data\/[^']+)'/g, (_, path) => `from '${pathToFileURL(resolve('app', path.slice(2))).href}'`)
+const component = (await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`)).default
+component.render = () => null
+const renderer = createRenderer({
+  createElement: type => ({ type }), createText: text => ({ text }), createComment: text => ({ text }),
+  setText() {}, setElementText() {}, parentNode: () => null, nextSibling: () => null,
+  insert() {}, remove() {}, patchProp() {},
+})
+const app = renderer.createApp(component, { theme: {} })
+const vm = app.mount({})
+const state = vm.$.setupState
+await nextTick()
+assert.equal(state.date.year, 2)
+assert.equal(state.note, 'Старая заметка')
+state.selectEra(1)
+assert.deepEqual(state.date, { era: 1, year: 1, month: 0, day: 1, hour: 0, minute: 0 })
+state.yearSign = 'red-monitor'
+await nextTick()
+assert.equal(state.chosenSign.name, 'Красный Варан')
+state.setYear(2)
+assert.equal(state.yearSign, '')
+state.setYear(1)
+assert.equal(state.yearSign, 'red-monitor')
+state.setDuration(0, '198')
+state.setDuration(1, '1')
+state.advance(24, 'hours')
+assert.deepEqual(state.date, { era: 2, year: 1, month: 0, day: 1, hour: 0, minute: 0 })
+assert.equal(state.absoluteTime, 199 * 1440)
+state.target = { ...state.date, hour: 2 }
+assert.equal(state.remaining, 120)
+state.advance(30, 'minutes')
+assert.equal(state.remaining, 90)
+state.baseline = { ...state.date }
+state.advance(2, 'hours')
+assert.equal(state.campaignTime, 120)
+state.yearSign = 'custom'
+state.customSign = 'Белый Вирм'
+await nextTick()
+const restored = JSON.parse(saved.get('enoa-calendar-v2'))
+assert.equal(restored.yearNames['2:1'].custom, 'Белый Вирм')
+assert.equal(restored.date.hour, 2)
+assert.equal(restored.note, 'Старая заметка')
+state.setDuration(2, '0')
+assert.equal(state.durations[2], null)
+assert(state.message.includes('Длительность'))
+app.unmount()
+console.log('Calendar page runtime checks passed: migration, signs per year, era reset, durations, countdown and persistence.')
