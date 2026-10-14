@@ -6,10 +6,10 @@ assert.equal(YEAR_NAME_PERIOD,1225)
 const circle=Array.from({length:YEAR_NAME_PERIOD},(_,i)=>name(i))
 assert.equal(new Set(circle.map(x=>x.name)).size,1225)
 assert.equal(new Set(circle.map(x=>x.image.id+':'+x.aspect.id)).size,35*35)
-for(const expected of ['Огненная Птица','Лазурный Каш','Кристальная Сова','Летящий Бук','Коралловый Перепелятник','Лазуритовый Бык','Рубиновая Лягушка','Лазурный Бык']) assert(circle.some(x=>x.name===expected),expected)
+for(const expected of ['Огненная Птица','Лазурный Каш','Кристальная Сова','Летящий Бук','Коралловый Перепелятник','Лазуритовый Бык','Рубиновая Жаба','Лазурный Бык']) assert(circle.some(x=>x.name===expected),expected)
 assert.equal(circle.find(x=>x.name==='Огненная Птица').yearLabel,'Огненной Птицы')
 assert.equal(circle.find(x=>x.name==='Кристальная Сова').yearLabel,'Кристальной Совы')
-assert.equal(circle.find(x=>x.name==='Рубиновая Лягушка').yearLabel,'Рубиновой Лягушки')
+assert.equal(circle.find(x=>x.name==='Рубиновая Жаба').yearLabel,'Рубиновой Жабы')
 assert.equal(circle.find(x=>x.name==='Коралловый Перепелятник').yearLabel,'Кораллового Перепелятника')
 assert.equal(name(0).name,'Пепельный Симург')
 assert(!YEAR_IMAGES.some(image=>image.name==='Олень'))
@@ -42,7 +42,7 @@ for(let a=1;a<=4;a++) for(let b=1;b<=4;b++) for(let c=1;c<=4;c++) for(let d=1;d<
 assert.equal(outcomes.size,35)
 for(const row of YEAR_DICE_TABLE) assert.equal(outcomes.get(row.code),row.multiplicity)
 assert.equal(YEAR_DICE_TABLE.reduce((sum,row)=>sum+row.multiplicity,0),256)
-assert.equal(diceYearName([4,4,4,4],[4,4,4,4]).yearLabel,'Перламутровой Мандрагоры')
+assert.equal(diceYearName([4,4,4,4],[4,4,4,4]).yearLabel,'Перламутровой Гиены')
 assert.deepEqual(diceYearName([3,1,4,1],[2,4,1,2]),diceYearName([1,1,3,4],[1,2,2,4]))
 assert.equal(diceYearName([0,1,1,1],[1,1,1,1]),null)
 assert.equal(diceYearName([1,1,1],[1,1,1,1]),null)
@@ -54,7 +54,7 @@ for (const [name, genitive] of [['Тахар','Тахара'],['Варан','В�
 }
 console.log('Revised image checks passed: three approved replacements and genitive forms.')
 
-for (const [name, genitive] of [['Павлин','Павлина'],['Архар','Архара'],['Лев','Льва'],['Скат','Ската'],['Баньян','Баньяна'],['Панголин','Панголина'],['Як','Яка']]) {
+for (const [name, genitive] of [['Павлин','Павлина'],['Архар','Архара'],['Лев','Льва'],['Скат','Ската'],['Ворон','Ворона'],['Панголин','Панголина'],['Як','Яка']]) {
   assert.equal(circle.find(x=>x.name===`Серебряный ${name}`).yearLabel,`Серебряного ${genitive}`)
 }
 assert(!YEAR_IMAGES.some(x=>x.name==='Снежный Лев'))
@@ -73,3 +73,7 @@ for(const label of ['Турмалиновый','Кварцевый','Жадеи�
   assert.equal(circle.find(x=>x.name===`${stem}ая Сова`).yearLabel,`${stem}ой Совы`)
 }
 console.log('Mineral aspect checks passed: all six replacements and feminine grammar.')
+
+assert.equal(circle.find(x=>x.name==='Серебряный Ибикс').yearLabel,'Серебряного Ибикса')
+assert(!YEAR_IMAGES.some(x=>['Лягушка','Ибис'].includes(x.name)))
+console.log('Toad and Ibix checks passed: updated images and genitive forms.')

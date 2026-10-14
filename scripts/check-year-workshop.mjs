@@ -34,9 +34,9 @@ assert.equal(state.proposedName,'')
 assert.equal(state.preview.length,0)
 state.imageRoll='4–4–4–4'
 state.aspectRoll='4 4 4 4'
-assert.equal(state.diceResult.name,'Перламутровая Мандрагора')
+assert.equal(state.diceResult.name,'Перламутровая Гиена')
 state.emit('apply',state.diceResult.name)
-assert.equal(applied,'Перламутровая Мандрагора')
+assert.equal(applied,'Перламутровая Гиена')
 state.imageRoll='1115'
 assert.equal(state.diceResult,null)
 state.rollName()
