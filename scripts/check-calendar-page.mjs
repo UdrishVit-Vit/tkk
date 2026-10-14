@@ -89,5 +89,22 @@ state.selectEra(1)
 assert.equal(state.date.year,1)
 assert.equal(state.date.month,0)
 assert.equal(state.date.day,1)
+state.durations = [null, null, null, null, null, null]
+state.yearNames = {}
+state.date = { era: 0, year: 1, month: 0, day: 1, hour: 0, minute: 0 }
+assert.equal(state.selectedYearName,'Пепельный Симург')
+assert.equal(state.yearNameIsSuggested,true)
+assert(state.selectedDateText.includes('Жертва Пуруша'))
+assert(state.selectedDateText.includes('месяц Эор · день 1'))
+assert(state.selectedDateText.includes('🌞 День Шамаса'))
+state.yearSign = 'ruby-frog'
+assert.equal(state.selectedYearName,'Рубиновая Лягушка')
+assert.equal(state.yearNameIsSuggested,false)
+state.yearSign = 'custom'
+state.customSign = 'Коралловый Аюр'
+assert.equal(state.selectedYearName,'Коралловый Аюр')
+state.date = { ...state.date, month:7,day:23 }
+assert(state.selectedDateText.includes('День Молчания'))
+assert(state.selectedDateText.includes('День Тьмы'))
 app.unmount()
 console.log('Calendar page runtime checks passed: migration, signs per year, era reset, durations, countdown and persistence.')

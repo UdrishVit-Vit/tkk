@@ -2,6 +2,8 @@
 import { CALENDAR_MONTHS as months, CALENDAR_EVENTS as holidays, YEAR_LENGTH, MAX_CALENDAR_YEAR, calendarCell, dayOfYear, calendarDateLabel } from '~/data/loreCalendar.js'
 import { CALENDAR_ERAS as eras, YEAR_SIGNS as signs, MINUTES_PER_DAY, MAX_ERA_DAYS, initialChronologyDate, emptyEraDurations, validEraDurations, validChronologyDate, eraDayIndex, shiftChronologyDate, minutesFromPurusha, chronologyDifference, nextChronologyEvent, chronologyEventCycles, chronologyTimeLabel, elapsedTimeLabel } from '~/data/loreChronology.js'
 
+import { workingYearName } from '~/data/yearNaming.js'
+
 defineProps({ theme: { type: Object, required: true } })
 defineEmits(['up'])
 const route = useRoute()
@@ -44,6 +46,17 @@ const customSign = computed({
   set: custom => { yearNames.value[yearKey.value] = { ...yearNames.value[yearKey.value], custom: custom.slice(0, 120) } },
 })
 const chosenSign = computed(() => signs.find(sign => sign.id === yearSign.value))
+const suggestedYear = computed(() => workingYearName(date.value.year - 1))
+const selectedYearName = computed(() => chosenSign.value?.name || (yearSign.value === 'custom' && customSign.value.trim()) || suggestedYear.value?.name || '')
+const yearNameIsSuggested = computed(() => !chosenSign.value && !(yearSign.value === 'custom' && customSign.value.trim()))
+const selectedDateText = computed(() => [eras[date.value.era].title, `год ${date.value.year} — ${selectedYearName.value}`, `месяц ${months[date.value.month].name}`, `день ${date.value.day}`, ...currentEvents.value.map(event => `${event.symbol} ${event.name}`)].join(' · '))
+const copyDateMessage = ref('')
+watch(selectedDateText, () => { copyDateMessage.value = '' })
+async function copySelectedDate() {
+  try { await navigator.clipboard.writeText(selectedDateText.value); copyDateMessage.value = 'Дата скопирована' }
+  catch { copyDateMessage.value = 'Не удалось скопировать автоматически. Можно выделить дату ниже.' }
+}
+
 const rows = Array.from({ length: 26 }, (_, i) => i + 1)
 const monthSlots = [...rows, null, null]
 const cells = months.map((month, index) => rows.map(day => calendarCell(index, day)))
@@ -140,7 +153,17 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
         <label class="calendar-control calendar-control-day"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 9-9 9-9-9Z"/><circle cx="12" cy="12" r="2"/></svg>День</span><input type="number" min="1" :max="months[date.month].days" step="1" :value="date.day" @change="setDay($event.target.value)"></label>
         <label class="calendar-control calendar-control-events"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Отметки</span><select v-model="filter"><option value="all">Все события</option><option v-for="event in holidays" :key="event.id" :value="event.id">{{ event.symbol }} {{ event.name }}</option><option value="eaten">■ Сожранные дни</option></select></label>
       </div>
-      <p class="calendar-selection" aria-live="polite">Выбрано: {{ calendarDateLabel(date) }}<span v-if="currentEvents.length"> · {{ currentEvents.map(event => `${event.symbol} ${event.name}`).join(' · ') }}</span></p>
+      <div class="selected-date-panel">
+        <div :key="selectedDateText" class="selected-date-story" aria-live="polite" aria-atomic="true">
+          <div class="selected-date-part selected-date-era"><span>Эпоха</span><strong>{{ eras[date.era].title }}</strong></div>
+          <div class="selected-date-part selected-date-year"><span>Год {{ date.year }}</span><strong>{{ selectedYearName }}</strong><small v-if="yearNameIsSuggested" title="Предложенное имя для этого номера года. Привязка эпохи к кругу после Раскола неизвестна; это не историческое соответствие.">Предложенное имя</small></div>
+          <div class="selected-date-part"><span>Месяц</span><strong>{{ months[date.month].name }}</strong></div>
+          <div class="selected-date-part selected-date-day"><span>День</span><strong>{{ date.day }}</strong></div>
+          <div class="selected-date-holidays"><span v-for="event in currentEvents" :key="event.id" :class="['selected-holiday', event.id]">{{ event.symbol }} {{ event.name }}</span><span v-if="!currentEvents.length" class="selected-ordinary">Обычный день</span></div>
+        </div>
+        <button type="button" class="copy-date-button" aria-label="Скопировать полную дату" title="Скопировать дату для заметки или истории" @click="copySelectedDate"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></svg></button>
+        <p v-if="copyDateMessage" class="copy-date-status" role="status">{{ copyDateMessage }}</p>
+      </div>
       <p v-if="message" class="hint" role="status">{{ message }}</p>
       <ul class="legend" aria-label="Легенда календаря"><li v-for="event in holidays" :key="event.id"><span :class="['symbol', event.id]">{{ event.symbol }}</span> {{ event.name }}</li><li>■ Сожранный день</li><li>— Нет такого дня в месяце</li></ul>
       <p class="hint">«—» означает, что у месяца нет такого числа; «■» — дата, сожранная Зверем: особый отсутствующий день. 23 Залар объединяет День Молчания и День Тьмы. Семь колонок — способ размещения дней; длина недели Эноа пока не определена.</p>
@@ -202,4 +225,6 @@ section{margin-bottom:46px}h2{margin:0 0 18px;font:600 34px/1.1 'Cormorant Garam
 .calendar-selection{font-size:12px;line-height:1.7;color:var(--theme-accent-strong);margin:0 0 20px}
 
 .calendar-page :deep(.lore-thread-intro){min-height:140px;padding-bottom:28px}.calendar-page :deep(.lore-thread-note){display:none}.calendar-toolbar{display:grid;grid-template-columns:minmax(190px,1.5fr) minmax(88px,.6fr) minmax(125px,1fr) minmax(70px,.5fr) minmax(160px,1.2fr);gap:14px;padding:18px;margin:0 0 18px;border:1px solid var(--line);border-radius:6px;background:rgba(var(--theme-surface-rgb),.5)}.calendar-control{min-width:0;gap:9px}.calendar-control-heading{display:flex;align-items:center;gap:8px;color:var(--theme-accent-strong);font-size:10px;letter-spacing:.04em}.calendar-control-heading svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}.calendar-control input,.calendar-control select{width:100%;min-width:0;padding:10px;font-size:12px}.calendar-selection{margin:0 0 20px}@media(max-width:1100px){.calendar-toolbar{grid-template-columns:repeat(4,minmax(0,1fr))}.calendar-control-era{grid-column:span 2}.calendar-control-events{grid-column:span 2}}@media(max-width:760px){.calendar-page :deep(.lore-thread-intro){min-height:110px;padding-bottom:22px}.calendar-toolbar{grid-template-columns:repeat(2,minmax(0,1fr));padding:14px;gap:14px}.calendar-control-era{grid-column:1 / -1}.calendar-control-events{grid-column:1 / -1}}
+
+.selected-date-panel{position:relative;margin:0 0 24px;padding:22px 48px 20px 22px;border-block:1px solid var(--line);background:linear-gradient(110deg,rgba(var(--theme-accent-rgb),.065),transparent 80%)}.selected-date-story{display:grid;grid-template-columns:minmax(160px,1.3fr) minmax(200px,1.8fr) minmax(85px,.7fr) minmax(40px,.4fr);gap:20px;align-items:start;animation:date-story-appear .25s ease-out}.selected-date-part>span{display:block;margin-bottom:7px;color:rgba(var(--theme-text-rgb),.6);font-size:9px;letter-spacing:.12em;text-transform:uppercase}.selected-date-part strong{font:500 26px/1.15 'Cormorant Garamond',serif;color:rgb(var(--theme-heading-rgb))}.selected-date-year strong{color:var(--theme-accent-strong)}.selected-date-part small{display:block;margin-top:7px;color:rgba(var(--theme-text-rgb),.45);font-size:9px}.selected-date-day strong{font-size:35px;line-height:1}.selected-date-holidays{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:10px}.selected-holiday{padding:6px 10px;border:1px solid var(--line);border-radius:3px;font-size:12px;background:rgba(var(--theme-accent-rgb),.04)}.selected-ordinary{font-size:11px;color:rgba(var(--theme-text-rgb),.5)}.copy-date-button{position:absolute;right:12px;top:18px;display:grid;place-items:center;width:32px;height:32px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--theme-accent-strong)}.copy-date-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round}.copy-date-button:hover{background:rgba(var(--theme-accent-rgb),.1)}.copy-date-status{margin:12px 0 0;font-size:10px;color:var(--theme-accent-strong)}@keyframes date-story-appear{from{opacity:.55;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}@media(max-width:1100px){.selected-date-story{grid-template-columns:1fr 1fr;gap:18px}.selected-date-part strong{font-size:25px}}@media(max-width:760px){.selected-date-panel{padding:18px 44px 18px 16px}.selected-date-story{gap:18px 14px}.selected-date-part strong{font-size:23px}.selected-date-year strong{overflow-wrap:anywhere}.selected-date-day strong{font-size:30px}}@media(prefers-reduced-motion:reduce){.selected-date-story{animation:none}}
 </style>
