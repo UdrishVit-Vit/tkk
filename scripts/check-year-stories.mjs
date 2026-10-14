@@ -14,14 +14,14 @@ for(let year=1;year<=YEAR_NAME_PERIOD;year++) {
     assert(!JSON.stringify(story).includes('undefined'))
     assert.deepEqual(story,yearStory(reading,narrator.id))
     voices.push(story.counsel)
-    if(narrator.id==='diviner') bodies.add(story.parable+'\n'+story.crossroads)
+    if(narrator.id==='shaman') bodies.add(story.parable+'\n'+story.crossroads)
   }
   assert.equal(new Set(voices).size,3)
 }
 assert.equal(bodies.size,1225)
 for(const name of ['Летящий Бук','Рубиновая Лягушка','Синий Перепелятник']) assert(yearStory(yearThread(1,name)))
 assert.equal(yearStory(null),null)
-assert.equal(yearStory(yearThread(1),'invalid').narrator,'diviner')
+assert.equal(yearStory(yearThread(1),'invalid').narrator,'shaman')
 const crystal=yearStory(yearThread(1,'Кристальный Барс'))
 const obsidian=yearStory(yearThread(1,'Обсидиановый Барс'))
 assert.notEqual(crystal.crossroads,obsidian.crossroads)

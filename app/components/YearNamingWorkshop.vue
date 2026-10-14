@@ -2,7 +2,7 @@
 import { YEAR_IMAGES as images, YEAR_ASPECTS as aspects } from '~/data/yearNaming.js'
 import { yearThread, YEAR_IMAGE_TALES as imageTales, YEAR_ASPECT_TALES as aspectTales } from '~/data/yearThreads.js'
 import { yearStory, YEAR_NARRATORS as narrators } from '~/data/yearStories.js'
-const narrator=ref('diviner')
+const narrator=ref('shaman')
 const props=defineProps({year:{type:Number,required:true},era:{type:String,required:true},yearName:{type:String,default:''}})
 const reading=computed(()=>yearThread(props.year,props.yearName))
 const story=computed(()=>yearStory(reading.value,narrator.value))
@@ -13,7 +13,7 @@ const displayName=computed(()=>props.yearName || reading.value?.name || 'Год 
   <section class="lore-thread-section year-threads" aria-labelledby="year-threads-title">
     <p class="eyebrow">Поверья · Приметы · Толкования</p>
     <h2 id="year-threads-title">Нити о годах</h2>
-    <p class="threads-intro">Присядь у очага. Имя года уже произнесено, но в разных устах оно обещает разное. Гадалка увидит примету, мудрец вспомнит притчу, а астролог заговорит о связях между людьми. Кому доверить рассказ?</p>
+    <p class="threads-intro">Присядь у очага. Имя года уже произнесено, но в разных устах оно обещает разное. Шаман услышит знак в треске огня, Магус из Медрессе прочтёт два смысла одной притчи, а Старый Дед вспомнит, как похожий год прошёл через соседний дом. Кому доверить рассказ?</p>
     <div class="year-reading" aria-live="polite" aria-atomic="true">
       <p class="reading-date">{{ era }} · год {{ year }}</p>
       <h3>{{ displayName }}</h3>

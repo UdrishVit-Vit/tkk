@@ -23,13 +23,13 @@ const mounted=renderer.createApp({render:()=>h(component,{...props,ref:vm=>{inst
 mounted.mount({})
 let state=instance.$.setupState
 assert.equal(state.reading.image.id,'simurgh')
-assert.equal(state.story.narrator,'diviner')
-const divinerText=state.story.counsel
-state.narrator='sage'
-assert.equal(state.story.narrator,'sage')
-assert.notEqual(state.story.counsel,divinerText)
-state.narrator='astrologer'
-assert.equal(state.story.narrator,'astrologer')
+assert.equal(state.story.narrator,'shaman')
+const shamanText=state.story.counsel
+state.narrator='magus'
+assert.equal(state.story.narrator,'magus')
+assert.notEqual(state.story.counsel,shamanText)
+state.narrator='elder'
+assert.equal(state.story.narrator,'elder')
 props.year=830;props.era='Время Ветров';props.yearName='Кристальный Барс'
 await nextTick()
 assert.equal(state.reading.image.id,'panther')
