@@ -42,7 +42,7 @@ for(let a=1;a<=4;a++) for(let b=1;b<=4;b++) for(let c=1;c<=4;c++) for(let d=1;d<
 assert.equal(outcomes.size,35)
 for(const row of YEAR_DICE_TABLE) assert.equal(outcomes.get(row.code),row.multiplicity)
 assert.equal(YEAR_DICE_TABLE.reduce((sum,row)=>sum+row.multiplicity,0),256)
-assert.equal(diceYearName([4,4,4,4],[4,4,4,4]).yearLabel,'Венценосной Мандрагоры')
+assert.equal(diceYearName([4,4,4,4],[4,4,4,4]).yearLabel,'Перламутровой Мандрагоры')
 assert.deepEqual(diceYearName([3,1,4,1],[2,4,1,2]),diceYearName([1,1,3,4],[1,2,2,4]))
 assert.equal(diceYearName([0,1,1,1],[1,1,1,1]),null)
 assert.equal(diceYearName([1,1,1],[1,1,1,1]),null)
@@ -66,3 +66,10 @@ for(let i=0;i<1225;i++) {
   assert.notEqual(circle[i].aspect.id,next.aspect.id)
 }
 console.log('Interwoven cycle checks passed: both symbols change at every boundary.')
+
+for(const label of ['Турмалиновый','Кварцевый','Жадеитовый','Гранатовый','Агатовый','Перламутровый']) {
+  assert(circle.some(x=>x.name===`${label} Симург`))
+  const stem=label.slice(0,-2)
+  assert.equal(circle.find(x=>x.name===`${stem}ая Сова`).yearLabel,`${stem}ой Совы`)
+}
+console.log('Mineral aspect checks passed: all six replacements and feminine grammar.')
