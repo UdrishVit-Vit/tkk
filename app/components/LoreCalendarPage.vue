@@ -3,6 +3,7 @@ import { CALENDAR_MONTHS as months, CALENDAR_EVENTS as holidays, YEAR_LENGTH, MA
 import { CALENDAR_ERAS as eras, YEAR_SIGNS as signs, MINUTES_PER_DAY, MAX_ERA_DAYS, initialChronologyDate, emptyEraDurations, validEraDurations, validChronologyDate, eraDayIndex, shiftChronologyDate, minutesFromPurusha, chronologyDifference, nextChronologyEvent, chronologyEventCycles, chronologyTimeLabel, elapsedTimeLabel } from '~/data/loreChronology.js'
 
 import { defaultGeneration, generateCalendarDate } from '~/data/calendarGeneration.js'
+import { DAY_THREADS as dayThreads, EATEN_DAY_THREAD as eatenDayThread } from '~/data/dayThreads.js'
 import { workingYearName } from '~/data/yearNaming.js'
 
 defineProps({ theme: { type: Object, required: true } })
@@ -260,13 +261,21 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
 
     <YearNamingWorkshop :year="date.year" :era="eras[date.era].title" :year-name="selectedYearName" />
 
-    <details class="calendar-reference"><summary>Имена годов в летописи</summary>
-    <section class="lore-thread-section year-signs" aria-labelledby="signs-title"><p class="eyebrow">Имена годов</p><h2 id="signs-title">Знаки Эноа</h2><p class="hint">Это известные названия, а не полный зодиакальный круг. Связь с номером года и правила смены знаков ещё не определены. Исторические даты «до Раскола» и «после Раскола» остаются отдельным отсчётом: 1240 П.Р. нельзя автоматически считать 1240-м годом Эпохи Восстановления.</p><div class="holiday-grid"><article v-for="sign in signs" :key="sign.id"><small>{{ sign.source }}</small><h3>{{ sign.name }}</h3><p>{{ sign.context }}</p><NuxtLink v-if="sign.history" :to="`/lore/history/${sign.history}`">Контекст в летописи ↗</NuxtLink></article></div></section>
-    </details>
 
-    <details class="calendar-reference"><summary>Все особые даты календаря</summary>
-    <section class="lore-thread-section holidays" aria-labelledby="holidays-title"><p class="eyebrow">Особые дни</p><h2 id="holidays-title">Знаки в календаре</h2><div class="holiday-grid"><article v-for="event in holidays" :key="event.id"><h3><span :class="event.id">{{ event.symbol }}</span> {{ event.name }}</h3><p>{{ eventDates(event) }}</p></article><article><h3>■ Сожранные Дни Зверя</h3><p>26 Шамды · 25–26 Манар · 24–26 Чокас · 24–26 Залар</p></article></div></section>
-    </details>
+    <section class="lore-thread-section day-threads" aria-labelledby="day-threads-title">
+      <p class="eyebrow">Обычаи · Поверья · Особые дни</p><h2 id="day-threads-title">Нити о днях</h2>
+      <p class="hint">Некоторые даты узнают по обряду, разговору или тишине у порога. В разных домах их встречают по-разному. Эти истории предлагают обычаям Эноа новые подробности.</p>
+      <div class="day-thread-grid">
+        <article v-for="event in holidays" :key="event.id" class="day-thread-card" :class="{ 'day-thread-today': currentEvents.some(mark=>mark.id===event.id) }">
+          <header><h3><span :class="event.id" aria-hidden="true">{{ event.symbol }}</span> {{ event.name }}</h3><span v-if="currentEvents.some(mark=>mark.id===event.id)" class="today-tag">В выбранную дату</span></header>
+          <p class="day-thread-dates">{{ eventDates(event) }}</p>
+          <h4>{{ dayThreads[event.id].title }}</h4><p>{{ dayThreads[event.id].story }}</p>
+          <details><summary>Как встречают этот день</summary><p>{{ dayThreads[event.id].custom }}</p></details>
+        </article>
+        <article class="day-thread-card"><h3>■ Сожранные Дни Зверя</h3><p class="day-thread-dates">26 Шамды · 25–26 Манар · 24–26 Чокас · 24–26 Залар</p><h4>{{ eatenDayThread.title }}</h4><p>{{ eatenDayThread.story }}</p><details><summary>Что говорят о пропавших днях</summary><p>{{ eatenDayThread.custom }}</p></details></article>
+      </div>
+      <p class="hint day-threads-note">Даты взяты из календаря; обычаи и приметы предложены как авторское дополнение к сеттингу.</p>
+    </section>
   </LoreThreadPage>
 </template>
 
@@ -289,4 +298,5 @@ section{margin-bottom:46px}h2{margin:0 0 18px;font:600 34px/1.1 'Cormorant Garam
 .selected-date-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:22px}.generate-date-button,.specify-date-button,.generation-reset{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:4px;padding:12px 16px;background:rgba(var(--theme-accent-rgb),.1);color:var(--theme-accent-strong);cursor:pointer}.specify-date-button{background:transparent}.specify-date-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round}.generate-date-button:hover,.specify-date-button:hover{background:rgba(var(--theme-accent-rgb),.18)}.calendar-filter-panel{border:1px solid var(--line);border-radius:6px;padding:22px;margin-bottom:20px}.calendar-filter-panel h3{margin:0 0 16px;font-size:25px}.generation-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.generation-fields label{min-width:0}.generation-fields input,.generation-fields select{width:100%;min-width:0}.generation-reset{margin:0 0 26px}.manual-date-toolbar{margin-bottom:0}@media(max-width:760px){.generation-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.calendar-filter-panel{padding:16px}.selected-date-actions{gap:10px}.generate-date-button,.specify-date-button{padding:11px 13px;font-size:12px}}
 .apply-date-button{margin-top:18px;padding:12px 18px;border:1px solid var(--theme-accent-strong);border-radius:4px;background:rgba(var(--theme-accent-rgb),.16);color:var(--theme-accent-strong);cursor:pointer}.generation-settings{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}.generation-settings summary{margin-bottom:18px}.generation-settings .generation-reset{margin-bottom:0}
 .calendar-reference{margin:22px 0;padding:16px 0;border-block:1px solid var(--line)}.calendar-reference>summary{font-size:13px}.calendar-reference>section{margin-top:24px}
+.day-thread-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:24px}.day-thread-card{padding:22px;border:1px solid var(--line);border-radius:6px;background:rgba(var(--theme-surface-rgb),.35);font-size:13px;line-height:1.85}.day-thread-card header{display:flex;align-items:start;justify-content:space-between;gap:12px}.day-thread-card h3{font-size:27px;margin:0}.day-thread-card h4{font:500 22px 'Cormorant Garamond',serif;color:var(--theme-accent-strong);margin:20px 0 10px}.day-thread-dates{font-size:10px;color:rgba(var(--theme-text-rgb),.6);margin:10px 0 0}.day-thread-card details{padding-top:16px;margin-top:18px;border-top:1px solid var(--line)}.day-thread-card summary{font-size:11px}.day-thread-card details p{font-size:12px}.day-thread-today{border-color:var(--theme-accent-strong)}.day-threads-note{margin-top:20px;font-size:10px}@media(max-width:760px){.day-thread-grid{grid-template-columns:1fr}.day-thread-card{padding:18px}.day-thread-card header{flex-wrap:wrap}}
 </style>
