@@ -21,7 +21,7 @@ assert.equal(today[4].today, true)
 assert.equal(today[5].today, true)
 assert.equal(today[5].next.days, 198)
 assert.equal(today[0].next.days, 1)
-assert.equal(cycles({ ...start(), year: 9999, month: 7, day: 23 })[5].next, null)
+assert.equal(cycles({ ...start(), year: 1000000, month: 7, day: 23 })[5].next, null)
 
 // Six short epochs have no hunt; the search must reach the final epoch.
 const lengths = [150,150,150,150,150,150]

@@ -38,7 +38,7 @@ for (let month = 0; month < 8; month++) {
 assert.deepEqual(shiftCalendarDate({ year: 1, month: 4, day: 25 }, 1), { year: 1, month: 5, day: 1 })
 assert.deepEqual(shiftCalendarDate({ year: 1, month: 7, day: 23 }, 1), { year: 2, month: 0, day: 1 })
 assert.equal(shiftCalendarDate({ year: 1, month: 0, day: 1 }, -1), null)
-assert.equal(shiftCalendarDate({ year: 9999, month: 7, day: 23 }, 1), null)
+assert.equal(shiftCalendarDate({ year: 1000000, month: 7, day: 23 }, 1), null)
 assert.equal(shiftCalendarDate({ year: 1, month: 0, day: 1 }, 1.5), null)
 assert.equal(validCalendarDate({ year: 1, month: 5, day: 25 }), false)
 assert.equal(validCalendarDate({ year: 1, month: 8, day: 1 }), false)

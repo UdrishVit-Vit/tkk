@@ -1,5 +1,5 @@
 import { HISTORY_THREAD } from './loreHistory.js'
-import { YEAR_LENGTH, CALENDAR_MONTHS, CALENDAR_EVENTS, validCalendarDate, dayOfYear, calendarCell } from './loreCalendar.js'
+import { YEAR_LENGTH, MAX_CALENDAR_YEAR, CALENDAR_MONTHS, CALENDAR_EVENTS, validCalendarDate, dayOfYear, calendarCell } from './loreCalendar.js'
 
 export const CALENDAR_ERAS = HISTORY_THREAD.sections.map(({ slug, title, summary }) => ({ id: slug, title, summary }))
 export const YEAR_SIGNS = [
@@ -10,11 +10,10 @@ export const YEAR_SIGNS = [
   { id: 'blue-sparrowhawk', name: 'Синий Перепелятник', yearLabel: 'Синего Перепелятника', source: 'Lore 0.31', context: 'Рождение героя во время Лета Трёх Солнц.', history: 'epoha-lyudey' },
   { id: 'lapis-bull', name: 'Лазуритовый Бык', yearLabel: 'Лазуритового Быка', source: 'Lore 0.31', context: '1240 П.Р.: первое собрание Высокого Круга. П.Р. — отдельный отсчёт после Раскола.', history: 'epoha-vosstanovleniya' },
   { id: 'ruby-frog', name: 'Рубиновая Лягушка', yearLabel: 'Рубиновой Лягушки', source: 'Lore 0.31', context: 'Видение Граару, через 50 лет после Объятия.', history: 'vremya-vetrov' },
-  { id: 'azure-bull', name: 'Лазурный Бык', yearLabel: 'Лазурного Быка', source: 'Пример автора', context: 'Дополнительный знак из описания календаря.' },
-  { id: 'red-monitor', name: 'Красный Варан', yearLabel: 'Красного Варана', source: 'Пример автора', context: 'Дополнительный знак из описания календаря.' },
+  { id: 'azure-bull', name: 'Лазурный Бык', yearLabel: 'Лазурного Быка', source: 'Пример автора', context: 'Дополнительное сочетание Лазурного облика и Быка, включённое в рабочий круг по вашему списку.' },
 ]
 export const MINUTES_PER_DAY = 1440
-export const MAX_ERA_DAYS = 9999 * YEAR_LENGTH
+export const MAX_ERA_DAYS = MAX_CALENDAR_YEAR * YEAR_LENGTH
 export const initialChronologyDate = (era = 0) => ({ era, year: 1, month: 0, day: 1, hour: 0, minute: 0 })
 export const emptyEraDurations = () => Array(CALENDAR_ERAS.length - 1).fill(null)
 export const validEraDurations = durations => Array.isArray(durations) && durations.length === CALENDAR_ERAS.length - 1 && durations.every(days => days === null || (Number.isSafeInteger(days) && days > 0 && days <= MAX_ERA_DAYS))
@@ -48,7 +47,7 @@ export function shiftChronologyDate(date, minutes, durations = emptyEraDurations
   while (durations[era] != null && position >= durations[era] * MINUTES_PER_DAY) {
     position -= durations[era++] * MINUTES_PER_DAY
   }
-  if (position >= MAX_ERA_DAYS * MINUTES_PER_DAY) return { error: 'Превышен предел 9999 лет в одной эпохе.' }
+  if (position >= MAX_ERA_DAYS * MINUTES_PER_DAY) return { error: 'Превышен технический предел одного миллиона лет в одной эпохе.' }
   return { date: fromEraMinutes(era, position) }
 }
 export function minutesFromPurusha(date, durations = emptyEraDurations()) {

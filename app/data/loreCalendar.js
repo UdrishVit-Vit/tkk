@@ -1,3 +1,4 @@
+export const MAX_CALENDAR_YEAR = 1000000
 export const CALENDAR_MONTHS = [
   { id: 'eor', name: 'Эор', days: 26 },
   { id: 'mulgur', name: 'Мулгур', days: 25 },
@@ -28,7 +29,7 @@ export function calendarCell(month, day) {
 }
 
 export function validCalendarDate(date) {
-  return Number.isSafeInteger(date?.year) && date.year >= 1 && date.year <= 9999
+  return Number.isSafeInteger(date?.year) && date.year >= 1 && date.year <= MAX_CALENDAR_YEAR
     && Number.isInteger(date.month) && date.month >= 0 && date.month < 8
     && Number.isInteger(date.day) && date.day >= 1 && date.day <= CALENDAR_MONTHS[date.month].days
 }
@@ -40,7 +41,7 @@ export function dayOfYear(date) {
 export function shiftCalendarDate(date, offset) {
   if (!validCalendarDate(date) || !Number.isSafeInteger(offset)) return null
   let ordinal = (date.year - 1) * YEAR_LENGTH + dayOfYear(date) - 1 + offset
-  if (ordinal < 0 || ordinal >= 9999 * YEAR_LENGTH) return null
+  if (ordinal < 0 || ordinal >= MAX_CALENDAR_YEAR * YEAR_LENGTH) return null
   const year = Math.floor(ordinal / YEAR_LENGTH) + 1
   ordinal %= YEAR_LENGTH
   let month = 0
