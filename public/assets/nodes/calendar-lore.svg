@@ -1,7 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" stroke="#d6aa60" stroke-width="1.5">
-  <path d="M64 6 105 23 122 64 105 105 64 122 23 105 6 64 23 23Z"/>
-  <circle cx="64" cy="64" r="43"/><circle cx="64" cy="64" r="33" stroke-opacity=".4"/>
-  <path d="M64 21v10m30-18-7 7m20 14H97m-3 30-7-7m-23 30V97m-30-3 7-7M21 64h10m3-30 7 7"/>
-  <path d="M48 43h32v42H48zM48 54h32M55 39v9m18-9v9M55 64h5m8 0h5m-18 11h5m8 0h5"/>
-  <path d="M64 2v8m62 54h-8m-54 62v-8M2 64h8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <g stroke="#16140f" stroke-width="1.4" stroke-linejoin="miter">
+    <path fill="#eee6c9" d="m128 6 9 9-9 9-9-9Zm122 122-9 9-9-9 9-9ZM128 250l-9-9 9-9 9 9ZM6 128l9-9 9 9-9 9Z"/>
+    <path fill="#eee6c9" fill-rule="evenodd" d="m128 25 47 47-12 12-35-35-35 35-12-12Zm103 103-47 47-12-12 35-35-35-35 12-12ZM128 231l-47-47 12-12 35 35 35-35 12 12ZM25 128l47-47 12 12-35 35 35 35-12 12Z"/>
+    <path id="corner-knot" fill="#eee6c9" d="m85 62 15 15-10 10-15-15-13 13 15 15-10 10-15-15-13 13-10-10Z"/>
+    <use href="#corner-knot" transform="rotate(90 128 128)"/>
+    <use href="#corner-knot" transform="rotate(180 128 128)"/>
+    <use href="#corner-knot" transform="rotate(270 128 128)"/>
+    <path fill="#eee6c9" fill-rule="evenodd" d="m128 65 45 18 18 45-18 45-45 18-45-18-18-45 18-45Zm0 15-34 14-14 34 14 34 34 14 34-14 14-34-14-34Z"/>
+  </g>
+  <g stroke="#eee6c9" stroke-width="3" stroke-linecap="square">
+    <path d="M128 24v30m74 74h30M128 202v30M24 128h30M128 88v11m40-11-8 8m8 32h-11m11 40-8-8m-32 8v-11m-40 11 8-8m-8-32h11m-11-40 8 8"/>
+  </g>
+  <g fill="#eee6c9" stroke="#16140f" stroke-width="1">
+    <path d="m128 106 6 14 16 2-12 10 4 16-14-8-14 8 4-16-12-10 16-2Z"/>
+    <path d="m128 56 5 5-5 5-5-5Zm72 72-5 5-5-5 5-5Zm-72 72-5-5 5-5 5 5Zm-72-72 5-5 5 5-5 5Z"/>
+  </g>
 </svg>

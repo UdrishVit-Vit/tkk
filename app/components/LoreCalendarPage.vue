@@ -175,7 +175,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
 </script>
 
 <template>
-  <LoreThreadPage class="calendar-page" :theme="theme" title="Календарь" eyebrow="Мир Эноа · Нить времени" icon="/assets/nodes/calendar-lore.svg" @up="$emit('up')">
+  <LoreThreadPage class="calendar-page" :theme="theme" title="Календарь" eyebrow="Мир Эноа · Нить времени" icon="/assets/nodes/calendar-lore.svg?v=2" @up="$emit('up')">
 
     <section class="lore-thread-section calendar-section" aria-label="Календарь по месяцам">
       <div class="selected-date-panel">
