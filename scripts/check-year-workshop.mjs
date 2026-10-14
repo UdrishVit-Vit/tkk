@@ -19,18 +19,27 @@ let applied = null
 const app = renderer.createApp(component, {year:6,era:'Жертва Пуруша',onApply: name => {applied=name}})
 const state = app.mount({}).$.setupState
 assert.equal(state.elapsed,829)
-assert.equal(state.proposedName,'Лазуритовый Журавль')
-assert.equal(state.preview.length,195)
+assert.equal(state.proposedName,'Золотая Саламандра')
+assert.equal(state.preview.length,1225)
 assert.equal(state.embraceElapsed,138)
 state.emit('apply',state.proposedName)
-assert.equal(applied,'Лазуритовый Журавль')
+assert.equal(applied,'Золотая Саламандра')
 state.elapsed=830
-assert.equal(state.proposedName,'Рубиновый Левиафан')
+assert.equal(state.proposedName,'Золотой Скорпион')
 assert.equal(state.embraceElapsed,139)
 state.elapsed=500000
-assert.equal(state.result.round,2565)
+assert.equal(state.result.round,409)
 state.elapsed=-1
 assert.equal(state.proposedName,'')
 assert.equal(state.preview.length,0)
+state.imageRoll='4–4–4–4'
+state.aspectRoll='4 4 4 4'
+assert.equal(state.diceResult.name,'Венценосная Мандрагора')
+state.emit('apply',state.diceResult.name)
+assert.equal(applied,'Венценосная Мандрагора')
+state.imageRoll='1115'
+assert.equal(state.diceResult,null)
+state.rollName()
+assert(state.diceResult)
 app.unmount()
-console.log('Working naming UI checks passed: current references, 195-year preview, long dates and applying a name.')
+console.log('Working naming UI checks passed: current references, 1225-year preview, long dates and applying a name.')
