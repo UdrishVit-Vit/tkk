@@ -1,45 +1,36 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
-import { createRequire } from 'node:module'
-import { pathToFileURL } from 'node:url'
-import { resolve } from 'node:path'
-import { createRenderer } from 'vue'
-import { parse, compileScript, compileTemplate } from 'vue/compiler-sfc'
-const require = createRequire(import.meta.url)
-const filename = resolve('app/components/YearNamingWorkshop.vue')
-const { descriptor } = parse(readFileSync(filename, 'utf8'), {filename})
-const template = compileTemplate({source: descriptor.template.content, filename, id:'year-workshop'})
-assert.equal(template.errors.length, 0)
-let source = compileScript(descriptor, {id:'year-workshop'}).content
-source = `import {ref,computed} from '${pathToFileURL(require.resolve('vue')).href}';\n` + source.replace(/from '(~\/data\/[^']+)'/g, (_, path) => `from '${pathToFileURL(resolve('app', path.slice(2))).href}'`)
-const component = (await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`)).default
-component.render = () => null
-const renderer = createRenderer({createElement: type=>({type}),createText:text=>({text}),createComment:text=>({text}),setText(){},setElementText(){},parentNode:()=>null,nextSibling:()=>null,insert(){},remove(){},patchProp(){}})
-let applied = null
-const app = renderer.createApp(component, {year:6,era:'Жертва Пуруша',onApply: name => {applied=name}})
-const state = app.mount({}).$.setupState
-assert.equal(state.elapsed,829)
-assert.equal(state.proposedName,'Кристальный Барс')
-assert.equal(state.preview.length,1225)
-assert.equal(state.embraceElapsed,138)
-state.emit('apply',state.proposedName)
-assert.equal(applied,'Кристальный Барс')
-state.elapsed=830
-assert.equal(state.proposedName,'Железный Миндаль')
-assert.equal(state.embraceElapsed,139)
-state.elapsed=500000
-assert.equal(state.result.round,409)
-state.elapsed=-1
-assert.equal(state.proposedName,'')
-assert.equal(state.preview.length,0)
-state.imageRoll='4–4–4–4'
-state.aspectRoll='4 4 4 4'
-assert.equal(state.diceResult.name,'Перламутровая Гиена')
-state.emit('apply',state.diceResult.name)
-assert.equal(applied,'Перламутровая Гиена')
-state.imageRoll='1115'
-assert.equal(state.diceResult,null)
-state.rollName()
-assert(state.diceResult)
-app.unmount()
-console.log('Working naming UI checks passed: current references, 1225-year preview, long dates and applying a name.')
+import {readFileSync} from 'node:fs'
+import {createRequire} from 'node:module'
+import {pathToFileURL} from 'node:url'
+import {resolve} from 'node:path'
+import {createRenderer,reactive,nextTick} from 'vue'
+import {parse,compileScript,compileTemplate} from 'vue/compiler-sfc'
+const require=createRequire(import.meta.url)
+const filename=resolve('app/components/YearNamingWorkshop.vue')
+const {descriptor}=parse(readFileSync(filename,'utf8'),{filename})
+assert.equal(compileTemplate({source:descriptor.template.content,filename,id:'threads-ui'}).errors.length,0)
+let source=compileScript(descriptor,{id:'threads-ui'}).content
+source=`import {computed} from '${pathToFileURL(require.resolve('vue')).href}';\n`+source.replace(/from '(~\/data\/[^']+)'/g,(_,path)=>`from '${pathToFileURL(resolve('app',path.slice(2))).href}'`)
+const component=(await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`)).default
+component.render=()=>null
+const renderer=createRenderer({createElement:type=>({type}),createText:text=>({text}),createComment:text=>({text}),setText(){},setElementText(){},parentNode:()=>null,nextSibling:()=>null,insert(){},remove(){},patchProp(){}})
+const props=reactive({year:1,era:'Жертва Пуруша',yearName:'Пепельный Симург'})
+const app=renderer.createApp({render(){return null}})
+// Render a reactive parent so calendar date/name changes reach the child.
+const {h}=await import('vue')
+let instance
+const mounted=renderer.createApp({render:()=>h(component,{...props,ref:vm=>{instance=vm}})})
+mounted.mount({})
+let state=instance.$.setupState
+assert.equal(state.reading.image.id,'simurgh')
+props.year=830;props.era='Время Ветров';props.yearName='Кристальный Барс'
+await nextTick()
+assert.equal(state.reading.image.id,'panther')
+assert.equal(state.reading.aspect.id,'crystal')
+assert.equal(state.displayName,'Кристальный Барс')
+props.yearName='Местное имя'
+await nextTick()
+assert.equal(state.reading,null)
+assert.equal(state.displayName,'Местное имя')
+mounted.unmount()
+console.log('Year threads UI checks passed: Vue compilation, selected year updates and local-name fallback.')

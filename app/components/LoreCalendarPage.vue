@@ -19,6 +19,24 @@ const offset = ref(1)
 const offsetUnit = ref('days')
 const filter = ref('all')
 const showFilters = ref(false)
+const dateDraft = ref({...date.value})
+const manualDateError = ref('')
+function toggleDateSettings() {
+  if(!showFilters.value) {dateDraft.value={...date.value};manualDateError.value=''}
+  showFilters.value=!showFilters.value
+}
+function applyManualDate() {
+  const candidate={...dateDraft.value,era:Number(dateDraft.value.era),year:Number(dateDraft.value.year),month:Number(dateDraft.value.month),day:Number(dateDraft.value.day)}
+  if(!validChronologyDate(candidate,durations.value)) {
+    manualDateError.value='Укажите существующую дату в пределах выбранной эпохи. Год: 1–1 000 000.'
+    return
+  }
+  updateDate(candidate)
+  generationStatus.value=''
+  manualDateError.value=''
+  showFilters.value=false
+  message.value='Дата применена.'
+}
 const generation = ref(defaultGeneration())
 const generationRolls = ref([])
 const generationStatus = ref('')
@@ -170,12 +188,24 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
         <button type="button" class="copy-date-button" aria-label="Скопировать полную дату" title="Скопировать дату для заметки или истории" @click="copySelectedDate"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></svg></button>
         <div class="selected-date-actions">
           <button type="button" class="generate-date-button" @click="generateDate">◇ Бросить 4d4</button>
-          <button type="button" class="specify-date-button" :aria-expanded="showFilters" aria-controls="calendar-filters" @click="showFilters=!showFilters"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18l-7 8v7l-4 2v-9Z"/></svg>Указать дату</button>
+          <button type="button" class="specify-date-button" :aria-expanded="showFilters" aria-controls="calendar-filters" @click="toggleDateSettings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18l-7 8v7l-4 2v-9Z"/></svg>Указать дату</button>
         </div>
         <p v-if="copyDateMessage" class="copy-date-status" role="status">{{ copyDateMessage }}</p>
       </div>
       <div v-if="showFilters" id="calendar-filters" class="calendar-filter-panel">
-        <h3>Условия генерации</h3>
+        <h3>Указать дату</h3>
+        <form @submit.prevent="applyManualDate">
+      <div class="calendar-toolbar manual-date-toolbar" role="region" aria-label="Параметры календаря">
+        <label class="calendar-control calendar-control-era"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10M7 21h10M8 3v4l4 5-4 5v4m8-18v4l-4 5 4 5v4" /></svg>Эпоха</span><select v-model.number="dateDraft.era"><option v-for="(era, index) in eras" :key="era.id" :value="index">{{ era.title }}</option></select></label>
+        <label class="calendar-control calendar-control-year"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-2 18m10-18-2 18M3 9h18M3 15h18" /></svg>Год</span><input type="number" min="1" :max="MAX_CALENDAR_YEAR" step="1" v-model.number="dateDraft.year"></label>
+        <label class="calendar-control"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18" /></svg>Месяц</span><select v-model.number="dateDraft.month" @change="dateDraft.day=Math.min(dateDraft.day,months[dateDraft.month].days)"><option v-for="(month, index) in months" :key="month.id" :value="index">{{ month.name }}</option></select></label>
+        <label class="calendar-control calendar-control-day"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 9-9 9-9-9Z"/><circle cx="12" cy="12" r="2"/></svg>День</span><input type="number" min="1" :max="months[dateDraft.month].days" step="1" v-model.number="dateDraft.day"></label>
+        <label class="calendar-control calendar-control-events"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Отметки</span><select v-model="filter"><option value="all">Все события</option><option v-for="event in holidays" :key="event.id" :value="event.id">{{ event.symbol }} {{ event.name }}</option><option value="eaten">■ Сожранные дни</option></select></label>
+      </div>
+        <p v-if="manualDateError" class="hint" role="alert">{{ manualDateError }}</p>
+        <button type="submit" class="apply-date-button">Применить дату</button>
+        </form>
+        <details class="generation-settings"><summary>Условия случайной генерации</summary>
         <div class="generation-fields">
           <label>Эпоха<select v-model="generation.era"><option value="any">Любая эпоха</option><option v-for="(era,index) in eras" :key="era.id" :value="index">{{ era.title }}</option></select></label>
           <label>Год от<input v-model.number="generation.yearMin" type="number" min="1" :max="MAX_CALENDAR_YEAR" step="1"></label>
@@ -186,14 +216,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
         </div>
         <p class="hint">Одинаковые границы года закрепляют год. Неизвестные длительности эпох не ограничивают генерацию; заданные длительности учитываются. Несуществующие и сожранные дни не выпадают.</p>
         <button type="button" class="generation-reset" @click="resetGeneration">Сбросить условия</button>
-        <h3>Выбрать дату вручную</h3>
-      <div class="calendar-toolbar manual-date-toolbar" role="region" aria-label="Параметры календаря">
-        <label class="calendar-control calendar-control-era"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10M7 21h10M8 3v4l4 5-4 5v4m8-18v4l-4 5 4 5v4" /></svg>Эпоха</span><select :value="date.era" @change="selectEra(Number($event.target.value))"><option v-for="(era, index) in eras" :key="era.id" :value="index">{{ era.title }}</option></select></label>
-        <label class="calendar-control calendar-control-year"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-2 18m10-18-2 18M3 9h18M3 15h18" /></svg>Год</span><input type="number" min="1" :max="MAX_CALENDAR_YEAR" step="1" :value="date.year" @change="setYear($event.target.value)"></label>
-        <label class="calendar-control"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18" /></svg>Месяц</span><select :value="date.month" @change="choose(Number($event.target.value), date.day)"><option v-for="(month, index) in months" :key="month.id" :value="index">{{ month.name }}</option></select></label>
-        <label class="calendar-control calendar-control-day"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 9-9 9-9-9Z"/><circle cx="12" cy="12" r="2"/></svg>День</span><input type="number" min="1" :max="months[date.month].days" step="1" :value="date.day" @change="setDay($event.target.value)"></label>
-        <label class="calendar-control calendar-control-events"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Отметки</span><select v-model="filter"><option value="all">Все события</option><option v-for="event in holidays" :key="event.id" :value="event.id">{{ event.symbol }} {{ event.name }}</option><option value="eaten">■ Сожранные дни</option></select></label>
-      </div>
+        </details>
       </div>
       <p v-if="generationStatus" class="hint" role="alert">{{ generationStatus }}</p>
       <p v-if="message" class="hint" role="status">{{ message }}</p>
@@ -235,11 +258,15 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
       <p class="hint">«К дате» выбирает этот день в календаре. Сожранные даты пропускаются. Ближайшие особые дни текущего года отмечены в таблице точкой.</p>
     </section>
 
-    <YearNamingWorkshop :year="date.year" :era="eras[date.era].title" @apply="name => { yearSign = 'custom'; customSign = name }" />
+    <YearNamingWorkshop :year="date.year" :era="eras[date.era].title" :year-name="selectedYearName" />
 
+    <details class="calendar-reference"><summary>Имена годов в летописи</summary>
     <section class="lore-thread-section year-signs" aria-labelledby="signs-title"><p class="eyebrow">Имена годов</p><h2 id="signs-title">Знаки Эноа</h2><p class="hint">Это известные названия, а не полный зодиакальный круг. Связь с номером года и правила смены знаков ещё не определены. Исторические даты «до Раскола» и «после Раскола» остаются отдельным отсчётом: 1240 П.Р. нельзя автоматически считать 1240-м годом Эпохи Восстановления.</p><div class="holiday-grid"><article v-for="sign in signs" :key="sign.id"><small>{{ sign.source }}</small><h3>{{ sign.name }}</h3><p>{{ sign.context }}</p><NuxtLink v-if="sign.history" :to="`/lore/history/${sign.history}`">Контекст в летописи ↗</NuxtLink></article></div></section>
+    </details>
 
+    <details class="calendar-reference"><summary>Все особые даты календаря</summary>
     <section class="lore-thread-section holidays" aria-labelledby="holidays-title"><p class="eyebrow">Особые дни</p><h2 id="holidays-title">Знаки в календаре</h2><div class="holiday-grid"><article v-for="event in holidays" :key="event.id"><h3><span :class="event.id">{{ event.symbol }}</span> {{ event.name }}</h3><p>{{ eventDates(event) }}</p></article><article><h3>■ Сожранные Дни Зверя</h3><p>26 Шамды · 25–26 Манар · 24–26 Чокас · 24–26 Залар</p></article></div></section>
+    </details>
   </LoreThreadPage>
 </template>
 
@@ -260,4 +287,6 @@ section{margin-bottom:46px}h2{margin:0 0 18px;font:600 34px/1.1 'Cormorant Garam
 
 .selected-date-panel{position:relative;margin:0 0 24px;padding:22px 48px 20px 22px;border-block:1px solid var(--line);background:linear-gradient(110deg,rgba(var(--theme-accent-rgb),.065),transparent 80%)}.selected-date-story{display:grid;grid-template-columns:minmax(160px,1.3fr) minmax(200px,1.8fr) minmax(85px,.7fr) minmax(40px,.4fr);gap:20px;align-items:start;animation:date-story-appear .25s ease-out}.selected-date-part>span{display:block;margin-bottom:7px;color:rgba(var(--theme-text-rgb),.6);font-size:9px;letter-spacing:.12em;text-transform:uppercase}.selected-date-part strong{font:500 26px/1.15 'Cormorant Garamond',serif;color:rgb(var(--theme-heading-rgb))}.selected-date-year strong{color:var(--theme-accent-strong)}.selected-date-part small{display:block;margin-top:7px;color:rgba(var(--theme-text-rgb),.45);font-size:9px}.selected-date-day strong{font-size:35px;line-height:1}.selected-date-holidays{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:10px}.selected-holiday{padding:6px 10px;border:1px solid var(--line);border-radius:3px;font-size:12px;background:rgba(var(--theme-accent-rgb),.04)}.selected-ordinary{font-size:11px;color:rgba(var(--theme-text-rgb),.5)}.copy-date-button{position:absolute;right:12px;top:18px;display:grid;place-items:center;width:32px;height:32px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--theme-accent-strong)}.copy-date-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round}.copy-date-button:hover{background:rgba(var(--theme-accent-rgb),.1)}.copy-date-status{margin:12px 0 0;font-size:10px;color:var(--theme-accent-strong)}@keyframes date-story-appear{from{opacity:.55;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}@media(max-width:1100px){.selected-date-story{grid-template-columns:1fr 1fr;gap:18px}.selected-date-part strong{font-size:25px}}@media(max-width:760px){.selected-date-panel{padding:18px 44px 18px 16px}.selected-date-story{gap:18px 14px}.selected-date-part strong{font-size:23px}.selected-date-year strong{overflow-wrap:anywhere}.selected-date-day strong{font-size:30px}}@media(prefers-reduced-motion:reduce){.selected-date-story{animation:none}}
 .selected-date-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:22px}.generate-date-button,.specify-date-button,.generation-reset{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:4px;padding:12px 16px;background:rgba(var(--theme-accent-rgb),.1);color:var(--theme-accent-strong);cursor:pointer}.specify-date-button{background:transparent}.specify-date-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round}.generate-date-button:hover,.specify-date-button:hover{background:rgba(var(--theme-accent-rgb),.18)}.calendar-filter-panel{border:1px solid var(--line);border-radius:6px;padding:22px;margin-bottom:20px}.calendar-filter-panel h3{margin:0 0 16px;font-size:25px}.generation-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.generation-fields label{min-width:0}.generation-fields input,.generation-fields select{width:100%;min-width:0}.generation-reset{margin:0 0 26px}.manual-date-toolbar{margin-bottom:0}@media(max-width:760px){.generation-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.calendar-filter-panel{padding:16px}.selected-date-actions{gap:10px}.generate-date-button,.specify-date-button{padding:11px 13px;font-size:12px}}
+.apply-date-button{margin-top:18px;padding:12px 18px;border:1px solid var(--theme-accent-strong);border-radius:4px;background:rgba(var(--theme-accent-rgb),.16);color:var(--theme-accent-strong);cursor:pointer}.generation-settings{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}.generation-settings summary{margin-bottom:18px}.generation-settings .generation-reset{margin-bottom:0}
+.calendar-reference{margin:22px 0;padding:16px 0;border-block:1px solid var(--line)}.calendar-reference>summary{font-size:13px}.calendar-reference>section{margin-top:24px}
 </style>
