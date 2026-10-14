@@ -76,5 +76,18 @@ state.date = { era: 0, year: 100000, month: 0, day: 1, hour: 0, minute: 0 }
 state.advance(1)
 assert.equal(state.date.year,100000)
 assert.equal(state.date.day,2)
+state.durations = [null, null, null, null, null, null]
+state.date = { era: 0, year: 1, month: 0, day: 26, hour: 0, minute: 0 }
+state.choose(7,state.date.day)
+assert.equal(state.date.month,7)
+assert.equal(state.date.day,23)
+state.setDay('6')
+assert.equal(state.date.day,6)
+state.setDay('24')
+assert.equal(state.date.day,6)
+state.selectEra(1)
+assert.equal(state.date.year,1)
+assert.equal(state.date.month,0)
+assert.equal(state.date.day,1)
 app.unmount()
 console.log('Calendar page runtime checks passed: migration, signs per year, era reset, durations, countdown and persistence.')
