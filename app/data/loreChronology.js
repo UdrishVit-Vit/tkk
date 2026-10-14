@@ -1,5 +1,5 @@
 import { HISTORY_THREAD } from './loreHistory.js'
-import { YEAR_LENGTH, CALENDAR_MONTHS, validCalendarDate, dayOfYear, calendarCell } from './loreCalendar.js'
+import { YEAR_LENGTH, CALENDAR_MONTHS, CALENDAR_EVENTS, validCalendarDate, dayOfYear, calendarCell } from './loreCalendar.js'
 
 export const CALENDAR_ERAS = HISTORY_THREAD.sections.map(({ slug, title, summary }) => ({ id: slug, title, summary }))
 export const YEAR_SIGNS = [
@@ -73,7 +73,7 @@ export function chronologyDifference(from, to, durations = emptyEraDurations()) 
   return from.era < to.era ? total : -total
 }
 export function nextChronologyEvent(date, durations = emptyEraDurations()) {
-  for (let offset = 1; offset <= YEAR_LENGTH; offset++) {
+  for (let offset = 1; offset <= YEAR_LENGTH * CALENDAR_ERAS.length; offset++) {
     const result = shiftChronologyDate({ ...date, hour: 0, minute: 0 }, offset * MINUTES_PER_DAY, durations)
     if (!result.date) return null
     const events = calendarCell(result.date.month, result.date.day).events
@@ -85,4 +85,44 @@ export const chronologyTimeLabel = date => `${String(date.hour).padStart(2, '0')
 export function elapsedTimeLabel(minutes) {
   const value = Math.abs(minutes)
   return `${Math.floor(value / MINUTES_PER_DAY)} дн. ${Math.floor((value % MINUTES_PER_DAY) / 60)} ч. ${value % 60} мин.`
+}
+
+// Calendar markers describe the supplied dates, not inferred orbital phases.
+// Short configured eras can restart the calendar several times before a marker.
+export function chronologyEventCycles(date, durations = emptyEraDurations()) {
+  if (!validChronologyDate(date, durations)) return []
+  const anchor = { ...date, hour: 0, minute: 0 }
+  const previous = new Map()
+  const upcoming = new Map()
+  const horizon = YEAR_LENGTH * CALENDAR_ERAS.length
+  for (let days = 0; days <= horizon; days++) {
+    const result = shiftChronologyDate(anchor, -days * MINUTES_PER_DAY, durations)
+    if (!result.date) break
+    for (const event of calendarCell(result.date.month, result.date.day).events) {
+      if (!previous.has(event.id)) previous.set(event.id, { date: result.date, days })
+    }
+    if (previous.size === CALENDAR_EVENTS.length) break
+  }
+  for (let days = 1; days <= horizon; days++) {
+    const result = shiftChronologyDate(anchor, days * MINUTES_PER_DAY, durations)
+    if (!result.date) break
+    const events = calendarCell(result.date.month, result.date.day).events
+    for (const event of events) {
+      if (!upcoming.has(event.id)) upcoming.set(event.id, { date: result.date, days, events })
+    }
+    if (upcoming.size === CALENDAR_EVENTS.length) break
+  }
+  const today = calendarCell(date.month, date.day).events
+  return CALENDAR_EVENTS.map(event => {
+    const before = previous.get(event.id) || null
+    const next = upcoming.get(event.id) || null
+    const spanMinutes = before && next ? chronologyDifference(before.date, next.date, durations) : null
+    const elapsedMinutes = before ? chronologyDifference(before.date, date, durations) : null
+    return {
+      event, today: today.some(item => item.id === event.id), previous: before, next,
+      remainingMinutes: next ? chronologyDifference(date, next.date, durations) : null,
+      spanDays: spanMinutes === null ? null : spanMinutes / MINUTES_PER_DAY,
+      progress: spanMinutes > 0 ? Math.min(100, elapsedMinutes / spanMinutes * 100) : null,
+    }
+  })
 }

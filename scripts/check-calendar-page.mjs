@@ -60,5 +60,17 @@ assert.equal(restored.note, 'Старая заметка')
 state.setDuration(2, '0')
 assert.equal(state.durations[2], null)
 assert(state.message.includes('Длительность'))
+state.durations = [null, null, null, null, null, null]
+state.date = { era: 0, year: 1, month: 0, day: 1, hour: 0, minute: 0 }
+const manu = state.eventCycles.find(cycle => cycle.event.id === 'manu')
+assert.equal(manu.next.days, 25)
+assert(state.upcomingCells.has('0:26'))
+state.countToCycle(manu)
+assert.equal(state.remaining, 25 * 1440)
+assert(state.cycleIsTarget(manu))
+state.advance(1)
+assert.equal(state.remaining, 24 * 1440)
+state.date = { era: 0, year: 1, month: 7, day: 23, hour: 0, minute: 0 }
+assert(!state.upcomingCells.has('7:23'))
 app.unmount()
 console.log('Calendar page runtime checks passed: migration, signs per year, era reset, durations, countdown and persistence.')
