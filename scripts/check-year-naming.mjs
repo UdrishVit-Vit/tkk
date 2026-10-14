@@ -12,18 +12,10 @@ assert.equal(circle.find(x=>x.name==='Кристальная Сова').yearLabe
 assert.equal(circle.find(x=>x.name==='Рубиновая Лягушка').yearLabel,'Рубиновой Лягушки')
 assert.equal(circle.find(x=>x.name==='Коралловый Перепелятник').yearLabel,'Кораллового Перепелятника')
 assert.equal(name(0).name,'Пепельный Симург')
-assert.equal(name(2).name,'Пепельный Аюр')
 assert(!YEAR_IMAGES.some(image=>image.name==='Олень'))
 assert(!YEAR_ASPECTS.some(aspect=>aspect.m==='Синий'))
-assert.equal(name(3).name,'Пепельный Краб')
-assert.equal(name(3).yearLabel,'Пепельного Краба')
-assert.equal(name(4).name,'Пепельный Ястреб')
-assert.equal(name(4).yearLabel,'Пепельного Ястреба')
-assert.equal(name(5).name,'Пепельный Левиафан')
-assert.equal(name(6).name,'Пепельный Скарабей')
-assert.equal(name(6).yearLabel,'Пепельного Скарабея')
 for(let year=0;year<1225;year++) assert.equal(name(year+1225).name,name(year).name)
-assert.equal(name(829).name,'Золотая Саламандра')
+assert.equal(name(829).name,'Кристальный Барс')
 assert.equal(name(829).round,1)
 assert.equal(name(829).position,830)
 assert.equal(name(829).year,830)
@@ -38,8 +30,6 @@ assert.equal(name(1000001),null)
 assert(!circle.some(x=>x.name==='Красный Варан'))
 console.log('Expanded cycle checks passed: all 1225 pairs, eight requested names, feminine grammar, rollover and long chronology.')
 
-assert.equal(name(34).name,'Пепельная Мандрагора')
-assert.equal(name(35).name,'Янтарный Симург')
 assert.equal(YEAR_DICE_TABLE.length,35)
 const outcomes = new Map()
 for(let a=1;a<=4;a++) for(let b=1;b<=4;b++) for(let c=1;c<=4;c++) for(let d=1;d<=4;d++) {
@@ -69,3 +59,10 @@ for (const [name, genitive] of [['Павлин','Павлина'],['Архар',
 }
 assert(!YEAR_IMAGES.some(x=>x.name==='Снежный Лев'))
 console.log('Remaining image checks passed: seven approved replacements and genitive forms.')
+
+for(let i=0;i<1225;i++) {
+  const next=name((i+1)%1225)
+  assert.notEqual(circle[i].image.id,next.image.id)
+  assert.notEqual(circle[i].aspect.id,next.aspect.id)
+}
+console.log('Interwoven cycle checks passed: both symbols change at every boundary.')

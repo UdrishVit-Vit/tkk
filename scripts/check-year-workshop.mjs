@@ -19,13 +19,13 @@ let applied = null
 const app = renderer.createApp(component, {year:6,era:'Жертва Пуруша',onApply: name => {applied=name}})
 const state = app.mount({}).$.setupState
 assert.equal(state.elapsed,829)
-assert.equal(state.proposedName,'Золотая Саламандра')
+assert.equal(state.proposedName,'Кристальный Барс')
 assert.equal(state.preview.length,1225)
 assert.equal(state.embraceElapsed,138)
 state.emit('apply',state.proposedName)
-assert.equal(applied,'Золотая Саламандра')
+assert.equal(applied,'Кристальный Барс')
 state.elapsed=830
-assert.equal(state.proposedName,'Золотой Скорпион')
+assert.equal(state.proposedName,'Железный Миндаль')
 assert.equal(state.embraceElapsed,139)
 state.elapsed=500000
 assert.equal(state.result.round,409)

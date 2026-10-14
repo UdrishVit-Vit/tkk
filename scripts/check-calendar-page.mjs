@@ -4,7 +4,7 @@ import { createRequire } from 'node:module'
 import { pathToFileURL } from 'node:url'
 import { resolve } from 'node:path'
 import { createRenderer, nextTick, reactive } from 'vue'
-import { parse, compileScript } from 'vue/compiler-sfc'
+import { parse, compileScript, compileTemplate } from 'vue/compiler-sfc'
 
 const require = createRequire(import.meta.url)
 const route = reactive({ query: {} })
@@ -14,6 +14,7 @@ globalThis.useHead = () => {}
 globalThis.localStorage = { getItem: key => saved.get(key) || null, setItem: (key, value) => saved.set(key, value) }
 const filename = resolve('app/components/LoreCalendarPage.vue')
 const { descriptor } = parse(readFileSync(filename, 'utf8'), { filename })
+assert.equal(compileTemplate({source:descriptor.template.content,filename,id:'calendar-runtime-check'}).errors.length,0)
 let source = compileScript(descriptor, { id: 'calendar-runtime-check' }).content
 source = `import {ref,computed,onMounted,watch} from '${pathToFileURL(require.resolve('vue')).href}';\n` + source.replace(/from '(~\/data\/[^']+)'/g, (_, path) => `from '${pathToFileURL(resolve('app', path.slice(2))).href}'`)
 const component = (await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`)).default
@@ -106,5 +107,16 @@ assert.equal(state.selectedYearName,'Коралловый Аюр')
 state.date = { ...state.date, month:7,day:23 }
 assert(state.selectedDateText.includes('День Молчания'))
 assert(state.selectedDateText.includes('День Тьмы'))
+state.resetGeneration()
+assert.equal(state.showFilters,false)
+assert.equal(state.generation.yearMax,1225)
+state.generation={era:2,yearMin:7,yearMax:7,month:7,day:23,event:'darkness'}
+state.generateDate()
+assert.deepEqual(state.date,{era:2,year:7,month:7,day:23,hour:0,minute:0})
+assert.equal(state.selectedYearName,state.suggestedYear.name)
+state.generation.day=26
+state.generateDate()
+assert(state.generationStatus.includes('нет существующей даты'))
+assert.equal(state.date.day,23)
 app.unmount()
 console.log('Calendar page runtime checks passed: migration, signs per year, era reset, durations, countdown and persistence.')

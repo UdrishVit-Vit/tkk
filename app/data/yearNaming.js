@@ -77,8 +77,12 @@ export const YEAR_NAME_PERIOD = YEAR_IMAGES.length * YEAR_ASPECTS.length
 export const HISTORY_REFERENCE = { afterSplit:829, afterEmbrace:138, embraceAfterSplit:691 }
 export function workingYearName(elapsedYears) {
   if (!Number.isSafeInteger(elapsedYears) || elapsedYears < 0 || elapsedYears > 1000000) return null
-  const image = YEAR_IMAGES[elapsedYears % YEAR_IMAGES.length]
-  const aspect = YEAR_ASPECTS[Math.floor(elapsedYears / YEAR_IMAGES.length) % YEAR_ASPECTS.length]
+  // Two interwoven permutations: every adjacent year changes both symbols.
+  const position = elapsedYears % YEAR_NAME_PERIOD
+  const step = position % 35
+  const turn = Math.floor(position / 35)
+  const image = YEAR_IMAGES[(11 * step) % 35]
+  const aspect = YEAR_ASPECTS[(17 * step + 13 * turn) % 35]
   return { name:`${aspect[image.gender]} ${image.name}`,yearLabel:`${aspect[image.gender+'g']} ${image.genitive}`,image,aspect,
     elapsedYears,year:elapsedYears+1,round:Math.floor(elapsedYears/YEAR_NAME_PERIOD)+1,position:elapsedYears%YEAR_NAME_PERIOD+1,period:YEAR_NAME_PERIOD }
 }

@@ -2,6 +2,7 @@
 import { CALENDAR_MONTHS as months, CALENDAR_EVENTS as holidays, YEAR_LENGTH, MAX_CALENDAR_YEAR, calendarCell, dayOfYear, calendarDateLabel } from '~/data/loreCalendar.js'
 import { CALENDAR_ERAS as eras, YEAR_SIGNS as signs, MINUTES_PER_DAY, MAX_ERA_DAYS, initialChronologyDate, emptyEraDurations, validEraDurations, validChronologyDate, eraDayIndex, shiftChronologyDate, minutesFromPurusha, chronologyDifference, nextChronologyEvent, chronologyEventCycles, chronologyTimeLabel, elapsedTimeLabel } from '~/data/loreChronology.js'
 
+import { defaultGeneration, generateCalendarDate } from '~/data/calendarGeneration.js'
 import { workingYearName } from '~/data/yearNaming.js'
 
 defineProps({ theme: { type: Object, required: true } })
@@ -17,6 +18,18 @@ const note = ref('')
 const offset = ref(1)
 const offsetUnit = ref('days')
 const filter = ref('all')
+const showFilters = ref(false)
+const generation = ref(defaultGeneration())
+const generationRolls = ref([])
+const generationStatus = ref('')
+function resetGeneration() { generation.value=defaultGeneration(); generationStatus.value=''; generationRolls.value=[] }
+function generateDate() {
+  const result=generateCalendarDate(generation.value,durations.value)
+  if(result.error) { generationStatus.value=result.error; generationRolls.value=[]; return }
+  updateDate(result.date)
+  generationRolls.value=result.rolls
+  generationStatus.value=result.rolls.length ? 'Новая дата выбрана бросками.' : 'Условия задают единственную дату.'
+}
 const message = ref('')
 const storageMessage = ref('')
 const ready = ref(false)
@@ -146,13 +159,33 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
   <LoreThreadPage class="calendar-page" :theme="theme" title="Календарь" eyebrow="Мир Эноа · Нить времени" icon="/assets/nodes/calendar-lore.svg" @up="$emit('up')">
 
     <section class="lore-thread-section calendar-section" aria-label="Календарь по месяцам">
-      <div class="calendar-toolbar" role="region" aria-label="Параметры календаря">
+      <div class="calendar-random-bar">
+        <div><span class="eyebrow">Случайная дата</span><h2>Куда приведут четыре грани?</h2><p class="hint">4d4 выбирают эпоху, год, месяц и существующий день. Для больших диапазонов бросаем дополнительные группы. По умолчанию — любая эпоха, годы 1–1225.</p></div>
+        <div class="calendar-random-actions"><button type="button" class="generate-date-button" @click="generateDate">◇ Бросить 4d4</button><button type="button" class="calendar-filter-button" :aria-expanded="showFilters" aria-controls="calendar-filters" title="Настройки даты и генерации" aria-label="Открыть настройки даты и генерации" @click="showFilters=!showFilters"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18l-7 8v7l-4 2v-9Z"/></svg></button></div>
+      </div>
+      <div v-if="showFilters" id="calendar-filters" class="calendar-filter-panel">
+        <h3>Условия генерации</h3>
+        <div class="generation-fields">
+          <label>Эпоха<select v-model="generation.era"><option value="any">Любая эпоха</option><option v-for="(era,index) in eras" :key="era.id" :value="index">{{ era.title }}</option></select></label>
+          <label>Год от<input v-model.number="generation.yearMin" type="number" min="1" :max="MAX_CALENDAR_YEAR" step="1"></label>
+          <label>Год до<input v-model.number="generation.yearMax" type="number" min="1" :max="MAX_CALENDAR_YEAR" step="1"></label>
+          <label>Месяц<select v-model="generation.month"><option value="any">Любой месяц</option><option v-for="(month,index) in months" :key="month.id" :value="index">{{ month.name }}</option></select></label>
+          <label>День<select v-model="generation.day"><option value="any">Любой день</option><option v-for="day in 26" :key="day" :value="day">{{ day }}</option></select></label>
+          <label>Событие<select v-model="generation.event"><option value="any">Любой день и праздник</option><option value="ordinary">Обычный день</option><option v-for="event in holidays" :key="event.id" :value="event.id">{{ event.symbol }} {{ event.name }}</option></select></label>
+        </div>
+        <p class="hint">Одинаковые границы года закрепляют год. Неизвестные длительности эпох не ограничивают генерацию; заданные длительности учитываются. Несуществующие и сожранные дни не выпадают.</p>
+        <button type="button" class="generation-reset" @click="resetGeneration">Сбросить условия</button>
+        <h3>Выбрать дату вручную</h3>
+      <div class="calendar-toolbar manual-date-toolbar" role="region" aria-label="Параметры календаря">
         <label class="calendar-control calendar-control-era"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10M7 21h10M8 3v4l4 5-4 5v4m8-18v4l-4 5 4 5v4" /></svg>Эпоха</span><select :value="date.era" @change="selectEra(Number($event.target.value))"><option v-for="(era, index) in eras" :key="era.id" :value="index">{{ era.title }}</option></select></label>
         <label class="calendar-control calendar-control-year"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-2 18m10-18-2 18M3 9h18M3 15h18" /></svg>Год</span><input type="number" min="1" :max="MAX_CALENDAR_YEAR" step="1" :value="date.year" @change="setYear($event.target.value)"></label>
         <label class="calendar-control"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18" /></svg>Месяц</span><select :value="date.month" @change="choose(Number($event.target.value), date.day)"><option v-for="(month, index) in months" :key="month.id" :value="index">{{ month.name }}</option></select></label>
         <label class="calendar-control calendar-control-day"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 9-9 9-9-9Z"/><circle cx="12" cy="12" r="2"/></svg>День</span><input type="number" min="1" :max="months[date.month].days" step="1" :value="date.day" @change="setDay($event.target.value)"></label>
         <label class="calendar-control calendar-control-events"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Отметки</span><select v-model="filter"><option value="all">Все события</option><option v-for="event in holidays" :key="event.id" :value="event.id">{{ event.symbol }} {{ event.name }}</option><option value="eaten">■ Сожранные дни</option></select></label>
       </div>
+      </div>
+      <p v-if="generationStatus" class="hint" role="status">{{ generationStatus }}</p>
+      <details v-if="generationRolls.length" class="generation-rolls"><summary>Результаты бросков</summary><ul><li v-for="(roll,index) in generationRolls" :key="index"><strong>{{ roll.label }}</strong>: {{ roll.dice.join(' · ') }}<span v-if="!roll.accepted"> — переброс для равных шансов</span></li></ul></details>
       <div class="selected-date-panel">
         <div :key="selectedDateText" class="selected-date-story" aria-live="polite" aria-atomic="true">
           <div class="selected-date-part selected-date-era"><span>Эпоха</span><strong>{{ eras[date.era].title }}</strong></div>
@@ -227,4 +260,5 @@ section{margin-bottom:46px}h2{margin:0 0 18px;font:600 34px/1.1 'Cormorant Garam
 .calendar-page :deep(.lore-thread-intro){min-height:140px;padding-bottom:28px}.calendar-page :deep(.lore-thread-note){display:none}.calendar-toolbar{display:grid;grid-template-columns:minmax(190px,1.5fr) minmax(88px,.6fr) minmax(125px,1fr) minmax(70px,.5fr) minmax(160px,1.2fr);gap:14px;padding:18px;margin:0 0 18px;border:1px solid var(--line);border-radius:6px;background:rgba(var(--theme-surface-rgb),.5)}.calendar-control{min-width:0;gap:9px}.calendar-control-heading{display:flex;align-items:center;gap:8px;color:var(--theme-accent-strong);font-size:10px;letter-spacing:.04em}.calendar-control-heading svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}.calendar-control input,.calendar-control select{width:100%;min-width:0;padding:10px;font-size:12px}.calendar-selection{margin:0 0 20px}@media(max-width:1100px){.calendar-toolbar{grid-template-columns:repeat(4,minmax(0,1fr))}.calendar-control-era{grid-column:span 2}.calendar-control-events{grid-column:span 2}}@media(max-width:760px){.calendar-page :deep(.lore-thread-intro){min-height:110px;padding-bottom:22px}.calendar-toolbar{grid-template-columns:repeat(2,minmax(0,1fr));padding:14px;gap:14px}.calendar-control-era{grid-column:1 / -1}.calendar-control-events{grid-column:1 / -1}}
 
 .selected-date-panel{position:relative;margin:0 0 24px;padding:22px 48px 20px 22px;border-block:1px solid var(--line);background:linear-gradient(110deg,rgba(var(--theme-accent-rgb),.065),transparent 80%)}.selected-date-story{display:grid;grid-template-columns:minmax(160px,1.3fr) minmax(200px,1.8fr) minmax(85px,.7fr) minmax(40px,.4fr);gap:20px;align-items:start;animation:date-story-appear .25s ease-out}.selected-date-part>span{display:block;margin-bottom:7px;color:rgba(var(--theme-text-rgb),.6);font-size:9px;letter-spacing:.12em;text-transform:uppercase}.selected-date-part strong{font:500 26px/1.15 'Cormorant Garamond',serif;color:rgb(var(--theme-heading-rgb))}.selected-date-year strong{color:var(--theme-accent-strong)}.selected-date-part small{display:block;margin-top:7px;color:rgba(var(--theme-text-rgb),.45);font-size:9px}.selected-date-day strong{font-size:35px;line-height:1}.selected-date-holidays{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:10px}.selected-holiday{padding:6px 10px;border:1px solid var(--line);border-radius:3px;font-size:12px;background:rgba(var(--theme-accent-rgb),.04)}.selected-ordinary{font-size:11px;color:rgba(var(--theme-text-rgb),.5)}.copy-date-button{position:absolute;right:12px;top:18px;display:grid;place-items:center;width:32px;height:32px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--theme-accent-strong)}.copy-date-button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round}.copy-date-button:hover{background:rgba(var(--theme-accent-rgb),.1)}.copy-date-status{margin:12px 0 0;font-size:10px;color:var(--theme-accent-strong)}@keyframes date-story-appear{from{opacity:.55;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}@media(max-width:1100px){.selected-date-story{grid-template-columns:1fr 1fr;gap:18px}.selected-date-part strong{font-size:25px}}@media(max-width:760px){.selected-date-panel{padding:18px 44px 18px 16px}.selected-date-story{gap:18px 14px}.selected-date-part strong{font-size:23px}.selected-date-year strong{overflow-wrap:anywhere}.selected-date-day strong{font-size:30px}}@media(prefers-reduced-motion:reduce){.selected-date-story{animation:none}}
+.calendar-random-bar{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:20px;padding:22px;border:1px solid var(--line);border-radius:6px;background:rgba(var(--theme-surface-rgb),.5)}.calendar-random-bar h2{margin:8px 0;font-size:28px}.calendar-random-bar p{margin:0;max-width:600px}.calendar-random-actions{display:flex;gap:10px;align-items:center;flex-shrink:0}.generate-date-button,.generation-reset{border:1px solid var(--line);border-radius:4px;padding:12px 16px;background:rgba(var(--theme-accent-rgb),.1);color:var(--theme-accent-strong);cursor:pointer}.calendar-filter-button{width:43px;height:43px;display:grid;place-items:center;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--theme-accent-strong);cursor:pointer}.calendar-filter-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round}.calendar-filter-panel{border:1px solid var(--line);border-radius:6px;padding:22px;margin-bottom:20px}.calendar-filter-panel h3{margin:0 0 16px;font-size:25px}.generation-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.generation-fields label{min-width:0}.generation-fields input,.generation-fields select{width:100%;min-width:0}.generation-reset{margin:0 0 26px}.manual-date-toolbar{margin-bottom:0}.generation-rolls{margin-bottom:20px;font-size:12px}.generation-rolls summary{cursor:pointer;color:var(--theme-accent-strong)}@media(max-width:760px){.calendar-random-bar{flex-direction:column;align-items:stretch;padding:16px}.calendar-random-actions{justify-content:space-between}.generation-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.calendar-filter-panel{padding:16px}}
 </style>
