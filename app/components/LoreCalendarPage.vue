@@ -1,4 +1,5 @@
 <script setup>
+import { nextTick } from 'vue'
 import { CALENDAR_MONTHS as months, CALENDAR_EVENTS as holidays, YEAR_LENGTH, MAX_CALENDAR_YEAR, calendarCell, dayOfYear, calendarDateLabel } from '~/data/loreCalendar.js'
 import { CALENDAR_ERAS as eras, YEAR_SIGNS as signs, MINUTES_PER_DAY, MAX_ERA_DAYS, initialChronologyDate, emptyEraDurations, validEraDurations, validChronologyDate, eraDayIndex, shiftChronologyDate, minutesFromPurusha, chronologyDifference, nextChronologyEvent, chronologyEventCycles, chronologyTimeLabel, elapsedTimeLabel } from '~/data/loreChronology.js'
 
@@ -24,6 +25,14 @@ const manualDateError = ref('')
 function toggleDateSettings() {
   if(!showFilters.value) {dateDraft.value={...date.value};manualDateError.value=''}
   showFilters.value=!showFilters.value
+}
+async function openDateSettings() {
+  if (!showFilters.value) toggleDateSettings()
+  await nextTick()
+  if (typeof document === 'undefined') return
+  const panel = document.getElementById('calendar-filters')
+  panel?.scrollIntoView({ block: 'start' })
+  panel?.querySelector('select')?.focus({ preventScroll: true })
 }
 function applyManualDate() {
   const candidate={...dateDraft.value,era:Number(dateDraft.value.era),year:Number(dateDraft.value.year),month:Number(dateDraft.value.month),day:Number(dateDraft.value.day)}
@@ -55,6 +64,8 @@ const storageKey = 'enoa-calendar-v2'
 const currentEvents = computed(() => calendarCell(date.value.month, date.value.day).events)
 const next = computed(() => nextChronologyEvent(date.value, durations.value))
 const eventCycles = computed(() => chronologyEventCycles(date.value, durations.value))
+const orderedEventCycles = computed(() => [...eventCycles.value].sort((a,b) => Number(b.today)-Number(a.today) || (a.next?.days ?? Infinity)-(b.next?.days ?? Infinity)))
+const dayCountLabel = count => `${count} ${count % 100 >= 11 && count % 100 <= 14 ? 'дней' : count % 10 === 1 ? 'день' : count % 10 >= 2 && count % 10 <= 4 ? 'дня' : 'дней'}`
 const upcomingCells = computed(() => new Set(eventCycles.value.filter(cycle => cycle.next && cycle.next.date.era === date.value.era && cycle.next.date.year === date.value.year).map(cycle => `${cycle.next.date.month}:${cycle.next.date.day}`)))
 function countToCycle(cycle) {
   if (!cycle.next) return
@@ -170,12 +181,17 @@ function cellLabel(month, day) {
   if (cell.kind === 'absent') return `${day} ${months[month].name}: нет такого дня в месяце`
   return `${day} ${months[month].name}${cell.events.length ? ': ' + cell.events.map(event => event.name).join(', ') : ': обычный день'}${upcomingCells.value.has(`${month}:${day}`) ? '; ближайший особый день этого типа' : ''}`
 }
-useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'description', content: 'Восемь месяцев Эноа, праздники и сожранные дни Зверя. Интерактивный календарь и счётчик времени для игровой кампании.' }] })
+useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'description', content: 'Календарь Эноа: восемь месяцев, особые даты и имена годов. Выберите дату и послушайте её толкование у Шамана, Магуса из Медрессе или Старого Деда.' }] })
 </script>
 
 <template>
   <LoreThreadPage class="calendar-page" :theme="theme" title="Календарь" eyebrow="Мир Эноа · Нить времени" icon="/assets/nodes/calendar-lore.svg?v=2" @up="$emit('up')">
 
+    <nav class="calendar-section-nav" aria-label="Разделы календаря"><a href="#calendar-months">Месяцы</a><a href="#cycles-title">Особые даты</a><a href="#year-threads-title">Нити о годах</a><a href="#day-threads-title">Нити о днях</a></nav>
+    <aside class="calendar-date-dock" aria-label="Выбранная дата">
+      <div class="dock-date" :title="selectedDateText"><span>{{ eras[date.era].title }} · год {{ date.year }}</span><strong>{{ selectedYearName }}</strong><span>{{ date.day }} {{ months[date.month].name }}</span></div>
+      <button type="button" @click="openDateSettings" :aria-expanded="showFilters" aria-controls="calendar-filters">Указать дату</button>
+    </aside>
     <section class="lore-thread-section calendar-section" aria-label="Календарь по месяцам">
       <div class="selected-date-panel">
         <div :key="selectedDateText" class="selected-date-story" aria-live="polite" aria-atomic="true">
@@ -194,7 +210,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
       </div>
       <div v-if="showFilters" id="calendar-filters" class="calendar-filter-panel">
         <h3>Указать дату</h3>
-        <form @submit.prevent="applyManualDate">
+        <form @submit.prevent="applyManualDate" @keydown.esc.prevent="showFilters=false">
       <div class="calendar-toolbar manual-date-toolbar" role="region" aria-label="Параметры календаря">
         <label class="calendar-control calendar-control-era"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10M7 21h10M8 3v4l4 5-4 5v4m8-18v4l-4 5 4 5v4" /></svg>Эпоха</span><select v-model.number="dateDraft.era"><option v-for="(era, index) in eras" :key="era.id" :value="index">{{ era.title }}</option></select></label>
         <label class="calendar-control calendar-control-year"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-2 18m10-18-2 18M3 9h18M3 15h18" /></svg>Год</span><input type="number" min="1" :max="MAX_CALENDAR_YEAR" step="1" v-model.number="dateDraft.year"></label>
@@ -203,7 +219,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
         <label class="calendar-control calendar-control-events"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Отметки</span><select v-model="filter"><option value="all">Все события</option><option v-for="event in holidays" :key="event.id" :value="event.id">{{ event.symbol }} {{ event.name }}</option><option value="eaten">■ Сожранные дни</option></select></label>
       </div>
         <p v-if="manualDateError" class="hint" role="alert">{{ manualDateError }}</p>
-        <button type="submit" class="apply-date-button">Применить дату</button>
+        <div class="manual-date-actions"><button type="submit" class="apply-date-button">Применить дату</button><button type="button" class="cancel-date-button" @click="showFilters=false">Отмена</button></div>
         </form>
         <details class="generation-settings"><summary>Условия случайной генерации</summary>
         <div class="generation-fields">
@@ -222,9 +238,10 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
       <p v-if="message" class="hint" role="status">{{ message }}</p>
       <ul class="legend" aria-label="Легенда календаря"><li v-for="event in holidays" :key="event.id"><span :class="['symbol', event.id]">{{ event.symbol }}</span> {{ event.name }}</li><li>■ Сожранный день</li><li>— Нет такого дня в месяце</li></ul>
       <p class="hint">«—» означает, что у месяца нет такого числа; «■» — дата, сожранная Зверем: особый отсутствующий день. 23 Залар объединяет День Молчания и День Тьмы.</p>
-      <div class="month-grid">
-        <article v-for="(month, index) in months" :key="month.id" class="month-card" :class="{ 'month-card-current': date.month === index }" :aria-labelledby="'month-title-' + month.id">
-          <header><h3 :id="'month-title-' + month.id">{{ month.name }}</h3><span>{{ month.days }} дней</span></header>
+      <div class="month-shortcut"><a :href="'#month-' + months[date.month].id">К выбранному месяцу: {{ months[date.month].name }} ↓</a></div>
+      <div id="calendar-months" class="month-grid">
+        <article v-for="(month, index) in months" :key="month.id" :id="'month-' + month.id" class="month-card" :class="{ 'month-card-current': date.month === index }" :aria-labelledby="'month-title-' + month.id">
+          <header><h3 :id="'month-title-' + month.id">{{ month.name }}</h3><span>{{ dayCountLabel(month.days) }}</span></header>
           <div class="month-days" :aria-label="'Дни месяца ' + month.name">
             <template v-for="(day, slot) in monthSlots" :key="slot">
               <span v-if="day === null" class="month-padding" aria-hidden="true" />
@@ -239,15 +256,17 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
 
     <section class="lore-thread-section celestial-cycles" aria-labelledby="cycles-title">
       <p class="eyebrow">Шамас · Ману · Эри</p><h2 id="cycles-title">Особые даты</h2>
-      <p class="hint">Каждый отсчёт идёт от вашей текущей даты до следующего отмеченного дня: солнечного, лунного или праздничного. Сегодняшнее событие показано отдельно. Расчёт использует известные даты календаря; фазы и положения светил между ними пока не заданы.</p>
+      <p class="hint">Ближайшие особые дни от выбранной даты. События этого дня отмечены отдельно; карточки расположены по близости следующей даты.</p>
       <div class="cycle-grid" aria-live="polite">
-        <article v-for="cycle in eventCycles" :key="cycle.event.id" :class="['cycle-card', { 'cycle-today': cycle.today }]">
-          <header><h3><span :class="cycle.event.id" aria-hidden="true">{{ cycle.event.symbol }}</span> {{ cycle.event.name }}</h3><span v-if="cycle.today" class="today-tag">Сегодня</span></header>
+        <article v-for="cycle in orderedEventCycles" :key="cycle.event.id" :class="['cycle-card', { 'cycle-today': cycle.today }]">
+          <header><h3><span :class="cycle.event.id" aria-hidden="true">{{ cycle.event.symbol }}</span> {{ cycle.event.name }}</h3><span v-if="cycle.today" class="today-tag">В выбранную дату</span></header>
           <template v-if="cycle.next">
-            <p class="cycle-distance">Через <strong>{{ cycle.next.days }}</strong> дн.</p>
+            <p class="cycle-distance"><span>Следующее наступление — через</span> <strong>{{ dayCountLabel(cycle.next.days) }}</strong></p>
             <p class="cycle-date">{{ calendarDateLabel(cycle.next.date) }}<small v-if="cycle.next.date.era !== date.era">{{ eras[cycle.next.date.era].title }}</small></p>
+            <details class="cycle-timing"><summary>Подробнее об отсчёте</summary>
             <p class="cycle-exact">До начала дня: {{ elapsedTimeLabel(cycle.remainingMinutes) }}</p>
             <div v-if="cycle.progress !== null" class="cycle-interval"><progress :value="cycle.progress" max="100" :aria-label="'Интервал между отмеченными днями: ' + cycle.event.name" /><span>Между этими датами: {{ cycle.spanDays }} дн.</span></div>
+            </details>
             <p v-if="cycle.next.events.length > 1" class="cycle-conjunction">Совпадает: {{ cycle.next.events.filter(event => event.id !== cycle.event.id).map(event => `${event.symbol} ${event.name}`).join(' · ') }}</p>
             <div class="cycle-actions"><button type="button" :aria-label="'Перейти к событию: ' + cycle.event.name" @click="updateDate({ ...cycle.next.date })">К дате →</button></div>
 
@@ -255,7 +274,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
           <p v-else class="hint">Следующая дата находится за пределами доступного отсчёта.</p>
         </article>
       </div>
-      <p class="hint">«К дате» выбирает этот день в календаре. Сожранные даты пропускаются. Ближайшие особые дни текущего года отмечены в таблице точкой.</p>
+      <p class="hint">Точка под числом отмечает ближайший особый день этого типа. «К дате» выбирает его в календаре.</p>
     </section>
 
     <YearNamingWorkshop :year="date.year" :era="eras[date.era].title" :year-name="selectedYearName" />
@@ -294,4 +313,13 @@ section{margin-bottom:46px}h2{margin:0 0 18px;font:600 34px/1.1 'Cormorant Garam
 .apply-date-button{margin-top:18px;padding:12px 18px;border:1px solid var(--theme-accent-strong);border-radius:4px;background:rgba(var(--theme-accent-rgb),.16);color:var(--theme-accent-strong);cursor:pointer}.generation-settings{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}.generation-settings summary{margin-bottom:18px}.generation-settings .generation-reset{margin-bottom:0}
 .calendar-reference{margin:22px 0;padding:16px 0;border-block:1px solid var(--line)}.calendar-reference>summary{font-size:13px}.calendar-reference>section{margin-top:24px}
 .day-thread-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:24px}.day-thread-card{padding:22px;border:1px solid var(--line);border-radius:6px;background:rgba(var(--theme-surface-rgb),.35);font-size:13px;line-height:1.85}.day-thread-card header{display:flex;align-items:start;justify-content:space-between;gap:12px}.day-thread-card h3{font-size:27px;margin:0}.day-thread-card h4{font:500 22px 'Cormorant Garamond',serif;color:var(--theme-accent-strong);margin:20px 0 10px}.day-thread-dates{font-size:10px;color:rgba(var(--theme-text-rgb),.6);margin:10px 0 0}.day-thread-card details{padding-top:16px;margin-top:18px;border-top:1px solid var(--line)}.day-thread-card summary{font-size:11px}.day-thread-card details p{font-size:12px}.day-thread-today{border-color:var(--theme-accent-strong)}.day-threads-note{margin-top:20px;font-size:10px}@media(max-width:760px){.day-thread-grid{grid-template-columns:1fr}.day-thread-card{padding:18px}.day-thread-card header{flex-wrap:wrap}}
+.calendar-section-nav{display:flex;flex-wrap:wrap;gap:8px 20px;padding:0 0 20px;margin-bottom:22px;border-bottom:1px solid var(--line)}.calendar-section-nav a{color:var(--theme-accent-strong);font-size:12px;text-decoration:none;padding:7px 0;text-underline-offset:5px}.calendar-section-nav a:hover{text-decoration:underline}.calendar-section-nav a:focus-visible{outline:2px solid var(--theme-accent-strong);outline-offset:4px}.calendar-page :deep([id]){scroll-margin-top:24px}.manual-date-actions{display:flex;align-items:center;gap:12px;margin-top:18px}.manual-date-actions .apply-date-button{margin-top:0}.cancel-date-button{padding:12px 16px;border:1px solid var(--line);border-radius:4px;background:transparent;color:rgb(var(--theme-text-rgb));cursor:pointer}.cycle-timing{padding:10px 0;border-top:1px solid var(--line)}.cycle-timing summary{font-size:11px}.cycle-timing .cycle-exact{margin:12px 0}.cycle-distance strong{font-size:36px;white-space:nowrap}.cycle-card h3{font-size:25px;overflow-wrap:anywhere}.month-card-current{border-color:var(--theme-accent-strong)}.calendar-control input,.calendar-control select,.generation-fields input,.generation-fields select{box-sizing:border-box;min-height:44px}.month-day.is-muted{opacity:.55}.day-thread-card{padding:18px}.day-thread-card h3{font-size:24px}.day-thread-dates{font-size:12px;line-height:1.8}.day-thread-card .today-tag{white-space:normal;max-width:100%}@media(max-width:760px){.calendar-page :deep(.lore-thread-body){padding-left:0}.calendar-page :deep(.lore-thread-axis){display:none}.calendar-page :deep(.lore-thread-section::before),.calendar-page :deep(.lore-thread-section::after){display:none}.calendar-section-nav{gap:4px 18px}.calendar-section-nav a{min-height:32px;display:flex;align-items:center}.selected-date-story{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.selected-date-part strong{overflow-wrap:anywhere}.month-card{padding:12px}.month-days{gap:3px}.month-day{min-height:48px}.cycle-distance strong{font-size:34px}.calendar-page .hint{font-size:12px}.generation-fields{grid-template-columns:1fr 1fr}.calendar-control-heading{font-size:11px}}
+
+.calendar-date-dock{position:sticky;top:0;z-index:12;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;margin:0 0 20px;background:var(--theme-bg,#181818);border:1px solid var(--line);border-radius:0 0 6px 6px;box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.dock-date{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 14px;min-width:0;font-size:12px;line-height:1.5}.dock-date strong{font:600 21px/1.15 'Cormorant Garamond',serif;color:var(--theme-accent-strong);overflow-wrap:anywhere}.dock-date>span:first-child{color:rgba(var(--theme-text-rgb),.75)}
+.calendar-date-dock button{flex-shrink:0;min-height:44px;padding:10px 14px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--theme-accent-strong);font:12px 'Hanken Grotesk',sans-serif}.calendar-date-dock button:hover{background:rgba(var(--theme-accent-rgb),.12)}
+.calendar-page :deep([id]){scroll-margin-top:140px}.month-shortcut{display:flex;justify-content:flex-end;margin:18px 0 14px}.month-shortcut a{display:inline-flex;align-items:center;min-height:44px;color:var(--theme-accent-strong);font-size:13px;text-underline-offset:4px}.month-shortcut a:focus-visible{outline:2px solid var(--theme-accent-strong);outline-offset:3px}
+.selected-date-part>span,.selected-date-part small{font-size:12px;letter-spacing:.03em}.selected-date-part small{color:rgba(var(--theme-text-rgb),.72)}.copy-date-button{width:44px;height:44px;right:8px;top:12px}.selected-date-panel{padding-right:64px}.copy-date-status{font-size:12px}
+.cycle-distance{display:flex;flex-direction:column;align-items:flex-start;gap:8px}.cycle-distance>span{font-size:12px;line-height:1.5}.cycle-distance strong{margin:0}.cycle-card header{flex-wrap:wrap}.today-tag{font-size:11px;white-space:normal}
+@media(max-width:760px){.calendar-date-dock{gap:10px;padding:10px 12px}.dock-date{display:grid;gap:2px;font-size:12px}.dock-date strong{font-size:20px}.calendar-date-dock button{padding:10px;font-size:12px}.selected-date-panel{padding-right:58px}.month-shortcut{justify-content:flex-start}}
 </style>

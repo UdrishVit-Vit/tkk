@@ -17,6 +17,7 @@ const { descriptor } = parse(readFileSync(filename, 'utf8'), { filename })
 assert.equal(compileTemplate({source:descriptor.template.content,filename,id:'calendar-runtime-check'}).errors.length,0)
 let source = compileScript(descriptor, { id: 'calendar-runtime-check' }).content
 source = `import {ref,computed,onMounted,watch} from '${pathToFileURL(require.resolve('vue')).href}';\n` + source.replace(/from '(~\/data\/[^']+)'/g, (_, path) => `from '${pathToFileURL(resolve('app', path.slice(2))).href}'`)
+source = source.replace(/from 'vue'/g, `from '${pathToFileURL(require.resolve('vue')).href}'`)
 const component = (await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`)).default
 component.render = () => null
 const renderer = createRenderer({
@@ -138,5 +139,31 @@ state.applyManualDate()
 assert.equal(state.date.day,8)
 assert.equal(state.showFilters,true)
 assert(state.manualDateError)
+assert.equal(state.dayCountLabel(1),'1 день')
+assert.equal(state.dayCountLabel(24),'24 дня')
+assert.equal(state.dayCountLabel(26),'26 дней')
+assert.equal(state.dayCountLabel(111),'111 дней')
+state.date={era:0,year:1,month:0,day:1,hour:0,minute:0}
+assert.equal(state.orderedEventCycles[0].event.id,'shamas')
+assert.equal(state.orderedEventCycles[1].event.id,'eri')
+assert.equal(state.orderedEventCycles[2].event.id,'manu')
 app.unmount()
 console.log('Calendar page runtime checks passed: migration, signs per year, era reset, durations, countdown and persistence.')
+
+// The persistent date control opens the current draft and brings the form into view.
+let scrolled = false
+let focused = false
+globalThis.document = { getElementById: id => {
+  assert.equal(id, 'calendar-filters')
+  return { scrollIntoView: () => { scrolled = true }, querySelector: () => ({ focus: options => { focused = options.preventScroll } }) }
+} }
+state.showFilters = false
+await state.openDateSettings()
+assert.equal(state.showFilters, true)
+assert.deepEqual(state.dateDraft, state.date)
+assert(scrolled && focused)
+state.dateDraft.day = 2
+await state.openDateSettings()
+assert.equal(state.dateDraft.day, 2, 'Opening an existing form preserves unsaved edits')
+delete globalThis.document
+console.log('Persistent date control checks passed: current draft, scroll, focus and unsaved edits.')

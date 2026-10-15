@@ -11,7 +11,7 @@ export const YEAR_IMAGES = [
   {id:'bird',name:'Птица',genitive:'Птицы',gender:'f',source:'Lore 0.31',meaning:'Образ из имени Огненной Птицы.'},
   {id:'kash',name:'Каш',genitive:'Каша',gender:'m',source:'Lore 0.31',meaning:'Образ из имени Лазурного Каша; его природа не установлена.'},
   {id:'owl',name:'Сова',genitive:'Совы',gender:'f',source:'Lore 0.31',meaning:'Образ из имени Кристальной Совы.'},
-  {id:'beech',name:'Бук',genitive:'Бука',gender:'m',source:'Lore 0.31',meaning:'Образ из имени Летящего Бука; написание сохранено буквально.'},
+  {id:'beech',name:'Бук',genitive:'Бука',gender:'m',source:'Lore 0.31',meaning:'Образ из имени Летящего Бука; название сохранено буквально.'},
   {id:'sparrowhawk',name:'Перепелятник',genitive:'Перепелятника',gender:'m',source:'Lore 0.31',meaning:'Образ из имени Синего Перепелятника.'},
   {id:'bull',name:'Бык',genitive:'Быка',gender:'m',source:'Lore 0.31',meaning:'Образ из имени Лазуритового Быка; допускает также Лазурный облик.'},
   {id:'toad',name:'Жаба',genitive:'Жабы',gender:'f',source:'Авторский вариант',meaning:'Образ Жабы заменяет Лягушку в рабочем круге; историческое имя Рубиновой Лягушки сохранено в Lore.'},
