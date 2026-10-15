@@ -1,45 +1,53 @@
 <script setup>
-import { YEAR_IMAGES as images, YEAR_ASPECTS as aspects } from '~/data/yearNaming.js'
-import { yearThread, YEAR_IMAGE_TALES as imageTales, YEAR_ASPECT_TALES as aspectTales } from '~/data/yearThreads.js'
-import { yearStory, YEAR_NARRATORS as narrators } from '~/data/yearStories.js'
-const narrator=ref('shaman')
-const props=defineProps({year:{type:Number,required:true},era:{type:String,required:true},yearName:{type:String,default:''}})
-const reading=computed(()=>yearThread(props.year,props.yearName))
-const story=computed(()=>yearStory(reading.value,narrator.value))
-const displayName=computed(()=>props.yearName || reading.value?.name || 'Год без имени')
+import { yearThread } from '~/data/yearThreads.js'
+import { yearReading, YEAR_NARRATORS as narrators } from '~/data/yearStories.js'
+const narrator = ref('shaman')
+const props = defineProps({ year: { type: Number, required: true }, era: { type: String, required: true }, yearName: { type: String, default: '' } })
+const reading = computed(() => yearThread(props.year, props.yearName))
+const story = computed(() => yearReading(reading.value, narrator.value))
+const displayName = computed(() => props.yearName || reading.value?.name || 'Год без имени')
 </script>
 
 <template>
   <section class="lore-thread-section year-threads" aria-labelledby="year-threads-title">
-    <p class="eyebrow">Поверья · Приметы · Толкования</p>
+    <p class="eyebrow">Поверья Эноа</p>
     <h2 id="year-threads-title">Нити о годах</h2>
-    <p class="threads-intro">Присядь у очага. Имя года уже произнесено, но в разных устах оно обещает разное. Шаман услышит знак в треске огня, Магус из Медрессе прочтёт два смысла одной притчи, а Старый Дед вспомнит, как похожий год прошёл через соседний дом. Кому доверить рассказ?</p>
     <div class="year-reading" :class="'voice-' + narrator">
       <p class="reading-date">{{ era }} · год {{ year }}</p>
       <h3 aria-live="polite" aria-atomic="true">{{ displayName }}</h3>
-      <template v-if="reading">
-        <div class="narrator-choice" role="group" aria-label="Кто толкует год"><button v-for="voice in narrators" :key="voice.id" type="button" :aria-pressed="narrator===voice.id" :title="voice.description" @click="narrator=voice.id"><svg class="voice-sign" viewBox="0 0 24 24" aria-hidden="true"><template v-if="voice.id==='shaman'"><path d="M12 2v4m0 12v4M2 12h4m12 0h4M5 5l3 3m8 8 3 3M5 19l3-3m8-8 3-3"/><path d="m12 6 6 6-6 6-6-6Z"/></template><template v-else-if="voice.id==='magus'"><path d="m5 4 14 16M19 4 5 20M5 4h14M5 20h14"/><path d="m12 8 4 4-4 4-4-4Z"/></template><template v-else><path d="M4 19h16M7 19v-8a5 5 0 0 1 10 0v8M7 13h10M12 6V3"/><circle cx="12" cy="16" r="1"/></template></svg>{{ voice.label }}</button></div>
-        <p class="narrator-note">{{ narrators.find(voice=>voice.id===narrator).description }}</p>
-        <div :key="displayName+':'+narrator" class="year-story">
-          <blockquote class="story-opening"><p>{{ story.opening }}</p><cite>{{ narrators.find(voice=>voice.id===narrator).label }}</cite></blockquote>
-          <p>{{ story.introduction }}</p>
-          <h4 class="parable-title">{{ story.title }}</h4><p class="story-parable">{{ story.parable }}</p>
-          <p>{{ story.crossroads }}</p>
-          <details class="reading-customs"><summary>Дослушать толкование</summary><h4>{{ story.influenceTitle }}</h4><p>{{ story.influence }}</p><p>{{ story.counsel }}</p><h4>Примета и обычай</h4><p>{{ story.omen }}</p><p>{{ story.custom }}</p><p>{{ story.calendarOmen }}</p></details>
-          <details class="reading-customs story-roleplay"><summary>История для отыгрыша</summary><p>{{ story.hook }}</p><p class="threads-note">Один знак — две просьбы. Кому помогут герои и что изменится для другого просителя?</p></details>
+      <template v-if="story">
+        <div class="narrator-choice" role="group" aria-label="Кто рассказывает о годе">
+          <button v-for="voice in narrators" :key="voice.id" type="button" :aria-pressed="narrator === voice.id" @click="narrator = voice.id"><svg class="voice-sign" viewBox="0 0 24 24" aria-hidden="true"><template v-if="voice.id==='shaman'"><path d="M12 2v4m0 12v4M2 12h4m12 0h4M5 5l3 3m8 8 3 3M5 19l3-3m8-8 3-3"/><path d="m12 6 6 6-6 6-6-6Z"/></template><template v-else-if="voice.id==='magus'"><path d="m5 4 14 16M19 4 5 20M5 4h14M5 20h14"/><path d="m12 8 4 4-4 4-4-4Z"/></template><template v-else><path d="M4 19h16M7 19v-8a5 5 0 0 1 10 0v8M7 13h10M12 6V3"/><circle cx="12" cy="16" r="1"/></template></svg>{{ voice.label }}</button>
         </div>
+        <article class="year-story" :aria-label="'Рассказ: ' + narrators.find(voice => voice.id === narrator).label">
+          <h4>{{ story.title }}</h4>
+          <p class="story-parable">{{ story.parable }}</p>
+          <p class="story-omen">{{ story.omen }}</p>
+        </article>
       </template>
-      <p v-else>У этого имени пока нет общего толкования. Одни видят в нём добрый знак, другие — предупреждение. Так начинается местная примета: кто-нибудь рассказывает историю, а соседи запоминают её.</p>
+      <p v-else class="unnamed-year">Об этом имени здесь ещё не сложили притчи. Может быть, первым его запомнят по твоему рассказу.</p>
     </div>
-    <p class="threads-note">Авторские сказания и поверья Эноа. Обещание года может стать надеждой, поводом для спора или товаром на торгу. Как с ним поступить, решает слушатель.</p>
-    <details class="threads-dictionary"><summary>Образы и облики: словарь поверий</summary><div class="dictionary-columns"><article><h3>Образы</h3><details v-for="image in images" :key="image.id"><summary>{{ image.name }}</summary><p>{{ imageTales[image.id].theme }}. В таком году надеются {{ imageTales[image.id].promise }}.</p><p>Обычай: в некоторых домах {{ imageTales[image.id].custom }}.</p></details></article><article><h3>Облики</h3><details v-for="aspect in aspects" :key="aspect.id"><summary>{{ aspect.m }}</summary><p>{{ aspectTales[aspect.id].theme }}. Считается, что {{ aspectTales[aspect.id].promise }}.</p><p>Предостережение: не стоит {{ aspectTales[aspect.id].warning }}.</p></details></article></div></details>
   </section>
 </template>
 
 <style scoped>
-.year-threads{margin-bottom:40px;color:rgba(var(--theme-text-rgb),.85);font-size:13px;line-height:1.8}.eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--theme-accent);margin:0 0 12px}h2{margin:0 0 18px;font:600 34px/1.1 'Cormorant Garamond',serif;color:rgb(var(--theme-heading-rgb))}.threads-intro{max-width:780px}.year-reading{margin:24px 0 16px;padding:24px;border:1px solid rgba(var(--theme-accent-rgb),.25);border-radius:6px;background:linear-gradient(120deg,rgba(var(--theme-accent-rgb),.055),transparent)}.reading-date{font-size:10px;color:rgba(var(--theme-text-rgb),.6);margin:0 0 8px}.year-reading h3{font:600 34px/1.15 'Cormorant Garamond',serif;margin:0 0 22px;color:var(--theme-accent-strong)}.reading-symbols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:22px}.reading-symbols p{margin:0;padding-top:14px;border-top:1px solid rgba(var(--theme-accent-rgb),.2)}.reading-symbols span{display:block;font-size:10px;color:rgba(var(--theme-text-rgb),.6);margin-bottom:5px}.reading-symbols strong{font-weight:500;color:rgb(var(--theme-heading-rgb))}.year-reading>p>strong{color:var(--theme-accent-strong);font-weight:500}.threads-note{font-size:10px;line-height:1.7;color:rgba(var(--theme-text-rgb),.55);max-width:740px}summary{cursor:pointer;color:var(--theme-accent-strong);font-size:12px}summary:focus-visible{outline:2px solid var(--theme-accent-strong);outline-offset:4px}.reading-customs{margin-top:20px;padding-top:16px;border-top:1px solid rgba(var(--theme-accent-rgb),.2)}blockquote{margin:20px 0;padding:0 0 0 16px;border-left:2px solid rgba(var(--theme-accent-rgb),.3)}blockquote p{margin:0 0 5px;font-family:'Cormorant Garamond',serif;font-size:21px;line-height:1.45}cite{font-size:10px;font-style:normal;color:rgba(var(--theme-text-rgb),.6)}.threads-dictionary{margin-top:24px;border-block:1px solid rgba(var(--theme-accent-rgb),.2);padding:16px 0}.dictionary-columns{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:24px}.dictionary-columns h3{font:600 25px 'Cormorant Garamond',serif;color:rgb(var(--theme-heading-rgb));margin:0 0 14px}.dictionary-columns details{padding:10px 0;border-bottom:1px solid rgba(var(--theme-accent-rgb),.12)}.dictionary-columns p{font-size:12px}@media(max-width:760px){h2{font-size:29px}.year-reading{padding:18px}.year-reading h3{font-size:29px}.reading-symbols,.dictionary-columns{grid-template-columns:1fr;gap:18px}}
-.narrator-choice{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px}.narrator-choice button{padding:9px 13px;border:1px solid rgba(var(--theme-accent-rgb),.25);border-radius:4px;background:transparent;color:rgba(var(--theme-text-rgb),.7);font-size:11px;cursor:pointer}.narrator-choice button[aria-pressed=true]{background:rgba(var(--theme-accent-rgb),.12);border-color:var(--theme-accent-strong);color:var(--theme-accent-strong)}.narrator-choice button:focus-visible{outline:2px solid var(--theme-accent-strong);outline-offset:3px}.year-story{max-width:780px}.year-story>p{line-height:1.95;margin:18px 0}.story-opening{margin:0 0 24px;padding:4px 0 4px 18px}.story-opening p{font-size:24px;line-height:1.5}.story-parable{color:rgb(var(--theme-text-rgb))}.year-story h4{font:600 23px 'Cormorant Garamond',serif;margin:22px 0 12px;color:var(--theme-accent-strong)}.story-roleplay p{font-size:12px}@media(max-width:760px){.story-opening p{font-size:22px}.narrator-choice button{font-size:10px;padding:9px 11px}}
-.year-threads{font-size:15px}.year-story{max-width:68ch}.year-story>p{line-height:1.85}.year-reading{padding:clamp(18px,3vw,34px)}.narrator-choice{margin-bottom:10px}.narrator-choice button{min-height:44px;font-size:12px}.narrator-note{font-size:12px;color:rgba(var(--theme-text-rgb),.68);margin:0 0 24px}.year-story .parable-title{margin:26px 0 10px;font-size:25px}.story-parable{padding-left:18px;border-left:1px solid rgba(var(--theme-accent-rgb),.25)}.reading-customs summary{min-height:34px;padding:4px 0;font-size:13px}.threads-note{font-size:11px;color:rgba(var(--theme-text-rgb),.68)}.dictionary-columns p{font-size:13px}.dictionary-columns summary{font-size:13px;padding:5px 0}.story-roleplay p{font-size:14px}@media(max-width:760px){.year-threads{font-size:15px}.year-reading{padding:18px}.year-reading h3{overflow-wrap:anywhere}.narrator-choice button{font-size:11px}.threads-intro{line-height:1.8}.story-opening p{font-size:22px}}
-
-.voice-sign{width:22px;height:22px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}.narrator-choice button{display:inline-flex;align-items:center;gap:8px;font-size:12px}.year-reading{--voice-color:var(--theme-accent-strong);border-top:2px solid var(--voice-color)}.voice-shaman{--voice-color:#c6a4dc}.voice-magus{--voice-color:#83c5c5}.voice-elder{--voice-color:#d8b17d}.narrator-choice button[aria-pressed=true]{color:var(--voice-color);border-color:var(--voice-color)}.voice-shaman .story-opening{border-left:2px dashed var(--voice-color)}.voice-magus .story-opening{border-left:3px double var(--voice-color)}.voice-elder .story-opening{border-left:3px solid var(--voice-color)}.story-opening cite{color:var(--voice-color);font-size:12px}.narrator-note{max-width:68ch}
+.year-threads{margin-bottom:40px;color:rgba(var(--theme-text-rgb),.88);font:15px/1.85 'Hanken Grotesk',sans-serif}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--theme-accent);margin:0 0 12px}
+h2{margin:0 0 22px;font:600 34px/1.1 'Cormorant Garamond',serif;color:rgb(var(--theme-heading-rgb))}
+.year-reading{--voice-color:var(--theme-accent-strong);padding:clamp(18px,3vw,34px);border:1px solid rgba(var(--theme-accent-rgb),.25);border-top:2px solid var(--voice-color);border-radius:6px;background:linear-gradient(120deg,rgba(var(--theme-accent-rgb),.045),transparent)}
+.voice-shaman{--voice-color:#c6a4dc}.voice-magus{--voice-color:#83c5c5}.voice-elder{--voice-color:#d8b17d}
+.reading-date{margin:0 0 8px;font-size:12px;color:rgba(var(--theme-text-rgb),.7)}
+h3{font:600 34px/1.15 'Cormorant Garamond',serif;margin:0 0 22px;color:var(--theme-accent-strong);overflow-wrap:anywhere}
+.narrator-choice{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+.narrator-choice button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 13px;border:1px solid rgba(var(--theme-accent-rgb),.25);border-radius:4px;background:transparent;color:rgba(var(--theme-text-rgb),.75);font:12px 'Hanken Grotesk',sans-serif;cursor:pointer}
+.narrator-choice button:hover{background:rgba(var(--theme-accent-rgb),.08)}
+.narrator-choice button[aria-pressed=true]{background:rgba(var(--theme-accent-rgb),.1);color:var(--voice-color);border-color:var(--voice-color)}
+.narrator-choice button:focus-visible{outline:2px solid var(--theme-accent-strong);outline-offset:3px}
+.voice-sign{width:22px;height:22px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.year-story{max-width:66ch;padding-left:20px;border-left:2px solid var(--voice-color)}
+.voice-shaman .year-story{border-left-style:dashed}.voice-magus .year-story{border-left:3px double var(--voice-color)}
+h4{font:600 27px/1.2 'Cormorant Garamond',serif;color:rgb(var(--theme-heading-rgb));margin:0 0 16px}
+.year-story p{margin:0;line-height:1.85}.year-story .story-omen{margin-top:18px;color:rgb(var(--theme-text-rgb))}
+.unnamed-year{max-width:60ch}
+@media(max-width:760px){h2,h3{font-size:29px}.year-reading{padding:18px}.narrator-choice{gap:8px}.narrator-choice button{padding:9px 10px}.year-story{padding-left:14px}h4{font-size:25px}}
 </style>

@@ -1,3 +1,4 @@
+import { YEAR_READING_ENDINGS } from './yearReadingEndings.js'
 import { voiceTale } from './yearVoiceTales.js'
 // Author-created tales and omens for Enoa. Narrators disagree; none is an objective forecast.
 const yearMotifs = {
@@ -174,4 +175,16 @@ export function yearStory(reading,narrator='shaman') {
     custom:reading.custom,
     calendarOmen:calendarOmens[(seed>>>4)%calendarOmens.length],
     hook:`На постоялом дворе объявился знак: ${omen}. Двое приносят разные узловые связки об этом событии. Один просит помочь ${choice}; другой считает, что прежде нужно ${task}. В обеих связках есть место для чужого свидетельства, но каждый хозяин предлагает вплести его только со своего конца.`}
+}
+
+// One compact spoken tale. The image supplies a distinct incident for each voice;
+// the aspect supplies its consequence, without a second layer of advice or game instructions.
+export function yearReading(reading, narrator = 'shaman') {
+  if (!reading) return null
+  const voiceIndex = Math.max(0, YEAR_NARRATORS.findIndex(voice => voice.id === narrator))
+  const voice = YEAR_NARRATORS[voiceIndex]
+  const tale = voiceTale(reading.image.id, voice.id)
+  const ending = YEAR_READING_ENDINGS[reading.aspect.id]?.[voiceIndex]
+  if (!tale || !ending) return null
+  return { narrator: voice.id, title: tale[0], parable: tale[1], omen: ending }
 }

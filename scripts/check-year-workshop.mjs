@@ -24,10 +24,10 @@ mounted.mount({})
 let state=instance.$.setupState
 assert.equal(state.reading.image.id,'simurgh')
 assert.equal(state.story.narrator,'shaman')
-const shamanText=state.story.counsel
+const shamanText=state.story.parable
 state.narrator='magus'
 assert.equal(state.story.narrator,'magus')
-assert.notEqual(state.story.counsel,shamanText)
+assert.notEqual(state.story.parable,shamanText)
 state.narrator='elder'
 assert.equal(state.story.narrator,'elder')
 props.year=830;props.era='Время Ветров';props.yearName='Кристальный Барс'
