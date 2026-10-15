@@ -3,7 +3,6 @@ import { CALENDAR_MONTHS as months, CALENDAR_EVENTS as holidays, YEAR_LENGTH, MA
 import { CALENDAR_ERAS as eras, YEAR_SIGNS as signs, MINUTES_PER_DAY, MAX_ERA_DAYS, initialChronologyDate, emptyEraDurations, validEraDurations, validChronologyDate, eraDayIndex, shiftChronologyDate, minutesFromPurusha, chronologyDifference, nextChronologyEvent, chronologyEventCycles, chronologyTimeLabel, elapsedTimeLabel } from '~/data/loreChronology.js'
 
 import { defaultGeneration, generateCalendarDate } from '~/data/calendarGeneration.js'
-import { DAY_THREADS as dayThreads, EATEN_DAY_THREAD as eatenDayThread } from '~/data/dayThreads.js'
 import { workingYearName } from '~/data/yearNaming.js'
 
 defineProps({ theme: { type: Object, required: true } })
@@ -263,18 +262,14 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
 
 
     <section class="lore-thread-section day-threads" aria-labelledby="day-threads-title">
-      <p class="eyebrow">Обычаи · Поверья · Особые дни</p><h2 id="day-threads-title">Нити о днях</h2>
-      <p class="hint">Некоторые даты узнают по обряду, разговору или тишине у порога. В разных домах их встречают по-разному. Эти истории предлагают обычаям Эноа новые подробности.</p>
+      <p class="eyebrow">Особые дни</p><h2 id="day-threads-title">Нити о днях</h2>
       <div class="day-thread-grid">
         <article v-for="event in holidays" :key="event.id" class="day-thread-card" :class="{ 'day-thread-today': currentEvents.some(mark=>mark.id===event.id) }">
           <header><h3><span :class="event.id" aria-hidden="true">{{ event.symbol }}</span> {{ event.name }}</h3><span v-if="currentEvents.some(mark=>mark.id===event.id)" class="today-tag">В выбранную дату</span></header>
           <p class="day-thread-dates">{{ eventDates(event) }}</p>
-          <h4>{{ dayThreads[event.id].title }}</h4><p>{{ dayThreads[event.id].story }}</p>
-          <details><summary>Как встречают этот день</summary><p>{{ dayThreads[event.id].custom }}</p></details>
         </article>
-        <article class="day-thread-card"><h3>■ Сожранные Дни Зверя</h3><p class="day-thread-dates">26 Шамды · 25–26 Манар · 24–26 Чокас · 24–26 Залар</p><h4>{{ eatenDayThread.title }}</h4><p>{{ eatenDayThread.story }}</p><details><summary>Что говорят о пропавших днях</summary><p>{{ eatenDayThread.custom }}</p></details></article>
+        <article class="day-thread-card"><h3>■ Сожранные Дни Зверя</h3><p class="day-thread-dates">26 Шамды · 25–26 Манар · 24–26 Чокас · 24–26 Залар</p></article>
       </div>
-      <p class="hint day-threads-note">Даты взяты из календаря; обычаи и приметы предложены как авторское дополнение к сеттингу.</p>
     </section>
   </LoreThreadPage>
 </template>
