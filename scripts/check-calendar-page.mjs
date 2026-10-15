@@ -147,6 +147,45 @@ state.date={era:0,year:1,month:0,day:1,hour:0,minute:0}
 assert.equal(state.orderedEventCycles[0].event.id,'shamas')
 assert.equal(state.orderedEventCycles[1].event.id,'eri')
 assert.equal(state.orderedEventCycles[2].event.id,'manu')
+// The dock must stay hidden while the full date is visible, or below the viewport.
+state.updateDockVisibility({isIntersecting:true,boundingClientRect:{bottom:200},rootBounds:{top:20}})
+assert.equal(state.showDateDock,false)
+state.updateDockVisibility({isIntersecting:false,boundingClientRect:{bottom:900},rootBounds:{top:20}})
+assert.equal(state.showDateDock,false)
+state.updateDockVisibility({isIntersecting:false,boundingClientRect:{bottom:19},rootBounds:{top:20}})
+assert.equal(state.showDateDock,true)
+state.updateDockVisibility({isIntersecting:true,boundingClientRect:{bottom:30},rootBounds:{top:20}})
+assert.equal(state.showDateDock,false)
+
+state.durations = state.durations.map(() => null)
+const originalDate={era:4,year:17,month:0,day:13,hour:5,minute:30}
+state.updateDate({...originalDate})
+state.generation={era:2,yearMin:7,yearMax:7,month:7,day:23,event:'darkness'}
+state.generateDate()
+assert.deepEqual(state.previousGeneratedDate,originalDate)
+state.generation.day=26
+state.generateDate() // A failed roll must not consume the previous successful date.
+assert.deepEqual(state.previousGeneratedDate,originalDate)
+state.undoGeneratedDate()
+assert.deepEqual(state.date,originalDate)
+assert.equal(state.previousGeneratedDate,null)
+assert.equal(state.generationStatus,'')
+await nextTick()
+assert.deepEqual(JSON.parse(saved.get('enoa-calendar-v2')).date,originalDate)
+state.generation.day=23
+state.generateDate()
+const firstRoll={...state.date}
+state.generation.yearMin=state.generation.yearMax=8
+state.generateDate()
+state.undoGeneratedDate()
+assert.deepEqual(state.date,firstRoll,'Undo returns to the preceding roll')
+state.generateDate()
+state.choose(0,2)
+assert.equal(state.previousGeneratedDate,null,'A manual date change dismisses unrelated undo')
+const current={...state.date}
+state.undoGeneratedDate()
+assert.deepEqual(state.date,current)
+console.log('Dock visibility and roll undo passed: scrolling both ways, failed rolls, consecutive rolls, manual selection, complete date and persistence.')
 app.unmount()
 console.log('Calendar page runtime checks passed: migration, signs per year, era reset, durations, countdown and persistence.')
 

@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick } from 'vue'
+import { nextTick, onBeforeUnmount } from 'vue'
 import { CALENDAR_MONTHS as months, CALENDAR_EVENTS as holidays, YEAR_LENGTH, MAX_CALENDAR_YEAR, calendarCell, dayOfYear, calendarDateLabel } from '~/data/loreCalendar.js'
 import { CALENDAR_ERAS as eras, YEAR_SIGNS as signs, MINUTES_PER_DAY, MAX_ERA_DAYS, initialChronologyDate, emptyEraDurations, validEraDurations, validChronologyDate, eraDayIndex, shiftChronologyDate, minutesFromPurusha, chronologyDifference, nextChronologyEvent, chronologyEventCycles, chronologyTimeLabel, elapsedTimeLabel } from '~/data/loreChronology.js'
 
@@ -20,6 +20,21 @@ const offset = ref(1)
 const offsetUnit = ref('days')
 const filter = ref('all')
 const showFilters = ref(false)
+const mainDatePanel = ref(null)
+const showDateDock = ref(false)
+let datePanelObserver
+function updateDockVisibility(entry) {
+  showDateDock.value = !entry.isIntersecting && entry.boundingClientRect.bottom <= (entry.rootBounds?.top ?? 0)
+}
+onMounted(() => {
+  const panel = mainDatePanel.value
+  if (!panel || typeof IntersectionObserver === 'undefined') return
+  datePanelObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) updateDockVisibility(entry)
+  }, { root: panel.closest('.lore-thread-scroll'), threshold: 0 })
+  datePanelObserver.observe(panel)
+})
+onBeforeUnmount(() => datePanelObserver?.disconnect())
 const dateDraft = ref({...date.value})
 const manualDateError = ref('')
 function toggleDateSettings() {
@@ -46,6 +61,7 @@ function applyManualDate() {
   showFilters.value=false
   message.value='Дата применена.'
 }
+const previousGeneratedDate = ref(null)
 const generation = ref(defaultGeneration())
 const generationRolls = ref([])
 const generationStatus = ref('')
@@ -53,9 +69,22 @@ function resetGeneration() { generation.value=defaultGeneration(); generationSta
 function generateDate() {
   const result=generateCalendarDate(generation.value,durations.value)
   if(result.error) { generationStatus.value=result.error; generationRolls.value=[]; return }
+  const previous = { ...date.value }
   updateDate(result.date)
+  previousGeneratedDate.value = previous
   generationRolls.value=result.rolls
   generationStatus.value=''
+}
+function undoGeneratedDate() {
+  if (!previousGeneratedDate.value) return
+  if (!validChronologyDate(previousGeneratedDate.value, durations.value)) {
+    message.value = 'Предыдущая дата не входит в выбранные границы эпох.'
+    return
+  }
+  updateDate({ ...previousGeneratedDate.value })
+  generationRolls.value = []
+  generationStatus.value = ''
+  message.value = 'Возвращена предыдущая дата.'
 }
 const message = ref('')
 const storageMessage = ref('')
@@ -139,7 +168,7 @@ watch([date, note, durations, yearNames, target, baseline], () => {
 }, { deep: true })
 
 function updateDate(candidate) {
-  if (validChronologyDate(candidate, durations.value)) { date.value = candidate; message.value = '' }
+  if (validChronologyDate(candidate, durations.value)) { date.value = candidate; previousGeneratedDate.value = null; message.value = '' }
   else message.value = 'Дата должна попадать в выбранную эпоху. Год: 1–1 000 000; часы: 0–23; минуты: 0–59.'
 }
 function choose(month, day) { updateDate({ ...date.value, month, day: Math.min(day, months[month].days) }) }
@@ -188,22 +217,25 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
   <LoreThreadPage class="calendar-page" :theme="theme" title="Календарь" eyebrow="Мир Эноа · Нить времени" icon="/assets/nodes/calendar-lore.svg?v=2" @up="$emit('up')">
 
     <nav class="calendar-section-nav" aria-label="Разделы календаря"><a href="#calendar-months">Месяцы</a><a href="#cycles-title">Особые даты</a><a href="#year-threads-title">Нити о годах</a><a href="#day-threads-title">Нити о днях</a></nav>
-    <aside class="calendar-date-dock" aria-label="Выбранная дата">
-      <div class="dock-date" :title="selectedDateText"><span>{{ eras[date.era].title }} · год {{ date.year }}</span><strong>{{ selectedYearName }}</strong><span>{{ date.day }} {{ months[date.month].name }}</span></div>
-      <button type="button" @click="openDateSettings" :aria-expanded="showFilters" aria-controls="calendar-filters">Указать дату</button>
-    </aside>
+    <div class="calendar-dock-slot">
+      <aside v-if="showDateDock" class="calendar-date-dock" aria-label="Выбранная дата">
+        <div class="dock-date"><span>{{ eras[date.era].title }} · год {{ date.year }}</span><a class="dock-year" href="#year-threads-title" :aria-label="'Толкование года: ' + selectedYearName">{{ selectedYearName }}</a><a class="dock-day" :href="'#calendar-day-' + months[date.month].id + '-' + date.day" :aria-label="'К выбранному дню: ' + date.day + ' ' + months[date.month].name">{{ date.day }} {{ months[date.month].name }}</a></div>
+        <button type="button" @click="openDateSettings" :aria-expanded="showFilters" aria-controls="calendar-filters">Указать дату</button>
+      </aside>
+    </div>
     <section class="lore-thread-section calendar-section" aria-label="Календарь по месяцам">
-      <div class="selected-date-panel">
+      <div ref="mainDatePanel" class="selected-date-panel">
         <div :key="selectedDateText" class="selected-date-story" aria-live="polite" aria-atomic="true">
           <div class="selected-date-part selected-date-era"><span>Эпоха</span><strong>{{ eras[date.era].title }}</strong></div>
           <div class="selected-date-part selected-date-year"><span>Год {{ date.year }}</span><strong>{{ selectedYearName }}</strong><small v-if="yearNameIsSuggested" title="Предложенное имя для этого номера года. Привязка эпохи к кругу после Раскола неизвестна; это не историческое соответствие.">Предложенное имя</small></div>
           <div class="selected-date-part"><span>Месяц</span><strong>{{ months[date.month].name }}</strong></div>
           <div class="selected-date-part selected-date-day"><span>День</span><strong>{{ date.day }}</strong></div>
-          <div class="selected-date-holidays"><span v-for="event in currentEvents" :key="event.id" :class="['selected-holiday', event.id]">{{ event.symbol }} {{ event.name }}</span><span v-if="!currentEvents.length" class="selected-ordinary">Обычный день</span></div>
+          <div class="selected-date-holidays"><span v-for="event in currentEvents" :key="event.id" :class="['selected-holiday', event.id]"><CalendarEventIcon :event="event.id" /> {{ event.name }}</span><span v-if="!currentEvents.length" class="selected-ordinary">Обычный день</span></div>
         </div>
         <button type="button" class="copy-date-button" aria-label="Скопировать полную дату" title="Скопировать дату для заметки или истории" @click="copySelectedDate"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></svg></button>
         <div class="selected-date-actions">
           <button type="button" class="generate-date-button" @click="generateDate">◇ Бросить 4d4</button>
+          <button v-if="previousGeneratedDate" type="button" class="undo-date-button" @click="undoGeneratedDate">Вернуть предыдущую</button>
           <button type="button" class="specify-date-button" :aria-expanded="showFilters" aria-controls="calendar-filters" @click="toggleDateSettings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18l-7 8v7l-4 2v-9Z"/></svg>Указать дату</button>
         </div>
         <p v-if="copyDateMessage" class="copy-date-status" role="status">{{ copyDateMessage }}</p>
@@ -216,7 +248,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
         <label class="calendar-control calendar-control-year"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-2 18m10-18-2 18M3 9h18M3 15h18" /></svg>Год</span><input type="number" min="1" :max="MAX_CALENDAR_YEAR" step="1" v-model.number="dateDraft.year"></label>
         <label class="calendar-control"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18" /></svg>Месяц</span><select v-model.number="dateDraft.month" @change="dateDraft.day=Math.min(dateDraft.day,months[dateDraft.month].days)"><option v-for="(month, index) in months" :key="month.id" :value="index">{{ month.name }}</option></select></label>
         <label class="calendar-control calendar-control-day"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 9-9 9-9-9Z"/><circle cx="12" cy="12" r="2"/></svg>День</span><input type="number" min="1" :max="months[dateDraft.month].days" step="1" v-model.number="dateDraft.day"></label>
-        <label class="calendar-control calendar-control-events"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Отметки</span><select v-model="filter"><option value="all">Все события</option><option v-for="event in holidays" :key="event.id" :value="event.id">{{ event.symbol }} {{ event.name }}</option><option value="eaten">■ Сожранные дни</option></select></label>
+        <label class="calendar-control calendar-control-events"><span class="calendar-control-heading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Отметки</span><select v-model="filter"><option value="all">Все события</option><option v-for="event in holidays" :key="event.id" :value="event.id">{{ event.name }}</option><option value="eaten">Сожранные дни</option></select></label>
       </div>
         <p v-if="manualDateError" class="hint" role="alert">{{ manualDateError }}</p>
         <div class="manual-date-actions"><button type="submit" class="apply-date-button">Применить дату</button><button type="button" class="cancel-date-button" @click="showFilters=false">Отмена</button></div>
@@ -228,7 +260,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
           <label>Год до<input v-model.number="generation.yearMax" type="number" min="1" :max="MAX_CALENDAR_YEAR" step="1"></label>
           <label>Месяц<select v-model="generation.month"><option value="any">Любой месяц</option><option v-for="(month,index) in months" :key="month.id" :value="index">{{ month.name }}</option></select></label>
           <label>День<select v-model="generation.day"><option value="any">Любой день</option><option v-for="day in 26" :key="day" :value="day">{{ day }}</option></select></label>
-          <label>Событие<select v-model="generation.event"><option value="any">Любой день и праздник</option><option value="ordinary">Обычный день</option><option v-for="event in holidays" :key="event.id" :value="event.id">{{ event.symbol }} {{ event.name }}</option></select></label>
+          <label>Событие<select v-model="generation.event"><option value="any">Любой день и праздник</option><option value="ordinary">Обычный день</option><option v-for="event in holidays" :key="event.id" :value="event.id">{{ event.name }}</option></select></label>
         </div>
         <p class="hint">Одинаковые границы года закрепляют год. Неизвестные длительности эпох не ограничивают генерацию; заданные длительности учитываются. Несуществующие и сожранные дни не выпадают.</p>
         <button type="button" class="generation-reset" @click="resetGeneration">Сбросить условия</button>
@@ -236,7 +268,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
       </div>
       <p v-if="generationStatus" class="hint" role="alert">{{ generationStatus }}</p>
       <p v-if="message" class="hint" role="status">{{ message }}</p>
-      <ul class="legend" aria-label="Легенда календаря"><li v-for="event in holidays" :key="event.id"><span :class="['symbol', event.id]">{{ event.symbol }}</span> {{ event.name }}</li><li>■ Сожранный день</li><li>— Нет такого дня в месяце</li></ul>
+      <ul class="legend" aria-label="Легенда календаря"><li v-for="event in holidays" :key="event.id"><CalendarEventIcon :event="event.id" /> {{ event.name }}</li><li><CalendarEventIcon event="eaten" /> Сожранный день</li><li><CalendarEventIcon event="absent" /> Нет такого дня в месяце</li></ul>
       <p class="hint">«—» означает, что у месяца нет такого числа; «■» — дата, сожранная Зверем: особый отсутствующий день. 23 Залар объединяет День Молчания и День Тьмы.</p>
       <div class="month-shortcut"><a :href="'#month-' + months[date.month].id">К выбранному месяцу: {{ months[date.month].name }} ↓</a></div>
       <div id="calendar-months" class="month-grid">
@@ -245,8 +277,8 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
           <div class="month-days" :aria-label="'Дни месяца ' + month.name">
             <template v-for="(day, slot) in monthSlots" :key="slot">
               <span v-if="day === null" class="month-padding" aria-hidden="true" />
-              <button v-else-if="cells[index][day-1].kind === 'day'" type="button" class="month-day" :class="{ 'is-selected': date.month === index && date.day === day, 'is-upcoming': upcomingCells.has(`${index}:${day}`), 'is-special': cells[index][day-1].events.length, 'is-muted': filter !== 'all' && !cells[index][day-1].events.some(event => event.id === filter) }" :aria-label="cellLabel(index, day)" :aria-pressed="date.month === index && date.day === day" :title="cellLabel(index, day)" @click="choose(index, day)"><span class="month-day-number">{{ day }}</span><span class="month-day-events" aria-hidden="true"><span v-for="event in cells[index][day-1].events" :key="event.id" :class="event.id">{{ event.symbol }}</span></span></button>
-              <span v-else class="month-day month-day-missing" :class="{ 'is-eaten': cells[index][day-1].kind === 'eaten', 'is-muted': filter !== 'all' && !(filter === 'eaten' && cells[index][day-1].kind === 'eaten') }" :aria-label="cellLabel(index, day)" :title="cellLabel(index, day)"><span class="month-day-number">{{ day }}</span><span class="month-day-events" aria-hidden="true">{{ cells[index][day-1].kind === 'eaten' ? '■' : '—' }}</span></span>
+              <button v-else-if="cells[index][day-1].kind === 'day'" type="button" :id="'calendar-day-' + month.id + '-' + day" class="month-day" :class="{ 'is-selected': date.month === index && date.day === day, 'is-upcoming': upcomingCells.has(`${index}:${day}`), 'is-special': cells[index][day-1].events.length, 'is-muted': filter !== 'all' && !cells[index][day-1].events.some(event => event.id === filter) }" :aria-label="cellLabel(index, day)" :aria-pressed="date.month === index && date.day === day" :title="cellLabel(index, day)" @click="choose(index, day)"><svg v-if="date.month === index && date.day === day" class="selected-day-check" viewBox="0 0 12 12" aria-hidden="true"><path d="m2 6 2.5 2.5L10 3"/></svg><span class="month-day-number">{{ day }}</span><span class="month-day-events" aria-hidden="true"><CalendarEventIcon v-for="event in cells[index][day-1].events" :key="event.id" :event="event.id" /></span></button>
+              <span v-else class="month-day month-day-missing" :class="{ 'is-eaten': cells[index][day-1].kind === 'eaten', 'is-muted': filter !== 'all' && !(filter === 'eaten' && cells[index][day-1].kind === 'eaten') }" :aria-label="cellLabel(index, day)" :title="cellLabel(index, day)"><span class="month-day-number">{{ day }}</span><span class="month-day-events" aria-hidden="true"><CalendarEventIcon :event="cells[index][day-1].kind === 'eaten' ? 'eaten' : 'absent'" /></span></span>
             </template>
           </div>
           <p v-if="date.month === index" class="month-selection">Выбрано: {{ date.day }} {{ month.name }}</p>
@@ -259,7 +291,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
       <p class="hint">Ближайшие особые дни от выбранной даты. События этого дня отмечены отдельно; карточки расположены по близости следующей даты.</p>
       <div class="cycle-grid" aria-live="polite">
         <article v-for="cycle in orderedEventCycles" :key="cycle.event.id" :class="['cycle-card', { 'cycle-today': cycle.today }]">
-          <header><h3><span :class="cycle.event.id" aria-hidden="true">{{ cycle.event.symbol }}</span> {{ cycle.event.name }}</h3><span v-if="cycle.today" class="today-tag">В выбранную дату</span></header>
+          <header><h3><CalendarEventIcon :event="cycle.event.id" /> {{ cycle.event.name }}</h3><span v-if="cycle.today" class="today-tag">В выбранную дату</span></header>
           <template v-if="cycle.next">
             <p class="cycle-distance"><span>Следующее наступление — через</span> <strong>{{ dayCountLabel(cycle.next.days) }}</strong></p>
             <p class="cycle-date">{{ calendarDateLabel(cycle.next.date) }}<small v-if="cycle.next.date.era !== date.era">{{ eras[cycle.next.date.era].title }}</small></p>
@@ -267,14 +299,14 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
             <p class="cycle-exact">До начала дня: {{ elapsedTimeLabel(cycle.remainingMinutes) }}</p>
             <div v-if="cycle.progress !== null" class="cycle-interval"><progress :value="cycle.progress" max="100" :aria-label="'Интервал между отмеченными днями: ' + cycle.event.name" /><span>Между этими датами: {{ cycle.spanDays }} дн.</span></div>
             </details>
-            <p v-if="cycle.next.events.length > 1" class="cycle-conjunction">Совпадает: {{ cycle.next.events.filter(event => event.id !== cycle.event.id).map(event => `${event.symbol} ${event.name}`).join(' · ') }}</p>
+            <p v-if="cycle.next.events.length > 1" class="cycle-conjunction">Совпадает: <span v-for="event in cycle.next.events.filter(event => event.id !== cycle.event.id)" :key="event.id"><CalendarEventIcon :event="event.id" /> {{ event.name }}</span></p>
             <div class="cycle-actions"><button type="button" :aria-label="'Перейти к событию: ' + cycle.event.name" @click="updateDate({ ...cycle.next.date })">К дате →</button></div>
 
           </template>
           <p v-else class="hint">Следующая дата находится за пределами доступного отсчёта.</p>
         </article>
       </div>
-      <p class="hint">Точка под числом отмечает ближайший особый день этого типа. «К дате» выбирает его в календаре.</p>
+      <p class="hint">Ромб в углу ячейки отмечает ближайший особый день. Галочка и рамка выделяют выбранный день. «К дате» выбирает его в календаре.</p>
     </section>
 
     <YearNamingWorkshop :year="date.year" :era="eras[date.era].title" :year-name="selectedYearName" />
@@ -284,10 +316,10 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
       <p class="eyebrow">Особые дни</p><h2 id="day-threads-title">Нити о днях</h2>
       <div class="day-thread-grid">
         <article v-for="event in holidays" :key="event.id" class="day-thread-card" :class="{ 'day-thread-today': currentEvents.some(mark=>mark.id===event.id) }">
-          <header><h3><span :class="event.id" aria-hidden="true">{{ event.symbol }}</span> {{ event.name }}</h3><span v-if="currentEvents.some(mark=>mark.id===event.id)" class="today-tag">В выбранную дату</span></header>
+          <header><h3><CalendarEventIcon :event="event.id" /> {{ event.name }}</h3><span v-if="currentEvents.some(mark=>mark.id===event.id)" class="today-tag">В выбранную дату</span></header>
           <p class="day-thread-dates">{{ eventDates(event) }}</p>
         </article>
-        <article class="day-thread-card"><h3>■ Сожранные Дни Зверя</h3><p class="day-thread-dates">26 Шамды · 25–26 Манар · 24–26 Чокас · 24–26 Залар</p></article>
+        <article class="day-thread-card"><h3><CalendarEventIcon event="eaten" /> Сожранные Дни Зверя</h3><p class="day-thread-dates">26 Шамды · 25–26 Манар · 24–26 Чокас · 24–26 Залар</p></article>
       </div>
     </section>
   </LoreThreadPage>
@@ -322,4 +354,12 @@ section{margin-bottom:46px}h2{margin:0 0 18px;font:600 34px/1.1 'Cormorant Garam
 .selected-date-part>span,.selected-date-part small{font-size:12px;letter-spacing:.03em}.selected-date-part small{color:rgba(var(--theme-text-rgb),.72)}.copy-date-button{width:44px;height:44px;right:8px;top:12px}.selected-date-panel{padding-right:64px}.copy-date-status{font-size:12px}
 .cycle-distance{display:flex;flex-direction:column;align-items:flex-start;gap:8px}.cycle-distance>span{font-size:12px;line-height:1.5}.cycle-distance strong{margin:0}.cycle-card header{flex-wrap:wrap}.today-tag{font-size:11px;white-space:normal}
 @media(max-width:760px){.calendar-date-dock{gap:10px;padding:10px 12px}.dock-date{display:grid;gap:2px;font-size:12px}.dock-date strong{font-size:20px}.calendar-date-dock button{padding:10px;font-size:12px}.selected-date-panel{padding-right:58px}.month-shortcut{justify-content:flex-start}}
+
+.calendar-dock-slot{position:sticky;top:0;z-index:12;height:0;pointer-events:none}.calendar-date-dock{position:relative;top:auto;margin:0;pointer-events:auto}
+.dock-date a{color:var(--theme-accent-strong);text-decoration:underline;text-decoration-color:rgba(var(--theme-accent-rgb),.45);text-underline-offset:4px}.dock-date .dock-year{font:600 21px/1.15 'Cormorant Garamond',serif;overflow-wrap:anywhere}.dock-date .dock-day{font-size:13px}.dock-date a:hover{text-decoration-color:currentColor}.dock-date a:focus-visible{outline:2px solid var(--theme-accent-strong);outline-offset:4px}
+.undo-date-button{min-height:44px;padding:10px 13px;border:1px solid var(--line);border-radius:4px;background:transparent;color:rgb(var(--theme-text-rgb));font:12px 'Hanken Grotesk',sans-serif}.undo-date-button:hover{background:rgba(var(--theme-accent-rgb),.1)}
+.legend li,.selected-holiday{display:inline-flex;align-items:center;gap:7px}.legend li{min-height:24px}.month-day-events :deep(.calendar-event-icon){width:14px;height:14px}.cycle-card h3 :deep(.calendar-event-icon),.day-thread-card h3 :deep(.calendar-event-icon){width:20px;height:20px}.cycle-conjunction>span{display:inline-flex;align-items:center;gap:5px}
+.month-day.is-upcoming::after{width:6px;height:6px;left:auto;bottom:auto;right:5px;top:5px;border-radius:1px;transform:rotate(45deg);box-shadow:0 0 0 2px var(--theme-bg,#181818)}.selected-day-check{position:absolute;left:3px;top:3px;width:11px;height:11px;fill:none;stroke:var(--theme-accent-strong);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.month-day.is-selected .month-day-number{font-weight:700}
+@media(max-width:1100px){.month-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.dock-date .dock-year{font-size:20px}.selected-date-actions{align-items:stretch}.undo-date-button{font-size:12px}}
 </style>
