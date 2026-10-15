@@ -221,7 +221,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
       <p v-if="generationStatus" class="hint" role="alert">{{ generationStatus }}</p>
       <p v-if="message" class="hint" role="status">{{ message }}</p>
       <ul class="legend" aria-label="Легенда календаря"><li v-for="event in holidays" :key="event.id"><span :class="['symbol', event.id]">{{ event.symbol }}</span> {{ event.name }}</li><li>■ Сожранный день</li><li>— Нет такого дня в месяце</li></ul>
-      <p class="hint">«—» означает, что у месяца нет такого числа; «■» — дата, сожранная Зверем: особый отсутствующий день. 23 Залар объединяет День Молчания и День Тьмы. Семь колонок — способ размещения дней; длина недели Эноа пока не определена.</p>
+      <p class="hint">«—» означает, что у месяца нет такого числа; «■» — дата, сожранная Зверем: особый отсутствующий день. 23 Залар объединяет День Молчания и День Тьмы.</p>
       <div class="month-grid">
         <article v-for="(month, index) in months" :key="month.id" class="month-card" :class="{ 'month-card-current': date.month === index }" :aria-labelledby="'month-title-' + month.id">
           <header><h3 :id="'month-title-' + month.id">{{ month.name }}</h3><span>{{ month.days }} дней</span></header>

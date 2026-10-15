@@ -20,7 +20,7 @@ assert.equal(name(829).round,1)
 assert.equal(name(829).position,830)
 assert.equal(name(829).year,830)
 assert.equal(circle.find(x=>x.name==='Медный Павлин').yearLabel,'Медного Павлина')
-assert.equal(circle.find(x=>x.name==='Халцедоновая Черепаха').yearLabel,'Халцедоновой Черепахи')
+assert.equal(circle.find(x=>x.name==='Пиритовая Черепаха').yearLabel,'Пиритовой Черепахи')
 assert.equal(circle.find(x=>x.name==='Берилловый Кипарис').yearLabel,'Бериллового Кипариса')
 assert.equal(HISTORY_REFERENCE.afterSplit-HISTORY_REFERENCE.afterEmbrace,HISTORY_REFERENCE.embraceAfterSplit)
 assert(name(1000000))
@@ -42,7 +42,7 @@ for(let a=1;a<=4;a++) for(let b=1;b<=4;b++) for(let c=1;c<=4;c++) for(let d=1;d<
 assert.equal(outcomes.size,35)
 for(const row of YEAR_DICE_TABLE) assert.equal(outcomes.get(row.code),row.multiplicity)
 assert.equal(YEAR_DICE_TABLE.reduce((sum,row)=>sum+row.multiplicity,0),256)
-assert.equal(diceYearName([4,4,4,4],[4,4,4,4]).yearLabel,'Перламутровой Гиены')
+assert.equal(diceYearName([4,4,4,4],[4,4,4,4]).yearLabel,'Азуритовой Гиены')
 assert.deepEqual(diceYearName([3,1,4,1],[2,4,1,2]),diceYearName([1,1,3,4],[1,2,2,4]))
 assert.equal(diceYearName([0,1,1,1],[1,1,1,1]),null)
 assert.equal(diceYearName([1,1,1],[1,1,1,1]),null)
@@ -67,7 +67,7 @@ for(let i=0;i<1225;i++) {
 }
 console.log('Interwoven cycle checks passed: both symbols change at every boundary.')
 
-for(const label of ['Турмалиновый','Кварцевый','Жадеитовый','Гранатовый','Агатовый','Перламутровый']) {
+for(const label of ['Турмалиновый','Кварцевый','Жадеитовый','Гранатовый','Агатовый','Азуритовый']) {
   assert(circle.some(x=>x.name===`${label} Симург`))
   const stem=label.slice(0,-2)
   assert.equal(circle.find(x=>x.name===`${stem}ая Сова`).yearLabel,`${stem}ой Совы`)
@@ -79,7 +79,7 @@ assert(!YEAR_IMAGES.some(x=>['Лягушка','Ибис'].includes(x.name)))
 console.log('Toad and Ibix checks passed: updated images and genitive forms.')
 
 assert.equal(circle.find(x=>x.name==='Яшмовая Гиена').yearLabel,'Яшмовой Гиены')
-console.log('Additional mineral aspect checks passed: jasper, beryl and chalcedony.')
+console.log('Additional mineral aspect checks passed: jasper, beryl and pyrite.')
 
 assert.equal(circle.find(x=>x.name==='Топазовая Гиена').yearLabel,'Топазовой Гиены')
 assert.equal(circle.find(x=>x.name==='Сердоликовый Вирм').yearLabel,'Сердоликового Вирма')
