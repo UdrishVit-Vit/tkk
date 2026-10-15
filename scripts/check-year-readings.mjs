@@ -16,6 +16,7 @@ for (let year = 1; year <= YEAR_NAME_PERIOD; year++) {
     assert.equal(story.narrator, voice.id)
     assert(!/Мне снился|Мой брат вернулся|Я однажды/u.test(story.forecast), 'A past anecdote has replaced the forecast')
     assert(!('parable' in story), 'The visible model should expose the forecast')
+    assert(!/неповреждённая ноша|порвавшейся лямк|равное число узлов|петли, ослабевшие|камень упадёт вверх/u.test(story.forecast + story.omen), 'An opaque mechanical omen has returned')
     const text = story.forecast + ' ' + story.omen
     const count = text.split(/\s+/u).length
     assert(count <= 120, `${reading.name}/${voice.id}: too long (${count})`)
