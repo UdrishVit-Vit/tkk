@@ -19,13 +19,13 @@ const displayName = computed(() => props.yearName || reading.value?.name || 'Г�
         <div class="narrator-choice" role="group" aria-label="Кто рассказывает о годе">
           <button v-for="voice in narrators" :key="voice.id" type="button" :aria-pressed="narrator === voice.id" @click="narrator = voice.id"><svg class="voice-sign" viewBox="0 0 24 24" aria-hidden="true"><template v-if="voice.id==='shaman'"><path d="M12 2v4m0 12v4M2 12h4m12 0h4M5 5l3 3m8 8 3 3M5 19l3-3m8-8 3-3"/><path d="m12 6 6 6-6 6-6-6Z"/></template><template v-else-if="voice.id==='magus'"><path d="m5 4 14 16M19 4 5 20M5 4h14M5 20h14"/><path d="m12 8 4 4-4 4-4-4Z"/></template><template v-else><path d="M4 19h16M7 19v-8a5 5 0 0 1 10 0v8M7 13h10M12 6V3"/><circle cx="12" cy="16" r="1"/></template></svg>{{ voice.label }}</button>
         </div>
-        <article class="year-story" :aria-label="'Рассказ: ' + narrators.find(voice => voice.id === narrator).label">
+        <article class="year-story" :aria-label="'Предсказание: ' + narrators.find(voice => voice.id === narrator).label">
           <h4>{{ story.title }}</h4>
-          <p class="story-parable">{{ story.parable }}</p>
+          <p class="story-forecast">{{ story.forecast }}</p>
           <p class="story-omen">{{ story.omen }}</p>
         </article>
       </template>
-      <p v-else class="unnamed-year">Об этом имени здесь ещё не сложили притчи. Может быть, первым его запомнят по твоему рассказу.</p>
+      <p v-else class="unnamed-year">У этого имени пока нет принятого толкования. Здесь ещё спорят, каких перемен от него ждать.</p>
     </div>
   </section>
 </template>
