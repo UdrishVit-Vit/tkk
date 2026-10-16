@@ -10,8 +10,6 @@ const category = ref('Все гильдии')
 const viewport = ref(null)
 const guild = computed(() => guildBySlug(String(route.params.slug || '')))
 const visibleGuilds = computed(() => GUILDS.filter(item => guildMatches(item, query.value, category.value)))
-const otherGuilds = computed(() => GUILDS.filter(item => item.slug !== guild.value?.slug).slice(0, 3))
-const place = computed(() => guild.value?.ship || guild.value?.base)
 function resetFilters() { query.value = ''; category.value = 'Все гильдии' }
 watch(() => route.fullPath, async () => {
   await nextTick()
@@ -68,21 +66,23 @@ watch(() => route.fullPath, async () => {
             <div class="history-entry timeline-row history-entry--right guild-prose-row"><div class="history-entry__card guild-prose"><p>{{ guild.description }}</p><p v-if="guild.namingNote" class="guild-note">{{ guild.namingNote }}</p></div><div class="history-entry__node" aria-hidden="true"><i/></div></div>
           </section>
 
-          <section class="history-era">
-            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>{{ guild.incompleteRoster ? 'Представители' : 'Участники' }}</h2><p>{{ guild.incompleteRoster ? 'Имена, сохранившиеся в архиве Башни.' : 'Те, кого связывает общее дело.' }}</p></div><div class="history-node history-node--era" aria-hidden="true"><span>02</span></div></div>
-            <div v-for="(member, index) in guild.members" :key="member.name" class="history-entry timeline-row guild-member-row" :class="index % 2 ? 'history-entry--right' : 'history-entry--left'"><div class="history-entry__card"><small>{{ member.role || `Участник ${String(index + 1).padStart(2, '0')}` }}</small><h3>{{ member.name }}</h3><p>{{ member.description }}</p></div><div class="history-entry__node" aria-hidden="true"><i/></div></div>
+          <section class="history-era guild-roster-section">
+            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>Участники</h2><p>{{ guild.incompleteRoster ? 'Имена, сохранившиеся в архиве Башни.' : 'Те, кого связывает общее дело.' }}</p></div><div class="history-node history-node--era" aria-hidden="true"><span>02</span></div></div>
+            <div v-if="guild.members.length" class="guild-member-grid">
+              <article v-for="(member, index) in guild.members" :key="member.id" class="guild-person-card">
+                <div class="guild-person-portrait">
+                  <img v-if="member.portrait" :src="member.portrait" :alt="member.portraitAlt || `Портрет: ${member.name}`" width="800" height="1000" loading="lazy">
+                  <template v-else><svg viewBox="0 0 240 300" fill="none" aria-hidden="true"><path d="M120 35 210 150 120 265 30 150Z" stroke="currentColor" opacity=".14"/><circle cx="120" cy="112" r="30" fill="currentColor" opacity=".1"/><path d="M56 235v-23c0-39 28-62 64-62s64 23 64 62v23" fill="currentColor" opacity=".08"/><path d="M88 112a32 32 0 0 1 64 0m-94 113c0-37 25-65 62-65s62 28 62 65" stroke="currentColor" opacity=".3"/></svg><span>Портрет ещё не добавлен</span></template>
+                  <small class="guild-person-number" aria-hidden="true">{{ String(index+1).padStart(2,'0') }}</small>
+                </div>
+                <div class="guild-person-copy"><span class="guild-kicker">{{ member.role || 'Участник гильдии' }}</span><h3>{{ member.name }}</h3><p>{{ member.description }}</p></div>
+              </article>
+            </div>
             <div v-if="guild.incompleteRoster" class="timeline-row guild-footnote-row"><p class="guild-footnote">{{ guild.members.length ? 'Перечислены известные представители. Полный состав гильдии пока не установлен.' : 'Имена участников в известных материалах пока не названы.' }}</p></div>
           </section>
 
-          <section v-if="place" class="history-era">
-            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>{{ guild.ship ? 'Под парусом' : 'Место встречи' }}</h2><p>{{ guild.ship ? 'Корабль гильдии' : guild.location }}</p></div><div class="history-node history-node--era" aria-hidden="true"><span>03</span></div></div>
-            <div class="history-entry timeline-row history-entry--right guild-place-row"><div class="history-entry__card guild-prose"><small>{{ place.type }}</small><h3>{{ place.name }}</h3><p v-if="place.location">{{ place.location }}</p><p v-if="place.captain">Капитан — {{ place.captain }}.</p><p v-if="place.description">{{ place.description }}</p></div><div class="history-entry__node" aria-hidden="true"><i/></div></div>
-          </section>
-
-          <section class="history-era guild-related">
-            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>Другие гильдии</h2><p>Другие узы, другие дороги.</p></div><NuxtLink to="/lore/guilds" class="history-node history-node--era" aria-label="Все гильдии"><span>↗</span></NuxtLink></div>
-            <div v-for="(item, index) in otherGuilds" :key="item.slug" class="history-entry timeline-row" :class="index % 2 ? 'history-entry--right' : 'history-entry--left'"><NuxtLink :to="`/lore/guilds/${item.slug}`" class="history-entry__card"><small>{{ item.location }}</small><strong>{{ item.name }}</strong><p>{{ item.summary }}</p></NuxtLink><div class="history-entry__node" aria-hidden="true"><i/></div></div>
-            <div class="timeline-row guild-footnote-row"><p class="guild-footnote guild-source">Из архива · {{ guild.source }}</p></div>
+          <section class="history-era guild-news">
+            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>Последние известия о гильдии</h2></div><div class="history-node history-node--era" aria-hidden="true"><span>03</span></div></div>
           </section>
         </template>
 
@@ -265,5 +265,30 @@ watch(() => route.fullPath, async () => {
 .history-intro__sigil :deep(.guild-mark){position:relative;z-index:1;color:rgba(var(--theme-accent-strong-rgb),.92)}
 @media(min-width:761px) and (max-width:1000px){.guild-history .guild-tile:nth-child(3n+1){--branch-reach:54px}.guild-branch-root{left:-57px}.guild-history .history-intro__sigil{left:42px}}
 @media(max-width:760px){.guild-history .guild-tools{gap:17px;margin-top:20px}.guild-history .history-intro aside p{font-size:16px}.guild-tools input,.guild-tools select{min-height:44px;font-size:13px}.guild-results{gap:4px 12px}.guild-results button{min-height:44px}.guild-results-hint{font-size:13px}.guild-directory-page .history-intro{padding-bottom:16px}}
+
+/* Guild dossiers: place, shared purpose and a portrait-led introduction. */
+.guild-atlas{margin:12px 0 20px 96px;max-width:760px;border-top:1px solid rgba(var(--theme-accent-rgb),.32);border-bottom:1px solid rgba(var(--theme-accent-rgb),.18);padding:24px 0}
+.guild-kicker,.guild-location-chain dt{font:9px/1.5 'Hanken Grotesk',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.72)}
+.guild-bond p{font:500 25px/1.35 'Cormorant Garamond',serif;margin:9px 0 24px;color:rgba(var(--theme-heading-rgb),.92);max-width:680px}
+.guild-location-chain{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:0}
+.guild-location-chain>div{position:relative;min-width:0;padding-top:16px;border-top:1px solid rgba(var(--theme-accent-rgb),.27)}
+.guild-location-chain>div::before{content:'';position:absolute;top:-3px;left:0;width:5px;height:5px;border-radius:50%;background:var(--theme-accent-strong);opacity:.65}
+.guild-location-chain dt{margin-bottom:8px}.guild-location-chain dd{margin:0;font:18px/1.4 'Cormorant Garamond',serif;color:rgba(var(--theme-text-rgb),.85)}
+.guild-geography-note{font:11px/1.6 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.58);margin:18px 0 0}
+.guild-history:not(.guild-directory-page) .history-era{padding:20px 0}
+.guild-history:not(.guild-directory-page) .history-era__heading{min-height:128px}
+.guild-history:not(.guild-directory-page) .history-era__title h2{font-size:40px}
+.guild-history:not(.guild-directory-page) .history-era__title p{max-width:580px;font-size:16px;line-height:1.5}
+.guild-history:not(.guild-directory-page) .guild-prose p{font-style:normal;color:rgba(var(--theme-text-rgb),.76)}
+.guild-member-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:10px 0 12px 96px;max-width:760px}
+.guild-person-card{min-width:0;overflow:hidden;border:1px solid rgba(var(--theme-accent-rgb),.25);background:linear-gradient(150deg,rgba(var(--theme-accent-rgb),.035),rgba(8,9,15,.8))}
+.guild-person-portrait{position:relative;aspect-ratio:4/5;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,rgba(var(--theme-accent-rgb),.075),transparent 70%);color:var(--theme-accent-strong);border-bottom:1px solid rgba(var(--theme-accent-rgb),.2)}
+.guild-person-portrait>img,.guild-person-portrait>svg{display:block;width:100%;height:100%;object-fit:cover}
+.guild-person-portrait>span{position:absolute;bottom:18px;left:12px;right:12px;text-align:center;font:9px/1.5 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.45)}
+.guild-person-number{position:absolute;top:14px;left:16px;font:10px 'Hanken Grotesk',sans-serif;letter-spacing:.1em;color:rgba(var(--theme-accent-strong-rgb),.5)}
+.guild-person-copy{padding:20px 18px 22px}.guild-person-copy h3{font:600 27px/1.12 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.95);margin:9px 0 10px;overflow-wrap:anywhere;text-wrap:balance}.guild-person-copy p{font:13px/1.65 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.7);margin:0}
+@media(max-width:1000px){.guild-member-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.guild-atlas,.guild-member-grid{max-width:650px}}
+@media(max-width:760px){.guild-atlas,.guild-member-grid{margin-left:48px}.guild-atlas{padding:20px 0}.guild-bond p{font-size:23px}.guild-location-chain{grid-template-columns:1fr;gap:18px}.guild-location-chain>div{padding-top:12px}.guild-location-chain dd{font-size:18px}.guild-member-grid{gap:16px}.guild-history:not(.guild-directory-page) .history-era__title h2{font-size:34px}.guild-person-copy{padding:17px 15px 20px}.guild-person-copy h3{font-size:25px}}
+@media(max-width:520px){.guild-member-grid{grid-template-columns:1fr;max-width:320px}.guild-person-portrait{aspect-ratio:5/4}.guild-person-portrait>svg{width:78%;margin:0 auto}.guild-person-copy p{font-size:14px}}
 
 </style>
