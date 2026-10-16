@@ -62,7 +62,7 @@ export const NODE_IMG = {
     'Наследия':'rasy','Архетипы':'osobennosti'
 };
 export function nodeImg(name, systemId = ''){
-  if (systemId === 'lore' && name === 'Календарь') return '/assets/nodes/calendar-lore.svg?v=2'
+  if (systemId === 'lore' && name === 'Календарь') return '/assets/nodes/calendar-lore-tibetan.webp?v=1'
   if (systemId === 'lore' && name === 'Глоссарий') return '/assets/nodes/glossary-lore.webp'
   if (systemId === 'lore' && name === 'Фракции') return '/assets/nodes/factions-lore.webp'
   if (systemId === 'lore' && name === 'Пантеон') return '/assets/nodes/pantheon-lore.webp'

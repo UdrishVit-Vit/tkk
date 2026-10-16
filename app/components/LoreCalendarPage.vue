@@ -214,7 +214,7 @@ useHead({ title: 'Календарь Эноа · Lore', meta: [{ name: 'descript
 </script>
 
 <template>
-  <LoreThreadPage class="calendar-page" :theme="theme" title="Календарь" eyebrow="Мир Эноа · Нить времени" icon="/assets/nodes/calendar-lore.svg?v=2" @up="$emit('up')">
+  <LoreThreadPage class="calendar-page" :theme="theme" title="Календарь" eyebrow="Мир Эноа · Нить времени" icon="/assets/nodes/calendar-lore-tibetan.webp?v=1" @up="$emit('up')">
 
     <nav class="calendar-section-nav" aria-label="Разделы календаря"><a href="#calendar-months">Месяцы</a><a href="#cycles-title">Особые даты</a><a href="#year-threads-title">Нити о годах</a><a href="#day-threads-title">Нити о днях</a></nav>
     <div class="calendar-dock-slot">
