@@ -1,5 +1,6 @@
 <script setup>
 import GuildMark from './GuildMark.vue'
+import LoreSectionSeal from './LoreSectionSeal.vue'
 import { GUILDS, GUILD_FILTERS, guildBySlug, guildMatches } from '~/data/loreGuilds.js'
 
 defineProps({ theme: { type: Object, required: true } })
@@ -31,7 +32,7 @@ watch(() => route.fullPath, async () => {
             <h1 id="guild-title">{{ guild?.name || 'Гильдии' }}</h1>
             <aside><span>Архив Башни</span><p>{{ guild ? guild.summary : 'Люди, которых связывает общее дело. Гильдии Эноа, их участники, корабли и места встреч — каждая со своей нитью в истории мира.' }}</p></aside>
           </div>
-          <NuxtLink v-if="guild" to="/lore/guilds" class="history-intro__sigil" aria-label="Вернуться к гильдиям"><GuildMark :kind="guild.mark"/></NuxtLink>
+          <NuxtLink v-if="guild" to="/lore/guilds" class="history-intro__sigil" aria-label="Вернуться к гильдиям"><svg class="guild-header-frame" viewBox="0 0 200 200" fill="none" aria-hidden="true"><path d="M100 5 195 100 100 195 5 100Z" fill="var(--theme-surface,#090a10)" stroke="currentColor" stroke-width="1.8"/><path d="M100 17 183 100 100 183 17 100Z" stroke="currentColor" stroke-width=".8" opacity=".4"/></svg><GuildMark :kind="guild.mark"/></NuxtLink>
           <button v-else type="button" class="history-intro__sigil" aria-label="Вернуться к карте Lore" @click="$emit('up')"><img src="/assets/nodes/guilds-lore.webp" width="124" height="124" alt=""></button>
           <div v-if="!guild" class="guild-tools">
             <label><span class="guild-field-label">Поиск по архиву</span><input v-model="query" type="search" aria-label="Поиск по гильдиям, участникам и кораблям" placeholder="Гильдия, участник или корабль…"></label>
@@ -62,12 +63,12 @@ watch(() => route.fullPath, async () => {
 
         <template v-else>
           <section class="history-era guild-about">
-            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>О гильдии</h2><p>{{ guild.place }}</p></div><div class="history-node history-node--era" aria-hidden="true"><span>01</span></div></div>
+            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>О гильдии</h2><p>{{ guild.place }}</p></div><div class="history-node history-node--era guild-section-node" aria-hidden="true"><LoreSectionSeal kind="about"/></div></div>
             <div class="history-entry timeline-row history-entry--right guild-prose-row"><div class="history-entry__card guild-prose"><p>{{ guild.description }}</p><p v-if="guild.namingNote" class="guild-note">{{ guild.namingNote }}</p></div><div class="history-entry__node" aria-hidden="true"><i/></div></div>
           </section>
 
           <section class="history-era guild-roster-section">
-            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>Участники</h2><p>{{ guild.incompleteRoster ? 'Имена, сохранившиеся в архиве Башни.' : 'Те, кого связывает общее дело.' }}</p></div><div class="history-node history-node--era" aria-hidden="true"><span>02</span></div></div>
+            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>Участники</h2><p>{{ guild.incompleteRoster ? 'Имена, сохранившиеся в архиве Башни.' : 'Те, кого связывает общее дело.' }}</p></div><div class="history-node history-node--era guild-section-node" aria-hidden="true"><LoreSectionSeal kind="members"/></div></div>
             <div v-if="guild.members.length" class="guild-member-grid">
               <article v-for="(member, index) in guild.members" :key="member.id" class="guild-person-card">
                 <div class="guild-person-portrait">
@@ -82,7 +83,7 @@ watch(() => route.fullPath, async () => {
           </section>
 
           <section class="history-era guild-news">
-            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>Последние известия о гильдии</h2></div><div class="history-node history-node--era" aria-hidden="true"><span>03</span></div></div>
+            <div class="history-era__heading timeline-row"><div class="history-era__title"><h2>Последние известия о гильдии</h2></div><div class="history-node history-node--era guild-section-node" aria-hidden="true"><LoreSectionSeal kind="news"/></div></div>
           </section>
         </template>
 
@@ -290,5 +291,13 @@ watch(() => route.fullPath, async () => {
 @media(max-width:1000px){.guild-member-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.guild-atlas,.guild-member-grid{max-width:650px}}
 @media(max-width:760px){.guild-atlas,.guild-member-grid{margin-left:48px}.guild-atlas{padding:20px 0}.guild-bond p{font-size:23px}.guild-location-chain{grid-template-columns:1fr;gap:18px}.guild-location-chain>div{padding-top:12px}.guild-location-chain dd{font-size:18px}.guild-member-grid{gap:16px}.guild-history:not(.guild-directory-page) .history-era__title h2{font-size:34px}.guild-person-copy{padding:17px 15px 20px}.guild-person-copy h3{font-size:25px}}
 @media(max-width:520px){.guild-member-grid{grid-template-columns:1fr;max-width:320px}.guild-person-portrait{aspect-ratio:5/4}.guild-person-portrait>svg{width:78%;margin:0 auto}.guild-person-copy p{font-size:14px}}
+
+/* Bordered guild crest and a shared family of woven section seals. */
+.guild-header-frame{position:absolute;inset:0;width:100%;height:100%;color:rgba(var(--theme-accent-strong-rgb),.9);filter:drop-shadow(0 0 5px rgba(var(--theme-accent-rgb),.1))}
+.guild-history:not(.guild-directory-page) .history-intro__sigil :deep(.guild-mark){width:72%;height:72%;position:relative;z-index:1}
+.guild-history .guild-section-node{width:86px;height:86px;transform:none;border:0;background:transparent;box-shadow:none;animation:none;color:rgba(var(--theme-accent-rgb),.85);grid-row:1}
+.guild-history .guild-section-node::before{display:none}
+.guild-history:not(.guild-directory-page) .history-era__title{grid-row:1}
+@media(max-width:760px){.guild-history .guild-section-node{width:56px;height:56px}}
 
 </style>
