@@ -36,25 +36,22 @@ watch(() => route.fullPath, async () => {
           <NuxtLink v-if="guild" to="/lore/guilds" class="history-intro__sigil" aria-label="Вернуться к гильдиям"><GuildMark :kind="guild.mark"/></NuxtLink>
           <button v-else type="button" class="history-intro__sigil" aria-label="Вернуться к карте Lore" @click="$emit('up')"><img src="/assets/nodes/guilds-lore.webp" width="124" height="124" alt=""></button>
           <div v-if="!guild" class="guild-tools">
-            <label><span class="sr-only">Поиск по гильдиям, участникам и кораблям</span><input v-model="query" type="search" placeholder="Гильдия, имя, корабль…"></label>
-            <label><span class="sr-only">Место гильдии</span><select v-model="category"><option v-for="filter in GUILD_FILTERS" :key="filter">{{ filter }}</option></select></label>
-            <p v-if="query || category !== 'Все гильдии'" aria-live="polite">Найдено: {{ visibleGuilds.length }}</p>
+            <label><span class="guild-field-label">Поиск по архиву</span><input v-model="query" type="search" aria-label="Поиск по гильдиям, участникам и кораблям" placeholder="Гильдия, участник или корабль…"></label>
+            <label><span class="guild-field-label">Место гильдии</span><select v-model="category" aria-label="Место гильдии"><option v-for="filter in GUILD_FILTERS" :key="filter">{{ filter }}</option></select></label>
+            <div class="guild-results"><p aria-live="polite">{{ query || category !== 'Все гильдии' ? `Найдено: ${visibleGuilds.length} из ${GUILDS.length}` : `Гильдий в архиве: ${GUILDS.length}` }}</p><button v-if="query || category !== 'Все гильдии'" type="button" @click="resetFilters">Сбросить фильтры <span aria-hidden="true">×</span></button><span v-else class="guild-results-hint">У каждого знака — своя история</span></div>
           </div>
         </section>
 
         <template v-if="!guild">
           <div v-if="visibleGuilds.length" class="guild-tile-grid" aria-label="Гильдии">
             <NuxtLink v-for="item in visibleGuilds" :key="item.slug" :to="`/lore/guilds/${item.slug}`" class="guild-tile" :aria-label="`Открыть ${item.name}`">
+              <i class="guild-branch-root" aria-hidden="true"/>
               <svg class="guild-diamond-frame" viewBox="0 0 200 200" fill="none" aria-hidden="true">
                 <path class="guild-diamond-surface" d="M100 9 191 100 100 191 9 100Z"/>
                 <path d="M100 9 191 100 100 191 9 100Z" stroke="currentColor" stroke-width="1.2"/>
                 <path d="M100 21 179 100 100 179 21 100Z" stroke="currentColor" stroke-opacity=".35" stroke-width=".8"/>
                 <path d="M100 30 170 100 100 170 30 100Z" stroke="currentColor" stroke-opacity=".18" stroke-width=".7" stroke-dasharray="2 5"/>
-                <g v-for="angle in [0, 90, 180, 270]" :key="angle" :transform="`rotate(${angle} 100 100)`">
-                  <path d="m73 35 12-12 15 15 15-15 12 12-12 12-15-15-15 15-12-12Z" stroke="var(--theme-bg)" stroke-width="5"/>
-                  <path d="m73 35 12-12 15 15 15-15 12 12-12 12-15-15-15 15-12-12Z" stroke="currentColor" stroke-width="1.05"/>
-                  <image href="/assets/nodes/guilds-lore.webp" x="84" y="-5" width="32" height="32"/>
-                </g>
+                <path class="guild-frame-tips" d="m83 26 17-17 17 17m57 57 17 17-17 17m-57 57-17 17-17-17m-57-57L9 100l17-17" stroke="currentColor" stroke-width="1.7"/>
               </svg>
               <span class="guild-tile-location">{{ item.location }}</span>
               <span class="guild-tile-number" aria-hidden="true">{{ String(GUILDS.indexOf(item) + 1).padStart(2, '0') }}</span>
@@ -223,5 +220,50 @@ watch(() => route.fullPath, async () => {
 @media(max-width:1000px){.guild-tile-grid{grid-template-columns:repeat(3,minmax(0,1fr));max-width:500px;gap:12px 20px}}
 @media(max-width:760px){.guild-tile-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:320px;gap:12px}.guild-tile-caption{margin-top:153px}}
 @media(max-width:520px){.guild-tile-grid{max-width:280px;gap:10px}.guild-history .guild-tile{--diamond-size:112px;height:165px}.guild-tile-symbol{width:80px;height:80px}.guild-tile h2{font-size:18px}.guild-tile-caption{margin-top:125px}}
+
+/* Each row grows from the Lore spine; the connectors meet diamond vertices. */
+.guild-tile-grid{--guild-gap:20px;column-gap:var(--guild-gap);row-gap:20px}
+.guild-history .guild-tile{--branch-reach:calc(50% - var(--diamond-size)*.455 + var(--guild-gap))}
+.guild-history .guild-tile::before{display:block!important;inset:auto;left:calc(-1*var(--branch-reach));top:calc(var(--diamond-size)/2);width:calc(50% - var(--diamond-size)*.455 + var(--branch-reach));height:1px;border:0;background:linear-gradient(90deg,rgba(var(--theme-accent-rgb),.5),rgba(var(--theme-accent-strong-rgb),.62));box-shadow:0 4px 0 rgba(var(--theme-accent-rgb),.09);z-index:-1;transition:background .3s,box-shadow .3s}
+.guild-history .guild-tile:nth-child(4n+1){--branch-reach:72px}
+.guild-branch-root{display:none;position:absolute;left:-75px;top:calc(var(--diamond-size)/2 - 3px);width:7px;height:7px;box-sizing:border-box;border:1px solid rgba(var(--theme-accent-strong-rgb),.75);border-radius:50%;background:var(--theme-bg,#090a10);box-shadow:0 0 8px rgba(var(--theme-accent-rgb),.22)}
+.guild-tile:nth-child(4n+1) .guild-branch-root{display:block}
+.guild-tile-symbol{width:108px;height:108px;color:rgba(var(--theme-accent-strong-rgb),.89)}
+.guild-diamond-frame{color:rgba(var(--theme-accent-rgb),.66)}
+.guild-frame-tips{color:rgba(var(--theme-accent-strong-rgb),.76)}
+.guild-tile h2{transition:color .25s;text-wrap:balance}
+.guild-tile:hover h2,.guild-tile:focus-visible h2{color:var(--theme-accent-strong)}
+.guild-history .guild-tile:hover::before,.guild-history .guild-tile:focus-visible::before{background:rgba(var(--theme-accent-strong-rgb),.85);box-shadow:0 0 9px rgba(var(--theme-accent-rgb),.3),0 4px 0 rgba(var(--theme-accent-rgb),.15)}
+@media(max-width:1000px){.guild-history .guild-tile:nth-child(n){--branch-reach:calc(50% - var(--diamond-size)*.455 + var(--guild-gap))}.guild-tile:nth-child(n) .guild-branch-root{display:none}.guild-history .guild-tile:nth-child(3n+1){--branch-reach:72px}.guild-tile:nth-child(3n+1) .guild-branch-root{display:block}}
+@media(max-width:760px){.guild-tile-grid{--guild-gap:12px}.guild-history .guild-tile:nth-child(n){--branch-reach:calc(50% - var(--diamond-size)*.455 + var(--guild-gap))}.guild-tile:nth-child(n) .guild-branch-root{display:none}.guild-history .guild-tile:nth-child(2n+1){--branch-reach:24px}.guild-tile:nth-child(2n+1) .guild-branch-root{display:block;left:-27px}}
+@media(max-width:520px){.guild-tile-grid{--guild-gap:10px;row-gap:14px}.guild-tile-symbol{width:88px;height:88px}}
+@media(prefers-reduced-motion:reduce){.guild-history .guild-tile::before,.guild-tile h2{transition:none}}
+
+/* A gentle zoom keeps the connected frame fixed while the guild seal responds. */
+.guild-tile-symbol{transform-origin:center;transition:transform .38s cubic-bezier(.2,.8,.25,1),filter .38s ease;will-change:transform}
+.guild-tile:hover .guild-tile-symbol,.guild-tile:focus-visible .guild-tile-symbol{transform:translate(-50%,-50%) scale(1.18);filter:drop-shadow(0 0 12px rgba(var(--theme-accent-rgb),.32))}
+.guild-tile:active .guild-tile-symbol{transform:translate(-50%,-50%) scale(1.08);transition-duration:.12s}
+@media(prefers-reduced-motion:reduce){.guild-tile-symbol{transition:none;will-change:auto}.guild-tile:hover .guild-tile-symbol,.guild-tile:focus-visible .guild-tile-symbol,.guild-tile:active .guild-tile-symbol{transform:translate(-50%,-50%)}}
+
+/* Editorial polish: readable controls, quiet metadata and crisp ornament. */
+.guild-history .history-intro aside{margin-top:16px}
+.guild-history .history-intro aside p{font-size:17px;line-height:1.65;color:rgba(var(--theme-text-rgb),.72)}
+.guild-history .guild-tools{margin-top:22px;gap:15px 24px;align-items:flex-end;max-width:680px}
+.guild-field-label{display:block;margin:0 0 7px 4px;font:9px/1.3 'Hanken Grotesk',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.72)}
+.guild-tools input,.guild-tools select{min-height:40px;padding:10px 4px;font-size:12px;line-height:1.5;color:rgba(var(--theme-text-rgb),.88);border-bottom-color:rgba(var(--theme-accent-rgb),.4);transition:border-color .2s,background .2s}
+.guild-tools input::placeholder{color:rgba(var(--theme-text-rgb),.55)}
+.guild-tools input:hover,.guild-tools select:hover,.guild-tools input:focus,.guild-tools select:focus{border-bottom-color:rgba(var(--theme-accent-strong-rgb),.85);background:rgba(var(--theme-accent-rgb),.035)}
+.guild-results{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;width:100%;font:10px/1.6 'Hanken Grotesk',sans-serif;color:rgba(var(--theme-text-rgb),.6)}
+.guild-results p{margin:0;font-variant-numeric:tabular-nums}
+.guild-results-hint{font:italic 14px/1.4 'Cormorant Garamond',serif;color:rgba(var(--theme-accent-strong-rgb),.6)}
+.guild-results button{border:0;background:transparent;padding:5px 0;color:rgba(var(--theme-accent-strong-rgb),.85);font:10px 'Hanken Grotesk',sans-serif;cursor:pointer;min-height:32px}
+.guild-results button span{font-size:17px;vertical-align:-1px;margin-left:7px}.guild-results button:hover{text-decoration:underline;text-underline-offset:4px}
+.guild-tile-grid{margin-top:16px}
+.guild-tile h2{font-weight:600;letter-spacing:.005em}
+.guild-tile:hover .guild-tile-symbol,.guild-tile:focus-visible .guild-tile-symbol{filter:drop-shadow(0 0 6px rgba(var(--theme-accent-rgb),.22))}
+.guild-history:not(.guild-directory-page) .history-intro__sigil::after{display:none}
+.history-intro__sigil :deep(.guild-mark){position:relative;z-index:1;color:rgba(var(--theme-accent-strong-rgb),.92)}
+@media(min-width:761px) and (max-width:1000px){.guild-history .guild-tile:nth-child(3n+1){--branch-reach:54px}.guild-branch-root{left:-57px}.guild-history .history-intro__sigil{left:42px}}
+@media(max-width:760px){.guild-history .guild-tools{gap:17px;margin-top:20px}.guild-history .history-intro aside p{font-size:16px}.guild-tools input,.guild-tools select{min-height:44px;font-size:13px}.guild-results{gap:4px 12px}.guild-results button{min-height:44px}.guild-results-hint{font-size:13px}.guild-directory-page .history-intro{padding-bottom:16px}}
 
 </style>

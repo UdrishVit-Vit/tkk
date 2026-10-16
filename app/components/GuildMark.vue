@@ -1,40 +1,58 @@
 <script setup>
 import { computed } from 'vue'
 const props = defineProps({ kind: { type: String, default: 'stone' } })
-// Abstract interwoven ribbons. Keys retain compatibility with catalogue data.
-const knots = {
-  apple: ['M72 68H116V104H88V148H116V184H72V140H104V112H72Z','M184 68H140V104H168V148H140V184H184V140H152V112H184Z','M100 84H128V116H156V144H128V172H100V140H128V112H100Z'],
-  stone: ['M72 72H120V104H104V152H152V136H184V184H136V152H152V104H104V120H72Z','M136 72H184V120H152V104H104V152H120V184H72V136H104V152H152V104H136Z'],
-  cup: ['M72 72H120V96H96V120H72ZM136 136H184V184H136V160H160V136Z','M136 72H184V120H160V96H136ZM72 136H96V160H120V184H72Z','M104 104H152V152H104Z'],
-  hat: ['M64 88H104V64H152V104H192V152H152V192H104V152H64Z','M88 64V104H64V152H104V192H152V152H192V104H152V64Z','M104 104H152V152H104Z'],
-  shield: ['M72 72H184V104H152V152H184V184H72V152H104V104H72Z','M104 56H152V88H128V168H152V200H104V168H128V88H104Z','M88 104H168V152H88Z'],
-  letter: ['M64 104H112V152H64ZM144 104H192V152H144Z','M104 64H152V112H104ZM104 144H152V192H104Z','M88 88H168V168H88Z'],
-  'blind-eye': ['M72 72H120V104H96V160H128V184H72V136H104V96H72Z','M136 72H184V120H152V96H128V152H160V184H136V160H184V136H136Z','M104 112H152V144H104Z'],
-  spears: ['M64 80H112V112H80V144H112V176H64V128H96V96H64Z','M144 80H192V128H160V160H192V176H144V144H176V112H144Z','M112 56H144V104H112ZM112 152H144V200H112Z','M96 112H160V144H96Z'],
-  hyena: ['M64 72H104V112H80V152H112V184H64V136H88V96H64Z','M112 64H152V104H128V152H152V192H112V152H136V104H112Z','M160 72H192V120H168V160H192V184H152V144H176V96H160Z'],
-  fist: ['M72 72H184V104H104V152H152V136H128V120H184V184H72V136H88V88H152V104H168V88H72Z','M104 56V120H136V168H104V200M152 56V88H128V136H152V200'],
-  earring: ['M88 64H168V96H144V88H112V112H88V144H112V168H144V160H168V192H88V168H64V112H88Z','M112 96H184V160H152V136H128V160H96V128H112Z'],
-  ring: ['M72 72H184V112H160V96H96V160H112V184H72Z','M184 184H72V144H96V160H160V96H144V72H184Z','M112 56H144V112H200V144H144V200H112V144H56V112H112Z'],
-  coins: ['M64 80H112V128H64ZM112 128H160V176H112Z','M96 64H144V112H96ZM144 112H192V160H144Z','M80 144H112V176H80ZM144 80H176V112H144Z'],
-  buffalo: ['M64 72H112V112H88V144H112V184H64V144H88V112H64Z','M192 72H144V112H168V144H144V184H192V144H168V112H192Z','M104 88H152V120H128V136H152V168H104V136H128V120H104Z'],
-  pickaxe: ['M64 64H112V96H96V112H64ZM144 64H192V112H160V96H144Z','M64 144H96V160H112V192H64ZM160 144H192V192H144V160H160Z','M104 80H152V104H176V152H152V176H104V152H80V104H104Z','M112 112H144V144H112Z'],
-  compass: ['M104 56H152V104H200V152H152V200H104V152H56V104H104Z','M80 80H128V112H112V128H80ZM128 128H176V176H128V144H144V128Z','M144 80H176V112H144ZM80 144H112V176H80Z'],
+const box = (x,y,w,h) => [[x,y],[x+w,y],[x+w,y+h],[x,y+h],[x,y]]
+// Emblem concepts, not additional lore: three linked vows, a stable weave,
+// four travelling strands, folded silk, a sealed centre, a hidden passage,
+// paired currents, a running braid, a tightened grip, an off-centre clasp,
+// an unbroken circuit, linked exchanges, paired shoulders, a crossing, a route.
+const patterns = {
+  apple: [box(62,62,72,72),box(122,62,72,72),box(92,122,72,72)],
+  stone: [box(62,86,132,84),box(86,62,84,132),box(110,62,36,132)],
+  cup: [box(56,80,96,48),box(104,128,96,48),box(80,104,48,96),box(128,56,48,96)],
+  hat: [[[56,80],[104,80],[104,56],[176,56],[176,104],[200,104],[200,176],[152,176],[152,200],[80,200],[80,152],[56,152],[56,80]],box(80,104,96,48)],
+  shield: [box(62,62,132,132),box(86,110,84,36),box(110,86,36,84)],
+  'blind-eye': [[[62,62],[146,62],[146,110],[110,110],[110,194],[62,194],[62,146],[194,146],[194,98],[170,98],[170,170],[86,170],[86,86],[62,86],[62,62]]],
+  spears: [box(62,86,132,36),box(62,134,132,36),box(86,62,36,132),box(134,62,36,132)],
+  hyena: [[[56,80],[104,80],[104,104],[152,104],[152,128],[200,128],[200,176],[152,176],[152,152],[104,152],[104,128],[56,128],[56,80]],[[80,56],[128,56],[128,104],[152,104],[152,152],[176,152],[176,200],[128,200],[128,152],[104,152],[104,104],[80,104],[80,56]]],
+  fist: [[[62,62],[194,62],[194,194],[62,194],[62,110],[146,110],[146,146],[110,146],[110,170],[170,170],[170,86],[86,86],[86,62],[62,62]],box(86,134,84,36)],
+  earring: [box(62,62,108,132),box(110,86,84,84),box(86,110,36,36)],
+  ring: [box(56,80,144,96),box(80,56,96,144)],
+  coins: [box(56,56,84,84),box(116,116,84,84),box(92,92,72,72)],
+  buffalo: [[[56,56],[104,56],[104,104],[152,104],[152,56],[200,56],[200,152],[176,152],[176,200],[128,200],[128,152],[80,152],[80,104],[56,104],[56,56]],box(80,128,96,48)],
+  pickaxe: [box(56,104,144,48),box(104,56,48,144),box(80,80,96,96)],
+  compass: [[[56,56],[152,56],[152,80],[80,80],[80,176],[176,176],[176,104],[200,104],[200,200],[56,200],[56,56]],[[104,56],[104,128],[56,128],[56,152],[152,152],[152,200],[176,200],[176,104],[128,104],[128,56],[104,56]]],
 }
-const strands = computed(() => knots[props.kind] || knots.stone)
+const strands = computed(() => patterns[props.kind] || patterns.stone)
+const path = points => points.map(([x,y],i) => `${i ? 'L' : 'M'}${x} ${y}`).join(' ')
+// Explicit alternating over/under bridges, including self-crossings.
+const bridges = computed(() => {
+  const segments = strands.value.flatMap(points => points.slice(1).map((p,i) => ({a:points[i],b:p})))
+  const result = new Map()
+  for (const h of segments.filter(s => s.a[1] === s.b[1])) {
+    for (const v of segments.filter(s => s.a[0] === s.b[0])) {
+      const x=v.a[0], y=h.a[1]
+      if (x<=Math.min(h.a[0],h.b[0]) || x>=Math.max(h.a[0],h.b[0]) || y<=Math.min(v.a[1],v.b[1]) || y>=Math.max(v.a[1],v.b[1])) continue
+      const horizontal = (Math.round((x-56)/24)+Math.round((y-56)/24))%2 === 0
+      result.set(`${x},${y}`, horizontal ? `M${x-9} ${y}h18` : `M${x} ${y-9}v18`)
+    }
+  }
+  return [...result.values()]
+})
 </script>
 
 <template>
   <svg viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="guild-mark">
-    <g transform="rotate(45 128 128)" stroke-linejoin="miter" stroke-linecap="square">
-      <rect x="46" y="46" width="164" height="164" stroke="#090a10" stroke-width="12"/>
-      <rect x="46" y="46" width="164" height="164" stroke="currentColor" stroke-width="6"/>
-      <rect x="54" y="54" width="148" height="148" stroke="currentColor" stroke-width="1" opacity=".45"/>
-      <g v-for="(strand, index) in strands" :key="index">
-        <path :d="strand" stroke="#090a10" stroke-width="12"/>
-        <path :d="strand" stroke="currentColor" stroke-width="6"/>
-        <path :d="strand" stroke="#fff9e6" stroke-width="1" opacity=".65"/>
+    <g transform="rotate(45 128 128)" stroke-linejoin="miter" stroke-linecap="butt">
+      <g v-for="(points,i) in strands" :key="i">
+        <path :d="path(points)" stroke="currentColor" stroke-width="8"/>
+        <path :d="path(points)" stroke="#fff9e6" stroke-width="1.5" opacity=".65"/>
       </g>
-      <path d="M46 76V46H76M180 46H210V76M210 180V210H180M76 210H46V180" stroke="currentColor" stroke-width="2"/>
+      <g v-for="(bridge,i) in bridges" :key="`cross-${i}`">
+        <path :d="bridge" stroke="var(--theme-surface,#090a10)" stroke-width="15"/>
+        <path :d="bridge" stroke="currentColor" stroke-width="8"/>
+        <path :d="bridge" stroke="#fff9e6" stroke-width="1.5" opacity=".65"/>
+      </g>
     </g>
   </svg>
 </template>
