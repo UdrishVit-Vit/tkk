@@ -1,6 +1,5 @@
 <script setup>
 import { DND55E_CLASSES } from '~/data/dnd55e/catalogues.js'
-import { DND55E_CLASS_DETAILS } from '~/data/dnd55e/classdata2024.js'
 import { mergeArchetypes2024 } from '~/data/dnd55e/classArchetypes2024.js'
 import { SYSTEMS, POOL, IMG, THEMES, nodeImg, classImg, layoutPoints, entriesFor } from '~/data/hub.js'
 import { useKnotCanvas } from '~/composables/useKnotCanvas.js'
@@ -75,18 +74,35 @@ watch(selectedTheme, value => { state.theme = value })
 // classdata.js статически тянет importedClassArchetypes.js (~1 МБ) и нужен
 // только когда открыта карточка класса. Грузим его по требованию, чтобы он не
 // попадал в бандл главной/хаб-карты, где детали классов не показываются.
-const classDataMap = ref(null)
+const classDataMap = shallowRef(null)
+const classDetails2024 = shallowRef(null)
+let classDetailsPromise = null
 let classDataPromise = null
 function loadClassData() {
   if (!classDataPromise) {
     classDataPromise = import('~/data/classdata.js').then((m) => {
       classDataMap.value = m.CLASSDATA
       return m.CLASSDATA
+    }).catch((error) => {
+      classDataPromise = null
+      throw error
     })
   }
-  return classDataPromise
+  const requests = [classDataPromise]
+  if (state.active === '2024') {
+    if (!classDetailsPromise) {
+      classDetailsPromise = import('~/data/dnd55e/classdata2024.js').then((m) => {
+        classDetails2024.value = m.DND55E_CLASS_DETAILS
+      }).catch((error) => {
+        classDetailsPromise = null
+        throw error
+      })
+    }
+    requests.push(classDetailsPromise)
+  }
+  return Promise.all(requests)
 }
-watch(() => state.cls, (cls) => { if (cls) loadClassData() })
+watch(() => [state.cls, state.active], ([cls]) => { if (cls) return loadClassData() })
 
 const CLASS_QUERY = {
   'Бард': 'bard',
@@ -814,7 +830,7 @@ const vm = computed(() => {
   const class2024 = S.active === '2024'
     ? DND55E_CLASSES.find(item => item.title === S.cls)
     : null
-  const details2024 = class2024 ? (DND55E_CLASS_DETAILS[class2024.title] || {}) : null
+  const details2024 = class2024 ? (classDetails2024.value?.[class2024.title] || {}) : null
   // Архетипы классов 2024: собственные (перенесённые вручную, как у Шамана) плюс
   // авторские архетипы из раздела 2014 — они общие для обеих редакций.
   const archetypes2024 = () => mergeArchetypes2024(
@@ -1399,16 +1415,16 @@ if (initialClass) await loadClassData()
     </div>
 
     <LazyClassPage v-if="vm.showClassPage" :vm="vm" :state="state" @up="closeClass" />
-    <LoreHistoryPage v-if="vm.showLoreHistory" :theme="vm.th" @up="closeLoreHistory" />
-    <LoreGuildsPage v-if="vm.showLoreGuilds" :theme="vm.th" @up="closeLoreHistory" />
-    <LoreCalendarPage v-if="vm.showLoreCalendar" :theme="vm.th" @up="closeLoreHistory" />
-    <LoreGlossaryPage v-if="vm.showLoreGlossary" :theme="vm.th" @up="closeLoreHistory" />
-    <LorePantheonPage v-if="vm.showLorePantheon" :theme="vm.th" @up="closeLoreHistory" />
-    <LoreGeographyPage v-if="vm.showLoreGeography" :theme="vm.th" @up="closeLoreHistory" />
-    <LoreShardsPage v-if="vm.showLoreShards" :theme="vm.th" @up="closeLoreHistory" />
-    <LoreFactionsPage v-if="vm.showLoreFactions" :theme="vm.th" @up="closeLoreHistory" />
-    <LoreTalesPage v-if="vm.showLoreTales" :theme="vm.th" @up="closeLoreHistory" />
-    <LoreUzlyPage v-if="vm.showLoreUzly" :theme="vm.th" @up="closeLoreHistory" />
+    <LazyLoreHistoryPage v-if="vm.showLoreHistory" :theme="vm.th" @up="closeLoreHistory" />
+    <LazyLoreGuildsPage v-if="vm.showLoreGuilds" :theme="vm.th" @up="closeLoreHistory" />
+    <LazyLoreCalendarPage v-if="vm.showLoreCalendar" :theme="vm.th" @up="closeLoreHistory" />
+    <LazyLoreGlossaryPage v-if="vm.showLoreGlossary" :theme="vm.th" @up="closeLoreHistory" />
+    <LazyLorePantheonPage v-if="vm.showLorePantheon" :theme="vm.th" @up="closeLoreHistory" />
+    <LazyLoreGeographyPage v-if="vm.showLoreGeography" :theme="vm.th" @up="closeLoreHistory" />
+    <LazyLoreShardsPage v-if="vm.showLoreShards" :theme="vm.th" @up="closeLoreHistory" />
+    <LazyLoreFactionsPage v-if="vm.showLoreFactions" :theme="vm.th" @up="closeLoreHistory" />
+    <LazyLoreTalesPage v-if="vm.showLoreTales" :theme="vm.th" @up="closeLoreHistory" />
+    <LazyLoreUzlyPage v-if="vm.showLoreUzly" :theme="vm.th" @up="closeLoreHistory" />
     <SectionCards v-if="vm.showCards" :vm="vm" @up="goUp" @add-bookmark="addBookmark" v-model:query="state.cardQuery" />
 
     <HubOverlays :vm="vm" :state="state" @close="state.overlay = null" @stop="stopClick" />
