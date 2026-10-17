@@ -1,6 +1,6 @@
 <script setup>
-import { tokenizeRuleText, getRuleTooltip } from '~/utils/ruleText5e.js'
-import { tokenizeRuleText55e, getRuleTooltip55e } from '~/utils/ruleText55e.js'
+import { loadRuleTextTools } from '~/utils/ruleTextLoader.js'
+
 
 const props = defineProps({
   text: { type: [String, Number], required: true },
@@ -11,6 +11,12 @@ const props = defineProps({
 
 const route = useRoute()
 const activeEdition = computed(() => props.edition || (route.path.startsWith('/dnd55e') ? '2024' : '2014'))
+// Await the matching tokenizer for SSR as well as hydration; share its import across text nodes.
+const ruleTools = shallowRef(await loadRuleTextTools(activeEdition.value))
+watch(activeEdition, async edition => {
+  const tools = await loadRuleTextTools(edition)
+  if (edition === activeEdition.value) ruleTools.value = tools
+})
 
 // Explicit rule links can include an English name in a nested bracket pair:
 // [Увеличение/уменьшение [Enlarge/Reduce]](/dnd55e/spells?spell=enlarge-reduce-phb)
@@ -33,7 +39,7 @@ const tokens = computed(() => String(props.text || '')
         const bold = segment.startsWith('**') && segment.endsWith('**')
         const italic = !bold && ((segment.startsWith('*') && segment.endsWith('*')) || (segment.startsWith('_') && segment.endsWith('_')))
         const text = bold ? segment.slice(2, -2) : italic ? segment.slice(1, -1) : segment
-        const tokenize = activeEdition.value === '2024' ? tokenizeRuleText55e : tokenizeRuleText
+        const tokenize = ruleTools.value.tokenize
         return tokenize(text, props.currentPath, props.excludePaths).map(token => ({ ...token, bold, italic }))
       })
   }))
@@ -59,9 +65,7 @@ function onLinkEnter(event, token) {
   window.clearTimeout(showTimer)
   window.clearTimeout(hideTimer)
   showTimer = window.setTimeout(async () => {
-    const info = activeEdition.value === '2024'
-      ? await getRuleTooltip55e(token.path)
-      : await getRuleTooltip(token.path)
+    const info = await ruleTools.value.tooltip(token.path)
     if (!info || hoveredPath !== token.path) return
     tip.value = { mode: 'rule', path: token.path, ...info, ...tipPosition(target) }
   }, 200)
@@ -130,6 +134,7 @@ onBeforeUnmount(() => {
   <span class="rt">
     <template v-for="(token, i) in tokens" :key="i">
       <NuxtLink
+        prefetch-on="interaction"
         v-if="token.type === 'link' || token.type === 'adv' || token.type === 'dis'"
         :to="token.path"
         class="rt-link"
@@ -141,6 +146,7 @@ onBeforeUnmount(() => {
         @click="hideNow"
       >{{ token.text }}</NuxtLink>
       <NuxtLink
+        prefetch-on="interaction"
         v-else-if="token.type === 'extlink'"
         :to="token.path"
         class="rt-link rt-extlink"
@@ -196,6 +202,7 @@ onBeforeUnmount(() => {
             <div class="rt-tip-foot">
               <div v-if="tip.section" class="rt-tip-section">{{ tip.section }}</div>
               <NuxtLink
+        prefetch-on="interaction"
                 v-if="tip.path"
                 :to="tip.path"
                 class="rt-tip-more"

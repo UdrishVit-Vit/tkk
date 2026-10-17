@@ -1,9 +1,32 @@
 <script setup>
-import { SPELLS_5E, SPELL_LEVELS, SPELL_SCHOOLS, SPELL_TAGS, SPELL_SOURCES } from '~/data/spells5e.js'
-import { DND55E_SPELLS, DND55E_SPELL_SCHOOLS } from '~/data/dnd55e/spells.js'
+import { SPELL_LEVELS, SPELL_SCHOOLS, SPELL_TAGS, SPELL_SOURCES } from '~/data/spellLabels.js'
+
 
 const props = defineProps(['vm', 'state'])
 const emit = defineEmits(['up'])
+
+// Keep immutable spell datasets outside deep reactivity and load only the active edition.
+const spellDataByEdition = shallowRef({})
+const spellDataRequests = new Map()
+const spellEdition = computed(() => props.vm.is2024 ? '2024' : '2014')
+const activeSpellData = computed(() => spellDataByEdition.value[spellEdition.value])
+function loadSpellData(edition) {
+  if (!spellDataRequests.has(edition)) {
+    const request = (edition === '2024'
+      ? import('~/data/dnd55e/spells.js').then(m => ({ spells: m.DND55E_SPELLS, schools: m.DND55E_SPELL_SCHOOLS }))
+      : import('~/data/spells5e.js').then(m => ({ spells: m.SPELLS_5E })))
+      .then(data => {
+        spellDataByEdition.value = { ...spellDataByEdition.value, [edition]: data }
+        return data
+      }).catch(error => {
+        spellDataRequests.delete(edition)
+        throw error
+      })
+    spellDataRequests.set(edition, request)
+  }
+  return spellDataRequests.get(edition)
+}
+watch(spellEdition, edition => loadSpellData(edition))
 
 // Keep the current class emblem on screen until the next one is fully loaded.
 // Replacing the <img> together with the route caused a brief empty frame and
@@ -293,7 +316,7 @@ function spellLevelName(level) {
 }
 
 function spellSchoolName(school) {
-  if (props.vm.is2024) return DND55E_SPELL_SCHOOLS[school]?.title || school
+  if (props.vm.is2024) return activeSpellData.value?.schools?.[school]?.title || school
   return SPELL_SCHOOLS[school] || school
 }
 
@@ -887,11 +910,12 @@ const activeClassTab = computed(() => ['skills', 'description', 'spells'].includ
   : 'skills'
 )
 const classSpellList = computed(() => {
-  if (props.vm.is2024) return DND55E_SPELLS.filter(spell => spell.classes?.includes(props.vm.className))
+  const spells = activeSpellData.value?.spells || []
+  if (props.vm.is2024) return spells.filter(spell => spell.classes?.includes(props.vm.className))
   const className = props.vm.className
-  const direct = SPELLS_5E.filter(spell => spell.classes?.includes(className))
+  const direct = spells.filter(spell => spell.classes?.includes(className))
   if (direct.length) return direct
-  return SPELLS_5E.filter(spell => !spell.classes?.length || spell.classes.includes(className))
+  return spells.filter(spell => !spell.classes?.length || spell.classes.includes(className))
 })
 const sourceFilteredArchetypes = computed(() => props.vm.classArchetypes.filter(arch => {
   if (!props.state.classFilterTouched) return true
@@ -1249,6 +1273,8 @@ function scrollToClassFeature(featureId) {
   window.setTimeout(() => target.classList.add('is-scroll-target'), 20)
   window.setTimeout(() => target.classList.remove('is-scroll-target'), 1500)
 }
+// Preserve the complete initial server render and hydration data for the selected edition.
+await loadSpellData(spellEdition.value)
 </script>
 
 <template>
