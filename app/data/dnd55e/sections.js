@@ -12,7 +12,7 @@ export const DND55E_GROUPS = [
   {
     id: 'tools',
     title: 'Инструменты',
-    sections: ['omens', 'wrath', 'tea']
+    sections: ['omens', 'wrath', 'tea', 'beads']
   },
   {
     id: 'workshop',
@@ -71,6 +71,11 @@ export const DND55E_SECTIONS = {
     title: 'Чай',
     path: '/dnd55e/tea',
     description: 'Чаи мира Эноа и их игровые эффекты для редакции 2024 года.'
+  },
+  beads: {
+    title: 'Бусины',
+    path: '/dnd55e/beads',
+    description: 'Бусины мира Эноа — малые магические предметы с зарядами и историей для редакции 2024 года.'
   },
   bestiary: {
     title: 'Бестиарий',

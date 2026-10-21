@@ -1,6 +1,7 @@
 import { TEAS_5E, TEA_LORE, TEA_STEPS } from '../tea5e.js'
 import { OMENS_5E } from '../omens5e.js'
 import { WRATHS_5E, WRATH_FACE_SKILLS, WRATH_LORE } from '../wrath5e.js'
+import { BEADS_5E, BEAD_RULES } from '../beads5e.js'
 
 const SPELL_REFS_2024 = [
   ['«Бесследное передвижение» (Pass without Trace)', '[Бесследное передвижение [Pass without Trace]](/dnd55e/spells?spell=pass-without-trace-phb)'],
@@ -170,6 +171,99 @@ export const TEA_STEPS_2024 = adaptValue2024(TEA_STEPS)
 export const WRATH_LORE_2024 = adaptValue2024(WRATH_LORE)
 export const WRATH_FACE_SKILLS_2024 = adaptValue2024(WRATH_FACE_SKILLS)
 
+// Бусины. В 2014 заклинания связываются со справочником по русскому названию, а здесь
+// ссылки ставятся явно: у части заклинаний в PHB 2024 другое русское название
+// («Огненная стена» → «Стена огня», «Указание» → «Наставление»). «Пиротехники»
+// в PHB 2024 нет, поэтому она остаётся текстом.
+const BEAD_SPELLS_2024 = [
+  ['Огненная стена', 'Стена огня', 'Wall of Fire', 'wall-of-fire'],
+  ['Маскировка', 'Маскировка', 'Disguise Self', 'disguise-self'],
+  ['Смена обличья', 'Смена обличья', 'Alter Self', 'alter-self'],
+  ['Защита от энергии', 'Защита от энергии', 'Protection from Energy', 'protection-from-energy'],
+  ['Изменение формы камня', 'Изменение формы камня', 'Stone Shape', 'stone-shape'],
+  ['Сотворение', 'Сотворение', 'Creation', 'creation'],
+  ['Порыв ветра', 'Порыв ветра', 'Gust of Wind', 'gust-of-wind'],
+  ['Удар стального ветра', 'Удар стального ветра', 'Steel Wind Strike', 'steel-wind-strike'],
+  ['Рост растений', 'Рост растений', 'Plant Growth', 'plant-growth'],
+  ['Тишина', 'Тишина', 'Silence', 'silence'],
+  ['Невидимость', 'Невидимость', 'Invisibility', 'invisibility'],
+  ['Необнаружимость', 'Необнаружимость', 'Nondetection', 'nondetection'],
+  ['Обнаружение мыслей', 'Обнаружение мыслей', 'Detect Thoughts', 'detect-thoughts'],
+  ['Размытый образ', 'Размытый образ', 'Blur', 'blur'],
+  ['Мерцание', 'Мерцание', 'Blink', 'blink'],
+  ['Волна грома', 'Волна грома', 'Thunderwave', 'thunderwave'],
+  ['Молния', 'Молния', 'Lightning Bolt', 'lightning-bolt'],
+  ['Туманный шаг', 'Туманный шаг', 'Misty Step', 'misty-step'],
+  ['Бесследное передвижение', 'Бесследное передвижение', 'Pass without Trace', 'pass-without-trace'],
+  ['Разговор с животными', 'Разговор с животными', 'Speak with Animals', 'speak-with-animals'],
+  ['Указание', 'Наставление', 'Guidance', 'guidance'],
+  ['Сопротивление', 'Сопротивление', 'Resistance', 'resistance'],
+  ['Тёмное зрение', 'Тёмное зрение', 'Darkvision', 'darkvision'],
+  ['Метка охотника', 'Метка охотника', 'Hunter’s Mark', 'hunters-mark'],
+  ['Порча', 'Порча', 'Bane', 'bane'],
+  ['Подмога', 'Подмога', 'Aid', 'aid'],
+  ['Сглаз', 'Сглаз', 'Hex', 'hex'],
+  ['Защита от смерти', 'Защита от смерти', 'Death Ward', 'death-ward'],
+  ['Огонь фей', 'Огонь фей', 'Faerie Fire', 'faerie-fire'],
+  ['Разговор с мёртвыми', 'Разговор с мёртвыми', 'Speak with Dead', 'speak-with-dead'],
+  ['Убежище', 'Убежище', 'Sanctuary', 'sanctuary'],
+  ['Газообразная форма', 'Газообразная форма', 'Gaseous Form', 'gaseous-form'],
+  ['Видение невидимого', 'Видение невидимого', 'See Invisibility', 'see-invisibility'],
+  ['Охраняющая связь', 'Охраняющая связь', 'Warding Bond', 'warding-bond'],
+  ['Очищение пищи и питья', 'Очищение пищи и питья', 'Purify Food and Drink', 'purify-food-and-drink'],
+  ['Умиротворение', 'Умиротворение', 'Calm Emotions', 'calm-emotions'],
+  ['Туманное облако', 'Туманное облако', 'Fog Cloud', 'fog-cloud'],
+  ['Ядовитые брызги', 'Ядовитые брызги', 'Poison Spray', 'poison-spray'],
+  ['Починка', 'Починка', 'Mending', 'mending'],
+  ['Оживление вещей', 'Оживление вещей', 'Animate Objects', 'animate-objects']
+]
+
+// Термины, которые общий слой адаптации не трогает, потому что в других
+// инструментах их нет: состояния 2024 пишутся с заглавной и без кавычек.
+const BEAD_TERMS_2024 = [
+  ['состояний «очарованный» и «испуганный»', 'состояний Очарованный и Испуганный'],
+  ['«отравленный», «испуганный», «очарованный», «парализованный» или «ошеломлённый»', 'Отравленный, Испуганный, Очарованный, Парализованный или Ошеломлённый'],
+  ['состояния «отравленный»', 'состояния Отравленный'],
+  ['состояние «отравленный»', 'состояние Отравленный'],
+  ['падает ничком', 'получает состояние Лежащий ничком'],
+  ['Атаки по возможности', 'Провоцированные атаки'],
+  ['уровня истощения', 'уровня Истощения'],
+  ['уровень истощения', 'уровень Истощения'],
+  ['против истощения', 'против Истощения'],
+  ['получаете вдохновение', 'получаете Героическое вдохновение'],
+  ['получает вдохновение', 'получает Героическое вдохновение'],
+  ['Интеллекта (Расследование)', 'Интеллекта (Анализ)'],
+  ['История или Расследование', 'История или Анализ'],
+  ['История, Магия или Природа', 'История, Аркана или Природа']
+]
+
+function adaptBeadText2024(text) {
+  // Явные ссылки 2014 на справочник заклинаний разворачиваем обратно в «Название» (English).
+  let out = text.replace(/\[(«[^»]+» \([^)]+\))\]\(\/dnd5e\/spells\?s=[a-z-]+\)/g, '$1')
+  for (const [ru2014, ru2024, en, id] of BEAD_SPELLS_2024) {
+    out = out.replaceAll(`«${ru2014}» (${en})`, `[${ru2024} [${en}]](/dnd55e/spells?spell=${id}-phb)`)
+  }
+  for (const [oldText, newText] of BEAD_TERMS_2024) out = out.replaceAll(oldText, newText)
+  return out
+}
+
+function adaptBead2024(value) {
+  if (typeof value === 'string') return adaptBeadText2024(value)
+  if (Array.isArray(value)) return value.map(adaptBead2024)
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, adaptBead2024(item)]))
+  }
+  return value
+}
+
+// Предыстория бусины — проза, её не трогаем: «молния» в сказке не должна стать ссылкой.
+export const BEADS_2024 = BEADS_5E.map(b => ({
+  ...adaptValue2024(adaptBead2024({ ...b, flavor: '' })),
+  flavor: b.flavor
+}))
+export const BEAD_RULES_2024 = adaptValue2024(BEAD_RULES)
+
 export const TEA_2024_BY_SIG = bySignature(TEAS_2024)
+export const BEAD_2024_BY_SIG = bySignature(BEADS_2024)
 export const OMEN_2024_BY_SIG = bySignature(OMENS_2024)
 export const WRATH_2024_BY_SIG = bySignature(WRATHS_2024)

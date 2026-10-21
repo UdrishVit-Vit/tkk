@@ -47,7 +47,7 @@
 | --- | --- |
 | Персонаж | Классы, Расы и происхождения, Черты, Особенности классов, Предыстории, Заклинания |
 | Предметы | Оружие, Доспехи, Снаряжение, Драгоценности, Магические предметы |
-| Инструменты | Знамения, Гнев Ильбеша, Чай |
+| Инструменты | Знамения, Гнев Ильбеша, Чай, Бусины |
 | Мастерская | Бестиарий, Ширма (справочник) |
 
 ### Связанные маршруты
@@ -67,6 +67,9 @@
 | Магические предметы | `/dnd5e/magic-items` |
 | Бестиарий | `/dnd5e/bestiary` |
 | Знамения | `/dnd5e/omens` |
+| Гнев Ильбеша | `/dnd5e/wrath` |
+| Чай | `/dnd5e/tea` |
+| Бусины | `/dnd5e/beads` |
 | Ширма (справочник) | `/dnd5e/screens` |
 
 ## 4. Справочники D&D 5e
@@ -88,6 +91,7 @@
 | Драгоценности | `/dnd5e/jewelry` | `gems5e.js` | 53 камня |
 | Магические предметы | `/dnd5e/magic-items` | `magicItems5e.js` | 32 предмета |
 | Знамения | `/dnd5e/omens` | `omens5e.js` | 35 знамений |
+| Бусины | `/dnd5e/beads` (2024: `/dnd55e/beads`, PF2e: `/pf2e/beads`) | `beads5e.js`; 2024 — `dnd55e/tools2024.js`; PF2e — `pf2e/beads.js` | 35 бусин, бросок 4к4, карточка `BeadCard.vue` |
 
 ## 5. Страница класса
 
@@ -971,6 +975,7 @@ python scripts/audit-ogni-glossary.py --season 1
 - `/dnd5e/jewelry`
 - `/dnd5e/magic-items`
 - `/dnd5e/omens`
+- `/dnd5e/beads`
 - `/dnd5e/screens`
 - `/dnd5e/screens/move`
 - `/dnd5e/screens/move/moving`
@@ -983,6 +988,7 @@ python scripts/audit-ogni-glossary.py --season 1
 - `/pf2e/classes/barbarian`
 - `/pf2e/equipment`
 - `/pf2e/magic-items`
+- `/pf2e/beads`
 - `/pf2e/spells`
 - `/pf2e/bestiary`
 - `/pf2e/glossary`

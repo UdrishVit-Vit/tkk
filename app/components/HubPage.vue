@@ -284,6 +284,7 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Знамения': '/dnd5e/omens',
     'Гнев Ильбеша': '/dnd5e/wrath',
     'Чай': '/dnd5e/tea',
+    'Бусины': '/dnd5e/beads',
     'Ширма (справочник)': '/dnd5e/screens'
   },
   '2024': {
@@ -298,6 +299,7 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Знамения': '/dnd55e/omens',
     'Гнев Ильбеша': '/dnd55e/wrath',
     'Чай': '/dnd55e/tea',
+    'Бусины': '/dnd55e/beads',
     'Бестиарий': '/dnd55e/bestiary',
     'Глоссарий': '/dnd55e/glossary'
   },
@@ -306,6 +308,7 @@ const SECTION_ROUTES_BY_SYSTEM = {
     'Классы': '/pf2e/classes',
     'Снаряжение': '/pf2e/equipment',
     'Магические предметы': '/pf2e/magic-items',
+    'Бусины': '/pf2e/beads',
     'Заклинания': '/pf2e/spells',
     'Бестиарий': '/pf2e/bestiary',
     'Глоссарий': '/pf2e/glossary'
