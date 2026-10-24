@@ -35,7 +35,7 @@ async function render(name) {
 }
 const backgrounds = await render('BackgroundsPage')
 assert.equal((backgrounds.match(/data-record=/g) || []).length, 73)
-assert.equal((backgrounds.match(/<details/g) || []).length, 14)
+assert.equal((backgrounds.match(/<details/g) || []).length, 0)
 for (const b of DND55E_BACKGROUNDS) {
   assert.ok(backgrounds.includes(`data-record="${b.id}"`), b.id)
   assert.ok(backgrounds.includes(`/dnd55e/feats?feat=${b.feat.id}`), `${b.id}: feat link`)
@@ -53,4 +53,4 @@ for (const f of DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.status === 'Draft')) 
   assert.ok(!feats.includes(`data-record="${f.id}"`), `${f.id} leaked into catalog`)
   assert.ok(!feats.includes(f.title), `${f.id} draft title leaked`)
 }
-console.log('Rendered 73 background cards, 14 lore sections and feat catalog. Links, text, labels and Draft exclusion passed. Browser layout not tested.')
+console.log('Rendered 73 background cards without additional story details and feat catalog. Links, text, labels and Draft exclusion passed. Browser layout not tested.')

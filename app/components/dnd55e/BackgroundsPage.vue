@@ -85,7 +85,6 @@ const visibleBackgrounds = computed(() => DND55E_BACKGROUNDS.filter((item) => {
     ...item.ties,
     ...item.equipment.items.map(entry => entry.label),
     ...(item.equipment.storyItems || []),
-    ...(item.loreContext || []),
     ...item.variants.flatMap(entry => [entry.title, entry.region, entry.text]),
     ...item.hooks.entries.map(entry => entry.text)
   ]
@@ -314,13 +313,6 @@ useSeoMeta({
         <p v-for="(para, index) in leadParagraphs(item.raw)" :key="index" class="bg-lead">
           {{ para }}
         </p>
-        <details v-if="item.raw.loreContext?.length" class="bg-block">
-          <summary>Дополнительные подробности истории</summary>
-          <p class="bg-stat-hint">Авторский материал приведён к узловой письменности Эноа. Личные чувства и события в этом варианте можно изменить при создании персонажа.</p>
-          <p v-for="(para, index) in item.raw.loreContext" :key="index" class="bg-lead">
-            {{ para }}
-          </p>
-        </details>
         <p class="bg-stat-hint">Варианты и события ниже — возможности для истории, а не обязательные факты биографии.</p>
         <article v-for="entry in item.raw.variants" :key="entry.title" class="bg-variant">
           <h4>
