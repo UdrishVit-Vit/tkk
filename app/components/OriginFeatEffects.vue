@@ -1,5 +1,5 @@
 <script setup>
-defineProps({ feat: { type: Object, required: true } })
+defineProps({ feat: { type: Object, required: true }, compact: Boolean })
 // Выделяем только явно сформулированное заключительное правило восстановления.
 // Текст сохраняется дословно; остальные ограничения остаются рядом с эффектом.
 function parts(text) {
@@ -9,7 +9,7 @@ function parts(text) {
 </script>
 
 <template>
-  <div class="origin-effects">
+  <div class="origin-effects" :class="{ 'origin-effects-compact': compact }">
     <p v-if="feat.intro" class="origin-intro"><RuleRichText :text="feat.intro" edition="2024" /></p>
     <article v-for="entry in feat.benefits" :key="entry.title" class="origin-effect">
       <h4>{{ entry.title }}</h4>
@@ -31,4 +31,10 @@ function parts(text) {
 .origin-recovery{border-top:1px solid rgba(var(--theme-accent-rgb),.18);margin-top:14px;padding-top:12px}
 .origin-recovery h5{margin:0 0 5px;font-size:12px;color:rgba(var(--theme-accent-strong-rgb),.95)}
 .origin-recovery p{font-size:13px;line-height:1.65}
+.origin-effects-compact{gap:0}
+.origin-effects-compact .origin-effect{padding:16px 0;border:0;border-radius:0;background:none}
+.origin-effects-compact .origin-effect + .origin-effect{border-top:1px solid rgba(var(--theme-text-rgb),.1)}
+.origin-effects-compact .origin-effect h4{font-family:inherit;font-size:14px;font-weight:650;margin-bottom:6px;color:rgba(var(--theme-accent-strong-rgb),.92)}
+.origin-effects-compact .origin-effect p{font-size:14px;line-height:1.75}
+.origin-effects-compact .origin-recovery{border:0;border-left:2px solid rgba(var(--theme-accent-rgb),.3);padding:0 0 0 12px;margin-top:12px}
 </style>

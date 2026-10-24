@@ -44,6 +44,8 @@ const backgrounds = await render('BackgroundsPage')
 assert.equal((backgrounds.match(/data-record=/g) || []).length, 73)
 assert.equal((backgrounds.match(/<details/g) || []).length, 0)
 for (const b of DND55E_BACKGROUNDS) {
+  const positions = ['stats', 'equipment', 'feat', 'story', 'event'].map(section => backgrounds.indexOf(`id="bg-${b.id}-${section}"`))
+  assert.ok(positions.every((position, index) => position >= 0 && (!index || position > positions[index - 1])), `${b.id}: section order`)
   assert.ok(backgrounds.includes(`data-record="${b.id}"`), b.id)
   assert.ok(backgrounds.includes(`/dnd55e/feats?feat=${b.feat.id}`), `${b.id}: feat link`)
   for (const paragraph of b.enoaLead) assert.ok(backgrounds.includes(paragraph), `${b.id}: description`)

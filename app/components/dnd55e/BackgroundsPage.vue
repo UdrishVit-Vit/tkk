@@ -57,11 +57,10 @@ function toolPath(item) {
   return id ? `/dnd55e/equipment?item=${id}` : null
 }
 
-const expandedFeats = reactive({})
 const cardSections = [
-  { id: 'stats', label: 'Параметры' }, { id: 'feat', label: 'Черта' },
-  { id: 'story', label: 'История' }, { id: 'event', label: 'Событие' },
-  { id: 'equipment', label: 'Снаряжение' }
+  { id: 'stats', label: 'Параметры' }, { id: 'equipment', label: 'Снаряжение' },
+  { id: 'feat', label: 'Черта' }, { id: 'story', label: 'История' },
+  { id: 'event', label: 'Событие' }
 ]
 const search = ref('')
 const open = ref(null)
@@ -265,26 +264,49 @@ useSeoMeta({
         </div>
       </dl>
 
+      <section class="bg-block bg-loadout">
+        <h3 :id="'bg-' + item.id + '-equipment'" tabindex="-1">Стартовое снаряжение</h3>
+        <div class="bg-equipment">
+          <p class="bg-equip-rule">Выберите А или Б — смешивать нельзя.</p>
+          <div class="bg-equipment-choices">
+          <p class="bg-equip-row">
+            <span class="bg-equip-key">А</span>
+            <span class="bg-equip-items">
+              <strong class="bg-choice-title">Готовый комплект</strong>
+              <template v-for="(entry, index) in item.raw.equipment.items" :key="entry.label">
+                <template v-if="index">, </template>
+                <NuxtLink v-if="entry.id && !entry.loreAdaptation" :to="equipmentPath(entry.id)">{{ entry.title }}</NuxtLink>
+                <span v-else :title="entry.adaptationNote">{{ entry.title }}</span>
+                <small v-if="entry.note"> ({{ entry.note }})</small>
+              </template>
+              <template v-if="item.raw.equipment.coins">
+                <span class="bg-equip-coins"> и {{ item.raw.equipment.coins }}</span>
+              </template>
+            </span>
+          </p>
+          <p class="bg-equip-row">
+            <span class="bg-equip-key">Б</span>
+            <span class="bg-equip-items"><strong class="bg-choice-title">Деньги</strong><b>{{ item.raw.equipment.alt }}</b> вместо всего набора</span>
+          </p>
+          </div>
+          <p class="bg-stat-hint bg-equip-note">Стоимость комплекта А с монетами — 50 зм. Владение инструментом сохраняется при любом выборе.</p>
+          <p v-if="item.raw.equipment.storyItems?.length" class="bg-equip-extra">
+            Детали для истории: {{ item.raw.equipment.storyItems.join(', ') }}.
+            <small>Не входят в комплект за 50 зм. Наличие и стоимость согласуются с мастером; предмет, предоставленный чертой, получают по правилам этой черты.</small>
+          </p>
+        </div>
+      </section>
+
 
 
       <section class="bg-block bg-feat-preview">
         <h3 :id="'bg-' + item.id + '-feat'" tabindex="-1">{{ featCategory(item.raw) }}</h3>
         <h4 class="bg-feat-name"><NuxtLink :to="featPath(item.raw)" target="_blank" rel="noopener" :aria-label="item.raw.feat.title + ' — открыть в новой вкладке'">{{ item.raw.feat.title }} <span aria-hidden="true">↗</span></NuxtLink></h4>
         <p v-if="item.raw.feat.note" class="bg-stat-hint">{{ item.raw.feat.note }}</p>
-        <p v-if="!expandedFeats[item.id]" class="bg-lead">{{ FEATS_BY_ID.get(item.raw.feat.id)?.benefits[0]?.text }}</p>
-        <p v-if="!expandedFeats[item.id] && FEATS_BY_ID.get(item.raw.feat.id)?.benefits.length > 1" class="bg-stat-hint">
-          Также: {{ FEATS_BY_ID.get(item.raw.feat.id).benefits.slice(1).map(entry => entry.title).join(' · ') }}
-        </p>
         <p v-if="FEATS_BY_ID.get(item.raw.feat.id)?.category !== 'origin'" class="bg-stat-hint">
           Авторское исключение: свободная черта вместо Origin. Для стандартной предыстории 2024 требуется согласование с мастером.
         </p>
-        <button v-if="FEATS_BY_ID.get(item.raw.feat.id)?.benefits.length > 1 || FEATS_BY_ID.get(item.raw.feat.id)?.intro" type="button" class="bg-feat-toggle" :aria-expanded="!!expandedFeats[item.id]"
-          :aria-controls="'bg-full-feat-' + item.id" @click="expandedFeats[item.id] = !expandedFeats[item.id]">
-          {{ expandedFeats[item.id] ? 'Свернуть эффекты ↑' : 'Все эффекты черты ↓' }}
-        </button>
-        <div :id="'bg-full-feat-' + item.id" v-show="expandedFeats[item.id]" class="bg-full-feat">
-          <OriginFeatEffects v-if="FEATS_BY_ID.get(item.raw.feat.id)" :feat="FEATS_BY_ID.get(item.raw.feat.id)" />
-        </div>
+        <OriginFeatEffects v-if="FEATS_BY_ID.get(item.raw.feat.id)" :feat="FEATS_BY_ID.get(item.raw.feat.id)" compact />
       </section>
 
       <section class="bg-block">
@@ -292,7 +314,7 @@ useSeoMeta({
         <p v-for="(para, index) in leadParagraphs(item.raw)" :key="index" class="bg-lead">
           {{ para }}
         </p>
-        <p class="bg-stat-hint">Варианты и события ниже — возможности для истории, а не обязательные факты биографии.</p>
+        <div class="bg-variants-heading"><h4>Варианты прошлого</h4><p>Выберите подходящий или придумайте свой.</p></div>
         <article v-for="entry in item.raw.variants" :key="entry.title" class="bg-variant">
           <h4>
             {{ entry.title }}
@@ -321,36 +343,7 @@ useSeoMeta({
         </table>
       </section>
 
-      <section class="bg-block">
-        <h3 :id="'bg-' + item.id + '-equipment'" tabindex="-1">Стартовое снаряжение</h3>
-        <div class="bg-equipment">
-          <p class="bg-equip-rule">Выберите А или Б — смешивать нельзя.</p>
-          <p class="bg-stat-hint">Комплект А адаптирован для Эноа: предметы и монеты вместе стоят 50 зм. Владение инструментом не обязывает брать именно комплект А.</p>
-          <p class="bg-equip-row">
-            <span class="bg-equip-key">А</span>
-            <span class="bg-equip-items">
-              <strong class="bg-choice-title">Готовый комплект</strong>
-              <template v-for="(entry, index) in item.raw.equipment.items" :key="entry.label">
-                <template v-if="index">, </template>
-                <NuxtLink v-if="entry.id && !entry.loreAdaptation" :to="equipmentPath(entry.id)">{{ entry.title }}</NuxtLink>
-                <span v-else :title="entry.adaptationNote">{{ entry.title }}</span>
-                <small v-if="entry.note"> ({{ entry.note }})</small>
-              </template>
-              <template v-if="item.raw.equipment.coins">
-                <span class="bg-equip-coins"> и {{ item.raw.equipment.coins }}</span>
-              </template>
-            </span>
-          </p>
-          <p class="bg-equip-row">
-            <span class="bg-equip-key">Б</span>
-            <span class="bg-equip-items"><strong class="bg-choice-title">Деньги</strong><b>{{ item.raw.equipment.alt }}</b> вместо всего набора</span>
-          </p>
-          <p v-if="item.raw.equipment.storyItems?.length" class="bg-equip-extra">
-            Детали для истории: {{ item.raw.equipment.storyItems.join(', ') }}.
-            <small>Не входят в комплект за 50 зм. Наличие и стоимость согласуются с мастером; предмет, предоставленный чертой, получают по правилам этой черты.</small>
-          </p>
-        </div>
-      </section>
+
 
       <section v-if="ruleLinks(item.raw).length" class="bg-block bg-screen">
         <h3>Нити</h3>
@@ -375,20 +368,15 @@ useSeoMeta({
 .bg-heading{padding-top:28px}
 [tabindex="-1"]{scroll-margin-top:110px}
 .bg-section-title{margin:0 0 10px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.6)}
-.bg-feat-preview{padding:4px 0 4px 20px;border:0;border-left:2px solid rgba(var(--theme-accent-rgb),.45);border-radius:0;background:none}
+.bg-feat-preview{padding:24px 0 0;border:0;border-top:1px solid rgba(var(--theme-accent-rgb),.25);border-radius:0;background:none}
 .bg-block.bg-feat-preview > h3{margin:0 0 8px;font-family:inherit;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.75)}
 .bg-feat-name{margin:0 0 12px;font-family:'Cormorant Garamond',serif;font-size:27px;color:rgba(var(--theme-heading-rgb),.95)}
 .bg-feat-name a{color:inherit;text-decoration:none}
 .bg-feat-name a:hover{text-decoration:underline;text-underline-offset:5px}
 .bg-feat-name a span{font-family:system-ui,sans-serif;font-size:16px;color:rgba(var(--theme-accent-strong-rgb),.6);vertical-align:middle}
 .bg-feat-name a:focus-visible{outline:2px solid currentColor;outline-offset:4px}
-.bg-feat-toggle{display:block;margin-top:12px;padding:8px 0;border:0;border-bottom:1px solid rgba(var(--theme-accent-rgb),.3);border-radius:0;background:none;color:rgba(var(--theme-accent-strong-rgb),1);font:inherit;font-size:13px;cursor:pointer;text-align:left}
-.bg-feat-toggle:hover{background:rgba(var(--theme-accent-rgb),.17)}
-.bg-feat-toggle:focus-visible{outline:2px solid currentColor;outline-offset:3px}
-.bg-full-feat{margin-top:16px}
 .bg-choice-title{display:block;margin-bottom:5px;color:rgba(var(--theme-heading-rgb),.95)}
 .bg-event-help{font-size:13px;color:rgba(var(--theme-text-rgb),.72);margin:0 0 12px}
-@media print{.bg-feat-toggle,.bg-feat-page{display:none}.bg-full-feat{display:block!important}}
 
 .bg-list-card{
   display:grid;
@@ -471,7 +459,7 @@ useSeoMeta({
 }
 /* Сетка зависит от ширины карточки, в том числе в боковой панели. */
 .bg-stats{display:block;margin:0;border:0;border-radius:0;background:none;overflow:visible}
-.bg-stats .tref-stat{display:grid;grid-template-columns:minmax(120px,28%) minmax(0,1fr);align-items:baseline;gap:8px 20px;padding:13px 0;border:0;border-bottom:1px solid rgba(var(--theme-text-rgb),.1);border-radius:0;background:none}
+.bg-stats .tref-stat{display:grid;grid-template-columns:140px minmax(0,1fr);align-items:baseline;gap:8px 16px;padding:11px 0;border:0;border-bottom:1px solid rgba(var(--theme-text-rgb),.1);border-radius:0;background:none}
 .bg-stats dt{font-size:13px;font-weight:450;letter-spacing:0;text-transform:none;color:rgba(var(--theme-text-rgb),.65)}
 .bg-stats dd{overflow-wrap:anywhere;font-size:15px;line-height:1.55;font-weight:500}
 .bg-ability-hint{display:block;max-width:46ch}
@@ -506,11 +494,18 @@ useSeoMeta({
   font-weight:600;
 }
 .bg-equipment{
-  border:1px solid rgba(var(--theme-text-rgb),.1);
-  border-radius:9px;
-  background:rgba(var(--theme-accent-rgb),.04);
-  padding:12px 15px;
+  container-type:inline-size;
+  border:0;
+  border-radius:0;
+  background:none;
+  padding:0;
 }
+.bg-loadout{margin-top:18px}
+.bg-loadout > h3{font-family:inherit;font-size:13px;font-weight:500;color:rgba(var(--theme-text-rgb),.7);margin-bottom:4px}
+.bg-equipment-choices{display:grid;grid-template-columns:minmax(0,2fr) minmax(140px,1fr);gap:12px}
+.bg-equipment-choices .bg-equip-row{height:100%;padding:14px;border:1px solid rgba(var(--theme-accent-rgb),.18);border-radius:6px;background:rgba(var(--theme-accent-rgb),.025);align-content:start;box-sizing:border-box}
+.bg-equip-note{margin-top:10px}
+@container (max-width:440px){.bg-equipment-choices{grid-template-columns:1fr}}
 .bg-equip-rule{
   margin:0 0 9px;
   color:rgba(var(--theme-text-rgb),.5);
@@ -526,7 +521,6 @@ useSeoMeta({
   margin:0;
   padding:14px 0;
 }
-.bg-equip-row + .bg-equip-row{border-top:1px solid rgba(var(--theme-text-rgb),.07)}
 .bg-equip-key{
   display:grid;
   width:22px;
@@ -565,7 +559,9 @@ useSeoMeta({
   line-height:1.5;
 }
 .bg-equip-extra small{
-  color:rgba(var(--theme-text-rgb),.36);
+  display:block;
+  margin-top:4px;
+  color:rgba(var(--theme-text-rgb),.6);
   font-size:11px;
 }
 .bg-lead{
@@ -575,12 +571,21 @@ useSeoMeta({
   line-height:1.8;
 }
 .bg-variant{
-  border-left:2px solid rgba(var(--theme-accent-rgb),.28);
-  background:linear-gradient(90deg,rgba(var(--theme-accent-rgb),.055),transparent 72%);
-  padding:10px 13px;
+  border-left:0;
+  border-top:1px solid rgba(var(--theme-text-rgb),.1);
+  background:none;
+  padding:14px 0;
 }
-.bg-variant + .bg-variant{margin-top:8px}
+.bg-variant + .bg-variant{margin-top:0}
+.bg-variants-heading{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-top:24px;margin-bottom:10px}
+.bg-variants-heading h4{margin:0;font-size:14px;color:rgba(var(--theme-heading-rgb),.9)}
+.bg-variants-heading p{margin:0;font-size:12px;color:rgba(var(--theme-text-rgb),.6)}
 .bg-variant h4{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px 12px;
+  justify-content:space-between;
+  align-items:baseline;
   margin:0 0 4px;
   color:rgba(var(--theme-heading-rgb),.9);
   font-family:'Cormorant Garamond',serif;
@@ -588,7 +593,7 @@ useSeoMeta({
   font-weight:600;
 }
 .bg-variant h4 small{
-  margin-left:7px;
+  margin-left:0;
   color:rgba(var(--theme-text-rgb),.44);
   font-size:10px;
   font-weight:450;
@@ -664,6 +669,6 @@ useSeoMeta({
   .bg-heading-icon{width:30px;height:34px;font-size:22px}
   .bg-title{font-size:29px}
 }
-@media (max-width:440px){.bg-stats .tref-stat{grid-template-columns:1fr;gap:4px}.bg-feat-preview{padding-left:14px}}
+@media (max-width:440px){.bg-stats .tref-stat{grid-template-columns:1fr;gap:4px}}
 .bg-stats a:focus-visible,.bg-equip-items a:focus-visible,.bg-screen-link:focus-visible{outline:2px solid rgba(var(--theme-accent-strong-rgb),.9);outline-offset:4px;border-radius:2px}
 </style>
