@@ -60,7 +60,7 @@ function toolPath(item) {
 const cardSections = [
   { id: 'stats', label: 'Параметры' }, { id: 'equipment', label: 'Снаряжение' },
   { id: 'feat', label: 'Черта' }, { id: 'story', label: 'История' },
-  { id: 'event', label: 'Событие' }
+  { id: 'event', label: 'Зацепки' }
 ]
 const search = ref('')
 const open = ref(null)
@@ -246,7 +246,7 @@ useSeoMeta({
           </dd>
         </div>
         <div class="tref-stat">
-          <dt>Навыки</dt>
+          <dt>Владение навыками</dt>
           <dd>
             <template v-for="(entry, index) in skillLinks(item.raw)" :key="entry.id">
               <template v-if="index">, </template>
@@ -255,7 +255,7 @@ useSeoMeta({
           </dd>
         </div>
         <div class="tref-stat">
-          <dt>Инструмент</dt>
+          <dt>Владение инструментом</dt>
           <dd>
             <span v-if="item.raw.toolDisplay" :title="`По правилам: ${item.raw.tool}`">{{ item.raw.toolDisplay }}</span>
             <NuxtLink v-else-if="toolPath(item.raw)" :to="toolPath(item.raw)">{{ item.raw.tool }}</NuxtLink>
@@ -269,21 +269,20 @@ useSeoMeta({
         <div class="bg-equipment">
           <p class="bg-equip-rule">Выберите А или Б — смешивать нельзя.</p>
           <div class="bg-equipment-choices">
-          <p class="bg-equip-row">
+          <div class="bg-equip-row">
             <span class="bg-equip-key">А</span>
-            <span class="bg-equip-items">
+            <div class="bg-equip-items">
               <strong class="bg-choice-title">Готовый комплект</strong>
-              <template v-for="(entry, index) in item.raw.equipment.items" :key="entry.label">
-                <template v-if="index">, </template>
+              <ul class="bg-kit-list">
+              <li v-for="entry in item.raw.equipment.items" :key="entry.label">
                 <NuxtLink v-if="entry.id && !entry.loreAdaptation" :to="equipmentPath(entry.id)">{{ entry.title }}</NuxtLink>
                 <span v-else :title="entry.adaptationNote">{{ entry.title }}</span>
                 <small v-if="entry.note"> ({{ entry.note }})</small>
-              </template>
-              <template v-if="item.raw.equipment.coins">
-                <span class="bg-equip-coins"> и {{ item.raw.equipment.coins }}</span>
-              </template>
-            </span>
-          </p>
+              </li>
+              </ul>
+              <p v-if="item.raw.equipment.coins" class="bg-kit-money">Монеты: <span class="bg-equip-coins">{{ item.raw.equipment.coins }}</span></p>
+            </div>
+          </div>
           <p class="bg-equip-row">
             <span class="bg-equip-key">Б</span>
             <span class="bg-equip-items"><strong class="bg-choice-title">Деньги</strong><b>{{ item.raw.equipment.alt }}</b> вместо всего набора</span>
@@ -291,7 +290,8 @@ useSeoMeta({
           </div>
           <p class="bg-stat-hint bg-equip-note">Стоимость комплекта А с монетами — 50 зм. Владение инструментом сохраняется при любом выборе.</p>
           <p v-if="item.raw.equipment.storyItems?.length" class="bg-equip-extra">
-            Детали для истории: {{ item.raw.equipment.storyItems.join(', ') }}.
+            <strong class="bg-story-item-label">Памятная вещь для истории</strong>
+            {{ item.raw.equipment.storyItems.join(', ') }}.
             <small>Не входят в комплект за 50 зм. Наличие и стоимость согласуются с мастером; предмет, предоставленный чертой, получают по правилам этой черты.</small>
           </p>
         </div>
@@ -311,6 +311,7 @@ useSeoMeta({
 
       <section class="bg-block">
         <h3 :id="'bg-' + item.id + '-story'" tabindex="-1">История и связи</h3>
+        <p class="bg-story-note">Параметры и черта выше — игровые преимущества; биографию и зацепки ниже можно менять под своего персонажа.</p>
         <p v-for="(para, index) in leadParagraphs(item.raw)" :key="index" class="bg-lead">
           {{ para }}
         </p>
@@ -326,12 +327,12 @@ useSeoMeta({
 
       <section class="bg-block">
         <h3 :id="'bg-' + item.id + '-event'" tabindex="-1">{{ item.raw.hooks.label }}</h3>
-        <p class="bg-event-help">Выберите событие или бросьте {{ item.raw.hooks.dice }}.</p>
+        <p class="bg-event-help">Выберите вариант или бросьте {{ item.raw.hooks.dice }}.</p>
         <table class="bg-table">
           <thead>
             <tr>
               <th scope="col">{{ item.raw.hooks.dice }}</th>
-              <th scope="col">Событие</th>
+              <th scope="col">Вариант</th>
             </tr>
           </thead>
           <tbody>
@@ -376,6 +377,11 @@ useSeoMeta({
 .bg-feat-name a span{font-family:system-ui,sans-serif;font-size:16px;color:rgba(var(--theme-accent-strong-rgb),.6);vertical-align:middle}
 .bg-feat-name a:focus-visible{outline:2px solid currentColor;outline-offset:4px}
 .bg-choice-title{display:block;margin-bottom:5px;color:rgba(var(--theme-heading-rgb),.95)}
+.bg-kit-list{margin:8px 0 0;padding-left:18px;list-style:disc}
+.bg-kit-list li{padding-left:2px;margin:3px 0}
+.bg-kit-money{margin:10px 0 0;padding-top:8px;border-top:1px solid rgba(var(--theme-text-rgb),.1)}
+.bg-story-item-label{display:block;margin-bottom:5px;font-weight:600;color:rgba(var(--theme-text-rgb),.8)}
+.bg-story-note{margin:0 0 18px;padding-left:12px;border-left:2px solid rgba(var(--theme-accent-rgb),.25);font-size:12px;line-height:1.65;color:rgba(var(--theme-text-rgb),.65)}
 .bg-event-help{font-size:13px;color:rgba(var(--theme-text-rgb),.72);margin:0 0 12px}
 
 .bg-list-card{

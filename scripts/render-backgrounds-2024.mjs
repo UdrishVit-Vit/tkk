@@ -9,6 +9,7 @@ import { createSSRApp, defineComponent, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { DND55E_BACKGROUNDS } from '../app/data/dnd55e/backgrounds.js'
 import { DND55E_FEATS } from '../app/data/dnd55e/feats.js'
+import { emphasizeFeatRule } from '../app/utils/featEmphasis.js'
 import { DND55E_HOMEBREW_ORIGIN_FEATS } from '../app/data/dnd55e/origin-feats-homebrew.js'
 
 await fs.mkdir('.tmpwork/backgrounds-render', { recursive: true })
@@ -34,7 +35,7 @@ async function render(name) {
   app.component('CardSectionNav', await compile('CardSectionNav', ''))
   app.component('OriginFeatEffects', await compile('OriginFeatEffects', ''))
   app.component('ThreadRefPage', shell)
-  app.component('RuleRichText', defineComponent({ props: ['text'], setup: props => () => h('span', props.text) }))
+  app.component('RuleRichText', defineComponent({ props: ['text'], setup: props => () => h('span', props.text.replace(/\*\*/g, '')) }))
   app.component('NuxtLink', defineComponent({ props: ['to'], setup: (props, { slots }) => () => h('a', { href: props.to }, slots.default?.()) }))
   const html = await renderToString(app)
   await fs.writeFile(path.resolve('.tmpwork/backgrounds-render', name + '.html'), html)
@@ -64,7 +65,10 @@ for (const html of [backgrounds, feats]) {
 }
 const plain = feats.replace(/<[^>]+>/g, ' ').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/\s+/g, ' ')
 for (const feat of DND55E_FEATS) {
-  for (const entry of feat.benefits) assert.ok(plain.includes(entry.text.replace(/\s+/g, ' ').replace(/(Воспользовавшись этим свойством,|Вы восстанавливаете все потраченные)/g, 'Использование и восстановление $1')), `${feat.id}: effect text changed`)
+  for (const entry of feat.benefits) {
+    assert.equal(emphasizeFeatRule(entry.text).replace(/\*\*/g, ''), entry.text.replace(/\*\*/g, ''), `${feat.id}: emphasis changed rule`)
+    assert.ok(plain.includes(entry.text.replace(/\*\*/g, '').replace(/\s+/g, ' ').replace(/(Воспользовавшись этим свойством,|Вы восстанавливаете все потраченные)/g, 'Использование и восстановление $1')), `${feat.id}: effect text changed`)
+  }
 }
 assert.ok(!feats.includes('Ранее опубликована; баланс требует проверки'))
 assert.ok(!feats.includes('Авторская механика Эноа'))

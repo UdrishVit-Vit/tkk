@@ -1,4 +1,5 @@
 <script setup>
+import { emphasizeFeatRule } from '~/utils/featEmphasis.js'
 defineProps({ feat: { type: Object, required: true }, compact: Boolean })
 // Выделяем только явно сформулированное заключительное правило восстановления.
 // Текст сохраняется дословно; остальные ограничения остаются рядом с эффектом.
@@ -13,10 +14,10 @@ function parts(text) {
     <p v-if="feat.intro" class="origin-intro"><RuleRichText :text="feat.intro" edition="2024" /></p>
     <article v-for="entry in feat.benefits" :key="entry.title" class="origin-effect">
       <h4>{{ entry.title }}</h4>
-      <p><RuleRichText :text="parts(entry.text).effect" edition="2024" /></p>
+      <p><RuleRichText :text="emphasizeFeatRule(parts(entry.text).effect)" edition="2024" /></p>
       <div v-if="parts(entry.text).recovery" class="origin-recovery">
         <h5>Использование и восстановление</h5>
-        <p><RuleRichText :text="parts(entry.text).recovery" edition="2024" /></p>
+        <p><RuleRichText :text="emphasizeFeatRule(parts(entry.text).recovery)" edition="2024" /></p>
       </div>
     </article>
   </div>
