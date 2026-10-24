@@ -45,9 +45,9 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.card-section-nav{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:4px;padding:8px 0;margin:0 0 20px;background:var(--theme-surface);border-bottom:1px solid rgba(var(--theme-accent-rgb),.2)}
-.card-section-nav a{padding:8px 10px;border-radius:6px;color:rgba(var(--theme-text-rgb),.75);font-size:12px;font-weight:600;text-decoration:none}
-.card-section-nav a:hover,.card-section-nav a[aria-current]{background:rgba(var(--theme-accent-rgb),.12);color:rgba(var(--theme-accent-strong-rgb),1)}
+.card-section-nav{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:0 20px;padding:0;margin:0 0 24px;background:var(--theme-surface);border-bottom:1px solid rgba(var(--theme-text-rgb),.12)}
+.card-section-nav a{padding:12px 0;border-radius:0;color:rgba(var(--theme-text-rgb),.6);font-size:12px;font-weight:500;text-decoration:none}
+.card-section-nav a:hover,.card-section-nav a[aria-current]{color:rgba(var(--theme-accent-strong-rgb),1)}
 .card-section-nav a[aria-current]{box-shadow:inset 0 -2px rgba(var(--theme-accent-strong-rgb),.8)}
 .card-section-nav a:focus-visible{outline:2px solid rgba(var(--theme-accent-strong-rgb),1);outline-offset:2px}
 @media print{.card-section-nav{display:none}}

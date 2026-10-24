@@ -234,7 +234,7 @@ useSeoMeta({
       </header>
 
       <CardSectionNav :prefix="'bg-' + item.id" :sections="cardSections" />
-      <h3 :id="'bg-' + item.id + '-stats'" class="bg-section-title" tabindex="-1">Что получает персонаж</h3>
+      <h3 :id="'bg-' + item.id + '-stats'" class="bg-section-title" tabindex="-1">Игровые параметры</h3>
       <dl class="tref-stats bg-stats">
         <div class="tref-stat">
           <dt>Характеристики</dt>
@@ -243,8 +243,8 @@ useSeoMeta({
               <template v-if="index">, </template>
               <NuxtLink :to="glossaryPath(entry.id)">{{ entry.title }}</NuxtLink>
             </template>
+            <span class="bg-stat-hint bg-ability-hint">+2 и +1 на две из них либо по +1 каждой; не выше 20</span>
           </dd>
-          <p class="bg-stat-hint">+2 и +1 на две из них либо по +1 каждой; не выше 20</p>
         </div>
         <div class="tref-stat">
           <dt>Навыки</dt>
@@ -269,23 +269,22 @@ useSeoMeta({
 
       <section class="bg-block bg-feat-preview">
         <h3 :id="'bg-' + item.id + '-feat'" tabindex="-1">{{ featCategory(item.raw) }}</h3>
-        <h4 class="bg-feat-name">{{ item.raw.feat.title }}</h4>
+        <h4 class="bg-feat-name"><NuxtLink :to="featPath(item.raw)" target="_blank" rel="noopener" :aria-label="item.raw.feat.title + ' — открыть в новой вкладке'">{{ item.raw.feat.title }} <span aria-hidden="true">↗</span></NuxtLink></h4>
         <p v-if="item.raw.feat.note" class="bg-stat-hint">{{ item.raw.feat.note }}</p>
-        <p class="bg-lead">{{ FEATS_BY_ID.get(item.raw.feat.id)?.benefits[0]?.text }}</p>
-        <p v-if="FEATS_BY_ID.get(item.raw.feat.id)?.benefits.length > 1" class="bg-stat-hint">
+        <p v-if="!expandedFeats[item.id]" class="bg-lead">{{ FEATS_BY_ID.get(item.raw.feat.id)?.benefits[0]?.text }}</p>
+        <p v-if="!expandedFeats[item.id] && FEATS_BY_ID.get(item.raw.feat.id)?.benefits.length > 1" class="bg-stat-hint">
           Также: {{ FEATS_BY_ID.get(item.raw.feat.id).benefits.slice(1).map(entry => entry.title).join(' · ') }}
         </p>
         <p v-if="FEATS_BY_ID.get(item.raw.feat.id)?.category !== 'origin'" class="bg-stat-hint">
           Авторское исключение: свободная черта вместо Origin. Для стандартной предыстории 2024 требуется согласование с мастером.
         </p>
-        <button type="button" class="bg-feat-toggle" :aria-expanded="!!expandedFeats[item.id]"
+        <button v-if="FEATS_BY_ID.get(item.raw.feat.id)?.benefits.length > 1 || FEATS_BY_ID.get(item.raw.feat.id)?.intro" type="button" class="bg-feat-toggle" :aria-expanded="!!expandedFeats[item.id]"
           :aria-controls="'bg-full-feat-' + item.id" @click="expandedFeats[item.id] = !expandedFeats[item.id]">
-          {{ expandedFeats[item.id] ? 'Свернуть правила черты' : 'Показать все эффекты черты' }}
+          {{ expandedFeats[item.id] ? 'Свернуть эффекты ↑' : 'Все эффекты черты ↓' }}
         </button>
         <div :id="'bg-full-feat-' + item.id" v-show="expandedFeats[item.id]" class="bg-full-feat">
           <OriginFeatEffects v-if="FEATS_BY_ID.get(item.raw.feat.id)" :feat="FEATS_BY_ID.get(item.raw.feat.id)" />
         </div>
-        <NuxtLink :to="featPath(item.raw)" target="_blank" rel="noopener" class="bg-feat-page">Открыть черту в новой вкладке ↗</NuxtLink>
       </section>
 
       <section class="bg-block">
@@ -375,13 +374,17 @@ useSeoMeta({
 :deep(.rule-body-wrap > .rule-body){overflow:clip}
 .bg-heading{padding-top:28px}
 [tabindex="-1"]{scroll-margin-top:110px}
-.bg-section-title{margin:0 0 12px;font-family:'Cormorant Garamond',serif;font-size:23px;color:rgba(var(--theme-heading-rgb),.95)}
-.bg-feat-preview{padding:20px;border:1px solid rgba(var(--theme-accent-rgb),.3);border-radius:12px;background:rgba(var(--theme-accent-rgb),.04)}
-.bg-feat-name{margin:0 0 12px;font-family:'Cormorant Garamond',serif;font-size:25px;color:rgba(var(--theme-heading-rgb),.95)}
-.bg-feat-toggle{display:block;margin-top:16px;padding:10px 14px;border:1px solid rgba(var(--theme-accent-rgb),.4);border-radius:7px;background:rgba(var(--theme-accent-rgb),.09);color:rgba(var(--theme-accent-strong-rgb),1);font:inherit;font-size:13px;cursor:pointer;text-align:left}
+.bg-section-title{margin:0 0 10px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.6)}
+.bg-feat-preview{padding:4px 0 4px 20px;border:0;border-left:2px solid rgba(var(--theme-accent-rgb),.45);border-radius:0;background:none}
+.bg-block.bg-feat-preview > h3{margin:0 0 8px;font-family:inherit;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(var(--theme-accent-strong-rgb),.75)}
+.bg-feat-name{margin:0 0 12px;font-family:'Cormorant Garamond',serif;font-size:27px;color:rgba(var(--theme-heading-rgb),.95)}
+.bg-feat-name a{color:inherit;text-decoration:none}
+.bg-feat-name a:hover{text-decoration:underline;text-underline-offset:5px}
+.bg-feat-name a span{font-family:system-ui,sans-serif;font-size:16px;color:rgba(var(--theme-accent-strong-rgb),.6);vertical-align:middle}
+.bg-feat-name a:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+.bg-feat-toggle{display:block;margin-top:12px;padding:8px 0;border:0;border-bottom:1px solid rgba(var(--theme-accent-rgb),.3);border-radius:0;background:none;color:rgba(var(--theme-accent-strong-rgb),1);font:inherit;font-size:13px;cursor:pointer;text-align:left}
 .bg-feat-toggle:hover{background:rgba(var(--theme-accent-rgb),.17)}
 .bg-feat-toggle:focus-visible{outline:2px solid currentColor;outline-offset:3px}
-.bg-feat-page{display:inline-block;margin-top:14px;font-size:12px;color:rgba(var(--theme-accent-strong-rgb),1);text-decoration:underline;text-underline-offset:3px}
 .bg-full-feat{margin-top:16px}
 .bg-choice-title{display:block;margin-bottom:5px;color:rgba(var(--theme-heading-rgb),.95)}
 .bg-event-help{font-size:13px;color:rgba(var(--theme-text-rgb),.72);margin:0 0 12px}
@@ -426,18 +429,18 @@ useSeoMeta({
 }
 .bg-heading{
   display:grid;
-  grid-template-columns:72px minmax(0,1fr);
-  align-items:center;
-  gap:18px;
-  margin:2px 0 20px;
+  grid-template-columns:44px minmax(0,1fr);
+  align-items:start;
+  gap:16px;
+  margin:2px 0 24px;
 }
 .bg-heading-icon{
   display:grid;
-  width:62px;
-  height:62px;
+  width:40px;
+  height:40px;
   place-items:center;
-  border:1px solid rgba(var(--theme-accent-rgb),.25);
-  background:radial-gradient(circle,rgba(var(--theme-accent-rgb),.1),transparent 70%);
+  border:0;
+  background:none;
   color:rgba(var(--theme-accent-strong-rgb),.88);
   font-family:'Cormorant Garamond',serif;
   font-size:28px;
@@ -447,7 +450,7 @@ useSeoMeta({
   margin:0;
   color:rgba(var(--theme-heading-rgb),.96);
   font-family:'Cormorant Garamond',serif;
-  font-size:30px;
+  font-size:34px;
   line-height:1.15;
 }
 .bg-original{
@@ -467,10 +470,11 @@ useSeoMeta({
   line-height:1.42;
 }
 /* Сетка зависит от ширины карточки, в том числе в боковой панели. */
-.bg-stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px;border:0;background:none;overflow:visible}
-.bg-stats .tref-stat{padding:16px;border:1px solid rgba(var(--theme-accent-rgb),.18);border-radius:10px;background:rgba(var(--theme-accent-rgb),.035)}
-.bg-stats dt{font-size:11px;letter-spacing:.06em;color:rgba(var(--theme-text-rgb),.68)}
-.bg-stats dd{overflow-wrap:anywhere;font-size:15px;line-height:1.55;font-weight:600}
+.bg-stats{display:block;margin:0;border:0;border-radius:0;background:none;overflow:visible}
+.bg-stats .tref-stat{display:grid;grid-template-columns:minmax(120px,28%) minmax(0,1fr);align-items:baseline;gap:8px 20px;padding:13px 0;border:0;border-bottom:1px solid rgba(var(--theme-text-rgb),.1);border-radius:0;background:none}
+.bg-stats dt{font-size:13px;font-weight:450;letter-spacing:0;text-transform:none;color:rgba(var(--theme-text-rgb),.65)}
+.bg-stats dd{overflow-wrap:anywhere;font-size:15px;line-height:1.55;font-weight:500}
+.bg-ability-hint{display:block;max-width:46ch}
 /* Ссылка внутри карточки должна читаться как ссылка: пунктир, который
    становится сплошным при наведении. Иначе значение неотличимо от текста. */
 .bg-stats a,
@@ -493,7 +497,7 @@ useSeoMeta({
   font-weight:450;
   line-height:1.55;
 }
-.bg-block{margin-top:28px}
+.bg-block{margin-top:32px}
 .bg-block h3{
   margin:0 0 9px;
   color:rgba(var(--theme-accent-strong-rgb),.9);
@@ -656,9 +660,10 @@ useSeoMeta({
 .bg-screen-link.feat::before{content:'✦'}
 .bg-screen-link.tool::before{content:'⚒'}
 @media (max-width:700px){
-  .bg-heading{grid-template-columns:56px minmax(0,1fr);gap:13px}
-  .bg-heading-icon{width:48px;height:48px;font-size:22px}
-  .bg-title{font-size:25px}
+  .bg-heading{grid-template-columns:32px minmax(0,1fr);gap:12px}
+  .bg-heading-icon{width:30px;height:34px;font-size:22px}
+  .bg-title{font-size:29px}
 }
+@media (max-width:440px){.bg-stats .tref-stat{grid-template-columns:1fr;gap:4px}.bg-feat-preview{padding-left:14px}}
 .bg-stats a:focus-visible,.bg-equip-items a:focus-visible,.bg-screen-link:focus-visible{outline:2px solid rgba(var(--theme-accent-strong-rgb),.9);outline-offset:4px;border-radius:2px}
 </style>
