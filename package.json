@@ -3,6 +3,12 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "backgrounds:check": "node scripts/check-backgrounds-2024.mjs",
+    "backgrounds:check:strict": "node scripts/check-backgrounds-2024.mjs --strict",
+    "backgrounds:test": "node scripts/test-backgrounds-2024.mjs",
+    "backgrounds:render": "node scripts/render-backgrounds-2024.mjs",
+    "backgrounds:report": "node scripts/report-backgrounds-2024.mjs",
+    "prebuild": "node scripts/check-backgrounds-2024.mjs",
     "audit:rulesets": "node scripts/audit-dnd-ruleset-boundaries.mjs",
     "lore:check": "node scripts/validate-lore.mjs",
     "images:webp": "node scripts/images-to-webp.mjs",

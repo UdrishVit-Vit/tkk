@@ -15,6 +15,7 @@ import { DND55E_FEATS } from '~/data/dnd55e/feats.js'
 // Подпись ячейки берётся из категории самой черты: у «Безымянного» она свободная,
 // а не черта происхождения, и ячейка не должна утверждать обратное.
 const FEAT_CATEGORY_TITLES = new Map(DND55E_FEATS.map(item => [item.id, item.categoryTitle]))
+const FEATS_BY_ID = new Map(DND55E_FEATS.map(item => [item.id, item]))
 const featCategory = item => FEAT_CATEGORY_TITLES.get(item.feat.id) || 'Черта происхождения'
 
 // Ширма — единственный источник названий терминов: заголовки не дублируются в данных
@@ -84,7 +85,8 @@ const visibleBackgrounds = computed(() => DND55E_BACKGROUNDS.filter((item) => {
     ...item.skills,
     ...item.ties,
     ...item.equipment.items.map(entry => entry.label),
-    ...(item.equipment.extra || []),
+    ...(item.equipment.storyItems || []),
+    ...(item.loreContext || []),
     ...item.variants.flatMap(entry => [entry.title, entry.region, entry.text]),
     ...item.hooks.entries.map(entry => entry.text)
   ]
@@ -114,7 +116,7 @@ const filters = computed(() => [
   {
     key: 'group',
     label: 'Каталог',
-    note: 'Механика одинакова: перекрашена только подача предыстории',
+    note: 'Адаптации PHB 2024 и авторские предыстории Эноа',
     options: Object.entries(DND55E_BACKGROUND_GROUPS).map(([value, meta]) => ({
       value,
       label: meta.label,
@@ -245,7 +247,7 @@ useSeoMeta({
               <NuxtLink :to="glossaryPath(entry.id)">{{ entry.title }}</NuxtLink>
             </template>
           </dd>
-          <p class="bg-stat-hint">+2 и +1 на две из них либо по +1 каждой</p>
+          <p class="bg-stat-hint">+2 и +1 на две из них либо по +1 каждой; не выше 20</p>
         </div>
         <div class="tref-stat">
           <dt>{{ featCategory(item.raw) }}</dt>
@@ -253,6 +255,12 @@ useSeoMeta({
             <NuxtLink :to="featPath(item.raw)">{{ item.raw.feat.title }}</NuxtLink>
             <template v-if="item.raw.feat.note"> ({{ item.raw.feat.note }})</template>
           </dd>
+          <p v-if="FEATS_BY_ID.get(item.raw.feat.id)?.contentKind === 'Homebrew'" class="bg-stat-hint">
+            Авторская механика Эноа · {{ FEATS_BY_ID.get(item.raw.feat.id)?.status === 'Approved' ? 'утверждена' : 'ранее опубликована, баланс требует проверки' }}
+          </p>
+          <p v-if="FEATS_BY_ID.get(item.raw.feat.id)?.category !== 'origin'" class="bg-stat-hint">
+            Сохранённое авторское исключение: свободная черта вместо Origin. Для стандартной предыстории 2024 требуется согласование с мастером.
+          </p>
         </div>
         <div class="tref-stat">
           <dt>Навыки</dt>
@@ -276,6 +284,7 @@ useSeoMeta({
         <h3>Стартовое снаряжение</h3>
         <div class="bg-equipment">
           <p class="bg-equip-rule">Выберите А или Б — смешивать нельзя.</p>
+          <p class="bg-stat-hint">Комплект А адаптирован для Эноа: предметы и монеты вместе стоят 50 зм. Владение инструментом не обязывает брать именно комплект А.</p>
           <p class="bg-equip-row">
             <span class="bg-equip-key" aria-hidden="true">А</span>
             <span class="bg-equip-items">
@@ -294,9 +303,9 @@ useSeoMeta({
             <span class="bg-equip-key" aria-hidden="true">Б</span>
             <span class="bg-equip-items"><b>{{ item.raw.equipment.alt }}</b> вместо всего набора</span>
           </p>
-          <p v-if="item.raw.equipment.extra" class="bg-equip-extra">
-            При вас также: {{ item.raw.equipment.extra.join(', ').toLocaleLowerCase('ru') }}
-            <small>— без игровой стоимости</small>
+          <p v-if="item.raw.equipment.storyItems?.length" class="bg-equip-extra">
+            Детали для истории: {{ item.raw.equipment.storyItems.join(', ') }}.
+            <small>Не входят в комплект за 50 зм. Наличие и стоимость согласуются с мастером; предмет, предоставленный чертой, получают по правилам этой черты.</small>
           </p>
         </div>
       </section>
@@ -306,6 +315,14 @@ useSeoMeta({
         <p v-for="(para, index) in leadParagraphs(item.raw)" :key="index" class="bg-lead">
           <RuleRichText :text="para" edition="2024" />
         </p>
+        <details v-if="item.raw.loreContext?.length" class="bg-block">
+          <summary>Лор и исходный вариант истории</summary>
+          <p class="bg-stat-hint">Сохранённый авторский материал. Личные чувства и события в этом варианте можно изменить при создании персонажа.</p>
+          <p v-for="(para, index) in item.raw.loreContext" :key="index" class="bg-lead">
+            <RuleRichText :text="para" edition="2024" />
+          </p>
+        </details>
+        <p class="bg-stat-hint">Варианты и события ниже — возможности для истории, а не обязательные факты биографии.</p>
         <article v-for="entry in item.raw.variants" :key="entry.title" class="bg-variant">
           <h4>
             {{ entry.title }}

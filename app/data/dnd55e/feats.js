@@ -1,3 +1,5 @@
+import { DND55E_HOMEBREW_ORIGIN_FEATS, isPublishableHomebrew } from './origin-feats-homebrew.js'
+
 export const DND55E_FEAT_CATEGORIES = {
   'fighting-style': {
     title: 'Боевые стили',
@@ -49,6 +51,8 @@ const feat = (category, data) => ({
   categoryTitle: DND55E_FEAT_CATEGORIES[category].singular,
   source: 'PHB',
   sourceTitle: 'Player’s Handbook 2024',
+  contentKind: data.source === 'TVV' ? 'Homebrew' : 'Official',
+  status: data.source === 'TVV' ? 'Legacy' : 'Official',
   abilities: [],
   repeatable: false,
   ...data
@@ -88,6 +92,7 @@ const enoaGeneral = data => general({ ...TVV, ...data })
 const enoaBoon = data => boon({ ...TVV, ...data })
 
 export const DND55E_FEATS = [
+  ...DND55E_HOMEBREW_ORIGIN_FEATS.filter(isPublishableHomebrew),
   style({
     id: 'dueling',
     title: 'Дуэлянт',

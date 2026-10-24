@@ -1,0 +1,14 @@
+import fs from 'node:fs'
+const { backgrounds, linkedFeats } = JSON.parse(fs.readFileSync('docs/backgrounds-2024/before.json', 'utf8'))
+const rows = backgrounds.map(b => {
+  const words = b.enoaLead.join(' ').split(/\s+/).length
+  const f = linkedFeats.find(f => f.id === b.feat.id)
+  const issues = ['Нужна предметная связь повседневных занятий с владениями; расчёт комплекта требует проверки']
+  if (words < 70 || words > 110) issues.push(`Объём ${words} слов`)
+  if (f?.category !== 'origin') issues.push(`Черта категории ${f?.category ?? 'не найдена'} вместо Origin`)
+  if (f?.source === 'TVV') issues.push('Опубликованная авторская механика без статуса и отдельного заключения о балансе')
+  if (/татуировщика|обо/.test(b.tool)) issues.push('Авторский инструмент вместо инструмента 2024')
+  if (b.equipment.items.some(i => i.title === 'Длинное копьё')) issues.push('Воинское оружие')
+  return `## ${b.title} — ${b.id}\n\nИсточник: ${b.source}. Статус: требует изменений.\n\n${b.enoaLead.join('\n\n')}\n\n- Характеристики: ${b.abilities.join(', ')}.\n- Навыки: ${b.skills.join(', ')}.\n- Инструмент: ${b.tool}.\n- Черта: ${b.feat.title} (${b.feat.id}); категория: ${f?.category}.\n- Комплект: ${b.equipment.items.map(i => i.label).join('; ')}; ${b.equipment.coins ?? 'монеты не заданы'}. Дополнительно: ${(b.equipment.extra ?? []).join('; ') || 'нет'}. Альтернатива: ${b.equipment.alt}.\n- Проблемы: ${issues.join('; ')}.\n`
+})
+fs.writeFileSync('docs/backgrounds-2024/audit-before.md', `# Аудит до редактирования\n\nДата: 23 октября 2026. Снимок before.json сделан до изменения контента. Найдено ${backgrounds.length} предыстории: 16 адаптаций PHB и 57 авторских.\n\nДанные: app/data/dnd55e/backgrounds.js и feats.js; обычные JS-объекты, фабрики phb/enoa, связь feat.id. Отображение: BackgroundsPage.vue и FeatsPage.vue, маршруты /dnd55e/backgrounds и /dnd55e/feats. Снаряжение связывается по названию. Отдельной проверки предысторий нет. Существуют audit:rulesets и lore:check; скриптов typecheck, test, lint нет. Редакция 2014 находится в app/data/backgrounds5e.js и /dnd5e; её не изменяем. Специальный словарь навыков и инструментов находится в backgrounds.js, общие термины — glossary*.js.\n\nОсновные проблемы: лорные справки вытесняют деятельность персонажа; ряд текстов навязывает чувства и дальнейшие решения; комплекты содержат переменные цены, превышения бюджета и уникальные подарки без оценки. Свободные черты в слоте Origin требуют отдельного решения, а не скрытого изменения категории.\n\nБлизкие пары: торговец/караванщик/погонщик (сделка/организация пути/уход за животными); писец/читающий узлы/хранитель Пламени (документы/узелковая письменность/охрана архива); ныряльщик/Слепой Бунти/Брат Глубин (подъём груза/разведка/помощь на воде); шахтёр/беглец из рудников (ремесло/опыт неволи). Эти различия необходимо раскрыть, не удаляя записи.\n\n` + rows.join('\n'))

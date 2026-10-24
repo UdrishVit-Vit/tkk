@@ -1,0 +1,200 @@
+[
+  {
+    "level": 1,
+    "pb": 2,
+    "expertise": false,
+    "mode": "normal",
+    "dc": 15,
+    "modifier": 5,
+    "baselinePercent": 55,
+    "withAppraiserD4Percent": 67.5,
+    "withAppraiserAndGuidancePercent": 80
+  },
+  {
+    "level": 1,
+    "pb": 2,
+    "expertise": false,
+    "mode": "advantage",
+    "dc": 15,
+    "modifier": 5,
+    "baselinePercent": 79.75,
+    "withAppraiserD4Percent": 89.125,
+    "withAppraiserAndGuidancePercent": 95.375
+  },
+  {
+    "level": 1,
+    "pb": 2,
+    "expertise": false,
+    "mode": "disadvantage",
+    "dc": 15,
+    "modifier": 5,
+    "baselinePercent": 30.25,
+    "withAppraiserD4Percent": 45.875,
+    "withAppraiserAndGuidancePercent": 64.625
+  },
+  {
+    "level": 1,
+    "pb": 2,
+    "expertise": true,
+    "mode": "normal",
+    "dc": 15,
+    "modifier": 7,
+    "baselinePercent": 65,
+    "withAppraiserD4Percent": 77.5,
+    "withAppraiserAndGuidancePercent": 89.688
+  },
+  {
+    "level": 1,
+    "pb": 2,
+    "expertise": true,
+    "mode": "advantage",
+    "dc": 15,
+    "modifier": 7,
+    "baselinePercent": 87.75,
+    "withAppraiserD4Percent": 94.625,
+    "withAppraiserAndGuidancePercent": 98.391
+  },
+  {
+    "level": 1,
+    "pb": 2,
+    "expertise": true,
+    "mode": "disadvantage",
+    "dc": 15,
+    "modifier": 7,
+    "baselinePercent": 42.25,
+    "withAppraiserD4Percent": 60.375,
+    "withAppraiserAndGuidancePercent": 80.984
+  },
+  {
+    "level": 5,
+    "pb": 3,
+    "expertise": false,
+    "mode": "normal",
+    "dc": 15,
+    "modifier": 7,
+    "baselinePercent": 65,
+    "withAppraiserD4Percent": 77.5,
+    "withAppraiserAndGuidancePercent": 89.688
+  },
+  {
+    "level": 5,
+    "pb": 3,
+    "expertise": false,
+    "mode": "advantage",
+    "dc": 15,
+    "modifier": 7,
+    "baselinePercent": 87.75,
+    "withAppraiserD4Percent": 94.625,
+    "withAppraiserAndGuidancePercent": 98.391
+  },
+  {
+    "level": 5,
+    "pb": 3,
+    "expertise": false,
+    "mode": "disadvantage",
+    "dc": 15,
+    "modifier": 7,
+    "baselinePercent": 42.25,
+    "withAppraiserD4Percent": 60.375,
+    "withAppraiserAndGuidancePercent": 80.984
+  },
+  {
+    "level": 5,
+    "pb": 3,
+    "expertise": true,
+    "mode": "normal",
+    "dc": 15,
+    "modifier": 10,
+    "baselinePercent": 80,
+    "withAppraiserD4Percent": 92.5,
+    "withAppraiserAndGuidancePercent": 98.75
+  },
+  {
+    "level": 5,
+    "pb": 3,
+    "expertise": true,
+    "mode": "advantage",
+    "dc": 15,
+    "modifier": 10,
+    "baselinePercent": 96,
+    "withAppraiserD4Percent": 99.125,
+    "withAppraiserAndGuidancePercent": 99.906
+  },
+  {
+    "level": 5,
+    "pb": 3,
+    "expertise": true,
+    "mode": "disadvantage",
+    "dc": 15,
+    "modifier": 10,
+    "baselinePercent": 64,
+    "withAppraiserD4Percent": 85.875,
+    "withAppraiserAndGuidancePercent": 97.594
+  },
+  {
+    "level": 11,
+    "pb": 4,
+    "expertise": false,
+    "mode": "normal",
+    "dc": 15,
+    "modifier": 9,
+    "baselinePercent": 75,
+    "withAppraiserD4Percent": 87.5,
+    "withAppraiserAndGuidancePercent": 96.875
+  },
+  {
+    "level": 11,
+    "pb": 4,
+    "expertise": false,
+    "mode": "advantage",
+    "dc": 15,
+    "modifier": 9,
+    "baselinePercent": 93.75,
+    "withAppraiserD4Percent": 98.125,
+    "withAppraiserAndGuidancePercent": 99.688
+  },
+  {
+    "level": 11,
+    "pb": 4,
+    "expertise": false,
+    "mode": "disadvantage",
+    "dc": 15,
+    "modifier": 9,
+    "baselinePercent": 56.25,
+    "withAppraiserD4Percent": 76.875,
+    "withAppraiserAndGuidancePercent": 94.063
+  },
+  {
+    "level": 11,
+    "pb": 4,
+    "expertise": true,
+    "mode": "normal",
+    "dc": 15,
+    "modifier": 13,
+    "baselinePercent": 95,
+    "withAppraiserD4Percent": 100,
+    "withAppraiserAndGuidancePercent": 100
+  },
+  {
+    "level": 11,
+    "pb": 4,
+    "expertise": true,
+    "mode": "advantage",
+    "dc": 15,
+    "modifier": 13,
+    "baselinePercent": 99.75,
+    "withAppraiserD4Percent": 100,
+    "withAppraiserAndGuidancePercent": 100
+  },
+  {
+    "level": 11,
+    "pb": 4,
+    "expertise": true,
+    "mode": "disadvantage",
+    "dc": 15,
+    "modifier": 13,
+    "baselinePercent": 90.25,
+    "withAppraiserD4Percent": 100,
+    "withAppraiserAndGuidancePercent": 100
+  }
+]

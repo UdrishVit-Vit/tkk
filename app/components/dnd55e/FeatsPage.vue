@@ -187,6 +187,10 @@ useSeoMeta({
           <dt>Источник</dt>
           <dd>{{ item.raw.sourceTitle }}</dd>
         </div>
+        <div v-if="item.raw.contentKind === 'Homebrew'" class="tref-stat">
+          <dt>Авторская механика Эноа</dt>
+          <dd>{{ item.raw.status === 'Approved' ? 'Утверждена' : 'Ранее опубликована; баланс требует проверки' }}</dd>
+        </div>
       </dl>
 
       <p v-if="item.raw.intro" class="feat-intro">
