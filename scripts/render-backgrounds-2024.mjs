@@ -39,11 +39,14 @@ assert.equal((backgrounds.match(/<details/g) || []).length, 14)
 for (const b of DND55E_BACKGROUNDS) {
   assert.ok(backgrounds.includes(`data-record="${b.id}"`), b.id)
   assert.ok(backgrounds.includes(`/dnd55e/feats?feat=${b.feat.id}`), `${b.id}: feat link`)
-  assert.ok(backgrounds.includes(b.enoaLead[0]), `${b.id}: description`)
+  for (const paragraph of b.enoaLead) assert.ok(backgrounds.includes(paragraph), `${b.id}: description`)
+  for (const entry of b.equipment.items.filter(e => e.loreAdaptation)) assert.ok(backgrounds.includes(entry.title), `${b.id}: knot equipment`)
 }
 assert.ok(backgrounds.includes('не выше 20'))
 assert.ok(backgrounds.includes('свободная черта вместо Origin'))
 assert.ok(backgrounds.includes('Не входят в комплект за 50 зм'))
+assert.ok(!backgrounds.includes('/dnd55e/equipment?item=gear-book'), 'paper book link returned')
+assert.ok(backgrounds.includes('Инструменты узлового писца'))
 const feats = await render('FeatsPage')
 assert.ok(feats.includes('Ранее опубликована; баланс требует проверки'))
 for (const f of DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.status === 'Draft')) {

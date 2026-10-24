@@ -274,7 +274,8 @@ useSeoMeta({
         <div class="tref-stat">
           <dt>Инструмент</dt>
           <dd>
-            <NuxtLink v-if="toolPath(item.raw)" :to="toolPath(item.raw)">{{ item.raw.tool }}</NuxtLink>
+            <span v-if="item.raw.toolDisplay" :title="`По правилам: ${item.raw.tool}`">{{ item.raw.toolDisplay }}</span>
+            <NuxtLink v-else-if="toolPath(item.raw)" :to="toolPath(item.raw)">{{ item.raw.tool }}</NuxtLink>
             <template v-else>{{ item.raw.tool }}</template>
           </dd>
         </div>
@@ -290,8 +291,8 @@ useSeoMeta({
             <span class="bg-equip-items">
               <template v-for="(entry, index) in item.raw.equipment.items" :key="entry.label">
                 <template v-if="index">, </template>
-                <NuxtLink v-if="entry.id" :to="equipmentPath(entry.id)">{{ entry.title }}</NuxtLink>
-                <span v-else>{{ entry.title }}</span>
+                <NuxtLink v-if="entry.id && !entry.loreAdaptation" :to="equipmentPath(entry.id)">{{ entry.title }}</NuxtLink>
+                <span v-else :title="entry.adaptationNote">{{ entry.title }}</span>
                 <small v-if="entry.note"> ({{ entry.note }})</small>
               </template>
               <template v-if="item.raw.equipment.coins">
@@ -316,8 +317,8 @@ useSeoMeta({
           <RuleRichText :text="para" edition="2024" />
         </p>
         <details v-if="item.raw.loreContext?.length" class="bg-block">
-          <summary>Лор и исходный вариант истории</summary>
-          <p class="bg-stat-hint">Сохранённый авторский материал. Личные чувства и события в этом варианте можно изменить при создании персонажа.</p>
+          <summary>Дополнительные подробности истории</summary>
+          <p class="bg-stat-hint">Авторский материал приведён к узловой письменности Эноа. Личные чувства и события в этом варианте можно изменить при создании персонажа.</p>
           <p v-for="(para, index) in item.raw.loreContext" :key="index" class="bg-lead">
             <RuleRichText :text="para" edition="2024" />
           </p>

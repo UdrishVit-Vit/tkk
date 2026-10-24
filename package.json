@@ -7,8 +7,8 @@
     "backgrounds:check:strict": "node scripts/check-backgrounds-2024.mjs --strict",
     "backgrounds:test": "node scripts/test-backgrounds-2024.mjs",
     "backgrounds:render": "node scripts/render-backgrounds-2024.mjs",
-    "backgrounds:report": "node scripts/report-backgrounds-2024.mjs",
-    "prebuild": "node scripts/check-backgrounds-2024.mjs",
+    "backgrounds:report": "node scripts/report-backgrounds-2024.mjs && node scripts/report-enoa-origins.mjs && node scripts/enoa-origin-math.mjs",
+    "prebuild": "node scripts/check-backgrounds-2024.mjs && node scripts/check-enoa-origins.mjs",
     "audit:rulesets": "node scripts/audit-dnd-ruleset-boundaries.mjs",
     "lore:check": "node scripts/validate-lore.mjs",
     "images:webp": "node scripts/images-to-webp.mjs",
@@ -19,7 +19,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "names:check": "node scripts/audit-race-name-generators.mjs",
-    "names:sync": "node scripts/sync-name-library.mjs"
+    "names:sync": "node scripts/sync-name-library.mjs",
+    "backgrounds:enoa-check": "node scripts/check-enoa-origins.mjs"
   },
   "dependencies": {
     "@iconify-json/game-icons": "1.2.4",

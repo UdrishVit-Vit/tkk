@@ -1,0 +1,203 @@
+{
+  "method": "Exact enumeration, ability checks; no automatic failure on 1 or success on 20.",
+  "rows": [
+    {
+      "level": 1,
+      "pb": 2,
+      "modifier": 5,
+      "expertise": false,
+      "mode": "normal",
+      "dc": 15,
+      "base": 55,
+      "plusD4": 67.5,
+      "plusD4AndGuidance": 80
+    },
+    {
+      "level": 1,
+      "pb": 2,
+      "modifier": 5,
+      "expertise": false,
+      "mode": "advantage",
+      "dc": 15,
+      "base": 79.75,
+      "plusD4": 89.125,
+      "plusD4AndGuidance": 95.375
+    },
+    {
+      "level": 1,
+      "pb": 2,
+      "modifier": 5,
+      "expertise": false,
+      "mode": "disadvantage",
+      "dc": 15,
+      "base": 30.25,
+      "plusD4": 45.875,
+      "plusD4AndGuidance": 64.625
+    },
+    {
+      "level": 1,
+      "pb": 2,
+      "modifier": 7,
+      "expertise": true,
+      "mode": "normal",
+      "dc": 15,
+      "base": 65,
+      "plusD4": 77.5,
+      "plusD4AndGuidance": 89.6875
+    },
+    {
+      "level": 1,
+      "pb": 2,
+      "modifier": 7,
+      "expertise": true,
+      "mode": "advantage",
+      "dc": 15,
+      "base": 87.75,
+      "plusD4": 94.625,
+      "plusD4AndGuidance": 98.390625
+    },
+    {
+      "level": 1,
+      "pb": 2,
+      "modifier": 7,
+      "expertise": true,
+      "mode": "disadvantage",
+      "dc": 15,
+      "base": 42.25,
+      "plusD4": 60.375,
+      "plusD4AndGuidance": 80.984375
+    },
+    {
+      "level": 5,
+      "pb": 3,
+      "modifier": 7,
+      "expertise": false,
+      "mode": "normal",
+      "dc": 15,
+      "base": 65,
+      "plusD4": 77.5,
+      "plusD4AndGuidance": 89.6875
+    },
+    {
+      "level": 5,
+      "pb": 3,
+      "modifier": 7,
+      "expertise": false,
+      "mode": "advantage",
+      "dc": 15,
+      "base": 87.75,
+      "plusD4": 94.625,
+      "plusD4AndGuidance": 98.390625
+    },
+    {
+      "level": 5,
+      "pb": 3,
+      "modifier": 7,
+      "expertise": false,
+      "mode": "disadvantage",
+      "dc": 15,
+      "base": 42.25,
+      "plusD4": 60.375,
+      "plusD4AndGuidance": 80.984375
+    },
+    {
+      "level": 5,
+      "pb": 3,
+      "modifier": 10,
+      "expertise": true,
+      "mode": "normal",
+      "dc": 15,
+      "base": 80,
+      "plusD4": 92.5,
+      "plusD4AndGuidance": 98.75
+    },
+    {
+      "level": 5,
+      "pb": 3,
+      "modifier": 10,
+      "expertise": true,
+      "mode": "advantage",
+      "dc": 15,
+      "base": 96,
+      "plusD4": 99.125,
+      "plusD4AndGuidance": 99.90625
+    },
+    {
+      "level": 5,
+      "pb": 3,
+      "modifier": 10,
+      "expertise": true,
+      "mode": "disadvantage",
+      "dc": 15,
+      "base": 64,
+      "plusD4": 85.875,
+      "plusD4AndGuidance": 97.59375
+    },
+    {
+      "level": 11,
+      "pb": 4,
+      "modifier": 9,
+      "expertise": false,
+      "mode": "normal",
+      "dc": 15,
+      "base": 75,
+      "plusD4": 87.5,
+      "plusD4AndGuidance": 96.875
+    },
+    {
+      "level": 11,
+      "pb": 4,
+      "modifier": 9,
+      "expertise": false,
+      "mode": "advantage",
+      "dc": 15,
+      "base": 93.75,
+      "plusD4": 98.125,
+      "plusD4AndGuidance": 99.6875
+    },
+    {
+      "level": 11,
+      "pb": 4,
+      "modifier": 9,
+      "expertise": false,
+      "mode": "disadvantage",
+      "dc": 15,
+      "base": 56.25,
+      "plusD4": 76.875,
+      "plusD4AndGuidance": 94.0625
+    },
+    {
+      "level": 11,
+      "pb": 4,
+      "modifier": 13,
+      "expertise": true,
+      "mode": "normal",
+      "dc": 15,
+      "base": 95,
+      "plusD4": 100,
+      "plusD4AndGuidance": 100
+    },
+    {
+      "level": 11,
+      "pb": 4,
+      "modifier": 13,
+      "expertise": true,
+      "mode": "advantage",
+      "dc": 15,
+      "base": 99.75,
+      "plusD4": 100,
+      "plusD4AndGuidance": 100
+    },
+    {
+      "level": 11,
+      "pb": 4,
+      "modifier": 13,
+      "expertise": true,
+      "mode": "disadvantage",
+      "dc": 15,
+      "base": 90.25,
+      "plusD4": 100,
+      "plusD4AndGuidance": 100
+    }
+  ]
+}
