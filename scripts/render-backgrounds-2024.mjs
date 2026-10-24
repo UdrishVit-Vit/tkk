@@ -8,6 +8,7 @@ import { parse, compileScript } from 'vue/compiler-sfc'
 import { createSSRApp, defineComponent, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { DND55E_BACKGROUNDS } from '../app/data/dnd55e/backgrounds.js'
+import { DND55E_FEATS } from '../app/data/dnd55e/feats.js'
 import { DND55E_HOMEBREW_ORIGIN_FEATS } from '../app/data/dnd55e/origin-feats-homebrew.js'
 
 await fs.mkdir('.tmpwork/backgrounds-render', { recursive: true })
@@ -17,15 +18,21 @@ const shell = defineComponent({
     return () => h('main', props.groups.flatMap(g => g.items.map(item => h('article', { 'data-record': item.id }, [slots.item?.({ item }), slots.body?.({ item })]))))
   }
 })
-async function render(name) {
-  const filename = `app/components/dnd55e/${name}.vue`
+async function compile(name, folder = 'dnd55e/') {
+  const filename = `app/components/${folder}${name}.vue`
   const { descriptor } = parse(await fs.readFile(filename, 'utf8'), { filename })
   const script = compileScript(descriptor, { id: name, inlineTemplate: true })
-  const code = `import { ref, reactive, computed } from 'vue';\nconst useSeoMeta = () => {};\n` + script.content.replace(/(['"])~\/([^'"]+)\1/g, (_, quote, relative) => JSON.stringify(pathToFileURL(path.resolve('app', relative)).href))
+  const code = `import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue';\nconst useSeoMeta = () => {};\n` + script.content.replace(/(['"])~\/([^'"]+)\1/g, (_, quote, relative) => JSON.stringify(pathToFileURL(path.resolve('app', relative)).href))
   const modulePath = path.resolve('.tmpwork/backgrounds-render', name + '.mjs')
   await fs.writeFile(modulePath, code)
   const { default: component } = await import(pathToFileURL(modulePath).href)
+  return component
+}
+async function render(name) {
+  const component = await compile(name)
   const app = createSSRApp(component)
+  app.component('CardSectionNav', await compile('CardSectionNav', ''))
+  app.component('OriginFeatEffects', await compile('OriginFeatEffects', ''))
   app.component('ThreadRefPage', shell)
   app.component('RuleRichText', defineComponent({ props: ['text'], setup: props => () => h('span', props.text) }))
   app.component('NuxtLink', defineComponent({ props: ['to'], setup: (props, { slots }) => () => h('a', { href: props.to }, slots.default?.()) }))
@@ -48,6 +55,15 @@ assert.ok(backgrounds.includes('Не входят в комплект за 50 з
 assert.ok(!backgrounds.includes('/dnd55e/equipment?item=gear-book'), 'paper book link returned')
 assert.ok(backgrounds.includes('Инструменты узлового писца'))
 const feats = await render('FeatsPage')
+for (const html of [backgrounds, feats]) {
+  const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(match => match[1])
+  assert.equal(new Set(ids).size, ids.length, 'duplicate navigation target')
+  for (const [, target] of html.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.includes(target), `missing section: ${target}`)
+}
+const plain = feats.replace(/<[^>]+>/g, ' ').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/\s+/g, ' ')
+for (const feat of DND55E_FEATS) {
+  for (const entry of feat.benefits) assert.ok(plain.includes(entry.text.replace(/\s+/g, ' ').replace(/(Воспользовавшись этим свойством,|Вы восстанавливаете все потраченные)/g, 'Использование и восстановление $1')), `${feat.id}: effect text changed`)
+}
 assert.ok(!feats.includes('Ранее опубликована; баланс требует проверки'))
 assert.ok(!feats.includes('Авторская механика Эноа'))
 assert.ok(!backgrounds.includes('Авторская механика Эноа'))

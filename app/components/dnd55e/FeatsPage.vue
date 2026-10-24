@@ -164,6 +164,8 @@ useSeoMeta({
         </div>
       </header>
 
+      <CardSectionNav :prefix="'feat-' + item.id" :sections="[{ id: 'requirements', label: 'Условия выбора' }, { id: 'effects', label: 'Эффекты' }]" />
+      <h3 :id="'feat-' + item.id + '-requirements'" class="feat-benefits-title feat-section-title" tabindex="-1">Условия выбора</h3>
       <dl class="tref-stats feat-stats">
         <div v-if="item.raw.category !== 'origin'" class="tref-stat">
           <dt>Категория</dt>
@@ -183,22 +185,20 @@ useSeoMeta({
         </div>
       </dl>
 
-      <p v-if="item.raw.intro" class="feat-intro">
-        <RuleRichText :text="item.raw.intro" edition="2024" />
-      </p>
-
       <section class="feat-benefits">
-        <h3 class="feat-benefits-title">Эффекты черты</h3>
-        <article v-for="entry in item.raw.benefits" :key="entry.title" class="feat-benefit">
-          <h4>{{ entry.title }}</h4>
-          <p><RuleRichText :text="entry.text" edition="2024" /></p>
-        </article>
+        <h3 :id="'feat-' + item.id + '-effects'" class="feat-benefits-title" tabindex="-1">Эффекты черты</h3>
+        <OriginFeatEffects :feat="item.raw" />
       </section>
     </template>
   </ThreadRefPage>
 </template>
 
 <style scoped>
+:deep(.rule-body-wrap > .rule-body){overflow:clip}
+.feat-heading{padding-top:28px}
+[tabindex="-1"]{scroll-margin-top:110px}
+.feat-section-title{margin-bottom:12px!important}
+
 .feat-list-card{
   display:grid;
   grid-template-columns:38px minmax(0,1fr);

@@ -57,6 +57,12 @@ function toolPath(item) {
   return id ? `/dnd55e/equipment?item=${id}` : null
 }
 
+const expandedFeats = reactive({})
+const cardSections = [
+  { id: 'stats', label: 'Параметры' }, { id: 'feat', label: 'Черта' },
+  { id: 'story', label: 'История' }, { id: 'event', label: 'Событие' },
+  { id: 'equipment', label: 'Снаряжение' }
+]
 const search = ref('')
 const open = ref(null)
 const showFilter = ref(false)
@@ -227,6 +233,8 @@ useSeoMeta({
         </div>
       </header>
 
+      <CardSectionNav :prefix="'bg-' + item.id" :sections="cardSections" />
+      <h3 :id="'bg-' + item.id + '-stats'" class="bg-section-title" tabindex="-1">Что получает персонаж</h3>
       <dl class="tref-stats bg-stats">
         <div class="tref-stat">
           <dt>Характеристики</dt>
@@ -237,16 +245,6 @@ useSeoMeta({
             </template>
           </dd>
           <p class="bg-stat-hint">+2 и +1 на две из них либо по +1 каждой; не выше 20</p>
-        </div>
-        <div class="tref-stat">
-          <dt>{{ featCategory(item.raw) }}</dt>
-          <dd>
-            <NuxtLink :to="featPath(item.raw)">{{ item.raw.feat.title }}</NuxtLink>
-            <template v-if="item.raw.feat.note"> ({{ item.raw.feat.note }})</template>
-          </dd>
-          <p v-if="FEATS_BY_ID.get(item.raw.feat.id)?.category !== 'origin'" class="bg-stat-hint">
-            Сохранённое авторское исключение: свободная черта вместо Origin. Для стандартной предыстории 2024 требуется согласование с мастером.
-          </p>
         </div>
         <div class="tref-stat">
           <dt>Навыки</dt>
@@ -267,37 +265,31 @@ useSeoMeta({
         </div>
       </dl>
 
-      <section class="bg-block">
-        <h3>Стартовое снаряжение</h3>
-        <div class="bg-equipment">
-          <p class="bg-equip-rule">Выберите А или Б — смешивать нельзя.</p>
-          <p class="bg-stat-hint">Комплект А адаптирован для Эноа: предметы и монеты вместе стоят 50 зм. Владение инструментом не обязывает брать именно комплект А.</p>
-          <p class="bg-equip-row">
-            <span class="bg-equip-key">А</span>
-            <span class="bg-equip-items">
-              <template v-for="(entry, index) in item.raw.equipment.items" :key="entry.label">
-                <template v-if="index">, </template>
-                <NuxtLink v-if="entry.id && !entry.loreAdaptation" :to="equipmentPath(entry.id)">{{ entry.title }}</NuxtLink>
-                <span v-else :title="entry.adaptationNote">{{ entry.title }}</span>
-                <small v-if="entry.note"> ({{ entry.note }})</small>
-              </template>
-              <template v-if="item.raw.equipment.coins">
-                <span class="bg-equip-coins"> и {{ item.raw.equipment.coins }}</span>
-              </template>
-            </span>
-          </p>
-          <p class="bg-equip-row">
-            <span class="bg-equip-key">Б</span>
-            <span class="bg-equip-items"><b>{{ item.raw.equipment.alt }}</b> вместо всего набора</span>
-          </p>
-          <p v-if="item.raw.equipment.storyItems?.length" class="bg-equip-extra">
-            Детали для истории: {{ item.raw.equipment.storyItems.join(', ') }}.
-            <small>Не входят в комплект за 50 зм. Наличие и стоимость согласуются с мастером; предмет, предоставленный чертой, получают по правилам этой черты.</small>
-          </p>
+
+
+      <section class="bg-block bg-feat-preview">
+        <h3 :id="'bg-' + item.id + '-feat'" tabindex="-1">{{ featCategory(item.raw) }}</h3>
+        <h4 class="bg-feat-name">{{ item.raw.feat.title }}</h4>
+        <p v-if="item.raw.feat.note" class="bg-stat-hint">{{ item.raw.feat.note }}</p>
+        <p class="bg-lead">{{ FEATS_BY_ID.get(item.raw.feat.id)?.benefits[0]?.text }}</p>
+        <p v-if="FEATS_BY_ID.get(item.raw.feat.id)?.benefits.length > 1" class="bg-stat-hint">
+          Также: {{ FEATS_BY_ID.get(item.raw.feat.id).benefits.slice(1).map(entry => entry.title).join(' · ') }}
+        </p>
+        <p v-if="FEATS_BY_ID.get(item.raw.feat.id)?.category !== 'origin'" class="bg-stat-hint">
+          Авторское исключение: свободная черта вместо Origin. Для стандартной предыстории 2024 требуется согласование с мастером.
+        </p>
+        <button type="button" class="bg-feat-toggle" :aria-expanded="!!expandedFeats[item.id]"
+          :aria-controls="'bg-full-feat-' + item.id" @click="expandedFeats[item.id] = !expandedFeats[item.id]">
+          {{ expandedFeats[item.id] ? 'Свернуть правила черты' : 'Показать все эффекты черты' }}
+        </button>
+        <div :id="'bg-full-feat-' + item.id" v-show="expandedFeats[item.id]" class="bg-full-feat">
+          <OriginFeatEffects v-if="FEATS_BY_ID.get(item.raw.feat.id)" :feat="FEATS_BY_ID.get(item.raw.feat.id)" />
         </div>
+        <NuxtLink :to="featPath(item.raw)" target="_blank" rel="noopener" class="bg-feat-page">Открыть черту в новой вкладке ↗</NuxtLink>
       </section>
 
       <section class="bg-block">
+        <h3 :id="'bg-' + item.id + '-story'" tabindex="-1">История и связи</h3>
         <p v-for="(para, index) in leadParagraphs(item.raw)" :key="index" class="bg-lead">
           {{ para }}
         </p>
@@ -312,7 +304,8 @@ useSeoMeta({
       </section>
 
       <section class="bg-block">
-        <h3>{{ item.raw.hooks.label }}</h3>
+        <h3 :id="'bg-' + item.id + '-event'" tabindex="-1">{{ item.raw.hooks.label }}</h3>
+        <p class="bg-event-help">Выберите событие или бросьте {{ item.raw.hooks.dice }}.</p>
         <table class="bg-table">
           <thead>
             <tr>
@@ -327,6 +320,37 @@ useSeoMeta({
             </tr>
           </tbody>
         </table>
+      </section>
+
+      <section class="bg-block">
+        <h3 :id="'bg-' + item.id + '-equipment'" tabindex="-1">Стартовое снаряжение</h3>
+        <div class="bg-equipment">
+          <p class="bg-equip-rule">Выберите А или Б — смешивать нельзя.</p>
+          <p class="bg-stat-hint">Комплект А адаптирован для Эноа: предметы и монеты вместе стоят 50 зм. Владение инструментом не обязывает брать именно комплект А.</p>
+          <p class="bg-equip-row">
+            <span class="bg-equip-key">А</span>
+            <span class="bg-equip-items">
+              <strong class="bg-choice-title">Готовый комплект</strong>
+              <template v-for="(entry, index) in item.raw.equipment.items" :key="entry.label">
+                <template v-if="index">, </template>
+                <NuxtLink v-if="entry.id && !entry.loreAdaptation" :to="equipmentPath(entry.id)">{{ entry.title }}</NuxtLink>
+                <span v-else :title="entry.adaptationNote">{{ entry.title }}</span>
+                <small v-if="entry.note"> ({{ entry.note }})</small>
+              </template>
+              <template v-if="item.raw.equipment.coins">
+                <span class="bg-equip-coins"> и {{ item.raw.equipment.coins }}</span>
+              </template>
+            </span>
+          </p>
+          <p class="bg-equip-row">
+            <span class="bg-equip-key">Б</span>
+            <span class="bg-equip-items"><strong class="bg-choice-title">Деньги</strong><b>{{ item.raw.equipment.alt }}</b> вместо всего набора</span>
+          </p>
+          <p v-if="item.raw.equipment.storyItems?.length" class="bg-equip-extra">
+            Детали для истории: {{ item.raw.equipment.storyItems.join(', ') }}.
+            <small>Не входят в комплект за 50 зм. Наличие и стоимость согласуются с мастером; предмет, предоставленный чертой, получают по правилам этой черты.</small>
+          </p>
+        </div>
       </section>
 
       <section v-if="ruleLinks(item.raw).length" class="bg-block bg-screen">
@@ -348,6 +372,21 @@ useSeoMeta({
 </template>
 
 <style scoped>
+:deep(.rule-body-wrap > .rule-body){overflow:clip}
+.bg-heading{padding-top:28px}
+[tabindex="-1"]{scroll-margin-top:110px}
+.bg-section-title{margin:0 0 12px;font-family:'Cormorant Garamond',serif;font-size:23px;color:rgba(var(--theme-heading-rgb),.95)}
+.bg-feat-preview{padding:20px;border:1px solid rgba(var(--theme-accent-rgb),.3);border-radius:12px;background:rgba(var(--theme-accent-rgb),.04)}
+.bg-feat-name{margin:0 0 12px;font-family:'Cormorant Garamond',serif;font-size:25px;color:rgba(var(--theme-heading-rgb),.95)}
+.bg-feat-toggle{display:block;margin-top:16px;padding:10px 14px;border:1px solid rgba(var(--theme-accent-rgb),.4);border-radius:7px;background:rgba(var(--theme-accent-rgb),.09);color:rgba(var(--theme-accent-strong-rgb),1);font:inherit;font-size:13px;cursor:pointer;text-align:left}
+.bg-feat-toggle:hover{background:rgba(var(--theme-accent-rgb),.17)}
+.bg-feat-toggle:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.bg-feat-page{display:inline-block;margin-top:14px;font-size:12px;color:rgba(var(--theme-accent-strong-rgb),1);text-decoration:underline;text-underline-offset:3px}
+.bg-full-feat{margin-top:16px}
+.bg-choice-title{display:block;margin-bottom:5px;color:rgba(var(--theme-heading-rgb),.95)}
+.bg-event-help{font-size:13px;color:rgba(var(--theme-text-rgb),.72);margin:0 0 12px}
+@media print{.bg-feat-toggle,.bg-feat-page{display:none}.bg-full-feat{display:block!important}}
+
 .bg-list-card{
   display:grid;
   grid-template-columns:38px minmax(0,1fr);
