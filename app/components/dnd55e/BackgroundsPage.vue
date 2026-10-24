@@ -18,7 +18,7 @@ const FEAT_CATEGORY_TITLES = new Map(DND55E_FEATS.map(item => [item.id, item.cat
 const FEATS_BY_ID = new Map(DND55E_FEATS.map(item => [item.id, item]))
 const featCategory = item => FEAT_CATEGORY_TITLES.get(item.feat.id) || 'Черта происхождения'
 
-// Ширма — единственный источник названий терминов: заголовки не дублируются в данных
+// Глоссарий — единственный источник названий терминов: заголовки не дублируются в данных
 // предысторий, поэтому переименование правила не оставляет здесь мёртвой строки.
 const GLOSSARY_TITLES = new Map(DND55E_GLOSSARY.map(item => [item.id, item.title]))
 
@@ -38,7 +38,7 @@ function skillLinks(item) {
 }
 
 function ruleLinks(item) {
-  // Навыки уже выведены отдельной строкой, поэтому в «Ширме» они не дублируются:
+  // Навыки уже выведены отдельной строкой, поэтому в «Нитях» они не дублируются:
   // предыстория вправе указать свой навык в glossary, чтобы подчеркнуть его роль.
   const shown = new Set(skillLinks(item).map(entry => entry.id))
   return item.glossary
@@ -78,7 +78,6 @@ const visibleBackgrounds = computed(() => DND55E_BACKGROUNDS.filter((item) => {
     item.summary,
     item.tool,
     ...(Array.isArray(item.enoaLead) ? item.enoaLead : [item.enoaLead]),
-    item.play,
     item.feat.title,
     item.feat.note,
     ...item.abilities,
@@ -312,15 +311,14 @@ useSeoMeta({
       </section>
 
       <section class="bg-block">
-        <h3>В мире Эноа</h3>
         <p v-for="(para, index) in leadParagraphs(item.raw)" :key="index" class="bg-lead">
-          <RuleRichText :text="para" edition="2024" />
+          {{ para }}
         </p>
         <details v-if="item.raw.loreContext?.length" class="bg-block">
           <summary>Дополнительные подробности истории</summary>
           <p class="bg-stat-hint">Авторский материал приведён к узловой письменности Эноа. Личные чувства и события в этом варианте можно изменить при создании персонажа.</p>
           <p v-for="(para, index) in item.raw.loreContext" :key="index" class="bg-lead">
-            <RuleRichText :text="para" edition="2024" />
+            {{ para }}
           </p>
         </details>
         <p class="bg-stat-hint">Варианты и события ниже — возможности для истории, а не обязательные факты биографии.</p>
@@ -329,7 +327,7 @@ useSeoMeta({
             {{ entry.title }}
             <small>{{ entry.region }}</small>
           </h4>
-          <p><RuleRichText :text="entry.text" edition="2024" /></p>
+          <p>{{ entry.text }}</p>
         </article>
       </section>
 
@@ -351,13 +349,8 @@ useSeoMeta({
         </table>
       </section>
 
-      <aside class="bg-advice">
-        <b>Как это играется</b>
-        <p><RuleRichText :text="item.raw.play" edition="2024" /></p>
-      </aside>
-
       <section v-if="ruleLinks(item.raw).length" class="bg-block bg-screen">
-        <h3>Ширма</h3>
+        <h3>Нити</h3>
         <p class="bg-screen-hint">Правила редакции 2024, которые стоит открыть до первой сессии за этого персонажа.</p>
         <div class="bg-screen-links">
           <NuxtLink
@@ -612,25 +605,6 @@ useSeoMeta({
   font-weight:700;
 }
 .bg-table td{color:rgba(var(--theme-text-rgb),.72);line-height:1.6}
-.bg-advice{
-  margin-top:20px;
-  border:1px solid rgba(var(--theme-accent-rgb),.2);
-  border-radius:9px;
-  background:rgba(var(--theme-accent-rgb),.05);
-  padding:12px 15px;
-}
-.bg-advice b{
-  color:rgba(var(--theme-accent-strong-rgb),.9);
-  font-family:'Cormorant Garamond',serif;
-  font-size:17px;
-  font-weight:600;
-}
-.bg-advice p{
-  margin:4px 0 0;
-  color:rgba(var(--theme-text-rgb),.68);
-  font-size:13px;
-  line-height:1.66;
-}
 .bg-screen-hint{
   margin:0 0 9px;
   color:rgba(var(--theme-text-rgb),.5);
