@@ -216,24 +216,15 @@ useSeoMeta({
     </template>
 
     <template #body="{ item }">
-      <div class="tref-badges">
-        <span class="tref-source" :title="item.raw.sourceTitle">{{ item.raw.source }}</span>
-        <span class="tref-pill">
-          <span>Черта</span>
-          <b>{{ item.raw.feat.title }}</b>
-        </span>
-        <span v-for="tie in item.raw.ties" :key="tie" class="tref-tag">{{ tie }}</span>
-      </div>
-
       <header class="bg-heading">
         <span class="bg-heading-icon" aria-hidden="true">
           {{ DND55E_BACKGROUND_GROUPS[item.raw.group].icon }}
         </span>
-        <span>
-          <span class="bg-title">{{ item.raw.title }}</span>
+        <div>
+          <h2 class="bg-title">{{ item.raw.title }}</h2>
           <span class="bg-original">{{ item.raw.originalName }}</span>
           <span class="bg-summary">{{ item.raw.summary }}</span>
-        </span>
+        </div>
       </header>
 
       <dl class="tref-stats bg-stats">
@@ -253,9 +244,6 @@ useSeoMeta({
             <NuxtLink :to="featPath(item.raw)">{{ item.raw.feat.title }}</NuxtLink>
             <template v-if="item.raw.feat.note"> ({{ item.raw.feat.note }})</template>
           </dd>
-          <p v-if="FEATS_BY_ID.get(item.raw.feat.id)?.contentKind === 'Homebrew'" class="bg-stat-hint">
-            Авторская механика Эноа · {{ FEATS_BY_ID.get(item.raw.feat.id)?.status === 'Approved' ? 'утверждена' : 'ранее опубликована, баланс требует проверки' }}
-          </p>
           <p v-if="FEATS_BY_ID.get(item.raw.feat.id)?.category !== 'origin'" class="bg-stat-hint">
             Сохранённое авторское исключение: свободная черта вместо Origin. Для стандартной предыстории 2024 требуется согласование с мастером.
           </p>
@@ -285,7 +273,7 @@ useSeoMeta({
           <p class="bg-equip-rule">Выберите А или Б — смешивать нельзя.</p>
           <p class="bg-stat-hint">Комплект А адаптирован для Эноа: предметы и монеты вместе стоят 50 зм. Владение инструментом не обязывает брать именно комплект А.</p>
           <p class="bg-equip-row">
-            <span class="bg-equip-key" aria-hidden="true">А</span>
+            <span class="bg-equip-key">А</span>
             <span class="bg-equip-items">
               <template v-for="(entry, index) in item.raw.equipment.items" :key="entry.label">
                 <template v-if="index">, </template>
@@ -299,7 +287,7 @@ useSeoMeta({
             </span>
           </p>
           <p class="bg-equip-row">
-            <span class="bg-equip-key" aria-hidden="true">Б</span>
+            <span class="bg-equip-key">Б</span>
             <span class="bg-equip-items"><b>{{ item.raw.equipment.alt }}</b> вместо всего набора</span>
           </p>
           <p v-if="item.raw.equipment.storyItems?.length" class="bg-equip-extra">
@@ -417,10 +405,11 @@ useSeoMeta({
 }
 .bg-title{
   display:block;
+  margin:0;
   color:rgba(var(--theme-heading-rgb),.96);
   font-family:'Cormorant Garamond',serif;
   font-size:30px;
-  line-height:1;
+  line-height:1.15;
 }
 .bg-original{
   display:block;
@@ -438,14 +427,11 @@ useSeoMeta({
   font-size:18px;
   line-height:1.42;
 }
-/* Четыре колонки на широкой карточке, две на узкой. Промежуточных раскладок нет
-   намеренно: при трёх колонках четвёртая ячейка уходит на вторую строку одна.
-   «Проницательность» в четверть узкой карточки не помещается и раньше обрезалась. */
-.bg-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
-.bg-stats dd{overflow-wrap:break-word}
-@media (max-width:1200px){
-  .bg-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
+/* Сетка зависит от ширины карточки, в том числе в боковой панели. */
+.bg-stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px;border:0;background:none;overflow:visible}
+.bg-stats .tref-stat{padding:16px;border:1px solid rgba(var(--theme-accent-rgb),.18);border-radius:10px;background:rgba(var(--theme-accent-rgb),.035)}
+.bg-stats dt{font-size:11px;letter-spacing:.06em;color:rgba(var(--theme-text-rgb),.68)}
+.bg-stats dd{overflow-wrap:anywhere;font-size:15px;line-height:1.55;font-weight:600}
 /* Ссылка внутри карточки должна читаться как ссылка: пунктир, который
    становится сплошным при наведении. Иначе значение неотличимо от текста. */
 .bg-stats a,
@@ -463,12 +449,12 @@ useSeoMeta({
 }
 .bg-stat-hint{
   margin:5px 0 0;
-  color:rgba(var(--theme-text-rgb),.42);
-  font-size:10px;
+  color:rgba(var(--theme-text-rgb),.66);
+  font-size:12px;
   font-weight:450;
-  line-height:1.4;
+  line-height:1.55;
 }
-.bg-block{margin-top:20px}
+.bg-block{margin-top:28px}
 .bg-block h3{
   margin:0 0 9px;
   color:rgba(var(--theme-accent-strong-rgb),.9);
@@ -488,14 +474,14 @@ useSeoMeta({
   font-size:12px;
   line-height:1.5;
 }
-/* Строка варианта: буква слева, перечисление справа — как в книге. */
+/* Буква варианта остаётся видимой и доступной скринридеру. */
 .bg-equip-row{
   display:grid;
   align-items:baseline;
   gap:10px;
   grid-template-columns:22px minmax(0,1fr);
   margin:0;
-  padding:7px 0;
+  padding:14px 0;
 }
 .bg-equip-row + .bg-equip-row{border-top:1px solid rgba(var(--theme-text-rgb),.07)}
 .bg-equip-key{
@@ -541,9 +527,9 @@ useSeoMeta({
 }
 .bg-lead{
   margin:0 0 10px;
-  color:rgba(var(--theme-text-rgb),.72);
-  font-size:13px;
-  line-height:1.68;
+  color:rgba(var(--theme-text-rgb),.84);
+  font-size:15px;
+  line-height:1.8;
 }
 .bg-variant{
   border-left:2px solid rgba(var(--theme-accent-rgb),.28);
@@ -569,8 +555,8 @@ useSeoMeta({
 .bg-variant p{
   margin:0;
   color:rgba(var(--theme-text-rgb),.7);
-  font-size:13px;
-  line-height:1.66;
+  font-size:14px;
+  line-height:1.75;
 }
 .bg-table{
   width:100%;
@@ -634,6 +620,6 @@ useSeoMeta({
   .bg-heading{grid-template-columns:56px minmax(0,1fr);gap:13px}
   .bg-heading-icon{width:48px;height:48px;font-size:22px}
   .bg-title{font-size:25px}
-  .bg-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+.bg-stats a:focus-visible,.bg-equip-items a:focus-visible,.bg-screen-link:focus-visible{outline:2px solid rgba(var(--theme-accent-strong-rgb),.9);outline-offset:4px;border-radius:2px}
 </style>

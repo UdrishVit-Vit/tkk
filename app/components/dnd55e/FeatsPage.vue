@@ -153,25 +153,19 @@ useSeoMeta({
     </template>
 
     <template #body="{ item }">
-      <div class="tref-badges">
-        <span class="tref-source" :title="item.raw.sourceTitle">{{ item.raw.source }}</span>
-        <span class="tref-pill"><span>Категория</span><b>{{ item.raw.categoryTitle }}</b></span>
-        <span v-if="item.raw.repeatable" class="tref-tag">Повторяемая</span>
-      </div>
-
       <header class="feat-heading">
         <span class="feat-heading-icon" aria-hidden="true">
           {{ DND55E_FEAT_CATEGORIES[item.raw.category].icon }}
         </span>
-        <span>
-          <span class="feat-title">{{ item.raw.title }}</span>
+        <div>
+          <h2 class="feat-title">{{ item.raw.title }}</h2>
           <span class="feat-original">{{ item.raw.originalName }}</span>
           <span class="feat-summary">{{ item.raw.summary }}</span>
-        </span>
+        </div>
       </header>
 
       <dl class="tref-stats feat-stats">
-        <div class="tref-stat">
+        <div v-if="item.raw.category !== 'origin'" class="tref-stat">
           <dt>Категория</dt>
           <dd>{{ item.raw.categoryTitle }}</dd>
         </div>
@@ -179,17 +173,13 @@ useSeoMeta({
           <dt>Требование</dt>
           <dd>{{ item.raw.requirement || 'Нет' }}</dd>
         </div>
-        <div class="tref-stat">
+        <div v-if="item.raw.abilities.length" class="tref-stat">
           <dt>Характеристика</dt>
           <dd>{{ item.raw.abilities.length ? item.raw.abilities.join(', ') : 'Не увеличивает' }}</dd>
         </div>
         <div class="tref-stat">
-          <dt>Источник</dt>
-          <dd>{{ item.raw.sourceTitle }}</dd>
-        </div>
-        <div v-if="item.raw.contentKind === 'Homebrew'" class="tref-stat">
-          <dt>Авторская механика Эноа</dt>
-          <dd>{{ item.raw.status === 'Approved' ? 'Утверждена' : 'Ранее опубликована; баланс требует проверки' }}</dd>
+          <dt>Можно выбрать</dt>
+          <dd>{{ item.raw.repeatable ? 'Несколько раз' : 'Один раз' }}</dd>
         </div>
       </dl>
 
@@ -198,8 +188,9 @@ useSeoMeta({
       </p>
 
       <section class="feat-benefits">
+        <h3 class="feat-benefits-title">Эффекты черты</h3>
         <article v-for="entry in item.raw.benefits" :key="entry.title" class="feat-benefit">
-          <h3>{{ entry.title }}</h3>
+          <h4>{{ entry.title }}</h4>
           <p><RuleRichText :text="entry.text" edition="2024" /></p>
         </article>
       </section>
@@ -265,10 +256,11 @@ useSeoMeta({
 }
 .feat-title{
   display:block;
+  margin:0;
   color:rgba(var(--theme-heading-rgb),.96);
   font-family:'Cormorant Garamond',serif;
   font-size:30px;
-  line-height:1;
+  line-height:1.15;
 }
 .feat-original{
   display:block;
@@ -286,40 +278,45 @@ useSeoMeta({
   font-size:18px;
   line-height:1.42;
 }
-.feat-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+.feat-stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px;border:0;background:none;overflow:visible}
+.feat-stats .tref-stat{padding:16px;border:1px solid rgba(var(--theme-accent-rgb),.18);border-radius:10px;background:rgba(var(--theme-accent-rgb),.035)}
+.feat-stats dt{font-size:11px;letter-spacing:.06em;color:rgba(var(--theme-text-rgb),.68)}
+.feat-stats dd{font-size:15px;line-height:1.55;font-weight:600;overflow-wrap:anywhere}
 .feat-intro{
   margin:0 0 4px;
-  color:rgba(var(--theme-text-rgb),.7);
-  font-size:13px;
-  line-height:1.7;
+  color:rgba(var(--theme-text-rgb),.84);
+  font-size:15px;
+  line-height:1.8;
 }
 .feat-benefits{
   display:grid;
-  gap:10px;
-  margin-top:18px;
+  gap:14px;
+  margin-top:26px;
 }
+.feat-benefits-title{margin:0;color:rgba(var(--theme-heading-rgb),.9);font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600}
 .feat-benefit{
   border-left:2px solid rgba(var(--theme-accent-rgb),.28);
   background:linear-gradient(90deg,rgba(var(--theme-accent-rgb),.055),transparent 72%);
-  padding:10px 13px;
+  padding:16px 18px;
+  border-radius:0 10px 10px 0;
 }
-.feat-benefit h3{
+.feat-benefit h4{
   margin:0 0 4px;
   color:rgba(var(--theme-accent-strong-rgb),.9);
   font-family:'Cormorant Garamond',serif;
-  font-size:18px;
+  font-size:21px;
   font-weight:600;
 }
 .feat-benefit p{
   margin:0;
-  color:rgba(var(--theme-text-rgb),.72);
-  font-size:13px;
-  line-height:1.66;
+  color:rgba(var(--theme-text-rgb),.84);
+  font-size:15px;
+  line-height:1.8;
+  overflow-wrap:anywhere;
 }
 @media (max-width:700px){
   .feat-heading{grid-template-columns:56px minmax(0,1fr);gap:13px}
   .feat-heading-icon{width:48px;height:48px;font-size:22px}
   .feat-title{font-size:25px}
-  .feat-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 </style>

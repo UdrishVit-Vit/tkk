@@ -48,7 +48,9 @@ assert.ok(backgrounds.includes('Не входят в комплект за 50 з
 assert.ok(!backgrounds.includes('/dnd55e/equipment?item=gear-book'), 'paper book link returned')
 assert.ok(backgrounds.includes('Инструменты узлового писца'))
 const feats = await render('FeatsPage')
-assert.ok(feats.includes('Ранее опубликована; баланс требует проверки'))
+assert.ok(!feats.includes('Ранее опубликована; баланс требует проверки'))
+assert.ok(!feats.includes('Авторская механика Эноа'))
+assert.ok(!backgrounds.includes('Авторская механика Эноа'))
 for (const f of DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.status === 'Draft')) {
   assert.ok(!feats.includes(`data-record="${f.id}"`), `${f.id} leaked into catalog`)
   assert.ok(!feats.includes(f.title), `${f.id} draft title leaked`)
