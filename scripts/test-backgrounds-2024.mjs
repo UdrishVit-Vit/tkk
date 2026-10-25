@@ -30,7 +30,7 @@ for (const [code, mutate] of cases) {
   mutate(data)
   assert.ok(validateBackgrounds(data).filter(e => e.code === code).length > before, code)
 }
-for (const status of ['Draft', 'Testing', 'Legacy', undefined]) assert.equal(isPublishableHomebrew({contentKind:'Homebrew',status}), false)
+for (const status of ['Draft', 'Testing', 'Playtest', 'Legacy', undefined]) assert.equal(isPublishableHomebrew({contentKind:'Homebrew',status}), false)
 assert.equal(isPublishableHomebrew({contentKind:'Homebrew',status:'Approved'}), true)
 const before = JSON.parse(fs.readFileSync('docs/backgrounds-2024/before.json'))
 for (const f of before.linkedFeats) {

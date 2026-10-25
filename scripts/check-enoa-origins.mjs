@@ -22,7 +22,7 @@ export function checkEnoaOrigins(bs, fs, mapping) {
   for(const b of bs) if(prohibited.test(JSON.stringify(b))) errors.push(`writing:${b.id}`)
   for(const f of fs) {
     if(prohibited.test(JSON.stringify(f))) errors.push(`writing:${f.id}`)
-    if(!f.balance?.comparator || !f.balance?.concern || f.balance.usesAtLevels.length !== 3) errors.push(`balance:${f.id}`)
+    if(!f.balance?.comparator || !f.balance?.concern || f.balance.usesAtLevels.length !== 4) errors.push(`balance:${f.id}`)
   }
   const mechanics = fs.map(f => f.benefits.map(b => b.text).join(' '))
   if(new Set(mechanics).size !== mechanics.length) errors.push('duplicate-mechanics')

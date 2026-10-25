@@ -7,6 +7,8 @@
     "backgrounds:check:strict": "node scripts/check-backgrounds-2024.mjs --strict",
     "backgrounds:test": "node scripts/test-backgrounds-2024.mjs",
     "backgrounds:render": "node scripts/render-backgrounds-2024.mjs",
+    "backgrounds:origin-review": "node scripts/build-enoa-origin-revision3.mjs",
+    "backgrounds:origin-check": "node scripts/check-enoa-origin-revision3.mjs",
     "backgrounds:report": "node scripts/report-backgrounds-2024.mjs && node scripts/report-enoa-origins.mjs && node scripts/enoa-origin-math.mjs",
     "prebuild": "node scripts/check-backgrounds-2024.mjs && node scripts/check-enoa-origins.mjs",
     "audit:rulesets": "node scripts/audit-dnd-ruleset-boundaries.mjs",

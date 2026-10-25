@@ -15,7 +15,7 @@ export function validateBackgrounds({ backgrounds, feats, homebrew = [], proposa
   const featById = new Map(feats.map(f => [f.id, f]))
   const gearById = new Map(equipment.map(e => [e.id, e]))
   const glossaryIds = new Set(glossary.map(g => g.id))
-  for (const f of feats) if (f.status === 'Draft' || f.status === 'Testing') issue('unpublished-feat', f.id, 'Черновик попал в публичный каталог')
+  for (const f of feats) if (['Draft', 'Testing', 'Playtest'].includes(f.status)) issue('unpublished-feat', f.id, 'Черновик попал в публичный каталог')
   for (const b of backgrounds) {
     if (!(Array.isArray(b.enoaLead) ? b.enoaLead.join(' ') : b.enoaLead)?.trim()) issue('description', b.id, 'Нет описания')
     const f = featById.get(b.feat?.id)
@@ -57,7 +57,7 @@ export function validateBackgrounds({ backgrounds, feats, homebrew = [], proposa
   for (const f of homebrew) {
     for (const key of ['title', 'summary', 'action', 'conditions', 'uses', 'recovery', 'sourceTitle']) if (!f[key]?.trim()) issue('homebrew-field', f.id, key)
     if (f.category !== 'origin' || f.contentKind !== 'Homebrew' || f.source !== 'TVV') issue('homebrew-kind', f.id, 'Неверный источник или категория')
-    if (!['Draft', 'Testing', 'Approved'].includes(f.status)) issue('homebrew-status', f.id, f.status)
+    if (!['Draft', 'Testing', 'Playtest', 'Approved'].includes(f.status)) issue('homebrew-status', f.id, f.status)
     if (!Object.hasOwn(f, 'requirement') || typeof f.repeatable !== 'boolean') issue('homebrew-field', f.id, 'requirement/repeatable')
     if (!f.benefits?.length || f.benefits.some(b => !b.title?.trim() || !b.text?.trim())) issue('homebrew-benefits', f.id, 'Неполная механика')
     if (!f.relatedBackgrounds?.length || f.relatedBackgrounds.some(id => !backgrounds.some(b => b.id === id))) issue('homebrew-background', f.id, 'Нет связанной предыстории')

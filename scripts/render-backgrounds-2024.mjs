@@ -73,8 +73,20 @@ for (const feat of DND55E_FEATS) {
 assert.ok(!feats.includes('Ранее опубликована; баланс требует проверки'))
 assert.ok(!feats.includes('Авторская механика Эноа'))
 assert.ok(!backgrounds.includes('Авторская механика Эноа'))
-for (const f of DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.status === 'Draft')) {
+for (const f of DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.status !== 'Approved')) {
   assert.ok(!feats.includes(`data-record="${f.id}"`), `${f.id} leaked into catalog`)
   assert.ok(!feats.includes(f.title), `${f.id} draft title leaked`)
 }
-console.log('Rendered 73 background cards without additional story details and feat catalog. Links, text, labels and Draft exclusion passed. Browser layout not tested.')
+// Exercise unpublished text through the real effect component without publishing it.
+const effectComponent = await compile('OriginFeatEffects', '')
+const proposals = DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.version === '0.3.0')
+assert.equal(proposals.length, 57)
+const draftApp = createSSRApp({ render: () => h('main', proposals.map(feat => h(effectComponent, { feat }))) })
+draftApp.component('RuleRichText', defineComponent({ props: ['text'], setup: props => () => h('span', props.text.replace(/\*\*/g, '')) }))
+const draftHtml = await renderToString(draftApp)
+await fs.writeFile('.tmpwork/backgrounds-render/OriginDrafts.html', draftHtml)
+const draftPlain = draftHtml.replace(/<[^>]+>/g, ' ').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/\s+/g, ' ')
+for (const feat of proposals) for (const benefit of feat.benefits) {
+  assert.ok(draftPlain.includes(benefit.text.replace(/\*\*/g, '').replace(/\s+/g, ' ')), `${feat.id}: draft effect text changed`)
+}
+console.log('Rendered 73 background cards, public feat catalog and 57 unpublished effect cards. Links, full text and Draft/Playtest exclusion passed. Browser layout not tested.')
