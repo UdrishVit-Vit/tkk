@@ -288,7 +288,14 @@ useSeoMeta({
             <span class="bg-equip-items"><strong class="bg-choice-title">Деньги</strong><b>{{ item.raw.equipment.alt }}</b> вместо всего набора</span>
           </p>
           </div>
-          <p class="bg-stat-hint bg-equip-note">Стоимость комплекта А с монетами — 50 зм. Владение инструментом сохраняется при любом выборе.</p>
+          <p v-if="item.raw.equipment.pricingStatus === 'pending'" class="bg-stat-hint bg-equip-note">{{ item.raw.equipment.pricingNote }}</p>
+          <p v-else class="bg-stat-hint bg-equip-note">Стоимость комплекта А с монетами — 50 зм. Владение инструментом сохраняется при любом выборе.</p>
+          <div v-if="item.raw.equipment.kitContents?.length" class="bg-kit-details">
+            <h4>{{ item.raw.equipment.kitTitle }}: состав</h4>
+            <ul class="bg-kit-list"><li v-for="part in item.raw.equipment.kitContents" :key="part">{{ part }}</li></ul>
+            <p>{{ item.raw.equipment.kitUse }}</p>
+            <p>{{ item.raw.equipment.kitNote }}</p>
+          </div>
           <p v-if="item.raw.equipment.storyItems?.length" class="bg-equip-extra">
             <strong class="bg-story-item-label">Памятная вещь для истории</strong>
             {{ item.raw.equipment.storyItems.join(', ') }}.
@@ -379,6 +386,9 @@ useSeoMeta({
 .bg-choice-title{display:block;margin-bottom:5px;color:rgba(var(--theme-heading-rgb),.95)}
 .bg-kit-list{margin:8px 0 0;padding-left:18px;list-style:disc}
 .bg-kit-list li{padding-left:2px;margin:3px 0}
+.bg-kit-details{margin-top:18px;padding-top:16px;border-top:1px solid rgba(var(--theme-text-rgb),.12)}
+.bg-kit-details h4{margin:0 0 10px;font-size:15px;color:rgba(var(--theme-accent-strong-rgb),.95)}
+.bg-kit-details p{margin:12px 0 0;font-size:13px;line-height:1.7}
 .bg-kit-money{margin:10px 0 0;padding-top:8px;border-top:1px solid rgba(var(--theme-text-rgb),.1)}
 .bg-story-item-label{display:block;margin-bottom:5px;font-weight:600;color:rgba(var(--theme-text-rgb),.8)}
 .bg-story-note{margin:0 0 18px;padding-left:12px;border-left:2px solid rgba(var(--theme-accent-rgb),.25);font-size:12px;line-height:1.65;color:rgba(var(--theme-text-rgb),.65)}

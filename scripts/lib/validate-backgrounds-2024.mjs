@@ -31,15 +31,21 @@ export function validateBackgrounds({ backgrounds, feats, homebrew = [], proposa
     const toolId = DND55E_TOOL_EQUIPMENT[b.tool?.replace(' (на выбор)', '')]
     if (!toolId || !gearById.has(toolId) || ['tool-obo-kit', 'tool-tattooists-tools'].includes(toolId)) issue('tool', b.id, 'Нужен один инструмент 2024')
     if (b.equipment?.alt !== '50 зм' || b.equipment.alternativeCp !== 5000) issue('alternative', b.id, 'Нет альтернативы 50 зм')
+    const pending = b.id === 'mlah-diver' && b.equipment?.pricingStatus === 'pending'
     let total = b.equipment?.coinsCp
-    if (!Number.isSafeInteger(total) || total < 0) issue('coins', b.id, 'Некорректные монеты')
+    if (pending) {
+      if (total !== null || b.equipment.coins !== '' || !b.equipment.pricingNote) issue('coins', b.id, 'Нельзя указывать остаток монет без цены комплекта')
+      total = 0
+    } else if (!Number.isSafeInteger(total) || total < 0) issue('coins', b.id, 'Некорректные монеты')
     const printedCoins = [...(b.equipment?.coins || '').matchAll(/(\d+) (зм|см|мм)/g)].reduce((n, m) => n + Number(m[1]) * {зм:100,см:10,мм:1}[m[2]], 0)
     if (printedCoins !== total) issue('coins-display', b.id, 'Текст монет расходится с числом')
     for (const i of b.equipment?.items || []) {
       const item = gearById.get(i.id)
       if (!item) issue('equipment-reference', b.id, i.id)
       if (item?.category.startsWith('martial') || item?.category === 'armor') issue('equipment-forbidden', b.id, i.title)
-      if (!Number.isSafeInteger(i.quantity) || i.quantity < 1 || !Number.isSafeInteger(i.unitCostCp) || i.unitCostCp < 0) issue('equipment-price', b.id, i.title)
+      if (!Number.isSafeInteger(i.quantity) || i.quantity < 1) issue('equipment-price', b.id, i.title)
+      if (pending && item?.pricePending && i.unitCostCp === null) continue
+      if (!Number.isSafeInteger(i.unitCostCp) || i.unitCostCp < 0) issue('equipment-price', b.id, i.title)
       const price = item?.cost.match(/^(\d+(?:\.\d+)?) (зм|см|мм)$/)
       const variantPrices = {
         'tool-gaming-set': { 'кости': 10 },
@@ -51,7 +57,7 @@ export function validateBackgrounds({ backgrounds, feats, homebrew = [], proposa
       if (expectedPrice === undefined || i.unitCostCp !== expectedPrice) issue('equipment-catalog-price', b.id, `${i.label}: цена не подтверждена каталогом/вариантом`)
       total += i.quantity * i.unitCostCp
     }
-    if (total !== 5000) issue('equipment-total', b.id, `${total} мм вместо 5000`)
+    if (!pending && total !== 5000) issue('equipment-total', b.id, `${total} мм вместо 5000`)
     for (const id of b.glossary || []) if (!glossaryIds.has(id)) issue('glossary-reference', b.id, id)
   }
   for (const f of homebrew) {

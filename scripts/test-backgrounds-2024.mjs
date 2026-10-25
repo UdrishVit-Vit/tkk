@@ -19,7 +19,7 @@ const cases = [
   ['equipment-total', d => d.backgrounds[0].equipment.coinsCp++],
   ['equipment-catalog-price', d => { d.backgrounds[0].equipment.items[0].unitCostCp--; d.backgrounds[0].equipment.coinsCp++ }],
   ['homebrew-field', d => { delete d.homebrew[0].action }],
-  ['unpublished-feat', d => d.feats.push(d.homebrew[0])],
+  ['unpublished-feat', d => d.feats.push(d.homebrew.find(f => f.status !== 'Approved'))],
   ['coins-display', d => { d.backgrounds[0].equipment.coins = '0 зм' }],
   ['proposal-reference', d => d.proposals['knot-scribe'].push('missing')],
   ['equipment-forbidden', d => { d.backgrounds[0].equipment.items[0].id = 'weapon-lance' }]
@@ -37,5 +37,12 @@ for (const f of before.linkedFeats) {
   const after = currentData.feats.find(x => x.id === f.id)
   for (const key of ['benefits', 'requirement', 'category', 'repeatable']) assert.deepEqual(after[key], f[key], `${f.id}.${key} changed`)
 }
-for (const b of before.backgrounds) assert.deepEqual(currentData.backgrounds.find(x => x.id === b.id).feat, b.feat, `${b.id}: published feat changed`)
+for (const b of before.backgrounds.filter(b => b.id !== 'mlah-diver')) assert.deepEqual(currentData.backgrounds.find(x => x.id === b.id).feat, b.feat, `${b.id}: published feat changed`)
+const diver = currentData.backgrounds.find(b => b.id === 'mlah-diver')
+assert.deepEqual(diver.skills, ['Атлетика', 'Природа'])
+assert.equal(diver.feat.title, 'Выучка глубин')
+assert.equal(diver.equipment.items.find(i => i.id === 'gear-dulur').quantity, 4)
+assert.equal(diver.equipment.coinsCp, null)
+assert.ok(currentData.feats.some(f => f.id === diver.feat.id && f.status === 'Approved'))
+assert.ok(validateBackgrounds({...currentData, backgrounds: currentData.backgrounds.map(b => b.id === diver.id ? {...b, equipment:{...b.equipment, coins:'10 зм', coinsCp:1000}} : b)}).some(e => e.code === 'coins'))
 console.log(`${cases.length} rejection cases passed; publication gate and published mechanics preserved.`)

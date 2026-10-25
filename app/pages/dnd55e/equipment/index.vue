@@ -86,7 +86,7 @@ const groups = computed(() => Object.entries(DND55E_EQUIPMENT_CATEGORIES)
   .map(([id, title]) => ({
     id,
     title,
-    code: 'PHB · 2024',
+    code: '2024 · Эноа',
     items: visibleItems.value.filter(item => item.category === id).map(item => ({
       id: item.id,
       title: item.title,
