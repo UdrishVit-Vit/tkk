@@ -89,7 +89,8 @@ const draftPlain = draftHtml.replace(/<[^>]+>/g, ' ').replace(/&quot;/g, '"').re
 for (const feat of proposals) for (const benefit of feat.benefits) {
   assert.ok(draftPlain.includes(benefit.text.replace(/\*\*/g, '').replace(/\s+/g, ' ')), `${feat.id}: draft effect text changed`)
 }
-assert.ok(backgrounds.includes('Набор ныряльщика М’лаха: состав'))
+assert.ok(!backgrounds.includes('bg-kit-details'))
+assert.ok(backgrounds.includes('/dnd55e/equipment?item=tool-mlah-diver-kit'))
 assert.ok(backgrounds.includes('4 паразита в ёмкости с водой'))
 assert.ok(backgrounds.includes('/dnd55e/equipment?item=gear-dulur'))
 assert.ok(backgrounds.includes('Стоимость нового набора, дулуров и ловушки пока не установлена'))
