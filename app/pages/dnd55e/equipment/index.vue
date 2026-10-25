@@ -78,6 +78,8 @@ const visibleItems = computed(() => DND55E_EQUIPMENT.filter((item) => {
     item.title, item.englishName, item.description, item.type, item.damage, item.damageType,
     item.properties, item.mastery, item.ac, item.strength, item.ability, item.utilize, item.craft,
     item.cost, item.weight, item.capacity, item.speed, item.crew, item.passengers, item.cargo, item.srdVersion,
+    ...(item.kit?.contents || []).map(part => `${part.title} ${part.description}`),
+    ...(item.kit?.supplies || []).map(supply => `${supply.title} ${supply.description}`),
     ...item.tags.map(tag => DND55E_EQUIPMENT_TAGS[tag] || tag)
   ].filter(Boolean).join(' ').toLocaleLowerCase('ru').includes(query.value)
 }))
@@ -119,9 +121,9 @@ const filters = computed(() => [
   },
   {
     key: 'srdVersion',
-    label: 'Версия SRD',
+    label: 'Источник правил',
     options: [...new Set(DND55E_EQUIPMENT.map(item => item.srdVersion).filter(Boolean))]
-      .map(value => ({ value, label: `SRD ${value}`, title: 'System Reference Document для правил 2024 года' }))
+      .map(value => ({ value, label: value === 'Эноа' ? 'Эноа' : `SRD ${value}`, title: value === 'Эноа' ? 'Авторское снаряжение Эноа' : 'System Reference Document для правил 2024 года' }))
   }
 ])
 
@@ -419,7 +421,7 @@ useSeoMeta({
               <span class="equipment-source-chip"><b>SRD</b> System Reference Document 5.2.1</span>
             </div>
           </section>
-          <p class="equipment-source-note">В каталоге используются только официальные правила снаряжения 2024 года. Материалы DMG и сторонних изданий не добавлены.</p>
+          <p class="equipment-source-note">В каталоге представлены правила снаряжения 2024 года и авторское снаряжение Эноа. Источник указан в карточке предмета.</p>
         </aside>
       </Transition>
     </template>
@@ -472,7 +474,9 @@ useSeoMeta({
         </template>
       </dl>
 
-      <section v-if="item.raw.kind === 'weapon'" class="equipment-rule-block">
+      <EquipmentKitDetails v-if="item.raw.kit" :item="item.raw" />
+
+      <section v-else-if="item.raw.kind === 'weapon'" class="equipment-rule-block">
         <h3>Свойства оружия</h3>
         <div v-if="weaponPropertyRules(item.raw).length" class="weapon-property-list">
           <article v-for="property in weaponPropertyRules(item.raw)" :key="property.label">
@@ -521,7 +525,7 @@ useSeoMeta({
             </div>
           </div>
         </template>
-        <template v-if="item.raw.craft !== '—'">
+        <template v-if="item.raw.craft && item.raw.craft !== '—'">
           <h3>Создание предметов</h3>
           <p>{{ item.raw.craft }}</p>
         </template>
