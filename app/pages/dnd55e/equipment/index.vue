@@ -1,5 +1,6 @@
 <script setup>
 import { toolGuide } from '~/data/dnd55e/toolGuides.js'
+import { TOOL_APPLICATIONS } from '~/data/dnd55e/toolApplications.js'
 import {
   DND55E_EQUIPMENT,
   DND55E_EQUIPMENT_CATEGORIES,
@@ -82,6 +83,8 @@ const visibleItems = computed(() => DND55E_EQUIPMENT.filter((item) => {
     ...(item.kit?.contents || []).map(part => `${part.title} ${part.description}`),
     ...(item.kit?.supplies || []).map(supply => `${supply.title} ${supply.description}`),
     ...(item.kind === 'tool' ? Object.values(toolGuide(item)) : []),
+    ...(TOOL_APPLICATIONS[item.id] || []).flat(),
+    ...(item.details || []).flatMap(detail => [detail.title, detail.text]),
     ...item.tags.map(tag => DND55E_EQUIPMENT_TAGS[tag] || tag)
   ].filter(Boolean).join(' ').toLocaleLowerCase('ru').includes(query.value)
 }))

@@ -7,6 +7,7 @@ import { createSSRApp, defineComponent, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { DND55E_EQUIPMENT } from '../app/data/dnd55e/equipment2024.js'
 import { TOOL_GUIDES, toolTasks } from '../app/data/dnd55e/toolGuides.js'
+import { TOOL_APPLICATIONS } from '../app/data/dnd55e/toolApplications.js'
 
 await fs.mkdir('.tmpwork/tool-check', { recursive: true })
 const filename = 'app/components/EquipmentToolDetails.vue'
@@ -20,6 +21,10 @@ assert.equal(tools.length, 27)
 for (const item of tools) {
   assert.ok(TOOL_GUIDES[item.id]?.every(Boolean), item.id)
   const tasks = toolTasks(item)
+  if (!item.details?.length) {
+    assert.equal(TOOL_APPLICATIONS[item.id]?.length, tasks.length, item.id + ': missing individual application')
+    for (const entry of TOOL_APPLICATIONS[item.id]) assert.ok(entry.length === 2 && entry.every(Boolean), item.id)
+  }
   assert.deepEqual(tasks.map(t => t.dc), [...item.utilize.matchAll(/\(Сл (\d+)\)/g)].map(m => m[1]), item.id + ': DC changed')
   const app = createSSRApp(component, { item, equipment: DND55E_EQUIPMENT })
   app.component('NuxtLink', defineComponent({ props: ['to'], setup: (p, { slots }) => () => h('a', { href: p.to }, slots.default?.()) }))
@@ -34,6 +39,9 @@ for (const item of tools) {
     for (const row of detail.table?.rows || []) for (const cell of row) assert.ok(plain.includes(cell), item.id + ': lost table cell')
   }
   assert.ok(!html.includes('undefined'), item.id)
+  for (const entry of TOOL_APPLICATIONS[item.id] || []) {
+    assert.ok(plain.includes(entry[0]) && plain.includes(entry[1]), item.id + ': missing application text')
+  }
   await fs.writeFile(`.tmpwork/tool-check/${item.id}.html`, html)
 }
 console.log('27 tool cards: guide coverage, unchanged DCs, special rules/tables, anchors and item links passed.')
