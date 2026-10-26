@@ -1,4 +1,5 @@
 <script setup>
+import { toolGuide } from '~/data/dnd55e/toolGuides.js'
 import {
   DND55E_EQUIPMENT,
   DND55E_EQUIPMENT_CATEGORIES,
@@ -80,6 +81,7 @@ const visibleItems = computed(() => DND55E_EQUIPMENT.filter((item) => {
     item.cost, item.weight, item.capacity, item.speed, item.crew, item.passengers, item.cargo, item.srdVersion,
     ...(item.kit?.contents || []).map(part => `${part.title} ${part.description}`),
     ...(item.kit?.supplies || []).map(supply => `${supply.title} ${supply.description}`),
+    ...(item.kind === 'tool' ? Object.values(toolGuide(item)) : []),
     ...item.tags.map(tag => DND55E_EQUIPMENT_TAGS[tag] || tag)
   ].filter(Boolean).join(' ').toLocaleLowerCase('ru').includes(query.value)
 }))
@@ -445,7 +447,7 @@ useSeoMeta({
         <span>
           <span class="equipment-card-title">{{ item.raw.title }}</span>
           <span class="equipment-card-original">{{ item.raw.englishName }}</span>
-          <span class="equipment-card-summary">{{ item.raw.description }}</span>
+          <span class="equipment-card-summary">{{ item.raw.kind === 'tool' && !item.raw.kit ? toolGuide(item.raw).summary : item.raw.description }}</span>
         </span>
       </header>
 
@@ -510,32 +512,7 @@ useSeoMeta({
         </dl>
       </section>
 
-      <section v-else-if="item.raw.kind === 'tool'" class="equipment-rule-block">
-        <h3>Использование</h3>
-        <p>{{ item.raw.utilize }}</p>
-        <template v-for="detail in item.raw.details || []" :key="detail.title">
-          <h3>{{ detail.title }}</h3>
-          <p>{{ detail.text }}</p>
-          <div v-if="detail.table" class="equipment-dc-table">
-            <div class="equipment-dc-head">
-              <span v-for="column in detail.table.columns" :key="column">{{ column }}</span>
-            </div>
-            <div v-for="row in detail.table.rows" :key="row[0]" class="equipment-dc-row">
-              <span v-for="(cell, ci) in row" :key="ci">{{ cell }}</span>
-            </div>
-          </div>
-        </template>
-        <template v-if="item.raw.craft && item.raw.craft !== '—'">
-          <h3>Создание предметов</h3>
-          <p>{{ item.raw.craft }}</p>
-        </template>
-        <template v-if="item.raw.usedBy?.length">
-          <h3>Где используется</h3>
-          <div class="equipment-used-links">
-            <NuxtLink v-for="use in item.raw.usedBy" :key="use.path" :to="use.path" class="rule-link">{{ use.title }}</NuxtLink>
-          </div>
-        </template>
-      </section>
+      <EquipmentToolDetails v-else-if="item.raw.kind === 'tool'" :key="item.id" :item="item.raw" :equipment="DND55E_EQUIPMENT" />
 
       <section v-else-if="item.raw.kind === 'vehicle' && item.raw.speed" class="equipment-rule-block vehicle-details">
         <h3>Характеристики судна</h3>

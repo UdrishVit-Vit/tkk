@@ -467,4 +467,4 @@ export const DND55E_WEAPON_MASTERIES = [
 export const DND55E_EQUIPMENT = [
   ...DND55E_WEAPONS, ...DND55E_ARMOR, ...DND55E_TOOLS, ...DND55E_GEAR,
   ...DND55E_MOUNTS, ...DND55E_TACK, ...DND55E_VEHICLES, ...DND55E_SERVICES
-].map(item => ({ ...item, srdVersion: '5.2.1' })).concat(mlahEquipment(DND55E_WEAPONS.find(item => item.id === 'weapon-spear')))
+].map(item => ({ ...item, srdVersion: item.source === 'TL' ? 'Эноа' : '5.2.1' })).concat(mlahEquipment(DND55E_WEAPONS.find(item => item.id === 'weapon-spear')))

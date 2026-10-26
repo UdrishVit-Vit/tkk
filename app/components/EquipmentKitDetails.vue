@@ -1,14 +1,19 @@
 <script setup>
 defineProps({ item: { type: Object, required: true } })
 const sectionId = (id, section) => `kit-${id}-${section}`
+function jump(id, section) {
+  const target = document.getElementById(sectionId(id, section))
+  target?.scrollIntoView({ block: 'start', behavior: 'instant' })
+  target?.focus({ preventScroll: true })
+}
 </script>
 
 <template>
   <div class="equipment-kit">
     <nav class="kit-nav" aria-label="Разделы набора">
-      <a :href="'#' + sectionId(item.id, 'contents')">Состав</a>
-      <a v-if="item.kit.proficiency" :href="'#' + sectionId(item.id, 'use')">Владение</a>
-      <a v-if="item.kit.supplies?.length" :href="'#' + sectionId(item.id, 'supplies')">Запас и хранение</a>
+      <a :href="'#' + sectionId(item.id, 'contents')" @click.stop.prevent="jump(item.id, 'contents')">Состав</a>
+      <a v-if="item.kit.proficiency" :href="'#' + sectionId(item.id, 'use')" @click.stop.prevent="jump(item.id, 'use')">Владение</a>
+      <a v-if="item.kit.supplies?.length" :href="'#' + sectionId(item.id, 'supplies')" @click.stop.prevent="jump(item.id, 'supplies')">Запас и хранение</a>
     </nav>
 
     <section :aria-labelledby="sectionId(item.id, 'contents')">
