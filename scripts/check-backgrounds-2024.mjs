@@ -8,7 +8,6 @@ import { validateBackgrounds } from './lib/validate-backgrounds-2024.mjs'
 export const currentData = { backgrounds, feats, homebrew, proposals, equipment, glossary }
 // Explicitly retained published exceptions, not waivers for new records.
 const known = new Map([
-  ['nameless', 'nameless: free'],
   ['blood-of-the-heshegi', 'curse-of-airun: free']
 ])
 const issues = validateBackgrounds(currentData)

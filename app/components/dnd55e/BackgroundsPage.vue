@@ -117,16 +117,6 @@ const groups = computed(() => Object.entries(DND55E_BACKGROUND_GROUPS)
 
 const filters = computed(() => [
   {
-    key: 'group',
-    label: 'Каталог',
-    note: 'Адаптации PHB 2024 и авторские предыстории Эноа',
-    options: Object.entries(DND55E_BACKGROUND_GROUPS).map(([value, meta]) => ({
-      value,
-      label: meta.label,
-      title: meta.title
-    }))
-  },
-  {
     key: 'ability',
     label: 'Характеристика',
     options: DND55E_BACKGROUND_ABILITIES.map(value => ({ value, label: value }))
@@ -172,7 +162,7 @@ function featPath(item) {
 
 useSeoMeta({
   title: 'Предыстории — D&D 5.5e 2024 — TKK.club',
-  description: 'Предыстории Player’s Handbook 2024, адаптированные под мир Эноа: характеристики, черты происхождения, навыки, инструменты и стартовое снаряжение.'
+  description: 'Предыстории Эноа по правилам D&D 2024: характеристики, черты происхождения, навыки, инструменты и стартовое снаряжение.'
 })
 </script>
 
@@ -189,6 +179,7 @@ useSeoMeta({
     node-prefix="d55-bg"
     query-key="background"
     :groups="groups"
+    :show-group-titles="false"
     :total="DND55E_BACKGROUNDS.length"
     :visible="visibleBackgrounds.length"
     :filters="filters"

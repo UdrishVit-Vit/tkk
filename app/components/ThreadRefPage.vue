@@ -12,6 +12,7 @@ const props = defineProps({
   crumbCurrent: { type: String, required: true },
   searchPlaceholder: { type: String, default: 'Поиск' },
   groups: { type: Array, default: () => [] }, // [{ id, title, code?, items:[{ id, title, meta?, badge?, badgeTitle? }] }]
+  showGroupTitles: { type: Boolean, default: true },
   total: { type: Number, default: 0 },
   visible: { type: Number, default: 0 },
   filters: { type: Array, default: () => [] }, // [{ key, label, note?, options:[{ value, label, title? }] }]
@@ -723,7 +724,7 @@ onBeforeUnmount(() => {
             :key="group.id"
             class="thread-group"
           >
-            <h2 class="thread-group-title">
+            <h2 v-if="showGroupTitles" class="thread-group-title">
               {{ group.title }}
               <span v-if="group.code" class="thread-group-code">{{ group.code }}</span>
             </h2>

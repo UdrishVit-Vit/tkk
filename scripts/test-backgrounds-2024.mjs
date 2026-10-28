@@ -26,6 +26,8 @@ const cases = [
 ]
 for (const [code, mutate] of cases) {
   const data = structuredClone(currentData)
+  // Generic invalid-price cases require a fully priced record, not M’lah's pending kit.
+  data.backgrounds.sort((a,b)=>Number(a.equipment.pricingStatus==='pending')-Number(b.equipment.pricingStatus==='pending'))
   const before = validateBackgrounds(data).filter(e => e.code === code).length
   mutate(data)
   assert.ok(validateBackgrounds(data).filter(e => e.code === code).length > before, code)
@@ -38,8 +40,12 @@ for (const f of before.linkedFeats) {
   for (const key of ['benefits', 'requirement', 'category', 'repeatable']) assert.deepEqual(after[key], f[key], `${f.id}.${key} changed`)
 }
 // Explicit author removal; keep the original snapshot as historical evidence.
-assert.ok(!currentData.backgrounds.some(b => b.id === 'charlatan'))
-for (const b of before.backgrounds.filter(b => !['mlah-diver', 'cohort-renegade', 'charlatan'].includes(b.id))) assert.deepEqual(currentData.backgrounds.find(x => x.id === b.id).feat, b.feat, `${b.id}: published feat changed`)
+const removedBackgrounds = new Set(['acolyte','artisan','charlatan','criminal','entertainer','farmer','guard','guide','hermit','merchant','noble','sage','sailor','scribe','soldier','wayfarer','nameless'])
+assert.equal(currentData.backgrounds.length,56)
+assert.ok(currentData.backgrounds.every(b => b.group==='enoa'&&!removedBackgrounds.has(b.id)))
+assert.equal(currentData.backgrounds.find(b=>b.id==='hakar').title,'Хакар')
+assert.ok(currentData.feats.some(f=>f.id==='nameless'))
+for (const b of before.backgrounds.filter(b => !removedBackgrounds.has(b.id)&&!['mlah-diver', 'cohort-renegade'].includes(b.id))) assert.deepEqual(currentData.backgrounds.find(x => x.id === b.id).feat, b.feat, `${b.id}: published feat changed`)
 const renegade = currentData.backgrounds.find(b => b.id === 'cohort-renegade')
 assert.deepEqual(renegade.feat, {id:'enoa-cohort-renegade-origin', title:'Всегда есть выход'})
 assert.ok(currentData.feats.some(f => f.id === renegade.feat.id && f.status === 'Approved' && f.version === '0.4.0'))

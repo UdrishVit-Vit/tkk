@@ -6,7 +6,8 @@ import { DND55E_FEATS as published } from '../app/data/dnd55e/feats.js'
 export function checkEnoaOrigins(bs, fs, mapping) {
   const errors = []
   const author = bs.filter(b => b.source === 'TVV')
-  if(author.length !== 57 || fs.length !== 57) errors.push('coverage-count')
+  // The original Nameless draft remains in the editorial source, outside active assignments.
+  if(author.length !== 56 || fs.length !== 56 || author.some(b=>b.id==='nameless')) errors.push('coverage-count')
   const mapped = new Set()
   for(const b of author) {
     const ids = mapping[b.id] || []
@@ -33,11 +34,11 @@ for(const f of drafts.filter(f => f.status !== 'Approved')) assert.ok(!published
 for(const [name,mutate] of [
   ['missing', (b,f,l)=>{delete l[b.find(x=>x.source==='TVV').id]}],
   ['paper', b=>{b[0].enoaLead[0]+=' Вы переписывали книги.'}],
-  ['official-scope', (b,f,l)=>{l[b[0].id]=[f[0].id]}],
+  ['official-scope', (b,f,l)=>{b.push({...b[0],id:'phb-scope-probe',source:'PHB'});l['phb-scope-probe']=[f[0].id]}],
   ['duplicate', (b,f)=>{f[1].benefits=structuredClone(f[0].benefits)}]
 ]){
  const b=structuredClone(backgrounds), f=structuredClone(drafts), l=structuredClone(links)
  mutate(b,f,l)
  assert.ok(checkEnoaOrigins(b,f,l).length,name)
 }
-console.log(`57 individual proposals; no PHB assignments; ${backgrounds.length} knot-writing audits; 4 regression cases passed. Mechanical uniqueness is not proof of balance.`)
+console.log(`${drafts.length} active individual proposals; no PHB assignments; ${backgrounds.length} knot-writing audits; 4 regression cases passed. Mechanical uniqueness is not proof of balance.`)
