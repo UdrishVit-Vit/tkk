@@ -19,7 +19,7 @@ for(const f of feats){
  assert.deepEqual(f.abilities,[])
  assert.ok(['Draft','Playtest'].includes(f.status))
  assert.equal(isPublishableHomebrew(f),false)
- if(f.id === 'enoa-mlah-diver-origin') assert.ok(published.some(x=>x.id===f.id && x.version==='0.4.0' && x.status==='Approved'))
+ if(['enoa-mlah-diver-origin', 'enoa-cohort-renegade-origin'].includes(f.id)) assert.ok(published.some(x=>x.id===f.id && x.version==='0.4.0' && x.status==='Approved'))
  else assert.ok(!published.some(x=>x.id===f.id))
  assert.equal(full.design.concepts.length,3)
  assert.equal(new Set(full.design.concepts.map(x=>x.effect)).size,3)

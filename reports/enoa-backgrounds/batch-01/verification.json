@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "date": "2026-10-28",
+  "backgrounds2014": 2,
+  "backgrounds2024": 73,
+  "unchanged2024Mechanics": 73,
+  "sourceFilesChanged": [
+    "app/components/dnd55e/BackgroundsPage.vue",
+    "app/data/backgrounds5e.js",
+    "app/data/dnd55e/backgrounds.js"
+  ],
+  "originalAuditBaseline": "Preserved; verify-audit.mjs intentionally rejects changed production sources after this authorized batch"
+}

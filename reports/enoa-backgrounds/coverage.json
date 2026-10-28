@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-28",
+  "backgrounds": 77,
+  "byEdition": {
+    "2014": 4,
+    "2024": 73
+  },
+  "byLoreStatus": {
+    "CONFLICT": 4,
+    "PARTIAL_SOURCE_CHECK": 70,
+    "UNKNOWN": 3
+  },
+  "individualNotes": 77,
+  "linkedFeatProfiles": 26,
+  "featVersions": 162,
+  "unlinkedCatalogFeatVersions": 80,
+  "proposalOnly": 55,
+  "issues": 101,
+  "severity": {
+    "BLOCKER": 0,
+    "MAJOR": 19,
+    "MINOR": 9,
+    "EDITORIAL": 73
+  },
+  "baselineFilesChecked": 529,
+  "sourceFilesChanged": [],
+  "structuralIssues": [
+    {
+      "code": "feat-category",
+      "id": "nameless",
+      "detail": "nameless: free"
+    },
+    {
+      "code": "feat-category",
+      "id": "blood-of-the-heshegi",
+      "detail": "curse-of-airun: free"
+    }
+  ]
+}

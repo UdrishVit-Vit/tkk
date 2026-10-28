@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-28",
+  "individualAudits": 77,
+  "aspectsPerAudit": 7,
+  "localMarkdownLinks": "PASS",
+  "uniqueWithinEdition": "PASS",
+  "sourceHashesUnchanged": 529,
+  "structuralExceptions": [
+    {
+      "code": "feat-category",
+      "id": "nameless",
+      "detail": "nameless: free"
+    },
+    {
+      "code": "feat-category",
+      "id": "blood-of-the-heshegi",
+      "detail": "curse-of-airun: free"
+    }
+  ],
+  "limitations": "No browser interaction, full canon acceptance, independent human review or live playtest claimed."
+}

@@ -37,7 +37,14 @@ for (const f of before.linkedFeats) {
   const after = currentData.feats.find(x => x.id === f.id)
   for (const key of ['benefits', 'requirement', 'category', 'repeatable']) assert.deepEqual(after[key], f[key], `${f.id}.${key} changed`)
 }
-for (const b of before.backgrounds.filter(b => b.id !== 'mlah-diver')) assert.deepEqual(currentData.backgrounds.find(x => x.id === b.id).feat, b.feat, `${b.id}: published feat changed`)
+// Explicit author removal; keep the original snapshot as historical evidence.
+assert.ok(!currentData.backgrounds.some(b => b.id === 'charlatan'))
+for (const b of before.backgrounds.filter(b => !['mlah-diver', 'cohort-renegade', 'charlatan'].includes(b.id))) assert.deepEqual(currentData.backgrounds.find(x => x.id === b.id).feat, b.feat, `${b.id}: published feat changed`)
+const renegade = currentData.backgrounds.find(b => b.id === 'cohort-renegade')
+assert.deepEqual(renegade.feat, {id:'enoa-cohort-renegade-origin', title:'Всегда есть выход'})
+assert.ok(currentData.feats.some(f => f.id === renegade.feat.id && f.status === 'Approved' && f.version === '0.4.0'))
+assert.deepEqual(renegade.equipment.items.map(i => i.id), before.backgrounds.find(b => b.id === renegade.id).equipment.items.map(i => i.id))
+assert.equal(renegade.equipment.coinsCp, 1950)
 const diver = currentData.backgrounds.find(b => b.id === 'mlah-diver')
 assert.deepEqual(diver.skills, ['Атлетика', 'Природа'])
 assert.equal(diver.feat.title, 'Выучка глубин')

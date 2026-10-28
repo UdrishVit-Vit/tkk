@@ -1,0 +1,90 @@
+[
+  {
+    "title": "Всадник белого тахара",
+    "start_pdf_page": 6,
+    "end_pdf_page": 14,
+    "themes": "имя, любопытство и выбор пути; Даскар и Туту; варианты предания",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  },
+  {
+    "title": "Легенда о глупом кобольде",
+    "start_pdf_page": 15,
+    "end_pdf_page": 23,
+    "themes": "сила сказа, многоверсийность, лабиринт и суеверия",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  },
+  {
+    "title": "Легенда о пророке и звере",
+    "start_pdf_page": 24,
+    "end_pdf_page": 27,
+    "themes": "культ Бачанги, вызов Граара, столкновение старой и новой веры",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  },
+  {
+    "title": "Сказка о фокуснике и Ильбеш",
+    "start_pdf_page": 28,
+    "end_pdf_page": 34,
+    "themes": "ответственность за магию, запреты, магусы и Ильбеш",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  },
+  {
+    "title": "Сказка о запретной любви Эоса",
+    "start_pdf_page": 35,
+    "end_pdf_page": 42,
+    "themes": "любовь и нарушение традиций; Эос и Еиза",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  },
+  {
+    "title": "Легенда короля боли",
+    "start_pdf_page": 43,
+    "end_pdf_page": 51,
+    "themes": "власть, дружба, знание, боль и цена убеждений",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  },
+  {
+    "title": "История бастарда Таш’нагара",
+    "start_pdf_page": 52,
+    "end_pdf_page": 60,
+    "themes": "происхождение, власть, клятвы и проклятие рода",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  },
+  {
+    "title": "История брошенных детей",
+    "start_pdf_page": 61,
+    "end_pdf_page": 65,
+    "themes": "серафимы, отказ творцов, изгнание и родство",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  },
+  {
+    "title": "История золотого брюха",
+    "start_pdf_page": 66,
+    "end_pdf_page": 70,
+    "themes": "жертва, скорбь, коллективная память северных худдулинов",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  },
+  {
+    "title": "Вечная охота",
+    "start_pdf_page": 71,
+    "end_pdf_page": 75,
+    "themes": "предостережение молодым охотникам, судьба и самонадеянность",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  },
+  {
+    "title": "Мальчик и багровый бизон",
+    "start_pdf_page": 76,
+    "end_pdf_page": 81,
+    "themes": "стойкость, забота и отношение к необычному существу",
+    "source": "TALES",
+    "status": "FOLKLORE"
+  }
+]

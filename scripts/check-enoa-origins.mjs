@@ -40,4 +40,4 @@ for(const [name,mutate] of [
  mutate(b,f,l)
  assert.ok(checkEnoaOrigins(b,f,l).length,name)
 }
-console.log('57 individual proposals; no PHB assignments; 73 knot-writing audits; 4 regression cases passed. Mechanical uniqueness is not proof of balance.')
+console.log(`57 individual proposals; no PHB assignments; ${backgrounds.length} knot-writing audits; 4 regression cases passed. Mechanical uniqueness is not proof of balance.`)

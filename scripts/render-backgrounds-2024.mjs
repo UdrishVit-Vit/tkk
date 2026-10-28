@@ -42,7 +42,7 @@ async function render(name) {
   return html
 }
 const backgrounds = await render('BackgroundsPage')
-assert.equal((backgrounds.match(/data-record=/g) || []).length, 73)
+assert.equal((backgrounds.match(/data-record=/g) || []).length, 72)
 assert.equal((backgrounds.match(/<details/g) || []).length, 0)
 for (const b of DND55E_BACKGROUNDS) {
   const positions = ['stats', 'equipment', 'feat', 'story', 'event'].map(section => backgrounds.indexOf(`id="bg-${b.id}-${section}"`))
@@ -80,7 +80,7 @@ for (const f of DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.status !== 'Approved'
 // Exercise unpublished text through the real effect component without publishing it.
 const effectComponent = await compile('OriginFeatEffects', '')
 const proposals = DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.version === '0.3.0')
-assert.equal(proposals.length, 56)
+assert.equal(proposals.length, 55)
 const draftApp = createSSRApp({ render: () => h('main', proposals.map(feat => h(effectComponent, { feat }))) })
 draftApp.component('RuleRichText', defineComponent({ props: ['text'], setup: props => () => h('span', props.text.replace(/\*\*/g, '')) }))
 const draftHtml = await renderToString(draftApp)
@@ -94,4 +94,7 @@ assert.ok(backgrounds.includes('/dnd55e/equipment?item=tool-mlah-diver-kit'))
 assert.ok(backgrounds.includes('4 паразита в ёмкости с водой'))
 assert.ok(backgrounds.includes('/dnd55e/equipment?item=gear-dulur'))
 assert.ok(backgrounds.includes('Стоимость нового набора, дулуров и ловушки пока не установлена'))
-console.log('Rendered 73 background cards, public feat catalog and 56 unpublished effect cards. M’lah kit, full text, links and Draft/Playtest exclusion passed. Browser layout not tested.')
+assert.ok(backgrounds.includes('Всегда есть выход'))
+assert.ok(feats.includes('Всегда есть выход'))
+assert.ok(!backgrounds.includes('старшие смотрят на вас как на почти семью'))
+console.log('Rendered 72 background cards, public feat catalog and 55 unpublished effect cards. Individual M’lah and Cohort cards, full text, links and Draft/Playtest exclusion passed. Browser layout not tested.')

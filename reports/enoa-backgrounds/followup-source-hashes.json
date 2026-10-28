@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-28",
+  "purpose": "Дополнительные локальные опоры; исходный baseline не заменён",
+  "files": {
+    "content/dnd55e/species/virmorozhdennye.md": "676cd0cc391d39937cc1b1eff05e68275837a8702924cccea66ce4955a87bd11",
+    "content/dnd55e/species/udrishi.md": "ed2f2b5bcb570c216a0d8d100449b10ea06c1fbfee5fb4562a065df8d0d4a433",
+    "app/data/loreGlossary.js": "706671d34017b5bb2932f2d16cdbfc1ea69433a403812cd3b133d242affcc2c5"
+  }
+}

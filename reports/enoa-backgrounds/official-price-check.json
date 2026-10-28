@@ -1,0 +1,1263 @@
+{
+  "date": "2026-10-28",
+  "edition": "2024",
+  "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment",
+  "scope": "Prices and 50 GP arithmetic, not exact PHB package composition",
+  "variantRules": "Flute 2 GP; dice 1 SP; arrows/bolts 20 for 1 GP; emblem 5 GP. Lore reskins inherit their stated base item price only.",
+  "items": [
+    {
+      "id": "tool-calligraphers-supplies",
+      "note": "",
+      "localCp": 1000,
+      "officialCp": 1000,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-book",
+      "note": "молитвы",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-holy-symbol",
+      "note": "эмблема",
+      "localCp": 500,
+      "officialCp": 500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-parchment",
+      "note": "10 наборов нитей",
+      "localCp": 10,
+      "officialCp": 10,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-robe",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-carpenters-tools",
+      "note": "пример набора А",
+      "localCp": 800,
+      "officialCp": 800,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-pouch",
+      "note": "2 шт.",
+      "localCp": 50,
+      "officialCp": 50,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-clothes-travelers",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-forgery-kit",
+      "note": "",
+      "localCp": 1500,
+      "officialCp": 1500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-clothes-fine",
+      "note": "",
+      "localCp": 1500,
+      "officialCp": 1500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-costume",
+      "note": "",
+      "localCp": 500,
+      "officialCp": 500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "weapon-dagger",
+      "note": "2 шт.",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-thieves-tools",
+      "note": "",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-crowbar",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-musical-instrument",
+      "note": "флейта",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-costume",
+      "note": "2 шт.",
+      "localCp": 500,
+      "officialCp": 500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-mirror-steel",
+      "note": "",
+      "localCp": 500,
+      "officialCp": 500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-perfume",
+      "note": "",
+      "localCp": 500,
+      "officialCp": 500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "weapon-sickle",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-carpenters-tools",
+      "note": "",
+      "localCp": 800,
+      "officialCp": 800,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-healers-kit",
+      "note": "",
+      "localCp": 500,
+      "officialCp": 500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-pot-iron",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-shovel",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "weapon-spear",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "weapon-light-crossbow",
+      "note": "",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-ammunition",
+      "note": "болты, 20 шт.",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-gaming-set",
+      "note": "кости",
+      "localCp": 10,
+      "officialCp": 10,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-lantern-hooded",
+      "note": "",
+      "localCp": 500,
+      "officialCp": 500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-manacles",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-quiver",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "weapon-shortbow",
+      "note": "",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-ammunition",
+      "note": "стрелы, 20 шт.",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-cartographers-tools",
+      "note": "",
+      "localCp": 1500,
+      "officialCp": 1500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-bedroll",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-tent",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "weapon-quarterstaff",
+      "note": "",
+      "localCp": 20,
+      "officialCp": 20,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-herbalism-kit",
+      "note": "",
+      "localCp": 500,
+      "officialCp": 500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-book",
+      "note": "философия",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-lamp",
+      "note": "",
+      "localCp": 50,
+      "officialCp": 50,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-oil",
+      "note": "3 фляги",
+      "localCp": 10,
+      "officialCp": 10,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-navigators-tools",
+      "note": "",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-book",
+      "note": "история",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-parchment",
+      "note": "8 наборов нитей",
+      "localCp": 10,
+      "officialCp": 10,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "weapon-dagger",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-rope",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-parchment",
+      "note": "12 наборов нитей",
+      "localCp": 10,
+      "officialCp": 10,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-mlah-diver-kit",
+      "note": "",
+      "localCp": null,
+      "officialCp": null,
+      "status": "HOMEBREW_NO_OFFICIAL_PRICE",
+      "source": "AUTHOR_DECISION_REQUIRED"
+    },
+    {
+      "id": "gear-dulur",
+      "note": "4 паразита в ёмкости с водой",
+      "localCp": null,
+      "officialCp": null,
+      "status": "HOMEBREW_NO_OFFICIAL_PRICE",
+      "source": "AUTHOR_DECISION_REQUIRED"
+    },
+    {
+      "id": "weapon-mlah-harpoon",
+      "note": "",
+      "localCp": 100,
+      "officialCp": null,
+      "status": "HOMEBREW_NO_OFFICIAL_PRICE",
+      "source": "AUTHOR_DECISION_REQUIRED"
+    },
+    {
+      "id": "gear-mlah-crab-trap",
+      "note": "",
+      "localCp": null,
+      "officialCp": null,
+      "status": "HOMEBREW_NO_OFFICIAL_PRICE",
+      "source": "AUTHOR_DECISION_REQUIRED"
+    },
+    {
+      "id": "gear-tinderbox",
+      "note": "",
+      "localCp": 50,
+      "officialCp": 50,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-blanket",
+      "note": "",
+      "localCp": 50,
+      "officialCp": 50,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-book",
+      "note": "путевые записи",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-parchment",
+      "note": "6 наборов нитей",
+      "localCp": 10,
+      "officialCp": 10,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-map",
+      "note": "Мифрасовый Путь",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-waterskin",
+      "note": "",
+      "localCp": 20,
+      "officialCp": 20,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-weavers-tools",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-case-map-or-scroll",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-grappling-hook",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-torch",
+      "note": "10 шт.",
+      "localCp": 1,
+      "officialCp": 1,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-net",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-flask",
+      "note": "",
+      "localCp": 2,
+      "officialCp": 2,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-cooks-utensils",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-blanket",
+      "note": "2 шт.",
+      "localCp": 50,
+      "officialCp": 50,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-masons-tools",
+      "note": "",
+      "localCp": 1000,
+      "officialCp": 1000,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-disguise-kit",
+      "note": "",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-tinkers-tools",
+      "note": "",
+      "localCp": 5000,
+      "officialCp": 5000,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-leatherworkers-tools",
+      "note": "",
+      "localCp": 500,
+      "officialCp": 500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-waterskin",
+      "note": "2 шт.",
+      "localCp": 20,
+      "officialCp": 20,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-alchemists-supplies",
+      "note": "",
+      "localCp": 5000,
+      "officialCp": 5000,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-jewelers-tools",
+      "note": "",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "weapon-handaxe",
+      "note": "",
+      "localCp": 500,
+      "officialCp": 500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-painters-supplies",
+      "note": "",
+      "localCp": 1000,
+      "officialCp": 1000,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-glassblowers-tools",
+      "note": "",
+      "localCp": 3000,
+      "officialCp": 3000,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-potters-tools",
+      "note": "",
+      "localCp": 1000,
+      "officialCp": 1000,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-pouch",
+      "note": "",
+      "localCp": 50,
+      "officialCp": 50,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-smiths-tools",
+      "note": "",
+      "localCp": 2000,
+      "officialCp": 2000,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-ink",
+      "note": "",
+      "localCp": 1000,
+      "officialCp": 1000,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-ink-pen",
+      "note": "",
+      "localCp": 2,
+      "officialCp": 2,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-book",
+      "note": "легенды ордена",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-bottle-glass",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-book",
+      "note": "записи о срывах",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-backpack",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-rations",
+      "note": "5 дней",
+      "localCp": 50,
+      "officialCp": 50,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-vial",
+      "note": "2 шт.",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-woodcarvers-tools",
+      "note": "",
+      "localCp": 100,
+      "officialCp": 100,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "weapon-light-hammer",
+      "note": "",
+      "localCp": 200,
+      "officialCp": 200,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-oil",
+      "note": "",
+      "localCp": 10,
+      "officialCp": 10,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "tool-brewers-supplies",
+      "note": "",
+      "localCp": 2000,
+      "officialCp": 2000,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "weapon-club",
+      "note": "",
+      "localCp": 10,
+      "officialCp": 10,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-jug",
+      "note": "",
+      "localCp": 2,
+      "officialCp": 2,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    },
+    {
+      "id": "gear-book",
+      "note": "",
+      "localCp": 2500,
+      "officialCp": 2500,
+      "status": "MATCH",
+      "source": "https://www.dndbeyond.com/sources/dnd/br-2024/equipment"
+    }
+  ],
+  "packages": [
+    {
+      "id": "acolyte",
+      "title": "Послушник",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "artisan",
+      "title": "Ремесленник",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "charlatan",
+      "title": "Шарлатан",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "criminal",
+      "title": "Преступник",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "entertainer",
+      "title": "Артист",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "farmer",
+      "title": "Фермер",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "guard",
+      "title": "Стражник",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "guide",
+      "title": "Проводник",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "hermit",
+      "title": "Отшельник",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "merchant",
+      "title": "Торговец",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "noble",
+      "title": "Аристократ",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "sage",
+      "title": "Мудрец",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "sailor",
+      "title": "Моряк",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "scribe",
+      "title": "Писец",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "soldier",
+      "title": "Солдат",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "wayfarer",
+      "title": "Странник",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "mlah-diver",
+      "title": "Ныряльщик озера М’лах",
+      "officialTotalCp": null,
+      "status": "PENDING_HOMEBREW",
+      "open": [
+        "tool-mlah-diver-kit",
+        "gear-dulur",
+        "weapon-mlah-harpoon",
+        "gear-mlah-crab-trap"
+      ]
+    },
+    {
+      "id": "cohort-renegade",
+      "title": "Отступник Когорты",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "nameless",
+      "title": "Безымянный",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "hakar",
+      "title": "Хакар, недомаг",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "mithras-caravaneer",
+      "title": "Караванщик Мифрасового Пути",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "bone-seer",
+      "title": "Костяной провидец",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "knot-scribe",
+      "title": "Читающий узлы",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "silk-mouse-catcher",
+      "title": "Ловец шёлковых мышей",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "pit-fighter",
+      "title": "Боец Ям",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "caravanserai-keeper",
+      "title": "Хозяин караван-сарая",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "sun-miner",
+      "title": "Шахтёр солнц",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "huurch",
+      "title": "Степной сказитель",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "white-falcon-watcher",
+      "title": "Соглядатай Белых Соколов",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "lifestone-wright",
+      "title": "Мастер камней жизни",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "sarban-drover",
+      "title": "Погонщик каравана",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "mithras-picker",
+      "title": "Мифрасоискатель",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "syndicate-appraiser",
+      "title": "Оценщик Синдиката",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "urdreg-hunter",
+      "title": "Ловчий Урдрега",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "spark-shepherd",
+      "title": "Пастух Искры",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "baraskus-foot",
+      "title": "Стопа Бараскуса",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "great-game-player",
+      "title": "Участник Великой Игры",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "spiral-runner",
+      "title": "Бегущий по Спирали",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "cradle-born",
+      "title": "Вышедший из Колыбели",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "nagbo",
+      "title": "Нагбо, низшей касты",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "norbu",
+      "title": "Норбу, высшей касты",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "tower-echo",
+      "title": "Отголосок Башни",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "called-one",
+      "title": "Ответивший на Призыв",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "omen-reader",
+      "title": "Толкователь знамений",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "white-hunter",
+      "title": "Белый Охотник",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "moon-maiden",
+      "title": "Лунная дева",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "word-preacher",
+      "title": "Проповедник Слова",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "crystal-eye",
+      "title": "Око Кристалла",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "flame-keeper",
+      "title": "Хранитель Пламени",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "ripple-listener",
+      "title": "Слушающий Рябь",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "elixir-warden",
+      "title": "Ключник Эликсира",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "blind-bunti",
+      "title": "Слепой Бунти",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "mine-escapee",
+      "title": "Сбежавший из рудников",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "deep-brother",
+      "title": "Брат Глубин",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "ilbesh-marked",
+      "title": "Отмеченный Ильбешем",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "steppe-tiger",
+      "title": "Юный степной тигр",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "titania-returned",
+      "title": "Вернувшийся из Титании",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "brotherhood-debtor",
+      "title": "Должник братства",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "dangun-secret",
+      "title": "Знающий Дангунский секрет",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "tea-house-keeper",
+      "title": "Хранитель чайного дома",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "promised-to-ibon",
+      "title": "Обещанный чайнику Ибона",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "omor-without-obo",
+      "title": "Омор без обо",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "chosen-by-the-sky",
+      "title": "Избранный небом",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "hound-of-the-dune-shah",
+      "title": "Гончая Шаха Дюн",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "chosen-of-batrina",
+      "title": "Избранник Бат’рины",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "blood-of-the-heshegi",
+      "title": "Кровь Хешег",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "apprentice-of-the-star",
+      "title": "Подмастерье Звезды",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "ruzda-apprentice",
+      "title": "Ученик Рузды",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "who-pleased-chidkur",
+      "title": "Угодивший Чидкуру",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "servant-of-the-meridirs",
+      "title": "Слуга Меридиров",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "blue-blooded",
+      "title": "Синекровый",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "spiral-dweller",
+      "title": "Житель Спирали",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    },
+    {
+      "id": "the-winds-game",
+      "title": "Игра ветров",
+      "officialTotalCp": 5000,
+      "status": "BUDGET_50_GP",
+      "open": []
+    }
+  ]
+}

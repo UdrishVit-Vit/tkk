@@ -1,0 +1,178 @@
+diff --git a/app/data/dnd55e/backgrounds.js b/app/data/dnd55e/backgrounds.js
+index a0dd03c..1ec2519 100644
+--- a/app/data/dnd55e/backgrounds.js
++++ b/app/data/dnd55e/backgrounds.js
+@@ -2477,22 +2477,23 @@ export const DND55E_BACKGROUNDS = [
+     "source": "TVV",
+     "sourceTitle": "The Threads of Vit-Vit",
+     "glossary": [
+-      "initiative-phb",
+-      "hide-phb",
+-      "exhaustion-phb"
++      "reaction-phb",
++      "opportunity-attack-phb",
++      "difficult-terrain-phb",
++      "long-rest-phb"
+     ],
+     "id": "cohort-renegade",
+     "title": "Отступник Когорты",
+     "originalName": "Cohort Renegade",
+-    "summary": "Вы ушли из Когорты, сохранив номер на лице и память о семье, в которую людей принимали через шлем прощения и ошейник.",
++    "summary": "Вы ушли из Когорты, сохранив номер на лице и память о семье",
+     "abilities": [
+       "Ловкость",
+       "Телосложение",
+       "Мудрость"
+     ],
+     "feat": {
+-      "id": "alert",
+-      "title": "Бдительный"
++      "id": "enoa-cohort-renegade-origin",
++      "title": "Всегда есть выход"
+     },
+     "skills": [
+       "Скрытность",
+@@ -2552,57 +2553,57 @@ export const DND55E_BACKGROUNDS = [
+       "Вуаль"
+     ],
+     "enoaLead": [
+-      "Когорта называет себя семьёй, а её воинов знают по номерам над верхней губой. Ошейник питается Искрой носителя; право снять его ограничено Заповедями Лазурита. После ухода номер остаётся на лице, и привычки строя выдают прошлое не хуже знака. Для отступника дорожная встреча с другим номером поэтому означает больше, чем встречу двух бывших солдат: перед ним человек, которому ещё принадлежит место в семье.",
+-      "До ухода вы подчиняли движения распорядку; после него учились выбирать ночлег, скрывать следы и обходить места, где вас могли узнать. Вы разбирались с запорами, готовили отход заранее и прислушивались к шагам за стеной, пока другие отдыхали. Долгие переходы требовали выдержки, а поиск безопасного пути — внимательного взгляда. Опыт преследования научил вас быстро замечать начало угрозы. Причины разрыва и отношение к прежним товарищам не определяли за вас ни дальнейшую службу, ни будущие решения."
++      "Пастух Искры снял с вас шлем прощения за мгновение до смерти. Вместо него вы получили ошейник, а над верхней губой — номер. Так Когорта приняла вас в семью: среди воинов, служивших правителям Даскара и сражавшихся с творениями Вуали, у вас появились своё место и люди, которым можно было доверить жизнь. Вы подчинялись Заповедям Лазурита, делили опасность с другими номерами и знали, что семья не оставляет своих без защиты и возмездия. Но после всего пережитого что-то сломалось. Убийство, чужой оговор или знание, вынесенное из-за Вуали, могли стать причиной разрыва. Что произошло на самом деле, решаете вы. Для Когорты вы теперь предатель, которого нужно уничтожить.",
++      "Ваш номер разыскивают. Задержавшийся на лице взгляд может означать узнавание; вопрос о прежней службе — попытку удержать вас до прихода охотников. Вы учились выбирать ночлег по выходам, запоминать проходные дворы и уходить с дороги прежде, чем погоня настигнет на открытом месте. Скрытность помогала миновать чужие глаза, выносливость — продолжить путь после бессонной ночи, а умение обращаться с запорами — не застрять перед закрытой дверью. Каждый день приходится решать, где переждать, кому довериться и куда бежать дальше. Нельзя знать наверняка, кто узнал цифру, кто промолчит и кто уже послал за Когортой. Эта жизнь приучила вас оставлять себе путь отхода и пользоваться им, пока преследователь ещё только сокращает расстояние."
+     ],
+     "variants": [
+       {
+-        "title": "Номер из набора Архона",
+-        "region": "Новый путь Архона",
+-        "text": "Тринадцать камней королевской короны и шестьдесят шесть копий — это старая Когорта, первые числа семьи. Ваш номер больше: он уже из набора Архона, и старшие смотрят на вас как на почти семью. Почти."
++        "title": "Кровь семьи",
++        "region": "Когорта",
++        "text": "От вашей руки погиб член Когорты. Вы защищались, исполняли приказ или сделали осознанный выбор — причина остаётся за вами. Номер погибшего перешёл к убийце, и семья чувствует, где вы находитесь. Этот вариант делает охоту особенно опасной: обычная маскировка не скрывает от связи номера."
+       },
+       {
+-        "title": "Факелоносец",
+-        "region": "Разломы Вуали",
+-        "text": "На костяшках ваших пальцев треугольники — по одному за каждое возвращение из-за Вуали. Факелоносцы молятся Укт’ээ, пламеннорукой деве, и носят на теле её огонь на удачу. Больше трёх выходов выдерживают немногие; вы свои пересчитываете каждое утро."
++        "title": "Чужая вина",
++        "region": "Когорта",
++        "text": "Более влиятельный член семьи возложил на вас свою вину. Вы могли бежать, не дождавшись разбирательства, или обнаружить, что вашу версию уже некому выслушать. Обстоятельства подставы и то, осталось ли в семье кому-то до вас дело, выбираете вы."
+       },
+       {
+-        "title": "Взятый из Кеш’аура",
+-        "region": "Бралльские горы",
+-        "text": "Темноту под шлемом прощения вы помните лучше, чем собственное прежнее имя. Пастух снял его за мгновение до смерти — и вы до сих пор не решили, спас он вас или всего лишь распорядился."
++        "title": "Вернувшийся Факелоносец",
++        "region": "По ту сторону Вуали",
++        "text": "Треугольники на костяшках отмечают ваши возвращения из-за Вуали. Во время одного из выходов вы узнали то, чего не должны были знать, и после возвращения бежали. Что именно вы увидели и кто боится вашего рассказа, определите вместе с мастером."
+       }
+     ],
+     "hooks": {
+       "dice": "к6",
+-      "label": "Почему семья вас ищет",
++      "label": "Что заставляет вас задержаться",
+       "entries": [
+         {
+           "roll": 1,
+-          "text": "Вы сняли ошейник не по Заповедям и остались живы."
++          "text": "Человек, укрывший вас, пропал после расспросов о вашем номере."
+         },
+         {
+           "roll": 2,
+-          "text": "Вы носите чужой номер: убивший члена семьи получает его число, и вся Когорта чувствует, где он."
++          "text": "Свидетель вашего разрыва с семьёй согласился встретиться, но только здесь."
+         },
+         {
+           "roll": 3,
+-          "text": "Вы не вернулись из последней экспедиции вместе со всеми."
++          "text": "Другой беглец просит провести его дорогой, которой вы уже спаслись."
+         },
+         {
+           "roll": 4,
+-          "text": "Вы отказались от приказа Архона и ушли, не объяснившись."
++          "text": "Член Когорты узнал вас и прошёл мимо. Вы хотите понять почему."
+         },
+         {
+           "roll": 5,
+-          "text": "Вас считают мёртвым, и ваш ошейник кто-то предъявил как доказательство."
++          "text": "Впереди готовят засаду; чтобы уйти другим путём, нужна помощь местного проводника."
+         },
+         {
+           "roll": 6,
+-          "text": "Вы ушли за тем, кого семья приказала оставить."
++          "text": "Ваши нынешние спутники ещё не знают о погоне, а охотники уже вышли на их след."
+         }
+       ]
+     },
+-    "play": "Скрытность помогает избежать обнаружения, Выживание — выбрать путь вдали от привычных стоянок. «Бдительный» отражает готовность к преследованию. Судьбу ошейника и отношения с Когортой определяйте как часть конкретной истории; дополнительных бонусов этим описанием не предоставляется."
++    "play": "Скрытность и Выживание помогают уйти от преследования. «Всегда есть выход» позволяет отступить при сближении врага. Судьбу ошейника определите с мастером: предыстория не выдаёт магический предмет."
+   },
+   {
+     "group": "enoa",
+diff --git a/app/data/dnd55e/origin-feats-homebrew.js b/app/data/dnd55e/origin-feats-homebrew.js
+index 309b825..922f60c 100644
+--- a/app/data/dnd55e/origin-feats-homebrew.js
++++ b/app/data/dnd55e/origin-feats-homebrew.js
+@@ -1,6 +1,8 @@
+ // Draft proposals are editorial material; only explicit approval admits them to the catalog.
+ import { ENOA_ORIGIN_DRAFTS } from './origin-feats-enoa-drafts.js'
+ import { MLAH_FEAT } from './mlah-diver.js'
+-export const DND55E_HOMEBREW_ORIGIN_FEATS = ENOA_ORIGIN_DRAFTS.map(feat => feat.id === MLAH_FEAT.id ? MLAH_FEAT : feat)
++import { COHORT_FEAT } from './cohort-renegade.js'
++const individualFeats = new Map([MLAH_FEAT, COHORT_FEAT].map(feat => [feat.id, feat]))
++export const DND55E_HOMEBREW_ORIGIN_FEATS = ENOA_ORIGIN_DRAFTS.map(feat => individualFeats.get(feat.id) ?? feat)
+ export const DND55E_BACKGROUND_FEAT_PROPOSALS = Object.fromEntries(ENOA_ORIGIN_DRAFTS.map(f => [f.relatedBackgrounds[0], [f.id]]))
+ export const isPublishableHomebrew = feat => feat.contentKind === 'Homebrew' && feat.status === 'Approved'
+diff --git a/scripts/check-enoa-origin-revision3.mjs b/scripts/check-enoa-origin-revision3.mjs
+index 5f4dec1..f77c57c 100644
+--- a/scripts/check-enoa-origin-revision3.mjs
++++ b/scripts/check-enoa-origin-revision3.mjs
+@@ -19,7 +19,7 @@ for(const f of feats){
+  assert.deepEqual(f.abilities,[])
+  assert.ok(['Draft','Playtest'].includes(f.status))
+  assert.equal(isPublishableHomebrew(f),false)
+- if(f.id === 'enoa-mlah-diver-origin') assert.ok(published.some(x=>x.id===f.id && x.version==='0.4.0' && x.status==='Approved'))
++ if(['enoa-mlah-diver-origin', 'enoa-cohort-renegade-origin'].includes(f.id)) assert.ok(published.some(x=>x.id===f.id && x.version==='0.4.0' && x.status==='Approved'))
+  else assert.ok(!published.some(x=>x.id===f.id))
+  assert.equal(full.design.concepts.length,3)
+  assert.equal(new Set(full.design.concepts.map(x=>x.effect)).size,3)
+diff --git a/scripts/render-backgrounds-2024.mjs b/scripts/render-backgrounds-2024.mjs
+index 1e09ea9..441e121 100644
+--- a/scripts/render-backgrounds-2024.mjs
++++ b/scripts/render-backgrounds-2024.mjs
+@@ -80,7 +80,7 @@ for (const f of DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.status !== 'Approved'
+ // Exercise unpublished text through the real effect component without publishing it.
+ const effectComponent = await compile('OriginFeatEffects', '')
+ const proposals = DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.version === '0.3.0')
+-assert.equal(proposals.length, 56)
++assert.equal(proposals.length, 55)
+ const draftApp = createSSRApp({ render: () => h('main', proposals.map(feat => h(effectComponent, { feat }))) })
+ draftApp.component('RuleRichText', defineComponent({ props: ['text'], setup: props => () => h('span', props.text.replace(/\*\*/g, '')) }))
+ const draftHtml = await renderToString(draftApp)
+@@ -94,4 +94,7 @@ assert.ok(backgrounds.includes('/dnd55e/equipment?item=tool-mlah-diver-kit'))
+ assert.ok(backgrounds.includes('4 паразита в ёмкости с водой'))
+ assert.ok(backgrounds.includes('/dnd55e/equipment?item=gear-dulur'))
+ assert.ok(backgrounds.includes('Стоимость нового набора, дулуров и ловушки пока не установлена'))
+-console.log('Rendered 73 background cards, public feat catalog and 56 unpublished effect cards. M’lah kit, full text, links and Draft/Playtest exclusion passed. Browser layout not tested.')
++assert.ok(backgrounds.includes('Всегда есть выход'))
++assert.ok(feats.includes('Всегда есть выход'))
++assert.ok(!backgrounds.includes('старшие смотрят на вас как на почти семью'))
++console.log('Rendered 73 background cards, public feat catalog and 55 unpublished effect cards. Individual M’lah and Cohort cards, full text, links and Draft/Playtest exclusion passed. Browser layout not tested.')
+diff --git a/scripts/test-backgrounds-2024.mjs b/scripts/test-backgrounds-2024.mjs
+index 7545707..979cb92 100644
+--- a/scripts/test-backgrounds-2024.mjs
++++ b/scripts/test-backgrounds-2024.mjs
+@@ -37,7 +37,12 @@ for (const f of before.linkedFeats) {
+   const after = currentData.feats.find(x => x.id === f.id)
+   for (const key of ['benefits', 'requirement', 'category', 'repeatable']) assert.deepEqual(after[key], f[key], `${f.id}.${key} changed`)
+ }
+-for (const b of before.backgrounds.filter(b => b.id !== 'mlah-diver')) assert.deepEqual(currentData.backgrounds.find(x => x.id === b.id).feat, b.feat, `${b.id}: published feat changed`)
++for (const b of before.backgrounds.filter(b => !['mlah-diver', 'cohort-renegade'].includes(b.id))) assert.deepEqual(currentData.backgrounds.find(x => x.id === b.id).feat, b.feat, `${b.id}: published feat changed`)
++const renegade = currentData.backgrounds.find(b => b.id === 'cohort-renegade')
++assert.deepEqual(renegade.feat, {id:'enoa-cohort-renegade-origin', title:'Всегда есть выход'})
++assert.ok(currentData.feats.some(f => f.id === renegade.feat.id && f.status === 'Approved' && f.version === '0.4.0'))
++assert.deepEqual(renegade.equipment.items.map(i => i.id), before.backgrounds.find(b => b.id === renegade.id).equipment.items.map(i => i.id))
++assert.equal(renegade.equipment.coinsCp, 1950)
+ const diver = currentData.backgrounds.find(b => b.id === 'mlah-diver')
+ assert.deepEqual(diver.skills, ['Атлетика', 'Природа'])
+ assert.equal(diver.feat.title, 'Выучка глубин')

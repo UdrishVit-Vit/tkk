@@ -1,0 +1,9 @@
+ M app/data/dnd55e/backgrounds.js
+ M app/data/dnd55e/origin-feats-homebrew.js
+ M scripts/check-enoa-origin-revision3.mjs
+ M scripts/render-backgrounds-2024.mjs
+ M scripts/test-backgrounds-2024.mjs
+?? .agents/
+?? app/data/dnd55e/cohort-renegade.js
+?? docs/backgrounds-2024/cohort-individual-review.md
+?? reports/

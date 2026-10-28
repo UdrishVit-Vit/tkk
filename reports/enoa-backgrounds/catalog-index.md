@@ -1,0 +1,79 @@
+# Указатель всех индивидуальных аудитов
+
+- 2014 · [Ныряльщик](../../audit/enoa-backgrounds/2014-diver.md) · diver · MAJOR
+- 2014 · [Отступник Когорты](../../audit/enoa-backgrounds/2014-cohort-renegade.md) · cohort-renegade · MAJOR
+- 2014 · [Творение К’шаакха](../../audit/enoa-backgrounds/2014-kshaakh-creation.md) · kshaakh-creation · MAJOR
+- 2014 · [Укротитель аюров](../../audit/enoa-backgrounds/2014-ayur-tamer.md) · ayur-tamer · MAJOR
+- 2024 · [Послушник](../../audit/enoa-backgrounds/2024-acolyte.md) · acolyte · EDITORIAL
+- 2024 · [Ремесленник](../../audit/enoa-backgrounds/2024-artisan.md) · artisan · EDITORIAL
+- 2024 · [Шарлатан](../../audit/enoa-backgrounds/2024-charlatan.md) · charlatan · EDITORIAL
+- 2024 · [Преступник](../../audit/enoa-backgrounds/2024-criminal.md) · criminal · EDITORIAL
+- 2024 · [Артист](../../audit/enoa-backgrounds/2024-entertainer.md) · entertainer · EDITORIAL
+- 2024 · [Фермер](../../audit/enoa-backgrounds/2024-farmer.md) · farmer · EDITORIAL
+- 2024 · [Стражник](../../audit/enoa-backgrounds/2024-guard.md) · guard · EDITORIAL
+- 2024 · [Проводник](../../audit/enoa-backgrounds/2024-guide.md) · guide · EDITORIAL
+- 2024 · [Отшельник](../../audit/enoa-backgrounds/2024-hermit.md) · hermit · EDITORIAL
+- 2024 · [Торговец](../../audit/enoa-backgrounds/2024-merchant.md) · merchant · EDITORIAL
+- 2024 · [Аристократ](../../audit/enoa-backgrounds/2024-noble.md) · noble · EDITORIAL
+- 2024 · [Мудрец](../../audit/enoa-backgrounds/2024-sage.md) · sage · EDITORIAL
+- 2024 · [Моряк](../../audit/enoa-backgrounds/2024-sailor.md) · sailor · EDITORIAL
+- 2024 · [Писец](../../audit/enoa-backgrounds/2024-scribe.md) · scribe · EDITORIAL
+- 2024 · [Солдат](../../audit/enoa-backgrounds/2024-soldier.md) · soldier · EDITORIAL
+- 2024 · [Странник](../../audit/enoa-backgrounds/2024-wayfarer.md) · wayfarer · EDITORIAL
+- 2024 · [Ныряльщик озера М’лах](../../audit/enoa-backgrounds/2024-mlah-diver.md) · mlah-diver · MAJOR
+- 2024 · [Отступник Когорты](../../audit/enoa-backgrounds/2024-cohort-renegade.md) · cohort-renegade · EDITORIAL
+- 2024 · [Безымянный](../../audit/enoa-backgrounds/2024-nameless.md) · nameless · MAJOR
+- 2024 · [Хакар, недомаг](../../audit/enoa-backgrounds/2024-hakar.md) · hakar · EDITORIAL
+- 2024 · [Караванщик Мифрасового Пути](../../audit/enoa-backgrounds/2024-mithras-caravaneer.md) · mithras-caravaneer · EDITORIAL
+- 2024 · [Костяной провидец](../../audit/enoa-backgrounds/2024-bone-seer.md) · bone-seer · EDITORIAL
+- 2024 · [Читающий узлы](../../audit/enoa-backgrounds/2024-knot-scribe.md) · knot-scribe · EDITORIAL
+- 2024 · [Ловец шёлковых мышей](../../audit/enoa-backgrounds/2024-silk-mouse-catcher.md) · silk-mouse-catcher · EDITORIAL
+- 2024 · [Боец Ям](../../audit/enoa-backgrounds/2024-pit-fighter.md) · pit-fighter · EDITORIAL
+- 2024 · [Хозяин караван-сарая](../../audit/enoa-backgrounds/2024-caravanserai-keeper.md) · caravanserai-keeper · EDITORIAL
+- 2024 · [Шахтёр солнц](../../audit/enoa-backgrounds/2024-sun-miner.md) · sun-miner · EDITORIAL
+- 2024 · [Степной сказитель](../../audit/enoa-backgrounds/2024-huurch.md) · huurch · EDITORIAL
+- 2024 · [Соглядатай Белых Соколов](../../audit/enoa-backgrounds/2024-white-falcon-watcher.md) · white-falcon-watcher · EDITORIAL
+- 2024 · [Мастер камней жизни](../../audit/enoa-backgrounds/2024-lifestone-wright.md) · lifestone-wright · EDITORIAL
+- 2024 · [Погонщик каравана](../../audit/enoa-backgrounds/2024-sarban-drover.md) · sarban-drover · EDITORIAL
+- 2024 · [Мифрасоискатель](../../audit/enoa-backgrounds/2024-mithras-picker.md) · mithras-picker · EDITORIAL
+- 2024 · [Оценщик Синдиката](../../audit/enoa-backgrounds/2024-syndicate-appraiser.md) · syndicate-appraiser · EDITORIAL
+- 2024 · [Ловчий Урдрега](../../audit/enoa-backgrounds/2024-urdreg-hunter.md) · urdreg-hunter · EDITORIAL
+- 2024 · [Пастух Искры](../../audit/enoa-backgrounds/2024-spark-shepherd.md) · spark-shepherd · EDITORIAL
+- 2024 · [Стопа Бараскуса](../../audit/enoa-backgrounds/2024-baraskus-foot.md) · baraskus-foot · EDITORIAL
+- 2024 · [Участник Великой Игры](../../audit/enoa-backgrounds/2024-great-game-player.md) · great-game-player · EDITORIAL
+- 2024 · [Бегущий по Спирали](../../audit/enoa-backgrounds/2024-spiral-runner.md) · spiral-runner · EDITORIAL
+- 2024 · [Вышедший из Колыбели](../../audit/enoa-backgrounds/2024-cradle-born.md) · cradle-born · EDITORIAL
+- 2024 · [Нагбо, низшей касты](../../audit/enoa-backgrounds/2024-nagbo.md) · nagbo · EDITORIAL
+- 2024 · [Норбу, высшей касты](../../audit/enoa-backgrounds/2024-norbu.md) · norbu · EDITORIAL
+- 2024 · [Отголосок Башни](../../audit/enoa-backgrounds/2024-tower-echo.md) · tower-echo · EDITORIAL
+- 2024 · [Ответивший на Призыв](../../audit/enoa-backgrounds/2024-called-one.md) · called-one · EDITORIAL
+- 2024 · [Толкователь знамений](../../audit/enoa-backgrounds/2024-omen-reader.md) · omen-reader · EDITORIAL
+- 2024 · [Белый Охотник](../../audit/enoa-backgrounds/2024-white-hunter.md) · white-hunter · EDITORIAL
+- 2024 · [Лунная дева](../../audit/enoa-backgrounds/2024-moon-maiden.md) · moon-maiden · EDITORIAL
+- 2024 · [Проповедник Слова](../../audit/enoa-backgrounds/2024-word-preacher.md) · word-preacher · EDITORIAL
+- 2024 · [Око Кристалла](../../audit/enoa-backgrounds/2024-crystal-eye.md) · crystal-eye · EDITORIAL
+- 2024 · [Хранитель Пламени](../../audit/enoa-backgrounds/2024-flame-keeper.md) · flame-keeper · EDITORIAL
+- 2024 · [Слушающий Рябь](../../audit/enoa-backgrounds/2024-ripple-listener.md) · ripple-listener · EDITORIAL
+- 2024 · [Ключник Эликсира](../../audit/enoa-backgrounds/2024-elixir-warden.md) · elixir-warden · EDITORIAL
+- 2024 · [Слепой Бунти](../../audit/enoa-backgrounds/2024-blind-bunti.md) · blind-bunti · MAJOR
+- 2024 · [Сбежавший из рудников](../../audit/enoa-backgrounds/2024-mine-escapee.md) · mine-escapee · MAJOR
+- 2024 · [Брат Глубин](../../audit/enoa-backgrounds/2024-deep-brother.md) · deep-brother · EDITORIAL
+- 2024 · [Отмеченный Ильбешем](../../audit/enoa-backgrounds/2024-ilbesh-marked.md) · ilbesh-marked · EDITORIAL
+- 2024 · [Юный степной тигр](../../audit/enoa-backgrounds/2024-steppe-tiger.md) · steppe-tiger · EDITORIAL
+- 2024 · [Вернувшийся из Титании](../../audit/enoa-backgrounds/2024-titania-returned.md) · titania-returned · EDITORIAL
+- 2024 · [Должник братства](../../audit/enoa-backgrounds/2024-brotherhood-debtor.md) · brotherhood-debtor · EDITORIAL
+- 2024 · [Знающий Дангунский секрет](../../audit/enoa-backgrounds/2024-dangun-secret.md) · dangun-secret · EDITORIAL
+- 2024 · [Хранитель чайного дома](../../audit/enoa-backgrounds/2024-tea-house-keeper.md) · tea-house-keeper · EDITORIAL
+- 2024 · [Обещанный чайнику Ибона](../../audit/enoa-backgrounds/2024-promised-to-ibon.md) · promised-to-ibon · EDITORIAL
+- 2024 · [Омор без обо](../../audit/enoa-backgrounds/2024-omor-without-obo.md) · omor-without-obo · MAJOR
+- 2024 · [Избранный небом](../../audit/enoa-backgrounds/2024-chosen-by-the-sky.md) · chosen-by-the-sky · EDITORIAL
+- 2024 · [Гончая Шаха Дюн](../../audit/enoa-backgrounds/2024-hound-of-the-dune-shah.md) · hound-of-the-dune-shah · MAJOR
+- 2024 · [Избранник Бат’рины](../../audit/enoa-backgrounds/2024-chosen-of-batrina.md) · chosen-of-batrina · EDITORIAL
+- 2024 · [Кровь Хешег](../../audit/enoa-backgrounds/2024-blood-of-the-heshegi.md) · blood-of-the-heshegi · MAJOR
+- 2024 · [Подмастерье Звезды](../../audit/enoa-backgrounds/2024-apprentice-of-the-star.md) · apprentice-of-the-star · EDITORIAL
+- 2024 · [Ученик Рузды](../../audit/enoa-backgrounds/2024-ruzda-apprentice.md) · ruzda-apprentice · MAJOR
+- 2024 · [Угодивший Чидкуру](../../audit/enoa-backgrounds/2024-who-pleased-chidkur.md) · who-pleased-chidkur · EDITORIAL
+- 2024 · [Слуга Меридиров](../../audit/enoa-backgrounds/2024-servant-of-the-meridirs.md) · servant-of-the-meridirs · MAJOR
+- 2024 · [Синекровый](../../audit/enoa-backgrounds/2024-blue-blooded.md) · blue-blooded · MAJOR
+- 2024 · [Житель Спирали](../../audit/enoa-backgrounds/2024-spiral-dweller.md) · spiral-dweller · MAJOR
+- 2024 · [Игра ветров](../../audit/enoa-backgrounds/2024-the-winds-game.md) · the-winds-game · EDITORIAL

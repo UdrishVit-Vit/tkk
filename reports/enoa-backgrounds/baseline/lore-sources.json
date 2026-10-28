@@ -1,0 +1,42 @@
+[
+  {
+    "code": "LORE",
+    "path": "C:\\Users\\Admin\\Downloads\\Эноа Lore 0.31 - Open(6).docx",
+    "available": true,
+    "units": 973,
+    "unit": "0-based paragraph",
+    "sha256": "2392384c2faab354a77bc25c1d0e3f84c6f52beb53dcfdb736cf551af241880a"
+  },
+  {
+    "code": "TALES",
+    "path": "C:\\Users\\Admin\\Downloads\\Сказания (1).pdf",
+    "available": true,
+    "units": 81,
+    "unit": "1-based PDF page",
+    "sha256": "c245caf3a72305963ca4145fa5e3c8f49f2d7437be2a14f24d1a107d18ba9d54"
+  },
+  {
+    "code": "OGNI-S1",
+    "path": "C:\\EnoaTranscripts\\Готовые версии\\ЭНОА - Кампания II - Сезон 1 - Огни - v0.10.0.pdf",
+    "available": true,
+    "units": 310,
+    "unit": "1-based PDF page",
+    "sha256": "417e98348175f7d7dd5d3b9f382c2ba3fd9e17220791a9cc9286c9aac902d7ba"
+  },
+  {
+    "code": "OGNI-S2",
+    "path": "C:\\EnoaTranscripts\\Готовые версии\\ЭНОА - Кампания II - Сезон 2 - Огни - v0.10.0.pdf",
+    "available": true,
+    "units": 896,
+    "unit": "1-based PDF page",
+    "sha256": "7c85e8dc3a5faa1a937a12ae0bf953ed147bfe46c460ad20e444eb70ab2b7173"
+  },
+  {
+    "code": "OGNI-S3",
+    "path": "C:\\EnoaTranscripts\\Готовые версии\\ЭНОА - Кампания II - Сезон 3 - Огни - v0.10.0.pdf",
+    "available": true,
+    "units": 137,
+    "unit": "1-based PDF page",
+    "sha256": "e14bdd3908e1242985efbff191994fd2c76e46afe7df85dc6df566552f31576d"
+  }
+]

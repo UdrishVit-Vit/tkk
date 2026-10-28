@@ -235,6 +235,10 @@ useSeoMeta({
       <CardSectionNav :prefix="'bg-' + item.id" :sections="cardSections" />
       <h3 :id="'bg-' + item.id + '-stats'" class="bg-section-title" tabindex="-1">Игровые параметры</h3>
       <dl class="tref-stats bg-stats">
+        <div v-if="item.raw.speciesRestriction" class="tref-stat">
+          <dt>Доступно только для</dt>
+          <dd><NuxtLink :to="'/dnd55e/species/' + item.raw.speciesRestriction.id">{{ item.raw.speciesRestriction.title }}</NuxtLink></dd>
+        </div>
         <div class="tref-stat">
           <dt>Характеристики</dt>
           <dd>
