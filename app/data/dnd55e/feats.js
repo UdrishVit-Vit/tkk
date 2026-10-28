@@ -1,4 +1,5 @@
 import { DND55E_HOMEBREW_ORIGIN_FEATS, isPublishableHomebrew } from './origin-feats-homebrew.js'
+import { ENOA_AUTHORED_ORIGINS_V4 } from '../enoa-authored-feats-v4.js'
 
 export const DND55E_FEAT_CATEGORIES = {
   'fighting-style': {
@@ -93,6 +94,7 @@ const enoaBoon = data => boon({ ...TVV, ...data })
 
 export const DND55E_FEATS = [
   ...DND55E_HOMEBREW_ORIGIN_FEATS.filter(isPublishableHomebrew),
+  ...ENOA_AUTHORED_ORIGINS_V4.filter(feat => !feat.relatedBackgrounds.length && isPublishableHomebrew(feat)),
   style({
     id: 'dueling',
     title: 'Дуэлянт',

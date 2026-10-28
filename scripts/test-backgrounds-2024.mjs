@@ -40,13 +40,13 @@ for (const f of before.linkedFeats) {
   for (const key of ['benefits', 'requirement', 'category', 'repeatable']) assert.deepEqual(after[key], f[key], `${f.id}.${key} changed`)
 }
 // Explicit author removal; keep the original snapshot as historical evidence.
-const removedBackgrounds = new Set(['acolyte','artisan','charlatan','criminal','entertainer','farmer','guard','guide','hermit','merchant','noble','sage','sailor','scribe','soldier','wayfarer','nameless'])
-assert.equal(currentData.backgrounds.length,56)
+const removedBackgrounds = new Set(['acolyte','artisan','charlatan','criminal','entertainer','farmer','guard','guide','hermit','merchant','noble','sage','sailor','scribe','soldier','wayfarer','nameless','lifestone-wright'])
+assert.equal(currentData.backgrounds.length,55)
 assert.ok(currentData.backgrounds.every(b => b.group==='enoa'&&!removedBackgrounds.has(b.id)))
 assert.equal(currentData.backgrounds.find(b=>b.id==='hakar').title,'Хакар')
 assert.ok(currentData.feats.some(f=>f.id==='nameless'))
 // The author requested unique V4 assignments for all active backgrounds.
-assert.equal(new Set(currentData.backgrounds.map(b=>b.feat.id)).size,56)
+assert.equal(new Set(currentData.backgrounds.map(b=>b.feat.id)).size,55)
 for(const b of currentData.backgrounds){
   const f=currentData.feats.find(f=>f.id===b.feat.id)
   assert.ok(f&&f.source==='TVV'&&f.category==='origin'&&f.status==='Approved',b.id)

@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "reviewed": 55,
+  "rewritten": 52,
+  "removedSecondary": 47,
+  "retainedNamedSecondary": 5,
+  "individualCoreEdits": 28,
+  "originPastHeadings": 0,
+  "unchangedResourceBudgets": true,
+  "playtest": false
+}

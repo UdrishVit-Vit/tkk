@@ -45,7 +45,7 @@ async function render(name, folder = 'dnd55e/') {
   return html
 }
 const backgrounds = await render('BackgroundsPage')
-assert.equal((backgrounds.match(/data-record=/g) || []).length, 56)
+assert.equal((backgrounds.match(/data-record=/g) || []).length, 55)
 assert.equal((backgrounds.match(/<details/g) || []).length, 0)
 for (const b of DND55E_BACKGROUNDS) {
   const positions = ['stats', 'equipment', 'feat', 'story', 'event'].map(section => backgrounds.indexOf(`id="bg-${b.id}-${section}"`))
@@ -102,9 +102,9 @@ assert.ok(feats.includes('Всегда есть выход'))
 assert.ok(!backgrounds.includes('старшие смотрят на вас как на почти семью'))
 const legacyFeats = await render('feats', '../pages/dnd5e/')
 assert.equal((legacyFeats.match(/data-record=/g)||[]).length, FEATS_5E.length)
-assert.equal(ENOA_AUTHORED_FEATS_2014_V4.length,56)
+assert.equal(ENOA_AUTHORED_FEATS_2014_V4.length,55)
 for(const f of ENOA_AUTHORED_FEATS_2014_V4){
   assert.ok(legacyFeats.includes(`data-record="${f.id}"`),f.id)
   for(const text of f.benefits)assert.ok(legacyFeats.includes(text.replace(/\*\*/g,'')),f.id+': missing 2014 rule')
 }
-console.log(`Rendered 56 backgrounds, ${DND55E_FEATS.length} feats 2024, ${FEATS_5E.length} feats 2014 and 54 archived draft effect cards. Text and links passed; browser layout not tested.`)
+console.log(`Rendered 55 backgrounds, ${DND55E_FEATS.length} feats 2024, ${FEATS_5E.length} feats 2014 and 54 archived draft effect cards. Text and links passed; browser layout not tested.`)

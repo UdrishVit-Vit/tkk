@@ -8,7 +8,7 @@ const root='reports/enoa-backgrounds/batch-02/';
 const beforeText=fs.readFileSync(root+'backgrounds.js.before','utf8');
 const marker='export const DND55E_BACKGROUNDS = ';
 const before=JSON.parse(beforeText.slice(beforeText.indexOf(marker)+marker.length,beforeText.indexOf('\n\nexport const DND55E_BACKGROUND_FEATS')).trim());
-assert.deepEqual(backgrounds.map(b=>b.id),before.map(b=>b.id));
+assert.deepEqual(backgrounds.map(b=>b.id),before.filter(b=>b.id!=='lifestone-wright').map(b=>b.id));
 for(const b of backgrounds){
  const old=before.find(x=>x.id===b.id);
  const withoutFeat=({feat,...rest})=>rest;
@@ -22,8 +22,10 @@ for(const b of backgrounds){
  if(['nagbo','norbu'].includes(b.id))assert.equal(f14.requirement,'Вирморожденные');
 }
 for(const catalogue of [feats,legacy])assert.equal(new Set(catalogue.map(f=>f.id)).size,catalogue.length);
-assert.equal(authored2014.length,56);assert.equal(new Set(backgrounds.map(b=>b.feat.id)).size,56);
+assert.equal(authored2014.length,55);assert.equal(new Set(backgrounds.map(b=>b.feat.id)).size,55);
+assert.ok(!legacy.some(f=>f.id==='enoa-lifestone-wright-feat-2014'));
+assert.ok(!feats.some(f=>f.id==='enoa-lifestone-wright-origin'));
 const oldLegacy=await import('data:text/javascript;base64,'+Buffer.from(fs.readFileSync(root+'feats5e.js.before','utf8')).toString('base64'));
 for(const f of oldLegacy.FEATS_5E)assert.deepEqual(legacy.find(x=>x.id===f.id),f,'Existing 2014 feat changed');
-const result={status:'PASS',date:'2026-10-28',originAssignments:56,uniqueOriginFeats:56,new2014Feats:56,feats2024:feats.length,feats2014:legacy.length,old2014FeatsPreserved:oldLegacy.FEATS_5E.length,backgroundRulesOtherThanFeat:'unchanged',remoteDeployment:false};
+const result={status:'PASS',date:'2026-10-28',originAssignments:backgrounds.length,uniqueOriginFeats:55,new2014Feats:55,feats2024:feats.length,feats2014:legacy.length,old2014FeatsPreserved:oldLegacy.FEATS_5E.length,backgroundRulesOtherThanFeat:'unchanged for retained backgrounds',remoteDeployment:false};
 fs.writeFileSync(root+'verification.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
