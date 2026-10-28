@@ -1,7 +1,10 @@
+import { ENOA_AUTHORED_FEATS_2014_V4 } from './enoa-authored-feats-v4.js'
+
 // Sources feats can come from — currently only the homebrew Enoa thread-book,
 // but the shape mirrors the reference filter (PHB/XGE/etc.) so more can be
 // added later without touching the filter UI.
 export const FEAT_SOURCES = {
+  TVV: 'Эноа',
   TJB: 'The Threads of JorasBashu',
   TU: 'The Threads of Unseen'
 }
@@ -9,6 +12,7 @@ export const FEAT_SOURCES = {
 export const FEAT_ABILITIES = ['Сила', 'Ловкость', 'Телосложение', 'Интеллект', 'Мудрость', 'Харизма']
 
 export const FEATS_5E = [
+  ...ENOA_AUTHORED_FEATS_2014_V4,
   {
     id: 'experienced-nomad',
     source: 'TJB',

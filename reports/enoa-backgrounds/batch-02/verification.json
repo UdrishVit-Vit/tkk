@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "date": "2026-10-28",
+  "originAssignments": 56,
+  "uniqueOriginFeats": 56,
+  "new2014Feats": 56,
+  "feats2024": 147,
+  "feats2014": 70,
+  "old2014FeatsPreserved": 14,
+  "backgroundRulesOtherThanFeat": "unchanged",
+  "remoteDeployment": false
+}

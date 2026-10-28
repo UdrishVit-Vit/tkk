@@ -15,5 +15,5 @@ const pending = issues.filter(i => i.code === 'feat-category' && known.get(i.id)
 const errors = issues.filter(i => !pending.includes(i))
 for (const i of pending) console.warn(`PENDING APPROVAL ${i.id}: ${i.detail}`)
 for (const i of errors) console.error(`${i.code} ${i.id}: ${i.detail}`)
-console.log(`${backgrounds.length} backgrounds; ${homebrew.length} drafts; ${errors.length} new errors; ${pending.length} retained category exceptions.`)
+console.log(`${backgrounds.length} backgrounds; ${homebrew.length} authored origin feats; ${errors.length} new errors; ${pending.length} retained category exceptions.`)
 if (errors.length || (process.argv.includes('--strict') && pending.length)) process.exitCode = 1

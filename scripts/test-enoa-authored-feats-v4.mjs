@@ -1,0 +1,29 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import { DND55E_BACKGROUNDS as backgrounds } from '../app/data/dnd55e/backgrounds.js';
+import { DND55E_FEATS as feats } from '../app/data/dnd55e/feats.js';
+import { FEATS_5E as legacy } from '../app/data/feats5e.js';
+import { ENOA_AUTHORED_FEATS_2014_V4 as authored2014 } from '../app/data/enoa-authored-feats-v4.js';
+const root='reports/enoa-backgrounds/batch-02/';
+const beforeText=fs.readFileSync(root+'backgrounds.js.before','utf8');
+const marker='export const DND55E_BACKGROUNDS = ';
+const before=JSON.parse(beforeText.slice(beforeText.indexOf(marker)+marker.length,beforeText.indexOf('\n\nexport const DND55E_BACKGROUND_FEATS')).trim());
+assert.deepEqual(backgrounds.map(b=>b.id),before.map(b=>b.id));
+for(const b of backgrounds){
+ const old=before.find(x=>x.id===b.id);
+ const withoutFeat=({feat,...rest})=>rest;
+ assert.deepEqual(withoutFeat(b),withoutFeat(old),b.id+': background changed beyond feat assignment');
+ const f=feats.find(f=>f.id===b.feat.id);
+ assert.equal(f.category,'origin');assert.equal(f.source,'TVV');assert.equal(f.status,'Approved');
+ assert.equal(f.title,b.feat.title);assert.deepEqual(f.relatedBackgrounds,[b.id]);assert.deepEqual(f.abilities,[]);
+ const f14=authored2014.find(f=>f.relatedBackgrounds.includes(b.id));assert(f14,b.id+': missing 2014');
+ assert(f14.benefits.some(x=>x.includes('Максимум — 20')));
+ assert(f14.intro.includes('Предыстория 2014 не выдаёт её автоматически'));
+ if(['nagbo','norbu'].includes(b.id))assert.equal(f14.requirement,'Вирморожденные');
+}
+for(const catalogue of [feats,legacy])assert.equal(new Set(catalogue.map(f=>f.id)).size,catalogue.length);
+assert.equal(authored2014.length,56);assert.equal(new Set(backgrounds.map(b=>b.feat.id)).size,56);
+const oldLegacy=await import('data:text/javascript;base64,'+Buffer.from(fs.readFileSync(root+'feats5e.js.before','utf8')).toString('base64'));
+for(const f of oldLegacy.FEATS_5E)assert.deepEqual(legacy.find(x=>x.id===f.id),f,'Existing 2014 feat changed');
+const result={status:'PASS',date:'2026-10-28',originAssignments:56,uniqueOriginFeats:56,new2014Feats:56,feats2024:feats.length,feats2014:legacy.length,old2014FeatsPreserved:oldLegacy.FEATS_5E.length,backgroundRulesOtherThanFeat:'unchanged',remoteDeployment:false};
+fs.writeFileSync(root+'verification.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

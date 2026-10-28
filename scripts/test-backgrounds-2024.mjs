@@ -19,7 +19,7 @@ const cases = [
   ['equipment-total', d => d.backgrounds[0].equipment.coinsCp++],
   ['equipment-catalog-price', d => { d.backgrounds[0].equipment.items[0].unitCostCp--; d.backgrounds[0].equipment.coinsCp++ }],
   ['homebrew-field', d => { delete d.homebrew[0].action }],
-  ['unpublished-feat', d => d.feats.push(d.homebrew.find(f => f.status !== 'Approved'))],
+  ['unpublished-feat', d => d.feats.push({...structuredClone(d.homebrew[0]),id:'test-unpublished-origin',status:'Draft'})],
   ['coins-display', d => { d.backgrounds[0].equipment.coins = '0 зм' }],
   ['proposal-reference', d => d.proposals['knot-scribe'].push('missing')],
   ['equipment-forbidden', d => { d.backgrounds[0].equipment.items[0].id = 'weapon-lance' }]
@@ -45,7 +45,14 @@ assert.equal(currentData.backgrounds.length,56)
 assert.ok(currentData.backgrounds.every(b => b.group==='enoa'&&!removedBackgrounds.has(b.id)))
 assert.equal(currentData.backgrounds.find(b=>b.id==='hakar').title,'Хакар')
 assert.ok(currentData.feats.some(f=>f.id==='nameless'))
-for (const b of before.backgrounds.filter(b => !removedBackgrounds.has(b.id)&&!['mlah-diver', 'cohort-renegade'].includes(b.id))) assert.deepEqual(currentData.backgrounds.find(x => x.id === b.id).feat, b.feat, `${b.id}: published feat changed`)
+// The author requested unique V4 assignments for all active backgrounds.
+assert.equal(new Set(currentData.backgrounds.map(b=>b.feat.id)).size,56)
+for(const b of currentData.backgrounds){
+  const f=currentData.feats.find(f=>f.id===b.feat.id)
+  assert.ok(f&&f.source==='TVV'&&f.category==='origin'&&f.status==='Approved',b.id)
+  assert.equal(f.title,b.feat.title)
+  assert.deepEqual(f.relatedBackgrounds,[b.id])
+}
 const renegade = currentData.backgrounds.find(b => b.id === 'cohort-renegade')
 assert.deepEqual(renegade.feat, {id:'enoa-cohort-renegade-origin', title:'Всегда есть выход'})
 assert.ok(currentData.feats.some(f => f.id === renegade.feat.id && f.status === 'Approved' && f.version === '0.4.0'))

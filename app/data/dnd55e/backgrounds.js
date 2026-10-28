@@ -473,9 +473,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "magic-initiate",
-      "title": "Посвящённый в магию",
-      "note": "список волшебника"
+      "id": "enoa-hakar-origin",
+      "title": "Нащупанная линия"
     },
     "skills": [
       "Аркана",
@@ -612,8 +611,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "skilled",
-      "title": "Одарённый"
+      "id": "enoa-route-memory",
+      "title": "Память путей"
     },
     "skills": [
       "Выживание",
@@ -745,9 +744,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "magic-initiate",
-      "title": "Посвящённый в магию",
-      "note": "список друида"
+      "id": "enoa-bone-seer-origin",
+      "title": "Лопатка додора"
     },
     "skills": [
       "Проницательность",
@@ -880,8 +878,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "skilled",
-      "title": "Одарённый"
+      "id": "enoa-knot-memory",
+      "title": "Память узла"
     },
     "skills": [
       "Анализ",
@@ -1018,8 +1016,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "alert",
-      "title": "Бдительный"
+      "id": "enoa-silk-mouse-catcher-origin",
+      "title": "Не порвать кокон"
     },
     "skills": [
       "Акробатика",
@@ -1157,8 +1155,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "tavern-brawler",
-      "title": "Драчун"
+      "id": "enoa-pit-fighter-origin",
+      "title": "Край Ямы"
     },
     "skills": [
       "Атлетика",
@@ -1289,8 +1287,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "healer",
-      "title": "Лекарь"
+      "id": "enoa-caravanserai-keeper-origin",
+      "title": "Под одной крышей"
     },
     "skills": [
       "Проницательность",
@@ -1429,8 +1427,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "tough",
-      "title": "Крепкий"
+      "id": "enoa-sun-miner-origin",
+      "title": "Слушающий крепь"
     },
     "skills": [
       "Атлетика",
@@ -1574,8 +1572,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "musician",
-      "title": "Музыкант"
+      "id": "enoa-huurch-origin",
+      "title": "Ещё одну сказку"
     },
     "skills": [
       "Выступление",
@@ -1708,8 +1706,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "alert",
-      "title": "Бдительный"
+      "id": "enoa-white-falcon-watcher-origin",
+      "title": "Уйти из-под взгляда"
     },
     "skills": [
       "Обман",
@@ -1830,8 +1828,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "crafter",
-      "title": "Ремесленник"
+      "id": "enoa-lifestone-wright-origin",
+      "title": "Сохранить соединение"
     },
     "skills": [
       "Аркана",
@@ -1930,8 +1928,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "tough",
-      "title": "Крепкий"
+      "id": "enoa-sarban-drover-origin",
+      "title": "Темп последнего зверя"
     },
     "skills": [
       "Уход за животными",
@@ -2070,8 +2068,8 @@ export const DND55E_BACKGROUNDS = [
       "Интеллект"
     ],
     "feat": {
-      "id": "crafter",
-      "title": "Ремесленник"
+      "id": "enoa-mithras-picker-origin",
+      "title": "Прежде чем ударить"
     },
     "skills": [
       "Природа",
@@ -2170,8 +2168,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "lucky",
-      "title": "Везунчик"
+      "id": "enoa-appraisers-eye",
+      "title": "Глаз оценщика"
     },
     "skills": [
       "Анализ",
@@ -2286,8 +2284,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "savage-attacker",
-      "title": "Дикий атакующий"
+      "id": "enoa-urdreg-hunter-origin",
+      "title": "След до возврата"
     },
     "skills": [
       "Проницательность",
@@ -2418,8 +2416,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "healer",
-      "title": "Лекарь"
+      "id": "enoa-spark-shepherd-origin",
+      "title": "Не дать погаснуть"
     },
     "skills": [
       "Медицина",
@@ -2557,8 +2555,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "skilled",
-      "title": "Одарённый"
+      "id": "enoa-baraskus-foot-origin",
+      "title": "Дорога под стопой"
     },
     "skills": [
       "Атлетика",
@@ -2691,8 +2689,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "lucky",
-      "title": "Везунчик"
+      "id": "enoa-great-game-player-origin",
+      "title": "Цена находки"
     },
     "skills": [
       "Обман",
@@ -2822,8 +2820,8 @@ export const DND55E_BACKGROUNDS = [
       "Интеллект"
     ],
     "feat": {
-      "id": "crafter",
-      "title": "Ремесленник"
+      "id": "enoa-spiral-runner-origin",
+      "title": "Путь к ядру"
     },
     "skills": [
       "Аркана",
@@ -2962,8 +2960,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "tavern-brawler",
-      "title": "Драчун"
+      "id": "enoa-cradle-born-origin",
+      "title": "Руки помнят"
     },
     "skills": [
       "Атлетика",
@@ -3093,8 +3091,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "crafter",
-      "title": "Ремесленник"
+      "id": "enoa-nagbo-origin",
+      "title": "Подхватить чужую ношу"
     },
     "skills": [
       "Запугивание",
@@ -3228,8 +3226,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "tough",
-      "title": "Крепкий"
+      "id": "enoa-norbu-origin",
+      "title": "Сохранить пламя перед родом"
     },
     "skills": [
       "Атлетика",
@@ -3355,8 +3353,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "musician",
-      "title": "Музыкант"
+      "id": "enoa-tower-echo-origin",
+      "title": "Пауза наблюдателя"
     },
     "skills": [
       "Проницательность",
@@ -3478,9 +3476,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "magic-initiate",
-      "title": "Посвящённый в магию",
-      "note": "список волшебника"
+      "id": "enoa-called-one-origin",
+      "title": "Ответ сквозь шум"
     },
     "skills": [
       "Проницательность",
@@ -3630,8 +3627,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "tough",
-      "title": "Крепкий"
+      "id": "enoa-omen-reader-origin",
+      "title": "Четыре грани шагая"
     },
     "skills": [
       "Религия",
@@ -3761,8 +3758,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "alert",
-      "title": "Бдительный"
+      "id": "enoa-white-hunter-origin",
+      "title": "Не дать сомкнуться"
     },
     "skills": [
       "Аркана",
@@ -3886,8 +3883,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "alert",
-      "title": "Бдительный"
+      "id": "enoa-moon-maiden-origin",
+      "title": "Место у охраняемого"
     },
     "skills": [
       "Внимательность",
@@ -4009,8 +4006,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "musician",
-      "title": "Музыкант"
+      "id": "enoa-word-preacher-origin",
+      "title": "Дать толпе услышать"
     },
     "skills": [
       "Убеждение",
@@ -4142,8 +4139,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "lucky",
-      "title": "Везунчик"
+      "id": "enoa-crystal-eye-origin",
+      "title": "Два свидетельства"
     },
     "skills": [
       "Анализ",
@@ -4267,8 +4264,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "skilled",
-      "title": "Одарённый"
+      "id": "enoa-flame-keeper-origin",
+      "title": "Спасти связку"
     },
     "skills": [
       "История",
@@ -4409,9 +4406,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "magic-initiate",
-      "title": "Посвящённый в магию",
-      "note": "список жреца"
+      "id": "enoa-ripple-listener-origin",
+      "title": "Слышать нарушение тишины"
     },
     "skills": [
       "Внимательность",
@@ -4542,8 +4538,8 @@ export const DND55E_BACKGROUNDS = [
       "Интеллект"
     ],
     "feat": {
-      "id": "crafter",
-      "title": "Ремесленник"
+      "id": "enoa-elixir-warden-origin",
+      "title": "Порядок изоляции"
     },
     "skills": [
       "Аркана",
@@ -4642,8 +4638,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "lucky",
-      "title": "Везунчик"
+      "id": "enoa-blind-bunti-origin",
+      "title": "Между перевёрнутых палуб"
     },
     "skills": [
       "Скрытность",
@@ -4778,8 +4774,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "tough",
-      "title": "Крепкий"
+      "id": "enoa-mine-escapee-origin",
+      "title": "Дождаться смены"
     },
     "skills": [
       "Атлетика",
@@ -4918,8 +4914,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "healer",
-      "title": "Лекарь"
+      "id": "enoa-deep-brother-origin",
+      "title": "Вернуть к причалу"
     },
     "skills": [
       "Медицина",
@@ -5050,9 +5046,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "magic-initiate",
-      "title": "Посвящённый в магию",
-      "note": "список волшебника"
+      "id": "enoa-ilbesh-marked-origin",
+      "title": "Не дать Искре сорваться"
     },
     "skills": [
       "Аркана",
@@ -5185,8 +5180,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "tough",
-      "title": "Крепкий"
+      "id": "enoa-steppe-tiger-origin",
+      "title": "Первым через страх"
     },
     "skills": [
       "Атлетика",
@@ -5321,8 +5316,8 @@ export const DND55E_BACKGROUNDS = [
       "Интеллект"
     ],
     "feat": {
-      "id": "lucky",
-      "title": "Везунчик"
+      "id": "enoa-titania-returned-origin",
+      "title": "Выход вопреки памяти"
     },
     "skills": [
       "История",
@@ -5458,8 +5453,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "tavern-brawler",
-      "title": "Драчун"
+      "id": "enoa-brotherhood-debtor-origin",
+      "title": "Свою часть работы"
     },
     "skills": [
       "Ловкость рук",
@@ -5590,8 +5585,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "skilled",
-      "title": "Одарённый"
+      "id": "enoa-dangun-secret-origin",
+      "title": "Между своими"
     },
     "skills": [
       "Анализ",
@@ -5723,8 +5718,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "healer",
-      "title": "Лекарь"
+      "id": "enoa-tea-house-keeper-origin",
+      "title": "Пиала перед дорогой"
     },
     "skills": [
       "Проницательность",
@@ -5903,8 +5898,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "turned-thread",
-      "title": "Повёрнутая нить"
+      "id": "enoa-promised-to-ibon-origin",
+      "title": "Последняя капля"
     },
     "skills": [
       "Медицина",
@@ -6037,8 +6032,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "obo-stone",
-      "title": "Камень обо"
+      "id": "enoa-omor-without-obo-origin",
+      "title": "Камень для привала"
     },
     "skills": [
       "Акробатика",
@@ -6171,8 +6166,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "storm-scarred",
-      "title": "Опалённый грозой"
+      "id": "enoa-chosen-by-the-sky-origin",
+      "title": "Отвести первый разряд"
     },
     "skills": [
       "Внимательность",
@@ -6298,8 +6293,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "roads-of-the-dune-shah",
-      "title": "Тропы Шаха Дюн"
+      "id": "enoa-hound-of-the-dune-shah-origin",
+      "title": "От обо до обо"
     },
     "skills": [
       "Внимательность",
@@ -6428,8 +6423,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "beloved-of-the-rider",
-      "title": "Возлюбленный Всадницы"
+      "id": "enoa-chosen-of-batrina-origin",
+      "title": "Плечо аюра"
     },
     "skills": [
       "Уход за животными",
@@ -6555,8 +6550,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "curse-of-airun",
-      "title": "Проклятье Айруна"
+      "id": "enoa-blood-of-the-heshegi-origin",
+      "title": "Удержать звериный след"
     },
     "skills": [
       "Уход за животными",
@@ -6701,8 +6696,8 @@ export const DND55E_BACKGROUNDS = [
       "Телосложение"
     ],
     "feat": {
-      "id": "builders-hand",
-      "title": "Рука Строителя"
+      "id": "enoa-apprentice-of-the-star-origin",
+      "title": "Не скрывать трещину"
     },
     "skills": [
       "Анализ",
@@ -6829,8 +6824,8 @@ export const DND55E_BACKGROUNDS = [
       "Ловкость"
     ],
     "feat": {
-      "id": "ruzdas-craft",
-      "title": "Ремесло рузды"
+      "id": "enoa-ruzda-apprentice-origin",
+      "title": "Проба на малом"
     },
     "skills": [
       "Аркана",
@@ -6949,8 +6944,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "chidkurs-drinking-mate",
-      "title": "Собутыльник Чидкура"
+      "id": "enoa-who-pleased-chidkur-origin",
+      "title": "Шутка у перевала"
     },
     "skills": [
       "Природа",
@@ -7077,8 +7072,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "eyes-of-the-coven",
-      "title": "Глаза ковена"
+      "id": "enoa-servant-of-the-meridirs-origin",
+      "title": "Исполнить без следа"
     },
     "skills": [
       "Анализ",
@@ -7209,8 +7204,8 @@ export const DND55E_BACKGROUNDS = [
       "Харизма"
     ],
     "feat": {
-      "id": "blood-of-tusus",
-      "title": "Кровь Тусуса"
+      "id": "enoa-blue-blooded-origin",
+      "title": "Кровь помнит себя"
     },
     "skills": [
       "История",
@@ -7340,8 +7335,8 @@ export const DND55E_BACKGROUNDS = [
       "Телосложение"
     ],
     "feat": {
-      "id": "spiral-memory",
-      "title": "Память Спирали"
+      "id": "enoa-spiral-dweller-origin",
+      "title": "Отзвук знакомого движения"
     },
     "skills": [
       "История",
@@ -7448,8 +7443,8 @@ export const DND55E_BACKGROUNDS = [
       "Мудрость"
     ],
     "feat": {
-      "id": "wind-listener",
-      "title": "Слушающий ветра"
+      "id": "enoa-the-winds-game-origin",
+      "title": "Шаг между ветрами"
     },
     "skills": [
       "Природа",

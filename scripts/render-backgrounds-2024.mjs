@@ -11,6 +11,9 @@ import { DND55E_BACKGROUNDS } from '../app/data/dnd55e/backgrounds.js'
 import { DND55E_FEATS } from '../app/data/dnd55e/feats.js'
 import { emphasizeFeatRule } from '../app/utils/featEmphasis.js'
 import { DND55E_HOMEBREW_ORIGIN_FEATS } from '../app/data/dnd55e/origin-feats-homebrew.js'
+import { ENOA_ORIGIN_DRAFTS } from '../app/data/dnd55e/origin-feats-enoa-drafts.js'
+import { FEATS_5E } from '../app/data/feats5e.js'
+import { ENOA_AUTHORED_FEATS_2014_V4 } from '../app/data/enoa-authored-feats-v4.js'
 
 await fs.mkdir('.tmpwork/backgrounds-render', { recursive: true })
 const shell = defineComponent({
@@ -29,8 +32,8 @@ async function compile(name, folder = 'dnd55e/') {
   const { default: component } = await import(pathToFileURL(modulePath).href)
   return component
 }
-async function render(name) {
-  const component = await compile(name)
+async function render(name, folder = 'dnd55e/') {
+  const component = await compile(name, folder)
   const app = createSSRApp(component)
   app.component('CardSectionNav', await compile('CardSectionNav', ''))
   app.component('OriginFeatEffects', await compile('OriginFeatEffects', ''))
@@ -53,7 +56,7 @@ for (const b of DND55E_BACKGROUNDS) {
   for (const entry of b.equipment.items.filter(e => e.loreAdaptation)) assert.ok(backgrounds.includes(entry.title), `${b.id}: knot equipment`)
 }
 assert.ok(backgrounds.includes('не выше 20'))
-assert.ok(backgrounds.includes('свободная черта вместо Origin'))
+assert.ok(!backgrounds.includes('свободная черта вместо Origin'))
 assert.ok(backgrounds.includes('Не входят в комплект за 50 зм'))
 assert.ok(!backgrounds.includes('/dnd55e/equipment?item=gear-book'), 'paper book link returned')
 assert.ok(backgrounds.includes('Инструменты узлового писца'))
@@ -79,7 +82,7 @@ for (const f of DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.status !== 'Approved'
 }
 // Exercise unpublished text through the real effect component without publishing it.
 const effectComponent = await compile('OriginFeatEffects', '')
-const proposals = DND55E_HOMEBREW_ORIGIN_FEATS.filter(f => f.version === '0.3.0')
+const proposals = ENOA_ORIGIN_DRAFTS.filter(f => !['mlah-diver','cohort-renegade','nameless'].includes(f.relatedBackgrounds[0]))
 assert.equal(proposals.length, 54)
 const draftApp = createSSRApp({ render: () => h('main', proposals.map(feat => h(effectComponent, { feat }))) })
 draftApp.component('RuleRichText', defineComponent({ props: ['text'], setup: props => () => h('span', props.text.replace(/\*\*/g, '')) }))
@@ -97,4 +100,11 @@ assert.ok(backgrounds.includes('Стоимость нового набора, д
 assert.ok(backgrounds.includes('Всегда есть выход'))
 assert.ok(feats.includes('Всегда есть выход'))
 assert.ok(!backgrounds.includes('старшие смотрят на вас как на почти семью'))
-console.log('Rendered 56 background cards, public feat catalog and 54 unpublished effect cards. Individual M’lah and Cohort cards, full text, links and Draft/Playtest exclusion passed. Browser layout not tested.')
+const legacyFeats = await render('feats', '../pages/dnd5e/')
+assert.equal((legacyFeats.match(/data-record=/g)||[]).length, FEATS_5E.length)
+assert.equal(ENOA_AUTHORED_FEATS_2014_V4.length,56)
+for(const f of ENOA_AUTHORED_FEATS_2014_V4){
+  assert.ok(legacyFeats.includes(`data-record="${f.id}"`),f.id)
+  for(const text of f.benefits)assert.ok(legacyFeats.includes(text.replace(/\*\*/g,'')),f.id+': missing 2014 rule')
+}
+console.log(`Rendered 56 backgrounds, ${DND55E_FEATS.length} feats 2024, ${FEATS_5E.length} feats 2014 and 54 archived draft effect cards. Text and links passed; browser layout not tested.`)

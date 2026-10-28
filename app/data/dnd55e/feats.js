@@ -16,7 +16,7 @@ export const DND55E_FEAT_CATEGORIES = {
   origin: {
     title: 'Черты происхождения',
     singular: 'Черта происхождения',
-    code: 'ПРОИСХОЖДЕНИЕ · PHB 2024',
+    code: 'ПРОИСХОЖДЕНИЕ · D&D 2024',
     icon: '✦'
   },
   'epic-boon': {
