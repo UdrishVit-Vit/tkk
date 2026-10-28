@@ -1,0 +1,394 @@
+[
+  {
+    "backgroundId": "mlah-diver",
+    "originFeatId": "enoa-mlah-diver-origin",
+    "feat2014Id": "enoa-mlah-diver-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "cohort-renegade",
+    "originFeatId": "enoa-cohort-renegade-origin",
+    "feat2014Id": "enoa-cohort-renegade-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "hakar",
+    "originFeatId": "enoa-hakar-origin",
+    "feat2014Id": "enoa-hakar-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "mithras-caravaneer",
+    "originFeatId": "enoa-route-memory",
+    "feat2014Id": "enoa-mithras-caravaneer-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "bone-seer",
+    "originFeatId": "enoa-bone-seer-origin",
+    "feat2014Id": "enoa-bone-seer-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "knot-scribe",
+    "originFeatId": "enoa-knot-memory",
+    "feat2014Id": "enoa-knot-scribe-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "silk-mouse-catcher",
+    "originFeatId": "enoa-silk-mouse-catcher-origin",
+    "feat2014Id": "enoa-silk-mouse-catcher-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "pit-fighter",
+    "originFeatId": "enoa-pit-fighter-origin",
+    "feat2014Id": "enoa-pit-fighter-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "caravanserai-keeper",
+    "originFeatId": "enoa-caravanserai-keeper-origin",
+    "feat2014Id": "enoa-caravanserai-keeper-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "sun-miner",
+    "originFeatId": "enoa-sun-miner-origin",
+    "feat2014Id": "enoa-sun-miner-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "huurch",
+    "originFeatId": "enoa-huurch-origin",
+    "feat2014Id": "enoa-huurch-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "white-falcon-watcher",
+    "originFeatId": "enoa-white-falcon-watcher-origin",
+    "feat2014Id": "enoa-white-falcon-watcher-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "lifestone-wright",
+    "originFeatId": "enoa-lifestone-wright-origin",
+    "feat2014Id": "enoa-lifestone-wright-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "sarban-drover",
+    "originFeatId": "enoa-sarban-drover-origin",
+    "feat2014Id": "enoa-sarban-drover-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "mithras-picker",
+    "originFeatId": "enoa-mithras-picker-origin",
+    "feat2014Id": "enoa-mithras-picker-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "syndicate-appraiser",
+    "originFeatId": "enoa-appraisers-eye",
+    "feat2014Id": "enoa-syndicate-appraiser-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "urdreg-hunter",
+    "originFeatId": "enoa-urdreg-hunter-origin",
+    "feat2014Id": "enoa-urdreg-hunter-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "spark-shepherd",
+    "originFeatId": "enoa-spark-shepherd-origin",
+    "feat2014Id": "enoa-spark-shepherd-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "baraskus-foot",
+    "originFeatId": "enoa-baraskus-foot-origin",
+    "feat2014Id": "enoa-baraskus-foot-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "great-game-player",
+    "originFeatId": "enoa-great-game-player-origin",
+    "feat2014Id": "enoa-great-game-player-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "spiral-runner",
+    "originFeatId": "enoa-spiral-runner-origin",
+    "feat2014Id": "enoa-spiral-runner-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "cradle-born",
+    "originFeatId": "enoa-cradle-born-origin",
+    "feat2014Id": "enoa-cradle-born-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "nagbo",
+    "originFeatId": "enoa-nagbo-origin",
+    "feat2014Id": "enoa-nagbo-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "norbu",
+    "originFeatId": "enoa-norbu-origin",
+    "feat2014Id": "enoa-norbu-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "tower-echo",
+    "originFeatId": "enoa-tower-echo-origin",
+    "feat2014Id": "enoa-tower-echo-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "called-one",
+    "originFeatId": "enoa-called-one-origin",
+    "feat2014Id": "enoa-called-one-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "omen-reader",
+    "originFeatId": "enoa-omen-reader-origin",
+    "feat2014Id": "enoa-omen-reader-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "white-hunter",
+    "originFeatId": "enoa-white-hunter-origin",
+    "feat2014Id": "enoa-white-hunter-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "moon-maiden",
+    "originFeatId": "enoa-moon-maiden-origin",
+    "feat2014Id": "enoa-moon-maiden-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "word-preacher",
+    "originFeatId": "enoa-word-preacher-origin",
+    "feat2014Id": "enoa-word-preacher-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "crystal-eye",
+    "originFeatId": "enoa-crystal-eye-origin",
+    "feat2014Id": "enoa-crystal-eye-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "flame-keeper",
+    "originFeatId": "enoa-flame-keeper-origin",
+    "feat2014Id": "enoa-flame-keeper-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "ripple-listener",
+    "originFeatId": "enoa-ripple-listener-origin",
+    "feat2014Id": "enoa-ripple-listener-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "elixir-warden",
+    "originFeatId": "enoa-elixir-warden-origin",
+    "feat2014Id": "enoa-elixir-warden-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "blind-bunti",
+    "originFeatId": "enoa-blind-bunti-origin",
+    "feat2014Id": "enoa-blind-bunti-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "mine-escapee",
+    "originFeatId": "enoa-mine-escapee-origin",
+    "feat2014Id": "enoa-mine-escapee-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "deep-brother",
+    "originFeatId": "enoa-deep-brother-origin",
+    "feat2014Id": "enoa-deep-brother-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "ilbesh-marked",
+    "originFeatId": "enoa-ilbesh-marked-origin",
+    "feat2014Id": "enoa-ilbesh-marked-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "steppe-tiger",
+    "originFeatId": "enoa-steppe-tiger-origin",
+    "feat2014Id": "enoa-steppe-tiger-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "titania-returned",
+    "originFeatId": "enoa-titania-returned-origin",
+    "feat2014Id": "enoa-titania-returned-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "brotherhood-debtor",
+    "originFeatId": "enoa-brotherhood-debtor-origin",
+    "feat2014Id": "enoa-brotherhood-debtor-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "dangun-secret",
+    "originFeatId": "enoa-dangun-secret-origin",
+    "feat2014Id": "enoa-dangun-secret-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "tea-house-keeper",
+    "originFeatId": "enoa-tea-house-keeper-origin",
+    "feat2014Id": "enoa-tea-house-keeper-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "promised-to-ibon",
+    "originFeatId": "enoa-promised-to-ibon-origin",
+    "feat2014Id": "enoa-promised-to-ibon-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "omor-without-obo",
+    "originFeatId": "enoa-omor-without-obo-origin",
+    "feat2014Id": "enoa-omor-without-obo-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "chosen-by-the-sky",
+    "originFeatId": "enoa-chosen-by-the-sky-origin",
+    "feat2014Id": "enoa-chosen-by-the-sky-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "hound-of-the-dune-shah",
+    "originFeatId": "enoa-hound-of-the-dune-shah-origin",
+    "feat2014Id": "enoa-hound-of-the-dune-shah-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "chosen-of-batrina",
+    "originFeatId": "enoa-chosen-of-batrina-origin",
+    "feat2014Id": "enoa-chosen-of-batrina-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "blood-of-the-heshegi",
+    "originFeatId": "enoa-blood-of-the-heshegi-origin",
+    "feat2014Id": "enoa-blood-of-the-heshegi-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "apprentice-of-the-star",
+    "originFeatId": "enoa-apprentice-of-the-star-origin",
+    "feat2014Id": "enoa-apprentice-of-the-star-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "ruzda-apprentice",
+    "originFeatId": "enoa-ruzda-apprentice-origin",
+    "feat2014Id": "enoa-ruzda-apprentice-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "who-pleased-chidkur",
+    "originFeatId": "enoa-who-pleased-chidkur-origin",
+    "feat2014Id": "enoa-who-pleased-chidkur-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "servant-of-the-meridirs",
+    "originFeatId": "enoa-servant-of-the-meridirs-origin",
+    "feat2014Id": "enoa-servant-of-the-meridirs-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "blue-blooded",
+    "originFeatId": "enoa-blue-blooded-origin",
+    "feat2014Id": "enoa-blue-blooded-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "spiral-dweller",
+    "originFeatId": "enoa-spiral-dweller-origin",
+    "feat2014Id": "enoa-spiral-dweller-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  },
+  {
+    "backgroundId": "the-winds-game",
+    "originFeatId": "enoa-the-winds-game-origin",
+    "feat2014Id": "enoa-the-winds-game-feat-2014",
+    "status": "DRAFT",
+    "apply": false
+  }
+]

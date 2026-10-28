@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-28",
+  "status": "STRUCTURE_PASS",
+  "concepts": 56,
+  "versions": 112,
+  "individualCards": 56,
+  "sourceFilesUnchanged": 6,
+  "assignmentsApplied": 0,
+  "uniqueTitles": 56,
+  "uniqueCoreTexts": 56,
+  "semanticPlaytest": false,
+  "review": "REVISION_REQUIRED: individual numeric review and human playtest remain",
+  "referenceMath": {
+    "dc": 15,
+    "modifier": 5,
+    "ordinary": 0.55,
+    "advantage": 0.7975,
+    "plusD4": 0.675,
+    "level20ReductionD6PlusPB": {
+      "perUse": 9.5,
+      "pbUses": 6,
+      "maximumExpectedTotal": 57,
+      "condition": "Only if all six applicable reactions are actually used; before resistance."
+    }
+  }
+}
