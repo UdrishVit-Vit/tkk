@@ -9,7 +9,7 @@ const beforeText=fs.readFileSync(root+'backgrounds.js.before','utf8');
 const marker='export const DND55E_BACKGROUNDS = ';
 const before=JSON.parse(beforeText.slice(beforeText.indexOf(marker)+marker.length,beforeText.indexOf('\n\nexport const DND55E_BACKGROUND_FEATS')).trim());
 const reviewedBackgrounds=backgrounds.filter(b=>before.some(old=>old.id===b.id));
-assert.deepEqual(reviewedBackgrounds.map(b=>b.id),before.filter(b=>b.id!=='lifestone-wright').map(b=>b.id));
+assert.deepEqual(reviewedBackgrounds.map(b=>b.id),before.filter(b=>!['lifestone-wright','knot-scribe','sarban-drover'].includes(b.id)).map(b=>b.id));
 for(const b of reviewedBackgrounds){
  const old=before.find(x=>x.id===b.id);
  const withoutFeat=({feat,...rest})=>rest;
@@ -23,7 +23,7 @@ for(const b of reviewedBackgrounds){
  if(['nagbo','norbu'].includes(b.id))assert.equal(f14.requirement,'Вирморожденные');
 }
 for(const catalogue of [feats,legacy])assert.equal(new Set(catalogue.map(f=>f.id)).size,catalogue.length);
-assert.equal(authored2014.length,55);assert.equal(new Set(backgrounds.map(b=>b.feat.id)).size,56);
+assert.equal(authored2014.length,55);assert.equal(new Set(backgrounds.map(b=>b.feat.id)).size,54);
 assert.ok(!legacy.some(f=>f.id==='enoa-lifestone-wright-feat-2014'));
 assert.ok(!feats.some(f=>f.id==='enoa-lifestone-wright-origin'));
 const oldLegacy=await import('data:text/javascript;base64,'+Buffer.from(fs.readFileSync(root+'feats5e.js.before','utf8')).toString('base64'));

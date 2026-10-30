@@ -7,7 +7,7 @@ export function checkEnoaOrigins(bs, fs, mapping) {
   const errors = []
   const author = bs.filter(b => b.source === 'TVV')
   // The original Nameless draft remains in the editorial source, outside active assignments.
-  if(author.length !== 56 || fs.length !== 56 || author.some(b=>['nameless','lifestone-wright'].includes(b.id))) errors.push('coverage-count')
+  if(author.length !== 54 || fs.length !== 54 || author.some(b=>['nameless','lifestone-wright','knot-scribe','sarban-drover'].includes(b.id))) errors.push('coverage-count')
   const mapped = new Set()
   for(const b of author) {
     const ids = mapping[b.id] || []

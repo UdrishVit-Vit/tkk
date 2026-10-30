@@ -21,7 +21,7 @@ const cases = [
   ['homebrew-field', d => { delete d.homebrew[0].action }],
   ['unpublished-feat', d => d.feats.push({...structuredClone(d.homebrew[0]),id:'test-unpublished-origin',status:'Draft'})],
   ['coins-display', d => { d.backgrounds[0].equipment.coins = '0 зм' }],
-  ['proposal-reference', d => d.proposals['knot-scribe'].push('missing')],
+  ['proposal-reference', d => d.proposals[d.backgrounds[0].id].push('missing')],
   ['equipment-forbidden', d => { d.backgrounds[0].equipment.items[0].id = 'weapon-lance' }]
 ]
 for (const [code, mutate] of cases) {
@@ -40,13 +40,14 @@ for (const f of before.linkedFeats) {
   for (const key of ['benefits', 'requirement', 'category', 'repeatable']) assert.deepEqual(after[key], f[key], `${f.id}.${key} changed`)
 }
 // Explicit author removal; keep the original snapshot as historical evidence.
-const removedBackgrounds = new Set(['acolyte','artisan','charlatan','criminal','entertainer','farmer','guard','guide','hermit','merchant','noble','sage','sailor','scribe','soldier','wayfarer','nameless','lifestone-wright'])
-assert.equal(currentData.backgrounds.length,56)
+const removedBackgrounds = new Set(['acolyte','artisan','charlatan','criminal','entertainer','farmer','guard','guide','hermit','merchant','noble','sage','sailor','scribe','soldier','wayfarer','nameless','lifestone-wright','knot-scribe','sarban-drover'])
+assert.equal(currentData.backgrounds.length,54)
 assert.ok(currentData.backgrounds.every(b => b.group==='enoa'&&!removedBackgrounds.has(b.id)))
 assert.equal(currentData.backgrounds.find(b=>b.id==='hakar').title,'Хакар')
 assert.ok(currentData.feats.some(f=>f.id==='nameless'))
 // The author requested unique V4 assignments for all active backgrounds.
-assert.equal(new Set(currentData.backgrounds.map(b=>b.feat.id)).size,56)
+assert.equal(new Set(currentData.backgrounds.map(b=>b.feat.id)).size,54)
+assert.deepEqual(currentData.feats.find(f=>f.id==='enoa-knot-memory').relatedBackgrounds,[])
 for(const b of currentData.backgrounds){
   const f=currentData.feats.find(f=>f.id===b.feat.id)
   assert.ok(f&&f.source==='TVV'&&f.category==='origin'&&f.status==='Approved',b.id)
