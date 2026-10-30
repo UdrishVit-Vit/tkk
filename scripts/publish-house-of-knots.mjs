@@ -17,22 +17,16 @@ const related=(edition)=>[
  {title, path:edition===2024?bgPath:bg14Path},
  {title:pearlKnot.title,path:edition===2024?magicPath:magic14Path}
 ];
-const contents=[
- {title:'Шнуры и нити',description:'Основа для узловых записей, копий, бирок и небольших связок.'},
- {title:'Челноки и плетельные иглы',description:'Для ведения нити через плетение и работы с плотными участками записи.'},
- {title:'Разделитель узлов',description:'Тонкое приспособление для аккуратного разбора и исправления плетения.'},
- {title:'Небольшие ножницы',description:'Для подготовки нитей и удаления повреждённых концов.'},
- {title:'Бирки и крепёжные шнурки',description:'Для отметок, соединения связок и сохранения порядка записей.'}
-];
+const contents=tool.contents;
 const kit=(edition)=>({
- intro:'Принадлежности для создания, копирования и восстановления узловых записей.',contents,
+ intro:'Письма и записи вяжут вручную. В наборе четыре вида нитей, нож и материалы для расстановки акцентов.',contents,
  proficiency:{rule:'Владение набором позволяет добавлять бонус мастерства к подходящим проверкам работы с узловыми записями. Характеристика и сложность зависят от задачи. Бонус мастерства добавляется к одной проверке только один раз.',
- tasks:['Составить опись или записать договорённость на известном вам языке.','Скопировать доступную узловую запись, сохранив порядок связок.','Исправить повреждённое плетение или разобрать перепутанные нити.','Подготовить бирки и указатели для хранения вещей и записей.'],
- limit:'Чтение требует знания языка. Набор не раскрывает неизвестный шифр и сам по себе не создаёт магических свойств.'},
- supplies:[{title:'Нити для новых записей',description:'Нити и шнуры расходуются по мере создания записей; запас пополняют отдельно.',storage:'Храните волокно в сухом чехле, защищая от грязи и масел.'}],
+ tasks:['Связать простое письмо из джутовых нитей или официальное письмо из шерсти яка на известном вам языке.','Скопировать доступную узловую запись, сохранив порядок узлов.','Исправить повреждённое плетение или разобрать перепутанные нити.','Расставить акценты с помощью костей, бусин, украшений и металлических нитей, соблюдая правила оформления документов.'],
+ limit:'Чтение и составление писем требуют знания языка записи.'},
+ supplies:[{title:'Пополнение набора',description:'Начальная длина каждого вида нитей указана в составе. Нити, кости, бусины и украшения можно пополнять отдельно.',storage:'Храните нити сухими и раздельно, чтобы они не путались.'}],
  related:related(edition)
 });
-const kit24={id:tool.id,title:tool.title,englishName:'Knot-Writing Kit',source:'TVV',sourceTitle:'Эноа',srdVersion:'Эноа',category:'tools',kind:'tool',tags:['tool','artisan'],group:'Ремесленный набор Эноа',ability:'По выполняемой задаче',cost:'10 зм',weight:'5 фнт.',description:tool.description,utilize:'Создание, копирование и восстановление узловых записей.',craft:'Обычные узловые записи; бирки; описи',kit:kit(2024)};
+const kit24={id:tool.id,title:tool.title,englishName:'Knot-Writing Kit',source:'TVV',sourceTitle:'Эноа',srdVersion:'Эноа',category:'tools',kind:'tool',tags:['tool','artisan'],group:'Ремесленный набор Эноа',ability:'По выполняемой задаче',cost:'10 зм',weight:'5 фнт.',description:tool.description,utilize:'Создание, копирование и восстановление узловых записей.',craft:'Узловые письма; копии записей; описи',kit:kit(2024)};
 const kit14={id:tool.id,title:tool.title,englishName:'Knot-Writing Kit',source:'TVV',category:'kit',cost:'10 зм',weight:'5 фнт.',tags:['utility','social'],description:tool.description,details:[],kit:kit(2014),usedBy:[]};
 const feat={...structuredClone(origin),status:'Approved',version:'0.4.2',approvalNote:'Автор запросил добавление согласованной предыстории, черты и предметов на сайт 30.10.2026.',action:'Постоянная Компетентность и получение одного Жемчужного узла.',conditions:'Выбор навыка и правила Жемчужного узла приведены в соответствующих описаниях.',uses:'Вы получаете один узел при получении черты. Число применений самого предмета не ограничено.',recovery:'Не требуется; отдых не создаёт новый предмет.',relatedItems:[{title:pearlKnot.title,path:magicPath},{title:tool.title,path:kitPath}]};
 const b24={group:'enoa',source:'TVV',sourceTitle:'Эноа',id:background2024.id,title,originalName:background2024.originalName,summary,abilities:background2024.abilities,skills:background2024.skills,tool:tool.title,feat:{id:feat.id,title:feat.title},equipment:structuredClone(background2024.equipment),glossary:[],ties:['Дом Узлов'],enoaLead:story,questions,variants:variants.map(v=>({...v,region:'Дом Узлов'})),hooks,grantedItems:[{id:pearlKnot.id,title:pearlKnot.title,path:magicPath,note:'Вы получаете один узел по черте «Архивная выучка» при любом выборе стартового снаряжения.'}]};

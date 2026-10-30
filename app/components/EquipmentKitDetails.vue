@@ -24,7 +24,7 @@ function jump(id, section) {
           <span class="kit-number" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
           <div>
             <h4><NuxtLink v-if="part.path" :to="part.path">{{ part.title }}</NuxtLink><template v-else>{{ part.title }}</template><span v-if="part.quantity" class="kit-quantity"> × {{ part.quantity }}</span></h4>
-            <p>{{ part.description }}</p>
+            <p v-if="part.description">{{ part.description }}</p>
           </div>
         </li>
       </ul>

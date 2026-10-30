@@ -36,7 +36,9 @@ assert(b14.feature.text.includes('один Жемчужный узел'));
 assert.equal(b24.equipment.items[0].id,'tool-knot-writing-kit');
 for(const [kit,catalogue] of [[house.HOUSE_KIT_2024,equipment24],[house.HOUSE_KIT_2014,equipment14]]){
  assert.deepEqual(catalogue.find(x=>x.id===kit.id),kit);
- assert.equal(kit.cost,'10 зм');assert.equal(kit.kit.contents.length,5);
+ assert.equal(kit.cost,'10 зм');assert.equal(kit.kit.contents.length,7);
+ assert.deepEqual(kit.kit.contents.filter(x=>x.lengthMeters).map(x=>x.lengthMeters),[10,5,3,1]);
+ assert(!/челнок|плетельн|разделитель|ножниц|бирк/iu.test(JSON.stringify(kit)),'obsolete kit implements');
  assert.equal(kit.kit.proficiency.tasks.length,4);assert.equal(kit.kit.supplies.length,1);
 }
 for(const item of [house.HOUSE_MAGIC_ITEM_2024,house.HOUSE_MAGIC_ITEM_2014]){
