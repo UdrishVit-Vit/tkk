@@ -33,19 +33,27 @@ export const HOUSE_BACKGROUND_2024 = {
         "note": ""
       },
       {
-        "id": "gear-chest",
-        "title": "Сундук",
+        "id": "gear-knot-storage-cord",
+        "title": "Архивная связка",
         "quantity": 1,
-        "unitCostCp": 500,
-        "label": "Сундук",
+        "unitCostCp": 100,
+        "label": "Архивная связка",
         "note": ""
       },
       {
-        "id": "gear-lock",
-        "title": "Замок с ключом",
+        "id": "gear-lantern-hooded",
+        "title": "Закрытый фонарь",
         "quantity": 1,
-        "unitCostCp": 1000,
-        "label": "Замок с ключом",
+        "unitCostCp": 500,
+        "label": "Закрытый фонарь",
+        "note": ""
+      },
+      {
+        "id": "gear-oil",
+        "title": "Фляга масла",
+        "quantity": 1,
+        "unitCostCp": 10,
+        "label": "Фляга масла",
         "note": ""
       },
       {
@@ -65,8 +73,8 @@ export const HOUSE_BACKGROUND_2024 = {
         "note": ""
       }
     ],
-    "coins": "22 зм 5 см",
-    "coinsCp": 2250,
+    "coins": "31 зм 4 см",
+    "coinsCp": 3140,
     "alt": "50 зм",
     "alternativeCp": 5000,
     "storyItems": [
@@ -170,7 +178,9 @@ export const HOUSE_BACKGROUND_2014 = {
     ],
     "equipment": [
       "Набор узлового письма",
-      "Футляр для связок",
+      "Архивная связка",
+      "Закрытый фонарь",
+      "Фляга масла",
       "Обычная одежда",
       "Кошель с 10 зм"
     ]
@@ -475,4 +485,38 @@ export const HOUSE_MAGIC_ITEM_2014 = {
     "/dnd5e/screens/downtime_activities/research",
     "/dnd5e/screens/action"
   ]
+}
+
+export const HOUSE_STORAGE_2024 = {
+  "id": "gear-knot-storage-cord",
+  "title": "Архивная связка",
+  "englishName": "Archive Cord",
+  "source": "TVV",
+  "cost": "1 зм",
+  "weight": "1 фнт.",
+  "description": "Прочный плетёный шнур с отдельными петлями для хранения узловых записей. Каждую запись складывают в небольшую связку и крепят за обвязку, не затрагивая узлы самого письма. Нужную запись можно снять отдельно, не распуская остальные. Шнур сворачивают для переноски, а во время работы развешивают, чтобы видеть хранимые связки. Бусина или костяная подвеска у крепления помогает отличить одну запись от другой.",
+  "sourceTitle": "Эноа",
+  "srdVersion": "Эноа",
+  "category": "gear",
+  "kind": "gear",
+  "tags": [
+    "container"
+  ]
+}
+
+export const HOUSE_STORAGE_2014 = {
+  "id": "gear-knot-storage-cord",
+  "title": "Архивная связка",
+  "englishName": "Archive Cord",
+  "source": "TVV",
+  "cost": "1 зм",
+  "weight": "1 фнт.",
+  "description": "Прочный плетёный шнур с отдельными петлями для хранения узловых записей. Каждую запись складывают в небольшую связку и крепят за обвязку, не затрагивая узлы самого письма. Нужную запись можно снять отдельно, не распуская остальные. Шнур сворачивают для переноски, а во время работы развешивают, чтобы видеть хранимые связки. Бусина или костяная подвеска у крепления помогает отличить одну запись от другой.",
+  "category": "container",
+  "tags": [
+    "utility",
+    "travel"
+  ],
+  "details": [],
+  "usedBy": []
 }

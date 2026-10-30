@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
-import {meta,title,premise,summary,story,variants,hooks,questions,tool,pearlKnot,origin,background2024 as b24,background2014 as b14,integration} from './draft.mjs';
+import {meta,title,premise,summary,story,variants,hooks,questions,tool,storage,pearlKnot,origin,background2024 as b24,background2014 as b14,integration} from './draft.mjs';
 import {DND55E_BACKGROUNDS as existing} from '../../../app/data/dnd55e/backgrounds.js';
 import {DND55E_FEATS as existingFeats} from '../../../app/data/dnd55e/feats.js';
 import {DND55E_EQUIPMENT as equipment} from '../../../app/data/dnd55e/equipment2024.js';
@@ -16,9 +16,10 @@ assert.equal(origin.status,'Draft');assert.equal(origin.balance.playtest,false);
 const adopted=existing.find(b=>b.id===b24.id);
 if(adopted){assert.equal(adopted.title,title);assert.equal(adopted.feat.id,origin.id);assert.equal(existingFeats.find(f=>f.id===origin.id)?.status,'Approved');}
 const itemsTotal=b24.equipment.items.reduce((s,e)=>s+e.quantity*e.unitCostCp,0);
-assert.equal(itemsTotal,2750);assert.equal(itemsTotal+b24.equipment.coinsCp,5000);assert.equal(b24.equipment.alternativeCp,5000);
-const officialPriceCp={'tool-calligraphers-supplies':1000,'gear-chest':500,'gear-lock':1000,'gear-clothes-travelers':200,'gear-pouch':50};
+assert.equal(itemsTotal,1860);assert.equal(itemsTotal+b24.equipment.coinsCp,5000);assert.equal(b24.equipment.alternativeCp,5000);
+const officialPriceCp={'tool-calligraphers-supplies':1000,'gear-lantern-hooded':500,'gear-oil':10,'gear-clothes-travelers':200,'gear-pouch':50};
 for(const item of b24.equipment.items){
+ if(item.id===storage.id){assert.equal(item.unitCostCp,storage.costCp);assert(equipment.some(e=>e.id===item.id));continue;}
  const id=item.id===tool.id?'tool-calligraphers-supplies':item.id;
  assert(equipment.some(e=>e.id===id));assert.equal(item.unitCostCp,officialPriceCp[id]);
 }
@@ -60,8 +61,8 @@ const card=`# ${title}\n\nПроект ${meta.version}, ${meta.date}. Основ
 const storySection='## История и связи\n\n'+story.join('\n\n')+'\n\n';
 const pearlSection=`## Жемчужный узел\n\n*Служебный магический инструмент Дома Узлов.*\n\n${pearlKnot.description}\n\n${pearlKnot.rule}\n\nОдин узел выдаётся по черте происхождения 2024 либо как отдельный служебный предмет предыстории 2014. Это один и тот же предмет; две редакции не используются для получения двух узлов. Он предоставляется отдельно от оплаченного комплекта А/Б; цена и редкость пока не установлены.\n\n`;
 const orderedCard=card.replace(storySection,'').replace('## Варианты прошлого\n\n',pearlSection+storySection+'## Варианты прошлого\n\n');
-fs.writeFileSync(root+'/README.md',orderedCard);
-fs.writeFileSync(root+'/catalog.json',JSON.stringify({meta,tool,pearlKnot,background2024:b24,originFeat:origin,background2014:b14,integration},null,2)+'\n');
+fs.writeFileSync(root+'/README.md',orderedCard+`\n## ${storage.title}\n\n${storage.description}\n\nРабочая авторская цена — ${storage.costCp/100} зм; вес — ${storage.weightLb} фнт. Это отдельный предмет снаряжения для хранения записей.\n`);
+fs.writeFileSync(root+'/catalog.json',JSON.stringify({meta,tool,storage,pearlKnot,background2024:b24,originFeat:origin,background2014:b14,integration},null,2)+'\n');
 fs.writeFileSync(root+'/math.json',JSON.stringify({assumptions:'Интеллект +3 удерживается постоянным; только обычный к20, без преимущества и иных бонусов. Результат — вероятность одной проверки, не баланс кампании.',levels:math,itemActivationMinutes:10,maxSerialItemUsesPerQuietHour:6,playtest:false},null,2)+'\n');
 for(const p of protectedPaths)assert.equal(sha(p),before[p],p+': production changed');
 const result={status:'PASS',date:meta.date,proposalVersion:meta.version,background2024:true,originFeat2024:true,background2014:true,equipmentACp:5000,equipmentBCp:5000,summaryWords:wordCount(summary),storyWords:wordCount(story.join(' ')),duplicateIds:false,editionsSeparated:true,canonBasis:'DIRECT_AUTHOR plus bounded chronicle evidence',playtest:false,productionUnchanged:true,productionHashes:before};

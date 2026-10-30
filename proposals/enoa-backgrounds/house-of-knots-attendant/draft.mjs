@@ -70,17 +70,24 @@ export const origin={
  balance:{comparator:'Skilled; Magic Initiate; Crafter (Origin 2024)',concern:'Компетентность и один передаваемый служебный магический предмет. Повторное создание, цена и автоматическая замена узла не предоставляются; каждое использование требует 10 минут. Нужно проверить перенос силы черты в передаваемый предмет.',usesAtLevels:[null,null,null,null],playtest:false}
 };
 
+export const storage={
+ id:'gear-knot-storage-cord',title:'Архивная связка',englishName:'Archive Cord',costCp:100,weightLb:1,
+ status:'PROPOSAL',priceBasis:'Авторская рабочая цена и вес; не официальная позиция PHB.',
+ description:'Прочный плетёный шнур с отдельными петлями для хранения узловых записей. Каждую запись складывают в небольшую связку и крепят за обвязку, не затрагивая узлы самого письма. Нужную запись можно снять отдельно, не распуская остальные. Шнур сворачивают для переноски, а во время работы развешивают, чтобы видеть хранимые связки. Бусина или костяная подвеска у крепления помогает отличить одну запись от другой.'
+};
+
 export const background2024={
  id:'house-of-knots-attendant',title,originalName:'House of Knots Attendant',group:'enoa',source:'TVV',status:'Draft',version:meta.version,summary,
  abilities:['Интеллект','Мудрость','Ловкость'],skills:['Анализ','Аркана'],tool:tool.title,toolId:tool.id,
  feat:{id:origin.id,title:origin.title},
  equipment:{items:[
  {id:tool.id,title:tool.title,quantity:1,unitCostCp:1000},
- {id:'gear-chest',title:'Сундук',quantity:1,unitCostCp:500},
- {id:'gear-lock',title:'Замок с ключом',quantity:1,unitCostCp:1000},
+ {id:storage.id,title:storage.title,quantity:1,unitCostCp:storage.costCp},
+ {id:'gear-lantern-hooded',title:'Закрытый фонарь',quantity:1,unitCostCp:500},
+ {id:'gear-oil',title:'Фляга масла',quantity:1,unitCostCp:10},
  {id:'gear-clothes-travelers',title:'Дорожная одежда',quantity:1,unitCostCp:200},
  {id:'gear-pouch',title:'Кошель',quantity:1,unitCostCp:50}
- ],coins:'22 зм 5 см',coinsCp:2250,alt:'50 зм',alternativeCp:5000},
+ ],coins:'31 зм 4 см',coinsCp:3140,alt:'50 зм',alternativeCp:5000},
  story,variants,hooks,questions,
  memento:'Собственная короткая узловая запись с вопросом, который вы пока не смогли разрешить. Она не содержит заклинания или права на чужую собственность; это часть отыгрыша, без отдельной установленной стоимости.'
 };
@@ -88,7 +95,7 @@ export const background2024={
 export const background2014={
  id:'house-of-knots-attendant',title,edition:'2014',source:'TVV',status:'Draft',version:meta.version,summary,
  skills:['Анализ','Магия'],tools:[tool.title],languages:'Один язык на выбор, встречавшийся в записях или среди посетителей вашего Дома; конкретный язык согласуйте с Мастером.',
- equipment:['Набор узлового письма','Футляр для связок','Обычная одежда','Кошель с 10 зм'],
+ equipment:['Набор узлового письма',storage.title,'Закрытый фонарь','Фляга масла','Обычная одежда','Кошель с 10 зм'],
  feature:{title:'Жемчужный узел',path:'/dnd5e/magic-items?m=magic-pearl-knot',text:'Во время службы в Доме Узлов вы получили один [Жемчужный узел](/dnd5e/magic-items?m=magic-pearl-knot) — жемчужину, вплетённую в связку шёлковых нитей. Он входит в ваше начальное снаряжение. С его помощью вы можете за 10 минут исследовать предмет или существо и узнать о действующей на него магии. Полные свойства и порядок использования приведены в описании Жемчужного узла.'},
  story,variants,hooks,questions,
  grantedItems:[pearlKnot.id],

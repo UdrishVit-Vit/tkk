@@ -28,6 +28,13 @@ assert(!/Инструменты узлового писца|Архивный с�
 assert.equal(b14.grantsFeat,null);assert(!('abilities' in b14));assert.equal(b14.feature.title,'Жемчужный узел');
 assert.equal(b24.equipment.items.reduce((n,x)=>n+x.quantity*x.unitCostCp,0)+b24.equipment.coinsCp,5000);
 assert.equal(b24.equipment.alternativeCp,5000);
+assert.equal(b24.equipment.coinsCp,3140);
+assert.deepEqual(b24.equipment.items.map(x=>x.id),['tool-knot-writing-kit','gear-knot-storage-cord','gear-lantern-hooded','gear-oil','gear-clothes-travelers','gear-pouch']);
+for(const item of b24.equipment.items)assert(equipment24.some(x=>x.id===item.id),'equipment link target: '+item.id);
+assert.deepEqual(equipment24.find(x=>x.id==='gear-knot-storage-cord'),house.HOUSE_STORAGE_2024);
+assert.deepEqual(equipment14.find(x=>x.id==='gear-knot-storage-cord'),house.HOUSE_STORAGE_2014);
+assert(b14.proficiencies.equipment.includes('Архивная связка'));
+assert(!b14.proficiencies.equipment.includes('Футляр для связок'));
 assert.equal(b24.grantedItems.length,1);assert.equal(b24.grantedItems[0].id,'magic-pearl-knot');
 assert.deepEqual(f.grantedItems,['magic-pearl-knot']);
 assert(!b24.equipment.items.some(x=>x.id==='magic-pearl-knot'),'gift must not be priced as mundane gear');

@@ -1,4 +1,4 @@
-import { HOUSE_KIT_2014 } from './house-of-knots.js'
+import { HOUSE_KIT_2014, HOUSE_STORAGE_2014 } from './house-of-knots.js'
 export const EQUIPMENT_SOURCES = {
   TVV: 'Эноа',
   PHB: "Player's Handbook (2014)",
@@ -47,6 +47,7 @@ function eq(id, title, englishName, category, cost, weight, tags, description, o
 
 export const EQUIPMENT_5E = [
   HOUSE_KIT_2014,
+  HOUSE_STORAGE_2014,
   eq('abacus', 'Абак', 'Abacus', 'service', '2 зм', '1 кг', ['utility'], 'Счётная доска для торговли, учёта припасов и быстрых вычислений. Полезна купцам, писцам и всем, кто ведёт записи в дороге.'),
   eq('acid-vial', 'Кислота (флакон)', 'Acid, vial', 'consumable', '25 зм', '0,5 кг', ['expendable', 'utility'], 'Едкая жидкость в стеклянном флаконе. В правилах 2014 года её можно метнуть как импровизированное оружие, чтобы нанести кислотный урон при попадании.'),
   eq('alchemists-fire', 'Алхимический огонь', "Alchemist's fire", 'consumable', '50 зм', '0,5 кг', ['expendable'], 'Липкая алхимическая смесь, вспыхивающая при контакте с воздухом. Её бросают во врага, после чего пламя продолжает гореть, пока цель не потушит его действием.'),
