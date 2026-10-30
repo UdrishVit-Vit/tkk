@@ -13,7 +13,7 @@ function parts(text) {
   <div class="origin-effects" :class="{ 'origin-effects-compact': compact }">
     <p v-if="feat.intro" class="origin-intro"><RuleRichText :text="feat.intro" edition="2024" /></p>
     <article v-for="entry in feat.benefits" :key="entry.title" class="origin-effect">
-      <h4>{{ entry.title }}</h4>
+      <h4><NuxtLink v-if="entry.path" :to="entry.path">{{ entry.title }}</NuxtLink><template v-else>{{ entry.title }}</template></h4>
       <p><RuleRichText :text="emphasizeFeatRule(parts(entry.text).effect)" edition="2024" /></p>
       <div v-if="parts(entry.text).recovery" class="origin-recovery">
         <h5>Использование и восстановление</h5>

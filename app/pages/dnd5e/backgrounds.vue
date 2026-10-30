@@ -126,8 +126,9 @@ useSeoMeta({
       <blockquote v-if="item.raw.quote" class="bg-quote">{{ item.raw.quote }}</blockquote>
 
       <div v-if="item.raw.feature" class="bg-feature">
-        <h3 class="tref-block-title">{{ item.raw.feature.title }}</h3>
-        <p class="tref-desc" v-html="mdBold(item.raw.feature.text)" />
+        <h3 class="tref-block-title"><NuxtLink v-if="item.raw.feature.path" :to="item.raw.feature.path">{{ item.raw.feature.title }}</NuxtLink><template v-else>{{ item.raw.feature.title }}</template></h3>
+        <p v-if="item.raw.feature.path" class="tref-desc"><RuleRichText :text="item.raw.feature.text" edition="2014" /></p>
+        <p v-else class="tref-desc" v-html="mdBold(item.raw.feature.text)" />
         <RelatedContentLinks :links="item.raw.relatedLinks" />
         <p v-if="item.raw.feature.alt" class="bg-feature-alt"><span>Или:</span> <span v-html="mdBold(item.raw.feature.alt)" /></p>
       </div>

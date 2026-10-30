@@ -24,7 +24,7 @@ for(const item of b24.equipment.items){
 }
 assert.equal(b14.skills.length,2);assert.equal(b14.tools.length,1);assert(b14.languages);
 assert(!('abilities' in b14));assert(!('feat' in b14));assert.equal(b14.feature.title,pearlKnot.title);
-assert(b14.feature.text.includes('получили один Жемчужный узел'));
+assert(b14.feature.text.replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').includes('получили один Жемчужный узел'));
 assert(!/связной|рабочего дня|запрос/iu.test(b14.feature.text),'old contact feature removed');
 assert.equal(hooks.entries.length,6);assert.equal(questions.length,3);assert.equal(variants.length,3);
 const wordCount=s=>s.split(/\s+/u).length;

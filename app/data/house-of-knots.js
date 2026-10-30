@@ -177,7 +177,8 @@ export const HOUSE_BACKGROUND_2014 = {
   },
   "feature": {
     "title": "Жемчужный узел",
-    "text": "Во время службы в Доме Узлов вы получили один Жемчужный узел — жемчужину, вплетённую в связку шёлковых нитей. Он входит в ваше начальное снаряжение. С его помощью вы можете за 10 минут исследовать предмет или существо и узнать о действующей на него магии. Полные свойства и порядок использования приведены в описании Жемчужного узла."
+    "path": "/dnd5e/magic-items?m=magic-pearl-knot",
+    "text": "Во время службы в Доме Узлов вы получили один [Жемчужный узел](/dnd5e/magic-items?m=magic-pearl-knot) — жемчужину, вплетённую в связку шёлковых нитей. Он входит в ваше начальное снаряжение. С его помощью вы можете за 10 минут исследовать предмет или существо и узнать о действующей на него магии. Полные свойства и порядок использования приведены в описании Жемчужного узла."
   },
   "storyParagraphs": [
     "Служба начиналась с чужого рассказа. Человек приносил вещь, называл своё имя и объяснял, что хочет оставить на хранение. Вам предстояло сверить сказанное с прежними записями, описать предмет и условия его передачи, найти место, где его смогут разыскать спустя годы. Кольцо со сколом, связка с чужим дополнением, два сходных имени в описи — небольшое расхождение могло обернуться большим спором. Вы учились задавать точные вопросы прежде, чем затягивать очередной узел.",
@@ -223,16 +224,6 @@ export const HOUSE_BACKGROUND_2014 = {
       ]
     }
   ],
-  "relatedLinks": [
-    {
-      "title": "Жемчужный узел",
-      "path": "/dnd5e/magic-items?m=magic-pearl-knot"
-    },
-    {
-      "title": "Набор узлового письма",
-      "path": "/dnd5e/equipment?e=tool-knot-writing-kit"
-    }
-  ],
   "variants": [
     {
       "title": "Составитель описей",
@@ -273,7 +264,8 @@ export const HOUSE_ORIGIN_FEAT = {
     },
     {
       "title": "Жемчужный узел",
-      "text": "Вы получаете один Жемчужный узел — служебный предмет Дома Узлов. Его свойства приведены в описании предмета."
+      "path": "/dnd55e/magic-items?item=magic-pearl-knot",
+      "text": "Вы получаете один [Жемчужный узел](/dnd55e/magic-items?item=magic-pearl-knot) — служебный предмет Дома Узлов. Его свойства приведены в описании предмета."
     }
   ],
   "grantedItems": [
@@ -294,21 +286,7 @@ export const HOUSE_ORIGIN_FEAT = {
   "action": "Постоянная Компетентность и получение одного Жемчужного узла.",
   "conditions": "Выбор навыка и правила Жемчужного узла приведены в соответствующих описаниях.",
   "uses": "Вы получаете один узел при получении черты. Число применений самого предмета не ограничено.",
-  "recovery": "Не требуется; отдых не создаёт новый предмет.",
-  "relatedItems": [
-    {
-      "title": "Служитель Дома Узлов",
-      "path": "/dnd55e/backgrounds?background=house-of-knots-attendant"
-    },
-    {
-      "title": "Жемчужный узел",
-      "path": "/dnd55e/magic-items?item=magic-pearl-knot"
-    },
-    {
-      "title": "Набор узлового письма",
-      "path": "/dnd55e/equipment?item=tool-knot-writing-kit"
-    }
-  ]
+  "recovery": "Не требуется; отдых не создаёт новый предмет."
 }
 
 export const HOUSE_KIT_2024 = {
@@ -383,16 +361,6 @@ export const HOUSE_KIT_2024 = {
         "description": "Начальная длина каждого вида нитей указана в составе. Нити, кости, бусины и украшения можно пополнять отдельно.",
         "storage": "Храните нити сухими и раздельно, чтобы они не путались."
       }
-    ],
-    "related": [
-      {
-        "title": "Служитель Дома Узлов",
-        "path": "/dnd55e/backgrounds?background=house-of-knots-attendant"
-      },
-      {
-        "title": "Жемчужный узел",
-        "path": "/dnd55e/magic-items?item=magic-pearl-knot"
-      }
     ]
   }
 }
@@ -463,16 +431,6 @@ export const HOUSE_KIT_2014 = {
         "description": "Начальная длина каждого вида нитей указана в составе. Нити, кости, бусины и украшения можно пополнять отдельно.",
         "storage": "Храните нити сухими и раздельно, чтобы они не путались."
       }
-    ],
-    "related": [
-      {
-        "title": "Служитель Дома Узлов",
-        "path": "/dnd5e/backgrounds?bg=house-of-knots-attendant"
-      },
-      {
-        "title": "Жемчужный узел",
-        "path": "/dnd5e/magic-items?m=magic-pearl-knot"
-      }
     ]
   },
   "usedBy": []
@@ -502,17 +460,7 @@ export const HOUSE_MAGIC_ITEM_2024 = {
     }
   ],
   "srdVersion": "Эноа",
-  "sourcePage": null,
-  "relatedLinks": [
-    {
-      "title": "Служитель Дома Узлов",
-      "path": "/dnd55e/backgrounds?background=house-of-knots-attendant"
-    },
-    {
-      "title": "Набор узлового письма",
-      "path": "/dnd55e/equipment?item=tool-knot-writing-kit"
-    }
-  ]
+  "sourcePage": null
 }
 
 export const HOUSE_MAGIC_ITEM_2014 = {
@@ -526,15 +474,5 @@ export const HOUSE_MAGIC_ITEM_2014 = {
   "excludeRulePaths": [
     "/dnd5e/screens/downtime_activities/research",
     "/dnd5e/screens/action"
-  ],
-  "relatedLinks": [
-    {
-      "title": "Служитель Дома Узлов",
-      "path": "/dnd5e/backgrounds?bg=house-of-knots-attendant"
-    },
-    {
-      "title": "Набор узлового письма",
-      "path": "/dnd5e/equipment?e=tool-knot-writing-kit"
-    }
   ]
 }

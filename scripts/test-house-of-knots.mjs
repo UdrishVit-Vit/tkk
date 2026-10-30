@@ -32,7 +32,13 @@ assert.equal(b24.grantedItems.length,1);assert.equal(b24.grantedItems[0].id,'mag
 assert.deepEqual(f.grantedItems,['magic-pearl-knot']);
 assert(!b24.equipment.items.some(x=>x.id==='magic-pearl-knot'),'gift must not be priced as mundane gear');
 assert(b24.grantedItems[0].note.includes('при любом выборе'));
-assert(b14.feature.text.includes('один Жемчужный узел'));
+assert(b14.feature.text.includes('один [Жемчужный узел](/dnd5e/magic-items?m=magic-pearl-knot)'));
+assert.equal(b14.feature.path,'/dnd5e/magic-items?m=magic-pearl-knot');
+assert.equal(f.benefits[1].path,'/dnd55e/magic-items?item=magic-pearl-knot');
+assert(f.benefits[1].text.includes('[Жемчужный узел](/dnd55e/magic-items?item=magic-pearl-knot)'));
+for(const row of Object.values(house)){
+ assert(!row.relatedItems?.length);assert(!row.relatedLinks?.length);assert(!row.kit?.related?.length,'bottom related links removed');
+}
 assert.equal(b24.equipment.items[0].id,'tool-knot-writing-kit');
 for(const [kit,catalogue] of [[house.HOUSE_KIT_2024,equipment24],[house.HOUSE_KIT_2014,equipment14]]){
  assert.deepEqual(catalogue.find(x=>x.id===kit.id),kit);
@@ -59,11 +65,12 @@ const routes=new Map([
 ]);
 let links=0;
 function visit(value){
+ if(typeof value==='string'){for(const match of value.matchAll(/\[[^\]]+\]\((\/[^)]+)\)/g))visit({path:match[1]});return;}
  if(Array.isArray(value)){const paths=value.filter(x=>x?.path).map(x=>x.path);assert.equal(new Set(paths).size,paths.length,'duplicate related link');value.forEach(visit);return;}
  if(!value||typeof value!=='object')return;
  if(value.path){const url=new URL(value.path,'http://localhost');const target=routes.get(url.pathname);assert(target,value.path);assert(target[1].some(x=>x.id===url.searchParams.get(target[0])),value.path);links++;}
- Object.values(value).forEach(visit);
+ Object.entries(value).filter(([key])=>key!=='path').forEach(([,entry])=>visit(entry));
 }
-visit(house);assert(links>=10);
+visit(house);assert.equal(links,5);
 const result={status:'PASS',date:'2026-10-30',backgrounds2024:backgrounds24.length,backgrounds2014:backgrounds14.length,feats2024:feats24.length,feats2014:feats14.length,priorBackgroundsPreserved:before.backgrounds2024.length+before.backgrounds2014.length,checkedLinks:links,kitBudgetCp:5000,browserLayout:'separate check',playtest:false,remoteDeployment:false};
 fs.writeFileSync(root+'verification.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
