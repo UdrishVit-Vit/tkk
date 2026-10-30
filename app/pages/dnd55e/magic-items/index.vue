@@ -1,11 +1,12 @@
 <script setup>
+import { HOUSE_MAGIC_ITEM_2024 } from '~/data/house-of-knots.js'
 const { data: magicItemsData, error: magicItemsError } = await useFetch('/data/dnd55e/magic-items-2024.json', {
   key: 'dnd55e-magic-items-2024',
   server: false,
   default: () => ({ items: [] })
 })
 
-const MAGIC_ITEMS = computed(() => magicItemsData.value?.items || [])
+const MAGIC_ITEMS = computed(() => [HOUSE_MAGIC_ITEM_2024, ...(magicItemsData.value?.items || [])])
 
 const RARITIES = {
   varies: 'Редкость варьируется',
@@ -234,6 +235,7 @@ useSeoMeta({
           </div>
         </template>
       </section>
+      <RelatedContentLinks :links="item.raw.relatedLinks" />
     </template>
   </ThreadRefPage>
 </template>

@@ -93,6 +93,7 @@ useSeoMeta({
       </dl>
 
       <p v-if="item.raw.description" class="tref-desc">{{ item.raw.description }}</p>
+      <EquipmentKitDetails v-if="item.raw.kit" :item="item.raw" />
 
       <div v-if="item.raw.details?.length" class="eq-details">
         <div v-for="detail in item.raw.details" :key="detail.title" class="eq-detail">

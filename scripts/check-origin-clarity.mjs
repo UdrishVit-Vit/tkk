@@ -4,6 +4,12 @@ import {DND55E_HOMEBREW_ORIGIN_FEATS as feats} from '../app/data/dnd55e/origin-f
 import {ENOA_AUTHORED_FEATS_2014_V4 as legacy} from '../app/data/enoa-authored-feats-v4.js';
 import {cores,secondaries} from '../reports/enoa-backgrounds/clarity-edits.mjs';
 const root='reports/enoa-backgrounds/clarity-review';
+// That review is historical once the subsequent gameplay revision is adopted.
+// Do not rewrite its statistics from newer records.
+if(feats.some(f=>f.version==='0.5.0')){
+ await import('./check-origin-playability.mjs');
+ process.exit(0);
+}
 const previous=await import('../'+root+'/before.js');
 const prior=previous.ENOA_AUTHORED_ORIGINS_V4;
 assert.equal(feats.length,55);

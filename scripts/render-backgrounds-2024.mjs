@@ -37,6 +37,7 @@ async function render(name, folder = 'dnd55e/') {
   const app = createSSRApp(component)
   app.component('CardSectionNav', await compile('CardSectionNav', ''))
   app.component('OriginFeatEffects', await compile('OriginFeatEffects', ''))
+  app.component('RelatedContentLinks', await compile('RelatedContentLinks', ''))
   app.component('ThreadRefPage', shell)
   app.component('RuleRichText', defineComponent({ props: ['text'], setup: props => () => h('span', props.text.replace(/\*\*/g, '')) }))
   app.component('NuxtLink', defineComponent({ props: ['to'], setup: (props, { slots }) => () => h('a', { href: props.to }, slots.default?.()) }))
@@ -45,7 +46,7 @@ async function render(name, folder = 'dnd55e/') {
   return html
 }
 const backgrounds = await render('BackgroundsPage')
-assert.equal((backgrounds.match(/data-record=/g) || []).length, 55)
+assert.equal((backgrounds.match(/data-record=/g) || []).length, DND55E_BACKGROUNDS.length)
 assert.equal((backgrounds.match(/<details/g) || []).length, 0)
 for (const b of DND55E_BACKGROUNDS) {
   const positions = ['stats', 'equipment', 'feat', 'story', 'event'].map(section => backgrounds.indexOf(`id="bg-${b.id}-${section}"`))
@@ -85,6 +86,8 @@ const effectComponent = await compile('OriginFeatEffects', '')
 const proposals = ENOA_ORIGIN_DRAFTS.filter(f => !['mlah-diver','cohort-renegade','nameless'].includes(f.relatedBackgrounds[0]))
 assert.equal(proposals.length, 54)
 const draftApp = createSSRApp({ render: () => h('main', proposals.map(feat => h(effectComponent, { feat }))) })
+draftApp.component('RelatedContentLinks', await compile('RelatedContentLinks', ''))
+draftApp.component('NuxtLink', defineComponent({ props: ['to'], setup: (props, { slots }) => () => h('a', { href: props.to }, slots.default?.()) }))
 draftApp.component('RuleRichText', defineComponent({ props: ['text'], setup: props => () => h('span', props.text.replace(/\*\*/g, '')) }))
 const draftHtml = await renderToString(draftApp)
 await fs.writeFile('.tmpwork/backgrounds-render/OriginDrafts.html', draftHtml)
@@ -107,4 +110,4 @@ for(const f of ENOA_AUTHORED_FEATS_2014_V4){
   assert.ok(legacyFeats.includes(`data-record="${f.id}"`),f.id)
   for(const text of f.benefits)assert.ok(legacyFeats.includes(text.replace(/\*\*/g,'')),f.id+': missing 2014 rule')
 }
-console.log(`Rendered 55 backgrounds, ${DND55E_FEATS.length} feats 2024, ${FEATS_5E.length} feats 2014 and 54 archived draft effect cards. Text and links passed; browser layout not tested.`)
+console.log(`Rendered ${DND55E_BACKGROUNDS.length} backgrounds, ${DND55E_FEATS.length} feats 2024, ${FEATS_5E.length} feats 2014 and 54 archived draft effect cards. Text and links passed; browser layout not tested.`)

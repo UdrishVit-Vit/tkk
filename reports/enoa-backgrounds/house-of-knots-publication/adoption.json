@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-30",
+  "proposalVersion": "0.4.1-proposal",
+  "ids": {
+    "background": "house-of-knots-attendant",
+    "feat": "enoa-house-of-knots-training-origin",
+    "kit": "tool-knot-writing-kit",
+    "magicItem": "magic-pearl-knot"
+  },
+  "kitRenamed": true,
+  "playtest": false,
+  "remoteDeployment": false
+}

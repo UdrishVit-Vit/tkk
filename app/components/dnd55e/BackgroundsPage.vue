@@ -285,6 +285,10 @@ useSeoMeta({
           </div>
           <p v-if="item.raw.equipment.pricingStatus === 'pending'" class="bg-stat-hint bg-equip-note">{{ item.raw.equipment.pricingNote }}</p>
           <p v-else class="bg-stat-hint bg-equip-note">Стоимость комплекта А с монетами — 50 зм. Владение инструментом сохраняется при любом выборе.</p>
+          <div v-for="grant in item.raw.grantedItems || []" :key="grant.id" class="bg-equip-extra">
+            <strong>От черты происхождения: <NuxtLink :to="grant.path">{{ grant.title }}</NuxtLink></strong>
+            <p class="bg-stat-hint">{{ grant.note }}</p>
+          </div>
           <p v-if="item.raw.equipment.storyItems?.length" class="bg-equip-extra">
             <strong class="bg-story-item-label">Памятная вещь для истории</strong>
             {{ item.raw.equipment.storyItems.join(', ') }}.
@@ -319,6 +323,10 @@ useSeoMeta({
           </h4>
           <p>{{ entry.text }}</p>
         </article>
+        <div v-if="item.raw.questions?.length" class="bg-variant">
+          <h4>Вопросы персонажу</h4>
+          <ul><li v-for="question in item.raw.questions" :key="question">{{ question }}</li></ul>
+        </div>
       </section>
 
       <section class="bg-block">

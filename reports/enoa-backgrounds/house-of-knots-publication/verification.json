@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "date": "2026-10-30",
+  "backgrounds2024": 56,
+  "backgrounds2014": 3,
+  "feats2024": 147,
+  "feats2014": 69,
+  "priorBackgroundsPreserved": 57,
+  "checkedLinks": 14,
+  "kitBudgetCp": 5000,
+  "browserLayout": "separate check",
+  "playtest": false,
+  "remoteDeployment": false
+}

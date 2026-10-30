@@ -88,7 +88,8 @@ useSeoMeta({
         <span class="tref-tag">{{ MAGIC_ITEM_TYPES[item.raw.type] }}</span>
         <span v-if="item.raw.attune" class="tref-tag">Требует настройки</span>
       </div>
-      <p class="tref-desc"><RuleRichText :text="item.raw.description" /></p>
+      <p class="tref-desc"><RuleRichText :text="item.raw.description" :current-path="`/dnd5e/magic-items?m=${item.id}`" :exclude-paths="item.raw.excludeRulePaths || []" /></p>
+      <RelatedContentLinks :links="item.raw.relatedLinks" />
     </template>
   </ThreadRefPage>
 </template>

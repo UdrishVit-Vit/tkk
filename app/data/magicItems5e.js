@@ -1,7 +1,9 @@
 // Магические предметы D&D 5e (по мотивам DMG 2014), сгруппированы по редкости.
 // Курируемая подборка знаковых предметов; поле attune — требуется ли настройка.
+import { HOUSE_MAGIC_ITEM_2014 } from './house-of-knots.js'
 
 export const MAGIC_ITEM_RARITIES = {
+  unknown: 'Редкость не определена',
   common: 'Обычные',
   uncommon: 'Необычные',
   rare: 'Редкие',
@@ -11,6 +13,7 @@ export const MAGIC_ITEM_RARITIES = {
 }
 
 export const MAGIC_ITEM_RARITY_SINGULAR = {
+  unknown: 'Редкость не определена',
   common: 'Обычный',
   uncommon: 'Необычный',
   rare: 'Редкий',
@@ -36,6 +39,7 @@ function mi(id, title, rarity, type, attune, description) {
 }
 
 export const MAGIC_ITEMS_5E = [
+  HOUSE_MAGIC_ITEM_2014,
   // Обычные
   mi('potion-healing', 'Зелье лечения', 'common', 'potion', false, 'Выпив это зелье, вы восстанавливаете 2к4 + 2 хита. Осушение зелья или его подача — это действие.'),
   mi('cloak-billowing', 'Плащ раздувания', 'common', 'wondrous', false, 'Бонусным действием вы можете заставить плащ эффектно раздуться, будто на ветру.'),

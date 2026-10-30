@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const source='app/data/enoa-authored-feats-v4.js';
+let s=fs.readFileSync(source,'utf8');
+const timing='Решение о перебросе принимается сразу после объявления провала, до применения его последствий.';
+const die=' При преимуществе или помехе перебрасывается только один к20 по выбору получателя; затем заново определяется используемый результат. Остальные модификаторы и уже брошенные дополнительные кубики сохраняются.';
+assert.equal(s.split(timing).length-1,24);
+s=s.replaceAll(timing,timing+die);
+const from='При преимуществе или помехе сначала выберите используемый к20 по обычным правилам, затем заменяйте его результат.';
+const to='При преимуществе или помехе можно заменить только один к20 по вашему выбору; затем заново определите используемый результат по обычным правилам.';
+assert.equal(s.split(from).length-1,3);s=s.replaceAll(from,to);
+fs.writeFileSync(source,s);
+const plan='reports/enoa-backgrounds/playability-review/designs.mjs';
+s=fs.readFileSync(plan,'utf8');assert.equal(s.split(from).length-1,1);fs.writeFileSync(plan,s.replace(from,to));

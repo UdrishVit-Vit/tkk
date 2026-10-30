@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "date": "2026-10-30",
+  "proposalVersion": "0.4.1-proposal",
+  "background2024": true,
+  "originFeat2024": true,
+  "background2014": true,
+  "equipmentACp": 5000,
+  "equipmentBCp": 5000,
+  "summaryWords": 79,
+  "storyWords": 310,
+  "duplicateIds": false,
+  "editionsSeparated": true,
+  "canonBasis": "DIRECT_AUTHOR plus bounded chronicle evidence",
+  "playtest": false,
+  "productionUnchanged": true,
+  "productionHashes": {
+    "app/data/dnd55e/backgrounds.js": "c6c0096a5d6824f197ea0394852bfacdcc71ec94853034c53f75b952113cde81",
+    "app/data/enoa-authored-feats-v4.js": "6a15ee224005e28267d1cd5d7284178b8e80a2c03bda7dfea46314379b260adc",
+    "app/data/backgrounds5e.js": "2de21be1fcafb4805109335ce2144353042bcdbc09ec1fbd536309dd7eae95c0"
+  }
+}

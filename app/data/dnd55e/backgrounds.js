@@ -16,6 +16,7 @@
 // навыки, инструмент и снаряжение собираются автоматически по таблицам ниже.
 
 import { DND55E_EQUIPMENT } from './equipment2024.js'
+import { HOUSE_BACKGROUND_2024 } from '../house-of-knots.js'
 
 export const DND55E_BACKGROUND_GROUPS = {
   enoa: {
@@ -37,6 +38,7 @@ export const DND55E_BACKGROUND_ABILITIES = [
 ]
 
 export const DND55E_BACKGROUND_TIES = [
+  'Дом Узлов',
   'Гильдии',
   'Нарекатели',
   'Башня Мафраш',
@@ -87,6 +89,7 @@ export const DND55E_SKILL_GLOSSARY = {
 
 // Инструмент → карточка снаряжения /dnd55e/equipment.
 export const DND55E_TOOL_EQUIPMENT = {
+  'Набор узлового письма': 'tool-knot-writing-kit',
   'Инструменты алхимика': 'tool-alchemists-supplies',
   'Инструменты пивовара': 'tool-brewers-supplies',
   'Инструменты каллиграфа': 'tool-calligraphers-supplies',
@@ -171,6 +174,7 @@ const enoa = data => withEquipment({
 })
 
 export const DND55E_BACKGROUNDS = [
+  HOUSE_BACKGROUND_2024,
   {
     "group": "enoa",
     "source": "TVV",
@@ -1017,7 +1021,7 @@ export const DND55E_BACKGROUNDS = [
     ],
     "feat": {
       "id": "enoa-silk-mouse-catcher-origin",
-      "title": "Не порвать кокон"
+      "title": "Цепкие пальцы"
     },
     "skills": [
       "Акробатика",
@@ -1969,7 +1973,7 @@ export const DND55E_BACKGROUNDS = [
     ],
     "feat": {
       "id": "enoa-mithras-picker-origin",
-      "title": "Прежде чем ударить"
+      "title": "Чутьё добытчика"
     },
     "skills": [
       "Природа",
@@ -3907,7 +3911,7 @@ export const DND55E_BACKGROUNDS = [
     ],
     "feat": {
       "id": "enoa-word-preacher-origin",
-      "title": "Дать толпе услышать"
+      "title": "Слово поддержки"
     },
     "skills": [
       "Убеждение",
@@ -4165,7 +4169,7 @@ export const DND55E_BACKGROUNDS = [
     ],
     "feat": {
       "id": "enoa-flame-keeper-origin",
-      "title": "Спасти связку"
+      "title": "Хранилище памяти"
     },
     "skills": [
       "История",
@@ -4675,7 +4679,7 @@ export const DND55E_BACKGROUNDS = [
     ],
     "feat": {
       "id": "enoa-mine-escapee-origin",
-      "title": "Дождаться смены"
+      "title": "Поймать момент"
     },
     "skills": [
       "Атлетика",
@@ -5081,7 +5085,7 @@ export const DND55E_BACKGROUNDS = [
     ],
     "feat": {
       "id": "enoa-steppe-tiger-origin",
-      "title": "Первым через страх"
+      "title": "Встать перед ударом"
     },
     "skills": [
       "Атлетика",
@@ -6067,7 +6071,7 @@ export const DND55E_BACKGROUNDS = [
     ],
     "feat": {
       "id": "enoa-chosen-by-the-sky-origin",
-      "title": "Отвести первый разряд"
+      "title": "Грозовая выдержка"
     },
     "skills": [
       "Внимательность",
@@ -6451,7 +6455,7 @@ export const DND55E_BACKGROUNDS = [
     ],
     "feat": {
       "id": "enoa-blood-of-the-heshegi-origin",
-      "title": "Удержать звериный след"
+      "title": "Звериная настороженность"
     },
     "skills": [
       "Уход за животными",
@@ -6597,7 +6601,7 @@ export const DND55E_BACKGROUNDS = [
     ],
     "feat": {
       "id": "enoa-apprentice-of-the-star-origin",
-      "title": "Не скрывать трещину"
+      "title": "Подогнать снаряжение"
     },
     "skills": [
       "Анализ",
@@ -6725,7 +6729,7 @@ export const DND55E_BACKGROUNDS = [
     ],
     "feat": {
       "id": "enoa-ruzda-apprentice-origin",
-      "title": "Проба на малом"
+      "title": "Находчивость мастера"
     },
     "skills": [
       "Аркана",

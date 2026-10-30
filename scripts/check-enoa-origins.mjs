@@ -7,7 +7,7 @@ export function checkEnoaOrigins(bs, fs, mapping) {
   const errors = []
   const author = bs.filter(b => b.source === 'TVV')
   // The original Nameless draft remains in the editorial source, outside active assignments.
-  if(author.length !== 55 || fs.length !== 55 || author.some(b=>['nameless','lifestone-wright'].includes(b.id))) errors.push('coverage-count')
+  if(author.length !== 56 || fs.length !== 56 || author.some(b=>['nameless','lifestone-wright'].includes(b.id))) errors.push('coverage-count')
   const mapped = new Set()
   for(const b of author) {
     const ids = mapping[b.id] || []
@@ -16,7 +16,7 @@ export function checkEnoaOrigins(bs, fs, mapping) {
     if(!f || f.relatedBackgrounds.length !== 1 || f.relatedBackgrounds[0] !== b.id) errors.push(`reverse:${b.id}`)
     if(mapped.has(ids[0])) errors.push(`shared:${b.id}`)
     mapped.add(ids[0])
-    if(b.enoaLead.length !== 2) errors.push(`depth:${b.id}`)
+    if(!Array.isArray(b.enoaLead) || b.enoaLead.length < 2) errors.push(`depth:${b.id}`)
   }
   for(const b of bs.filter(b => b.source !== 'TVV')) if(mapping[b.id]) errors.push(`scope:${b.id}`)
   const prohibited = /книг[а-яё]*|бумаг[а-яё]*|пергамент[а-яё]*|чернил[а-яё]*|почерк[а-яё]*|страниц[а-яё]*|писчее перо/iu

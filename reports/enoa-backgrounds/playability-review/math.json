@@ -1,0 +1,61 @@
+{
+  "base40percent": 0.4,
+  "withD4": 0.525,
+  "withD6": 0.575,
+  "advantage": 0.64,
+  "rerollFailed": 0.64,
+  "floor10Mod5DC15": 1,
+  "levels": [
+    {
+      "level": 1,
+      "pb": 2,
+      "pbResource2024": 2,
+      "pbResource2014": 2,
+      "meanD6Reduction": 5.5,
+      "meanD6HPPerRecipient": 5.5,
+      "maxGroupRecipients": 2,
+      "meanOnceRestGroupHP": 11
+    },
+    {
+      "level": 4,
+      "pb": 2,
+      "pbResource2024": 2,
+      "pbResource2014": 2,
+      "meanD6Reduction": 5.5,
+      "meanD6HPPerRecipient": 5.5,
+      "maxGroupRecipients": 2,
+      "meanOnceRestGroupHP": 11
+    },
+    {
+      "level": 5,
+      "pb": 3,
+      "pbResource2024": 3,
+      "pbResource2014": 2,
+      "meanD6Reduction": 6.5,
+      "meanD6HPPerRecipient": 6.5,
+      "maxGroupRecipients": 3,
+      "meanOnceRestGroupHP": 19.5
+    },
+    {
+      "level": 11,
+      "pb": 4,
+      "pbResource2024": 4,
+      "pbResource2014": 2,
+      "meanD6Reduction": 7.5,
+      "meanD6HPPerRecipient": 7.5,
+      "maxGroupRecipients": 4,
+      "meanOnceRestGroupHP": 30
+    },
+    {
+      "level": 20,
+      "pb": 6,
+      "pbResource2024": 6,
+      "pbResource2014": 2,
+      "meanD6Reduction": 9.5,
+      "meanD6HPPerRecipient": 9.5,
+      "maxGroupRecipients": 6,
+      "meanOnceRestGroupHP": 57
+    }
+  ],
+  "note": "К6 в среднем 3.5; численная модель не оценивает частоту ситуаций и расход реакций. Равная вероятность отдельного броска не означает равную ценность запаса."
+}

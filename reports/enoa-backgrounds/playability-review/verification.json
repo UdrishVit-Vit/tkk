@@ -1,0 +1,81 @@
+{
+  "status": "PASS",
+  "date": "2026-10-29",
+  "reviewed": 55,
+  "rewritten": 48,
+  "retained": 7,
+  "mirrored2014": 48,
+  "scenariosDeskReviewed": 165,
+  "playedScenarios": 0,
+  "resourceBudgetsChanged": [
+    "mithras-caravaneer",
+    "great-game-player",
+    "spiral-runner",
+    "omen-reader",
+    "titania-returned",
+    "promised-to-ibon",
+    "blue-blooded"
+  ],
+  "titleChanges": [
+    {
+      "id": "silk-mouse-catcher",
+      "from": "Не порвать кокон",
+      "to": "Цепкие пальцы"
+    },
+    {
+      "id": "mithras-picker",
+      "from": "Прежде чем ударить",
+      "to": "Чутьё добытчика"
+    },
+    {
+      "id": "word-preacher",
+      "from": "Дать толпе услышать",
+      "to": "Слово поддержки"
+    },
+    {
+      "id": "flame-keeper",
+      "from": "Спасти связку",
+      "to": "Хранилище памяти"
+    },
+    {
+      "id": "mine-escapee",
+      "from": "Дождаться смены",
+      "to": "Поймать момент"
+    },
+    {
+      "id": "steppe-tiger",
+      "from": "Первым через страх",
+      "to": "Встать перед ударом"
+    },
+    {
+      "id": "chosen-by-the-sky",
+      "from": "Отвести первый разряд",
+      "to": "Грозовая выдержка"
+    },
+    {
+      "id": "blood-of-the-heshegi",
+      "from": "Удержать звериный след",
+      "to": "Звериная настороженность"
+    },
+    {
+      "id": "apprentice-of-the-star",
+      "from": "Не скрывать трещину",
+      "to": "Подогнать снаряжение"
+    },
+    {
+      "id": "ruzda-apprentice",
+      "from": "Проба на малом",
+      "to": "Находчивость мастера"
+    }
+  ],
+  "protectedBackgroundFields": "unchanged",
+  "protectedFeatIds": "unchanged",
+  "automatic2014Grant": false,
+  "mathematicalModels": "PASS; explicit reference assumptions",
+  "playtest": false,
+  "remoteDeployment": false,
+  "hashes": {
+    "app/data/enoa-authored-feats-v4.js": "6a15ee224005e28267d1cd5d7284178b8e80a2c03bda7dfea46314379b260adc",
+    "app/data/dnd55e/backgrounds.js": "c6c0096a5d6824f197ea0394852bfacdcc71ec94853034c53f75b952113cde81"
+  }
+}

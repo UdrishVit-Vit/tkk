@@ -20,6 +20,7 @@ function parts(text) {
         <p><RuleRichText :text="emphasizeFeatRule(parts(entry.text).recovery)" edition="2024" /></p>
       </div>
     </article>
+    <RelatedContentLinks :links="feat.relatedItems" />
   </div>
 </template>
 

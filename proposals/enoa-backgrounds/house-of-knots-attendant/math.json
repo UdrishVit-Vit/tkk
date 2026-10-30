@@ -1,0 +1,52 @@
+{
+  "assumptions": "Интеллект +3 удерживается постоянным; только обычный к20, без преимущества и иных бонусов. Результат — вероятность одной проверки, не баланс кампании.",
+  "levels": [
+    {
+      "level": 1,
+      "intModifierHeldConstant": 3,
+      "pb": 2,
+      "proficient": 5,
+      "expert": 7,
+      "normalDC15": 0.55,
+      "expertDC15": 0.65,
+      "normalDC20": 0.3,
+      "expertDC20": 0.4
+    },
+    {
+      "level": 4,
+      "intModifierHeldConstant": 3,
+      "pb": 2,
+      "proficient": 5,
+      "expert": 7,
+      "normalDC15": 0.55,
+      "expertDC15": 0.65,
+      "normalDC20": 0.3,
+      "expertDC20": 0.4
+    },
+    {
+      "level": 5,
+      "intModifierHeldConstant": 3,
+      "pb": 3,
+      "proficient": 6,
+      "expert": 9,
+      "normalDC15": 0.6,
+      "expertDC15": 0.75,
+      "normalDC20": 0.35,
+      "expertDC20": 0.5
+    },
+    {
+      "level": 11,
+      "intModifierHeldConstant": 3,
+      "pb": 4,
+      "proficient": 7,
+      "expert": 11,
+      "normalDC15": 0.65,
+      "expertDC15": 0.85,
+      "normalDC20": 0.4,
+      "expertDC20": 0.6
+    }
+  ],
+  "itemActivationMinutes": 10,
+  "maxSerialItemUsesPerQuietHour": 6,
+  "playtest": false
+}

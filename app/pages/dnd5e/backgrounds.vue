@@ -128,6 +128,7 @@ useSeoMeta({
       <div v-if="item.raw.feature" class="bg-feature">
         <h3 class="tref-block-title">{{ item.raw.feature.title }}</h3>
         <p class="tref-desc" v-html="mdBold(item.raw.feature.text)" />
+        <RelatedContentLinks :links="item.raw.relatedLinks" />
         <p v-if="item.raw.feature.alt" class="bg-feature-alt"><span>Или:</span> <span v-html="mdBold(item.raw.feature.alt)" /></p>
       </div>
 
@@ -140,7 +141,17 @@ useSeoMeta({
         </div>
       </div>
 
+      <p v-for="(paragraph, index) in item.raw.storyParagraphs || []" :key="index" class="tref-desc">{{ paragraph }}</p>
       <p v-if="item.raw.personalization" class="tref-desc bg-person">{{ item.raw.personalization }}</p>
+      <section v-if="item.raw.variants?.length" class="tref-block">
+        <h3 class="tref-block-title">Варианты прошлого</h3>
+        <p class="tref-desc">Выберите подходящий или придумайте свой.</p>
+        <p v-for="variant in item.raw.variants" :key="variant.title" class="tref-desc"><strong>{{ variant.title }}.</strong> {{ variant.text }}</p>
+      </section>
+      <section v-if="item.raw.questions?.length" class="tref-block">
+        <h3 class="tref-block-title">Вопросы персонажу</h3>
+        <ul class="tref-list"><li v-for="question in item.raw.questions" :key="question">{{ question }}</li></ul>
+      </section>
 
       <div v-for="table in item.raw.tables || []" :key="table.id" class="bg-table">
         <div class="bg-table-head">
