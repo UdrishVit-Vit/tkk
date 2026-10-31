@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-31",
+  "authorization": "Добавь пожалуйста их на сайт",
+  "backgrounds": [
+    "great-game-player",
+    "cradle-born"
+  ],
+  "originFeats": [
+    "enoa-great-game-player-origin",
+    "enoa-cradle-born-origin"
+  ],
+  "optionalFeats2014": [
+    "enoa-great-game-player-feat-2014",
+    "enoa-cradle-born-feat-2014"
+  ],
+  "scope": "Local site catalogue",
+  "remoteDeployment": false,
+  "playtest": false
+}

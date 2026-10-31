@@ -1,14 +1,18 @@
 {
   "status": "PASS",
-  "date": "2026-10-30",
+  "date": "2026-10-31",
   "backgrounds2024": 54,
   "backgrounds2014": 3,
   "feats2024": 145,
   "feats2014": 67,
-  "priorBackgroundsPreserved": 55,
+  "priorBackgroundsPreserved": 53,
   "subsequentlyRemoved": [
     "knot-scribe",
     "sarban-drover"
+  ],
+  "revisedBackgrounds": [
+    "great-game-player",
+    "cradle-born"
   ],
   "checkedLinks": 5,
   "kitBudgetCp": 5000,

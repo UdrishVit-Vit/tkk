@@ -12,6 +12,10 @@ import * as house from '../app/data/house-of-knots.js';
 const root='reports/enoa-backgrounds/house-of-knots-publication/';
 const before=JSON.parse(fs.readFileSync(root+'before.json','utf8'));
 const retired=new Set(['knot-scribe','sarban-drover']); // Explicit author removals after the House was added.
+const revised=new Map(['great-game-player','cradle-born'].map(id=>{
+ const b=JSON.parse(fs.readFileSync(`proposals/enoa-backgrounds/${id}/proposal.json`,'utf8')).background;
+ return [id,{glossary:[],ties:[],...b,equipment:{...b.equipment,items:b.equipment.items.map(x=>({...x,label:x.title,note:x.note??''}))}}];
+}));
 for(const id of retired){
  const removal=JSON.parse(fs.readFileSync(`reports/enoa-backgrounds/removals/${id}.json`,'utf8'));
  assert(!backgrounds24.some(b=>b.id===removal.background.id));
@@ -25,7 +29,7 @@ const b24=house.HOUSE_BACKGROUND_2024,b14=house.HOUSE_BACKGROUND_2014,f=house.HO
 for(const [old,current] of [[before.backgrounds2024,backgrounds24],[before.backgrounds2014,backgrounds14]]){
  const retained=old.filter(row=>!retired.has(row.id));
  assert.equal(current.length,retained.length+1);
- for(const row of retained)assert.deepEqual(current.find(x=>x.id===row.id),row,row.id+': prior record changed');
+ for(const row of retained)assert.deepEqual(current.find(x=>x.id===row.id),current===backgrounds24?(revised.get(row.id)||row):row,row.id+': prior record or approved revision changed');
 }
 for(const list of [backgrounds24,backgrounds14,feats24,feats14,equipment24,equipment14,magic14])assert.equal(new Set(list.map(x=>x.id)).size,list.length,'duplicate ID');
 assert.equal(backgrounds24.find(x=>x.id===b24.id),b24);
@@ -90,5 +94,5 @@ function visit(value){
  Object.entries(value).filter(([key])=>key!=='path').forEach(([,entry])=>visit(entry));
 }
 visit(house);assert.equal(links,5);
-const result={status:'PASS',date:'2026-10-30',backgrounds2024:backgrounds24.length,backgrounds2014:backgrounds14.length,feats2024:feats24.length,feats2014:feats14.length,priorBackgroundsPreserved:[...before.backgrounds2024,...before.backgrounds2014].filter(b=>!retired.has(b.id)).length,subsequentlyRemoved:[...retired],checkedLinks:links,kitBudgetCp:5000,browserLayout:'separate check',playtest:false,remoteDeployment:false};
+const result={status:'PASS',date:'2026-10-31',backgrounds2024:backgrounds24.length,backgrounds2014:backgrounds14.length,feats2024:feats24.length,feats2014:feats14.length,priorBackgroundsPreserved:[...before.backgrounds2024,...before.backgrounds2014].filter(b=>!retired.has(b.id)&&!revised.has(b.id)).length,subsequentlyRemoved:[...retired],revisedBackgrounds:[...revised.keys()],checkedLinks:links,kitBudgetCp:5000,browserLayout:'separate check',playtest:false,remoteDeployment:false};
 fs.writeFileSync(root+'verification.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "date": "2026-10-30",
+  "date": "2026-10-31",
   "originAssignments": 54,
   "uniqueOriginFeats": 54,
   "legacyBackgroundsReviewed": 53,
@@ -8,6 +8,10 @@
   "feats2024": 145,
   "feats2014": 67,
   "old2014FeatsPreserved": 14,
-  "backgroundRulesOtherThanFeat": "unchanged for retained backgrounds",
+  "backgroundRulesOtherThanFeat": "unchanged except author-approved revisions",
+  "revisedBackgrounds": [
+    "great-game-player",
+    "cradle-born"
+  ],
   "remoteDeployment": false
 }

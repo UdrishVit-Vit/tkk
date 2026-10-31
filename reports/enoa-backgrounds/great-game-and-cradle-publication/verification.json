@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-31",
+  "status": "PASS",
+  "catalogueCounts": {
+    "backgrounds": 54,
+    "feats2024": 145,
+    "feats2014": 67
+  },
+  "updated": [
+    {
+      "id": "great-game-player",
+      "title": "Участник Великой Игры",
+      "feat": "Ритм Великой Игры",
+      "introWords": 29,
+      "storyWords": 197,
+      "storyParagraphs": 3,
+      "kitTotalCp": 5000,
+      "originVersion": "0.6.1",
+      "feat2014Version": "0.6.1"
+    },
+    {
+      "id": "cradle-born",
+      "title": "Вышедший из Колыбели",
+      "feat": "Учиться жить",
+      "introWords": 33,
+      "storyWords": 195,
+      "storyParagraphs": 3,
+      "kitTotalCp": 5000,
+      "originVersion": "0.6.0",
+      "feat2014Version": "0.6.0"
+    }
+  ],
+  "unrelatedRecordsPreserved": 152,
+  "playtest": false,
+  "remoteDeployment": false
+}

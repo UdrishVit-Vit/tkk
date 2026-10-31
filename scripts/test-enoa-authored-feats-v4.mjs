@@ -9,11 +9,16 @@ const beforeText=fs.readFileSync(root+'backgrounds.js.before','utf8');
 const marker='export const DND55E_BACKGROUNDS = ';
 const before=JSON.parse(beforeText.slice(beforeText.indexOf(marker)+marker.length,beforeText.indexOf('\n\nexport const DND55E_BACKGROUND_FEATS')).trim());
 const reviewedBackgrounds=backgrounds.filter(b=>before.some(old=>old.id===b.id));
+// Author requested these complete revisions after the V4 assignment snapshot.
+const revised=new Map(['great-game-player','cradle-born'].map(id=>{
+ const b=JSON.parse(fs.readFileSync(`proposals/enoa-backgrounds/${id}/proposal.json`,'utf8')).background;
+ return [id,{glossary:[],ties:[],...b,equipment:{...b.equipment,items:b.equipment.items.map(x=>({...x,label:x.title,note:x.note??''}))}}];
+}));
 assert.deepEqual(reviewedBackgrounds.map(b=>b.id),before.filter(b=>!['lifestone-wright','knot-scribe','sarban-drover'].includes(b.id)).map(b=>b.id));
 for(const b of reviewedBackgrounds){
  const old=before.find(x=>x.id===b.id);
  const withoutFeat=({feat,...rest})=>rest;
- assert.deepEqual(withoutFeat(b),withoutFeat(old),b.id+': background changed beyond feat assignment');
+ assert.deepEqual(withoutFeat(b),withoutFeat(revised.get(b.id)||old),b.id+': background differs from its approved revision or historical snapshot');
  const f=feats.find(f=>f.id===b.feat.id);
  assert.equal(f.category,'origin');assert.equal(f.source,'TVV');assert.equal(f.status,'Approved');
  assert.equal(f.title,b.feat.title);assert.deepEqual(f.relatedBackgrounds,[b.id]);assert.deepEqual(f.abilities,[]);
@@ -28,5 +33,5 @@ assert.ok(!legacy.some(f=>f.id==='enoa-lifestone-wright-feat-2014'));
 assert.ok(!feats.some(f=>f.id==='enoa-lifestone-wright-origin'));
 const oldLegacy=await import('data:text/javascript;base64,'+Buffer.from(fs.readFileSync(root+'feats5e.js.before','utf8')).toString('base64'));
 for(const f of oldLegacy.FEATS_5E)assert.deepEqual(legacy.find(x=>x.id===f.id),f,'Existing 2014 feat changed');
-const result={status:'PASS',date:'2026-10-30',originAssignments:backgrounds.length,uniqueOriginFeats:new Set(backgrounds.map(b=>b.feat.id)).size,legacyBackgroundsReviewed:reviewedBackgrounds.length,authored2014Feats:authored2014.length,feats2024:feats.length,feats2014:legacy.length,old2014FeatsPreserved:oldLegacy.FEATS_5E.length,backgroundRulesOtherThanFeat:'unchanged for retained backgrounds',remoteDeployment:false};
+const result={status:'PASS',date:'2026-10-31',originAssignments:backgrounds.length,uniqueOriginFeats:new Set(backgrounds.map(b=>b.feat.id)).size,legacyBackgroundsReviewed:reviewedBackgrounds.length,authored2014Feats:authored2014.length,feats2024:feats.length,feats2014:legacy.length,old2014FeatsPreserved:oldLegacy.FEATS_5E.length,backgroundRulesOtherThanFeat:'unchanged except author-approved revisions',revisedBackgrounds:[...revised.keys()],remoteDeployment:false};
 fs.writeFileSync('reports/enoa-backgrounds/house-of-knots-publication/legacy-preservation.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
