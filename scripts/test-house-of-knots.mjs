@@ -12,8 +12,9 @@ import * as house from '../app/data/house-of-knots.js';
 const root='reports/enoa-backgrounds/house-of-knots-publication/';
 const before=JSON.parse(fs.readFileSync(root+'before.json','utf8'));
 const retired=new Set(['knot-scribe','sarban-drover']); // Explicit author removals after the House was added.
-const revised=new Map(['great-game-player','cradle-born'].map(id=>{
- const b=JSON.parse(fs.readFileSync(`proposals/enoa-backgrounds/${id}/proposal.json`,'utf8')).background;
+const revised=new Map(['great-game-player','cradle-born','spiral-runner'].map(id=>{
+ const folder=id==='spiral-runner'?'spiral-runner-yondani':id;
+ const b=JSON.parse(fs.readFileSync(`proposals/enoa-backgrounds/${folder}/proposal.json`,'utf8')).background;
  return [id,{glossary:[],ties:[],...b,equipment:{...b.equipment,items:b.equipment.items.map(x=>({...x,label:x.title,note:x.note??''}))}}];
 }));
 for(const id of retired){

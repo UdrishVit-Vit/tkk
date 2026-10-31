@@ -1,7 +1,7 @@
 {
   "meta": {
     "date": "2026-10-31",
-    "status": "PROPOSAL_NOT_PUBLISHED",
+    "status": "ADOPTED_IN_LOCAL_SITE",
     "scope": "Rewrite of existing spiral-runner, not a new catalogue background",
     "canonDecision": "Author clarification 2026-10-31: yondani are Children of Edra, possibly a broader identity. Background remains restricted to Morhor, Child of Edra.",
     "roleDecision": "The hero is yondani. Restore original background name. The earlier independent-seeker alternative and membership exclusion are superseded.",
@@ -11,9 +11,22 @@
       "statement": "Йондани это и есть Дети Эдры, может даже в более широком смысле",
       "status": "APPROVED_CANON",
       "scope": "Identity and membership for this background; broader meaning not yet defined"
+    },
+    "publication": {
+      "date": "2026-10-31",
+      "authorRequested": true,
+      "remoteDeployment": false
     }
   },
   "background": {
+    "group": "enoa",
+    "source": "TVV",
+    "sourceTitle": "Эноа",
+    "glossary": [],
+    "originalName": "Spiral Runner",
+    "ties": [
+      "Спирали"
+    ],
     "id": "spiral-runner",
     "title": "Бегущий по Спирали",
     "speciesRestriction": {
@@ -91,14 +104,6 @@
       "alt": "50 зм",
       "alternativeCp": 5000
     },
-    "group": "enoa",
-    "source": "TVV",
-    "sourceTitle": "Эноа",
-    "originalName": "Spiral Runner",
-    "glossary": [],
-    "ties": [
-      "Спирали"
-    ],
     "variants": [
       {
         "title": "Собиратель сведений",

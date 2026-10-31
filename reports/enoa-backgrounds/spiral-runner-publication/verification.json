@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-31",
+  "status": "PASS",
+  "backgroundId": "spiral-runner",
+  "featTitle": "Наследие Спиралей",
+  "versions": {
+    "origin2024": "0.6.0",
+    "feat2014": "0.6.0"
+  },
+  "introWords": 30,
+  "storyWords": 195,
+  "storyParagraphs": 3,
+  "speciesRestriction": {
+    "id": "morhory",
+    "title": "Мор’хор — Дитя Эдры",
+    "subtype": "Дитя Эдры"
+  },
+  "kitTotalCp": 5000,
+  "catalogueCounts": {
+    "backgrounds": 54,
+    "feats2024": 145,
+    "feats2014": 67
+  },
+  "unrelatedRecordsPreserved": 155,
+  "browser": {
+    "status": "UNAVAILABLE",
+    "reason": "browser.user is unavailable; inventory accessible but tab control unavailable"
+  },
+  "playtest": false,
+  "remoteDeployment": false
+}

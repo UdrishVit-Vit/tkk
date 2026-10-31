@@ -10,8 +10,9 @@ const marker='export const DND55E_BACKGROUNDS = ';
 const before=JSON.parse(beforeText.slice(beforeText.indexOf(marker)+marker.length,beforeText.indexOf('\n\nexport const DND55E_BACKGROUND_FEATS')).trim());
 const reviewedBackgrounds=backgrounds.filter(b=>before.some(old=>old.id===b.id));
 // Author requested these complete revisions after the V4 assignment snapshot.
-const revised=new Map(['great-game-player','cradle-born'].map(id=>{
- const b=JSON.parse(fs.readFileSync(`proposals/enoa-backgrounds/${id}/proposal.json`,'utf8')).background;
+const revised=new Map(['great-game-player','cradle-born','spiral-runner'].map(id=>{
+ const folder=id==='spiral-runner'?'spiral-runner-yondani':id;
+ const b=JSON.parse(fs.readFileSync(`proposals/enoa-backgrounds/${folder}/proposal.json`,'utf8')).background;
  return [id,{glossary:[],ties:[],...b,equipment:{...b.equipment,items:b.equipment.items.map(x=>({...x,label:x.title,note:x.note??''}))}}];
 }));
 assert.deepEqual(reviewedBackgrounds.map(b=>b.id),before.filter(b=>!['lifestone-wright','knot-scribe','sarban-drover'].includes(b.id)).map(b=>b.id));

@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-31",
+  "authorization": "Внеси обновленные изменения на сайт Бегущий по спирали.",
+  "background": "spiral-runner",
+  "origin": "enoa-spiral-runner-origin",
+  "optionalFeat2014": "enoa-spiral-runner-feat-2014",
+  "speciesRestriction": {
+    "id": "morhory",
+    "title": "Мор’хор — Дитя Эдры",
+    "subtype": "Дитя Эдры"
+  },
+  "remoteDeployment": false,
+  "playtest": false
+}

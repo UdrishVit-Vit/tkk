@@ -11,7 +11,8 @@
   "backgroundRulesOtherThanFeat": "unchanged except author-approved revisions",
   "revisedBackgrounds": [
     "great-game-player",
-    "cradle-born"
+    "cradle-born",
+    "spiral-runner"
   ],
   "remoteDeployment": false
 }
