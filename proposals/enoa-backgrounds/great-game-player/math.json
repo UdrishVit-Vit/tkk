@@ -1,0 +1,83 @@
+{
+  "assumptions": "Attack bonus +5 vs AC 15; save modifier +2 vs DC 15; no other features. Bonus applied to every eligible failure for this model, not an optimal resource policy.",
+  "meanD4": 2.5,
+  "attack": {
+    "before": 0.55,
+    "afterUsingD4": 0.425,
+    "natural20AlwaysHits": true
+  },
+  "save": {
+    "before": 0.4,
+    "afterUsingD4": 0.525
+  },
+  "attackMargins": [
+    {
+      "attackTotalMinusAC": 0,
+      "avoidProbability": 1
+    },
+    {
+      "attackTotalMinusAC": 1,
+      "avoidProbability": 0.75
+    },
+    {
+      "attackTotalMinusAC": 2,
+      "avoidProbability": 0.5
+    },
+    {
+      "attackTotalMinusAC": 3,
+      "avoidProbability": 0.25
+    },
+    {
+      "attackTotalMinusAC": 4,
+      "avoidProbability": 0
+    }
+  ],
+  "saveDeficits": [
+    {
+      "dcMinusTotal": 1,
+      "successProbability": 1
+    },
+    {
+      "dcMinusTotal": 2,
+      "successProbability": 0.75
+    },
+    {
+      "dcMinusTotal": 3,
+      "successProbability": 0.5
+    },
+    {
+      "dcMinusTotal": 4,
+      "successProbability": 0.25
+    },
+    {
+      "dcMinusTotal": 5,
+      "successProbability": 0
+    }
+  ],
+  "uses2024": [
+    {
+      "level": 1,
+      "uses": 2
+    },
+    {
+      "level": 5,
+      "uses": 3
+    },
+    {
+      "level": 11,
+      "uses": 4
+    },
+    {
+      "level": 20,
+      "uses": 6
+    }
+  ],
+  "uses2014": 2,
+  "normalUdrishWalking": {
+    "before": 25,
+    "after": 30,
+    "dashBefore": 50,
+    "dashAfter": 60
+  },
+  "playtest": false
+}

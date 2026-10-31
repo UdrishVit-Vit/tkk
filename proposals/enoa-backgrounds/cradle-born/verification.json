@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-31",
+  "status": "DRAFT_STRUCTURALLY_VALID_NOT_PUBLISHED",
+  "backgroundId": "cradle-born",
+  "introWords": 30,
+  "introSentences": 3,
+  "storyWords": 195,
+  "storyParagraphs": 3,
+  "validator": {
+    "mode": "In-memory candidate uses Approved status solely to check publishable structure; stored proposal remains Draft",
+    "issues": []
+  },
+  "equipmentCp": 5000,
+  "editionsSeparated": true,
+  "productionFiles": [
+    {
+      "path": "app/data/dnd55e/backgrounds.js",
+      "unchanged": true
+    },
+    {
+      "path": "app/data/enoa-authored-feats-v4.js",
+      "unchanged": true
+    },
+    {
+      "path": "content/dnd55e/species/morhory.md",
+      "unchanged": true
+    }
+  ],
+  "playtest": false
+}

@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-31",
+  "status": "DRAFT_VALIDATED_NOT_PUBLISHED",
+  "summaryWords": 29,
+  "storyWords": 197,
+  "paragraphs": 3,
+  "teamRoles": 4,
+  "budgetCp": 5000,
+  "returnCrystalGranted": false,
+  "editionsSeparated": true,
+  "productionUnchanged": true,
+  "playtest": false,
+  "revision": 2,
+  "approvedBenefitPreserved": "Тренированный бег",
+  "pendingBenefit": "На волосок",
+  "defensiveBranches": [
+    "one attack",
+    "Strength save",
+    "Dexterity save",
+    "Constitution save"
+  ],
+  "mathChecks": "PASS: all 20x4 outcomes, margin boundaries and natural 20"
+}

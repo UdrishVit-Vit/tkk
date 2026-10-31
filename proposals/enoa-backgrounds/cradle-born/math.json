@@ -1,0 +1,39 @@
+{
+  "method": "Exact enumeration of 20 d20 outcomes and 6 d6 outcomes; ability checks have no automatic success/failure on 1/20",
+  "abilityModifier": 2,
+  "dc": 15,
+  "levels": [
+    {
+      "level": 1,
+      "proficiencyBonus": 2,
+      "learnedProficienciesAtOnce": 1,
+      "bonusDicePerLongRest": 1,
+      "successWithProficiency": 0.5,
+      "successWithProficiencyAndBonusDie": 0.675
+    },
+    {
+      "level": 5,
+      "proficiencyBonus": 3,
+      "learnedProficienciesAtOnce": 1,
+      "bonusDicePerLongRest": 1,
+      "successWithProficiency": 0.55,
+      "successWithProficiencyAndBonusDie": 0.725
+    },
+    {
+      "level": 11,
+      "proficiencyBonus": 4,
+      "learnedProficienciesAtOnce": 1,
+      "bonusDicePerLongRest": 1,
+      "successWithProficiency": 0.6,
+      "successWithProficiencyAndBonusDie": 0.775
+    },
+    {
+      "level": 20,
+      "proficiencyBonus": 6,
+      "learnedProficienciesAtOnce": 1,
+      "bonusDicePerLongRest": 1,
+      "successWithProficiency": 0.7,
+      "successWithProficiencyAndBonusDie": 0.875
+    }
+  ]
+}
