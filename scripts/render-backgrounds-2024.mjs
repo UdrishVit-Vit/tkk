@@ -105,7 +105,7 @@ assert.ok(feats.includes('Всегда есть выход'))
 assert.ok(!backgrounds.includes('старшие смотрят на вас как на почти семью'))
 const legacyFeats = await render('feats', '../pages/dnd5e/')
 assert.equal((legacyFeats.match(/data-record=/g)||[]).length, FEATS_5E.length)
-assert.equal(ENOA_AUTHORED_FEATS_2014_V4.length,55)
+assert.equal(ENOA_AUTHORED_FEATS_2014_V4.length,53)
 for(const f of ENOA_AUTHORED_FEATS_2014_V4){
   assert.ok(legacyFeats.includes(`data-record="${f.id}"`),f.id)
   for(const text of f.benefits)assert.ok(legacyFeats.includes(text.replace(/\*\*/g,'')),f.id+': missing 2014 rule')

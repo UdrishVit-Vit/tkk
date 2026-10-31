@@ -23,10 +23,10 @@ for(const b of reviewedBackgrounds){
  if(['nagbo','norbu'].includes(b.id))assert.equal(f14.requirement,'Вирморожденные');
 }
 for(const catalogue of [feats,legacy])assert.equal(new Set(catalogue.map(f=>f.id)).size,catalogue.length);
-assert.equal(authored2014.length,55);assert.equal(new Set(backgrounds.map(b=>b.feat.id)).size,54);
+assert.equal(authored2014.length,53);assert.equal(new Set(backgrounds.map(b=>b.feat.id)).size,54);
 assert.ok(!legacy.some(f=>f.id==='enoa-lifestone-wright-feat-2014'));
 assert.ok(!feats.some(f=>f.id==='enoa-lifestone-wright-origin'));
 const oldLegacy=await import('data:text/javascript;base64,'+Buffer.from(fs.readFileSync(root+'feats5e.js.before','utf8')).toString('base64'));
 for(const f of oldLegacy.FEATS_5E)assert.deepEqual(legacy.find(x=>x.id===f.id),f,'Existing 2014 feat changed');
-const result={status:'PASS',date:'2026-10-30',originAssignments:backgrounds.length,uniqueOriginFeats:new Set(backgrounds.map(b=>b.feat.id)).size,legacyBackgroundsReviewed:reviewedBackgrounds.length,authored2014Feats:55,feats2024:feats.length,feats2014:legacy.length,old2014FeatsPreserved:oldLegacy.FEATS_5E.length,backgroundRulesOtherThanFeat:'unchanged for retained backgrounds',remoteDeployment:false};
+const result={status:'PASS',date:'2026-10-30',originAssignments:backgrounds.length,uniqueOriginFeats:new Set(backgrounds.map(b=>b.feat.id)).size,legacyBackgroundsReviewed:reviewedBackgrounds.length,authored2014Feats:authored2014.length,feats2024:feats.length,feats2014:legacy.length,old2014FeatsPreserved:oldLegacy.FEATS_5E.length,backgroundRulesOtherThanFeat:'unchanged for retained backgrounds',remoteDeployment:false};
 fs.writeFileSync('reports/enoa-backgrounds/house-of-knots-publication/legacy-preservation.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

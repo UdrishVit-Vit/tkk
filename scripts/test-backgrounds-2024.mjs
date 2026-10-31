@@ -47,7 +47,7 @@ assert.equal(currentData.backgrounds.find(b=>b.id==='hakar').title,'Хакар')
 assert.ok(currentData.feats.some(f=>f.id==='nameless'))
 // The author requested unique V4 assignments for all active backgrounds.
 assert.equal(new Set(currentData.backgrounds.map(b=>b.feat.id)).size,54)
-assert.deepEqual(currentData.feats.find(f=>f.id==='enoa-knot-memory').relatedBackgrounds,[])
+assert.ok(!currentData.feats.some(f=>['enoa-knot-memory','enoa-sarban-drover-origin'].includes(f.id)))
 for(const b of currentData.backgrounds){
   const f=currentData.feats.find(f=>f.id===b.feat.id)
   assert.ok(f&&f.source==='TVV'&&f.category==='origin'&&f.status==='Approved',b.id)

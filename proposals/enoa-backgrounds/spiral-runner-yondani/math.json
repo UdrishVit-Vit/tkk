@@ -1,0 +1,27 @@
+{
+  "assumptions": "Dexterity save modifier +2, DC 15, no other bonuses. Models the outcome when the die is applied, not the policy of choosing when to spend it.",
+  "base": 0.4,
+  "withD6": 0.575,
+  "withAdvantage": 0.64,
+  "withAdvantageAndD6": 0.8120833333333334,
+  "uses2024": [
+    {
+      "level": 1,
+      "uses": 2
+    },
+    {
+      "level": 5,
+      "uses": 3
+    },
+    {
+      "level": 11,
+      "uses": 4
+    },
+    {
+      "level": 20,
+      "uses": 6
+    }
+  ],
+  "uses2014": 2,
+  "playtest": false
+}

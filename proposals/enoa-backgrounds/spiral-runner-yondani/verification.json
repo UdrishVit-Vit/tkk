@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-31",
+  "status": "DRAFT_VALIDATED_NOT_PUBLISHED",
+  "summaryWords": 30,
+  "storyWords": 195,
+  "paragraphs": 3,
+  "budgetCp": 5000,
+  "editionsSeparated": true,
+  "productionUnchanged": true,
+  "catalogueCounts": {
+    "backgrounds2024": 54,
+    "feats2024": 145,
+    "feats2014": 67
+  },
+  "canonGate": "RESOLVED_BY_AUTHOR: yondani are Children of Edra; the hero belongs to yondani.",
+  "playtest": false,
+  "authorClarificationApplied": true
+}

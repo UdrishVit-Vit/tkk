@@ -18,7 +18,7 @@ for(const id of retired){
  if(removal.preservedBackground)assert.deepEqual(backgrounds24.find(b=>b.id===removal.preservedBackground.id),removal.preservedBackground,'retained counterpart unchanged');
  for(const old of removal.previousFeats){
   const current=[...feats24,...feats14].find(f=>f.id===old.id);
-  assert.deepEqual(current,{...old,relatedBackgrounds:[]},old.id+': preserved independently, rules unchanged');
+  assert.equal(current,undefined,old.id+': later removed at explicit author request');
  }
 }
 const b24=house.HOUSE_BACKGROUND_2024,b14=house.HOUSE_BACKGROUND_2014,f=house.HOUSE_ORIGIN_FEAT;
