@@ -1,0 +1,52 @@
+{
+  "method": "Movement arithmetic and exact Hit Die enumeration; normal ground, no speed modifiers or difficult terrain unless specified",
+  "movement": [
+    {
+      "walkingSpeed": 30,
+      "dashes": 0,
+      "baseline": 30,
+      "proposal": 30
+    },
+    {
+      "walkingSpeed": 30,
+      "dashes": 1,
+      "baseline": 60,
+      "proposal": 70
+    },
+    {
+      "walkingSpeed": 30,
+      "dashes": 2,
+      "baseline": 90,
+      "proposal": 100
+    },
+    {
+      "walkingSpeed": 0,
+      "dashes": 1,
+      "baseline": 0,
+      "proposal": 0
+    }
+  ],
+  "heal": {
+    "usesPerLongRest": 1,
+    "ownHitDiceSpent": 1,
+    "constitutionModifier": 2,
+    "examples": [
+      {
+        "sides": 6,
+        "meanHealing": 5.5
+      },
+      {
+        "sides": 8,
+        "meanHealing": 6.5
+      },
+      {
+        "sides": 10,
+        "meanHealing": 7.5
+      },
+      {
+        "sides": 12,
+        "meanHealing": 8.5
+      }
+    ]
+  }
+}

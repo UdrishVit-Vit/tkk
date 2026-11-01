@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-01",
+  "revision": 5,
+  "status": "DRAFT_STRUCTURALLY_VALID_NOT_PUBLISHED",
+  "id": "steppe-tiger",
+  "feat": "Тигриный вызов",
+  "narrativeScope": "Alliance of multiple Adaad bloods across settlements of Hurhon",
+  "karazStatus": "NOT_YET_PASSED",
+  "featRequiresKaraz": {
+    "origin2024": false,
+    "feat2014": false
+  },
+  "introWords": 31,
+  "storyWords": 187,
+  "storyParagraphs": 3,
+  "validator": {
+    "mode": "Approved only on in-memory candidate; stored project stays Draft",
+    "issues": []
+  },
+  "productionUnchanged": true,
+  "mechanicsChanged": false,
+  "playtest": false,
+  "authorAcceptedMechanic": false
+}

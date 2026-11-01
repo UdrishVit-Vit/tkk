@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-01",
+  "revision": 13,
+  "status": "INTEGRATED_LOCAL_SITE",
+  "backgrounds2014": 4,
+  "backgrounds2024": 54,
+  "feature2014": "Сберечь людей",
+  "origin2024": "Тигриный вызов",
+  "optionalFeat2014": "Тигриный вызов",
+  "oldRacialOverlapRemoved": true,
+  "karazStatus": "NOT_YET_PASSED",
+  "unrelatedRecordsUnchanged": true,
+  "automaticFeat2014": false,
+  "equipment2024TotalCp": 5000,
+  "checks": {
+    "backgroundsCheck": "PASS",
+    "originsCheck": "PASS: 4 regression cases",
+    "backgroundsTest": "PASS: 19 rejection cases",
+    "render2024": "PASS: 54 backgrounds, 145 feats; text and links",
+    "renderFeats2014": "PASS: 67 feats",
+    "renderBackgrounds2014": "PASS: 4 backgrounds; Tiger story, feature and characteristics rendered",
+    "browser": "NOT_VERIFIED: Page.navigate and Emulation.setFocusEmulationEnabled timed out"
+  },
+  "localServer": "http://127.0.0.1:3000",
+  "remoteDeployment": false,
+  "playtest": false,
+  "readyPreview": "READY_BOTH_EDITIONS.md",
+  "publicationReview": "PUBLICATION_REVIEW.md"
+}

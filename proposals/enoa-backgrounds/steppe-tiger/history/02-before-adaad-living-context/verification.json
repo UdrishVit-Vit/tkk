@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-31",
+  "revision": 2,
+  "status": "DRAFT_STRUCTURALLY_VALID_NOT_PUBLISHED",
+  "id": "steppe-tiger",
+  "feat": "Тигриный вызов",
+  "introWords": 30,
+  "storyWords": 183,
+  "storyParagraphs": 3,
+  "equipmentCp": 5000,
+  "validator": {
+    "mode": "Approved only in memory for structural check; stored project stays Draft",
+    "issues": []
+  },
+  "productionUnchanged": true,
+  "playtest": false,
+  "authorAcceptedMechanic": false,
+  "legitimacyAndMyth": "PROPOSAL_NOT_CANON"
+}

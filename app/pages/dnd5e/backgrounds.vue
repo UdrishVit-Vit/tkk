@@ -128,7 +128,9 @@ useSeoMeta({
       <div v-if="item.raw.feature" class="bg-feature">
         <h3 class="tref-block-title"><NuxtLink v-if="item.raw.feature.path" :to="item.raw.feature.path">{{ item.raw.feature.title }}</NuxtLink><template v-else>{{ item.raw.feature.title }}</template></h3>
         <p v-if="item.raw.feature.path" class="tref-desc"><RuleRichText :text="item.raw.feature.text" edition="2014" /></p>
-        <p v-else class="tref-desc" v-html="mdBold(item.raw.feature.text)" />
+        <template v-else>
+          <p v-for="(paragraph, index) in item.raw.feature.text.split(/\n\s*\n/)" :key="index" class="tref-desc" v-html="mdBold(paragraph)" />
+        </template>
         <RelatedContentLinks :links="item.raw.relatedLinks" />
         <p v-if="item.raw.feature.alt" class="bg-feature-alt"><span>Или:</span> <span v-html="mdBold(item.raw.feature.alt)" /></p>
       </div>
@@ -144,6 +146,13 @@ useSeoMeta({
 
       <p v-for="(paragraph, index) in item.raw.storyParagraphs || []" :key="index" class="tref-desc">{{ paragraph }}</p>
       <p v-if="item.raw.personalization" class="tref-desc bg-person">{{ item.raw.personalization }}</p>
+      <section v-if="item.raw.suggestedCharacteristics" class="tref-block">
+        <h3 class="tref-block-title">Предлагаемый характер</h3>
+        <p class="tref-desc"><strong>Черты характера.</strong> {{ item.raw.suggestedCharacteristics.traits.join(' ') }}</p>
+        <p class="tref-desc"><strong>Идеал.</strong> {{ item.raw.suggestedCharacteristics.ideal }}</p>
+        <p class="tref-desc"><strong>Привязанность.</strong> {{ item.raw.suggestedCharacteristics.bond }}</p>
+        <p class="tref-desc"><strong>Слабость.</strong> {{ item.raw.suggestedCharacteristics.flaw }}</p>
+      </section>
       <section v-if="item.raw.variants?.length" class="tref-block">
         <h3 class="tref-block-title">Варианты прошлого</h3>
         <p class="tref-desc">Выберите подходящий или придумайте свой.</p>

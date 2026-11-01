@@ -1,5 +1,6 @@
 // Sources backgrounds can come from — homebrew Enoa thread-books.
 import { HOUSE_BACKGROUND_2014 } from './house-of-knots.js'
+import { STEPPE_TIGER_BACKGROUND_2014 } from './steppe-tiger.js'
 export const BACKGROUND_SOURCES = {
   TVV: 'Эноа',
   TRC: 'The Threads of RandCarter',
@@ -7,6 +8,7 @@ export const BACKGROUND_SOURCES = {
 }
 
 export const BACKGROUNDS_5E = [
+  STEPPE_TIGER_BACKGROUND_2014,
   HOUSE_BACKGROUND_2014,
   {
     id: 'kshaakh-creation',

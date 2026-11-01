@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-31",
+  "revision": 2,
+  "status": "DRAFT_STRUCTURALLY_VALID_NOT_PUBLISHED",
+  "id": "baraskus-foot",
+  "feat": "Дыхание гонца",
+  "introWords": 29,
+  "storyWords": 186,
+  "storyParagraphs": 3,
+  "speciesRestriction": {
+    "id": "adzhaidy",
+    "title": "Аджаид"
+  },
+  "validator": {
+    "mode": "Approved on in-memory candidate only; stored project remains Draft",
+    "issues": []
+  },
+  "productionUnchanged": true,
+  "playtest": false,
+  "authorAcceptedMechanic": false,
+  "religiousDuties": "UNKNOWN_BY_AUTHOR",
+  "speciesWalkingSpeedUsedForMath": 40,
+  "sacredProtectionScope": "All peoples and everyone around the courier; explicitly clarified by the author"
+}

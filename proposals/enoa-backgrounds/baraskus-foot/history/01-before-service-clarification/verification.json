@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-31",
+  "status": "DRAFT_STRUCTURALLY_VALID_NOT_PUBLISHED",
+  "id": "baraskus-foot",
+  "feat": "Дыхание гонца",
+  "introWords": 31,
+  "storyWords": 182,
+  "storyParagraphs": 3,
+  "equipmentCp": 5000,
+  "validator": {
+    "mode": "Approved status only on in-memory candidates; stored project stays Draft",
+    "issues": []
+  },
+  "productionUnchanged": true,
+  "playtest": false,
+  "authorAcceptedMechanic": false
+}

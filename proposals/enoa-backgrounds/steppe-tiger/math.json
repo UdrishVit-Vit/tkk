@@ -1,0 +1,63 @@
+{
+  "revision": 2,
+  "method": "Exact d20 and two-d20 enumeration; target keeps attacking the same ally after save; attacker +5, ally AC15, target Wisdom +0, owner Charisma +3",
+  "levels": [
+    {
+      "level": 1,
+      "pb": 2,
+      "charismaModifier": 3,
+      "saveDc": 13,
+      "uses2024": 2,
+      "uses2014": 2
+    },
+    {
+      "level": 5,
+      "pb": 3,
+      "charismaModifier": 3,
+      "saveDc": 14,
+      "uses2024": 3,
+      "uses2014": 2
+    },
+    {
+      "level": 11,
+      "pb": 4,
+      "charismaModifier": 3,
+      "saveDc": 15,
+      "uses2024": 4,
+      "uses2014": 2
+    },
+    {
+      "level": 20,
+      "pb": 6,
+      "charismaModifier": 3,
+      "saveDc": 17,
+      "uses2024": 6,
+      "uses2014": 2
+    }
+  ],
+  "exampleLevel1": {
+    "dc": 13,
+    "targetSaveFailureChance": 0.6,
+    "normalHitChance": 0.55,
+    "disadvantageHitChance": 0.3025,
+    "hitChanceIncludingSuccessfulSaves": 0.4015,
+    "expectedReductionThreeAttacksEightDamageEach": 3.5640000000000005
+  },
+  "limitations": [
+    "Target can attack owner instead; attack chance then unchanged by the feat",
+    "No prediction for AI decisions or real encounter damage",
+    "Area effects and saving-throw spells are unaffected",
+    "No proof of live balance"
+  ],
+  "playtest": false,
+  "socialReroll": {
+    "revision": 10,
+    "assumptions": "Single d20 ability check, modifier +5, DC15, no advantage/disadvantage or other rerolls; use only after failure",
+    "beforeSuccess": 0.55,
+    "afterSuccess": 0.7975,
+    "absoluteGain": 0.2475,
+    "frequency": "Once per long rest, independent of challenge uses",
+    "advantage": "Replace one die only, then apply normal selection; does not grant another advantage source",
+    "impossibleTask": "No automatic success or new permission to attempt an impossible task"
+  }
+}
