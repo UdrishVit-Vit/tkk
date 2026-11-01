@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-01",
+  "revision": 6,
+  "status": "MOBILITY_DIRECTION_CONFIRMED_NUMBERS_PROPOSED",
+  "rejectedVeilSignAbsent": true,
+  "rejectedRunningSubsystemAbsent": true,
+  "validator": {
+    "mode": "Approved in memory only; stored remains Draft",
+    "issues": []
+  },
+  "productionUnchanged": true,
+  "mechanicsApproved": false,
+  "optionalDirectionQuestionPending": false,
+  "playtest": false,
+  "authorConfirmedDirection": "Быстрее добираться до нужного места и уходить из опасности"
+}

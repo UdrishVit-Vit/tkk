@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-01",
+  "revision": 3,
+  "status": "REVISION_REQUIRED_ULTRAMARATHON_ENDURANCE",
+  "id": "baraskus-foot",
+  "feat": "Дыхание гонца",
+  "introWords": 29,
+  "storyWords": 186,
+  "storyParagraphs": 3,
+  "speciesRestriction": {
+    "id": "adzhaidy",
+    "title": "Аджаид"
+  },
+  "validator": {
+    "mode": "Approved on in-memory candidate only; stored project remains Draft",
+    "issues": []
+  },
+  "productionUnchanged": true,
+  "playtest": false,
+  "authorAcceptedMechanic": false,
+  "religiousDuties": "UNKNOWN_BY_AUTHOR",
+  "speciesWalkingSpeedUsedForMath": 40,
+  "sacredProtectionScope": "All peoples and everyone around the courier; explicitly clarified by the author",
+  "authorConfirmedDistanceKm": 500,
+  "canContinueAfter500Km": true,
+  "elapsedTimeSpecified": false,
+  "priorValidatorResultScope": "Earlier rules draft only; does not validate the new ultramarathon requirement."
+}

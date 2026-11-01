@@ -20,7 +20,14 @@ export function checkEnoaOrigins(bs, fs, mapping) {
   }
   for(const b of bs.filter(b => b.source !== 'TVV')) if(mapping[b.id]) errors.push(`scope:${b.id}`)
   const prohibited = /книг[а-яё]*|бумаг[а-яё]*|пергамент[а-яё]*|чернил[а-яё]*|почерк[а-яё]*|страниц[а-яё]*|писчее перо/iu
-  for(const b of bs) if(prohibited.test(JSON.stringify(b))) errors.push(`writing:${b.id}`)
+  for(const b of bs) {
+    // The author explicitly confirmed Veil ink for this courier's tattoos.
+    // Keep all other ink and paper wording subject to the existing audit.
+    const text = b.id === 'baraskus-foot'
+      ? JSON.stringify(b).replaceAll('вуальными чернилами', '')
+      : JSON.stringify(b)
+    if(prohibited.test(text)) errors.push(`writing:${b.id}`)
+  }
   for(const f of fs) {
     if(prohibited.test(JSON.stringify(f))) errors.push(`writing:${f.id}`)
     if(!f.balance?.comparator || !f.balance?.concern || f.balance.usesAtLevels.length !== 4) errors.push(`balance:${f.id}`)
@@ -34,6 +41,7 @@ for(const f of drafts.filter(f => f.status !== 'Approved')) assert.ok(!published
 for(const [name,mutate] of [
   ['missing', (b,f,l)=>{delete l[b.find(x=>x.source==='TVV').id]}],
   ['paper', b=>{b[0].enoaLead[0]+=' Вы переписывали книги.'}],
+  ['ordinary-ink', b=>{b.find(x=>x.id==='baraskus-foot').enoaLead[0]+=' Вы писали письма чернилами.'}],
   ['official-scope', (b,f,l)=>{b.push({...b[0],id:'phb-scope-probe',source:'PHB'});l['phb-scope-probe']=[f[0].id]}],
   ['duplicate', (b,f)=>{f[1].benefits=structuredClone(f[0].benefits)}]
 ]){
@@ -41,4 +49,4 @@ for(const [name,mutate] of [
  mutate(b,f,l)
  assert.ok(checkEnoaOrigins(b,f,l).length,name)
 }
-console.log(`${drafts.length} active individual proposals; no PHB assignments; ${backgrounds.length} knot-writing audits; 4 regression cases passed. Mechanical uniqueness is not proof of balance.`)
+console.log(`${drafts.length} active individual proposals; no PHB assignments; ${backgrounds.length} knot-writing audits; 5 regression cases passed. Mechanical uniqueness is not proof of balance.`)

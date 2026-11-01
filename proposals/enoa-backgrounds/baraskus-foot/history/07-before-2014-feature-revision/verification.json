@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-01",
+  "revision": 7,
+  "status": "READY_PREVIEW_AUTHOR_ACCEPTED_NOT_PUBLISHED",
+  "introWords": 29,
+  "storyWords": 151,
+  "storyParagraphs": 3,
+  "background2014": {
+    "skills": 2,
+    "toolsAndLanguages": 2,
+    "automaticFeat": false,
+    "feature": "Почитаемый гонец",
+    "equipmentTotalCp": 4270
+  },
+  "background2024": {
+    "feat": "Шаг гонца",
+    "equipmentTotalCp": 5000,
+    "validatorIssues": [],
+    "validationMode": "Approved flag in memory only; stored remains Draft until site integration"
+  },
+  "authorAcceptedMechanics": true,
+  "rejectedMechanicsAbsent": true,
+  "previewMatchesData": true,
+  "productionUnchanged": true,
+  "remoteDeployment": false,
+  "playtest": false,
+  "readyPreview": "READY_BOTH_EDITIONS.md",
+  "qualityReview": "FINAL_REVIEW.md"
+}

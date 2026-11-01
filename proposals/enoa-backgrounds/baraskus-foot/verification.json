@@ -1,24 +1,34 @@
 {
-  "date": "2026-10-31",
-  "revision": 2,
-  "status": "DRAFT_STRUCTURALLY_VALID_NOT_PUBLISHED",
-  "id": "baraskus-foot",
-  "feat": "Дыхание гонца",
-  "introWords": 29,
-  "storyWords": 186,
-  "storyParagraphs": 3,
-  "speciesRestriction": {
-    "id": "adzhaidy",
-    "title": "Аджаид"
+  "date": "2026-11-01",
+  "revision": 12,
+  "status": "INTEGRATED_LOCAL_SITE",
+  "backgrounds2014": 5,
+  "backgrounds2024": 54,
+  "feature2014": "Передать дальше",
+  "origin2024": "Шаг гонца",
+  "optionalFeat2014": "Шаг гонца",
+  "onlyAdzhaidsBothEditions": true,
+  "automaticFeat2014": false,
+  "unlimitedDelivery": true,
+  "unlimitedStationStay": true,
+  "unrelatedRecordsUnchanged": true,
+  "checks": {
+    "backgroundsCheck": "PASS: 54 backgrounds, zero errors",
+    "originsCheck": "PASS: 5 regression cases, tattoo-ink exception is narrow",
+    "backgroundsTest": "PASS: 19 rejection cases",
+    "render2024": "PASS: 54 backgrounds and 145 feats",
+    "renderFeats2014": "PASS: 67 feats",
+    "renderBackgrounds2014": "PASS: 5 backgrounds, history, feature, restriction and character profile",
+    "browser2024": "PASS: open card shows restriction, equipment, feat and history",
+    "browser2014": "PASS: open card shows free delivery, restriction, equipment and history",
+    "diffCheck": "PASS"
   },
-  "validator": {
-    "mode": "Approved on in-memory candidate only; stored project remains Draft",
-    "issues": []
-  },
-  "productionUnchanged": true,
+  "localServer": "http://127.0.0.1:3000",
+  "remoteDeployment": false,
   "playtest": false,
-  "authorAcceptedMechanic": false,
-  "religiousDuties": "UNKNOWN_BY_AUTHOR",
-  "speciesWalkingSpeedUsedForMath": 40,
-  "sacredProtectionScope": "All peoples and everyone around the courier; explicitly clarified by the author"
+  "screenshots": {
+    "edition2024": ".tmpwork/backgrounds-render/baraskus-2024.jpg",
+    "edition2014": ".tmpwork/backgrounds-render/baraskus-2014.jpg"
+  },
+  "publicationReview": "PUBLICATION_REVIEW.md"
 }

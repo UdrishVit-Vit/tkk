@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-01",
+  "revision": 8,
+  "status": "READY_PREVIEW_2014_FEATURE_REVISED_NOT_PUBLISHED",
+  "introWords": 29,
+  "storyWords": 151,
+  "storyParagraphs": 3,
+  "background2014": {
+    "skills": 2,
+    "toolsAndLanguages": 2,
+    "automaticFeat": false,
+    "feature": "Приют гонца",
+    "equipmentTotalCp": 4270,
+    "featureAcceptedByAuthor": false,
+    "speciesRestriction": "Только аджаиды"
+  },
+  "background2024": {
+    "feat": "Шаг гонца",
+    "equipmentTotalCp": 5000,
+    "validatorIssues": [],
+    "validationMode": "Approved flag in memory only; stored remains Draft until site integration",
+    "speciesRestriction": "Только аджаиды"
+  },
+  "authorAcceptedMechanics": true,
+  "rejectedMechanicsAbsent": true,
+  "previewMatchesData": true,
+  "productionUnchanged": true,
+  "remoteDeployment": false,
+  "playtest": false,
+  "readyPreview": "READY_BOTH_EDITIONS.md",
+  "qualityReview": "FINAL_REVIEW.md",
+  "approvedFeatMechanicsUnchanged": true,
+  "feature2014Review": {
+    "kind": "Social hospitality proposal",
+    "beneficiaries": "Owner and up to five companions",
+    "where": "Existing Baraskus runner stations and Adzhaid communities",
+    "duration": "Up to one day during a journey stop",
+    "conditions": "Available provisions and space",
+    "reciprocity": "Hosts may ask to carry a message along the existing route",
+    "doesNotGrant": [
+      "Magical healing",
+      "Supplies created from nothing",
+      "A station in every settlement",
+      "Cash income",
+      "Compulsory change of route"
+    ]
+  }
+}

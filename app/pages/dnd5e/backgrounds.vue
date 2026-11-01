@@ -123,6 +123,10 @@ useSeoMeta({
       </div>
 
       <p class="bg-intro">{{ item.raw.intro }}</p>
+      <p v-if="item.raw.speciesRestriction" class="tref-desc">
+        <strong>Доступно только для:</strong>
+        <NuxtLink :to="'/dnd5e/races/' + item.raw.speciesRestriction.id">{{ item.raw.speciesRestriction.title }}</NuxtLink>
+      </p>
       <blockquote v-if="item.raw.quote" class="bg-quote">{{ item.raw.quote }}</blockquote>
 
       <div v-if="item.raw.feature" class="bg-feature">

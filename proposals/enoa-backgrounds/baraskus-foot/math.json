@@ -1,53 +1,21 @@
 {
-  "method": "Movement arithmetic and exact Hit Die enumeration; normal ground, no speed modifiers or difficult terrain unless specified",
-  "movement": [
-    {
-      "walkingSpeed": 40,
-      "dashes": 0,
-      "baseline": 40,
-      "proposal": 40
-    },
-    {
-      "walkingSpeed": 40,
-      "dashes": 1,
-      "baseline": 80,
-      "proposal": 90
-    },
-    {
-      "walkingSpeed": 40,
-      "dashes": 2,
-      "baseline": 120,
-      "proposal": 130
-    },
-    {
-      "walkingSpeed": 0,
-      "dashes": 1,
-      "baseline": 0,
-      "proposal": 0
-    }
-  ],
-  "heal": {
-    "usesPerLongRest": 1,
-    "ownHitDiceSpent": 1,
-    "constitutionModifier": 2,
-    "examples": [
-      {
-        "sides": 6,
-        "meanHealing": 5.5
-      },
-      {
-        "sides": 8,
-        "meanHealing": 6.5
-      },
-      {
-        "sides": 10,
-        "meanHealing": 7.5
-      },
-      {
-        "sides": 12,
-        "meanHealing": 8.5
-      }
-    ]
+  "revision": 5,
+  "assumptions": "Ordinary Adzhaid walking speed 40 ft, no other modifiers, no difficult terrain",
+  "walking": {
+    "baseline": 40,
+    "candidate": 50,
+    "relativeIncrease": 0.25
   },
-  "speciesContext": "Current Adzhaid catalogue speed is 40 feet; background does not grant or modify existing racial endurance and tattoo rules."
+  "dash": {
+    "ordinaryDashBaseline": 80,
+    "ordinaryDashCandidate": 100,
+    "limitedBonusDashWithMainActionAvailable": 100,
+    "limitedBonusDashAndMainActionDash": 150
+  },
+  "limitedUsesPerLongRest": 1,
+  "withGrappledSpeedZero": 0,
+  "extraBonusActionsGranted": 0,
+  "tattooChargesGranted": 0,
+  "travelDistanceMultiplierGranted": 0,
+  "playtest": false
 }

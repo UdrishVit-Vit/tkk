@@ -1,0 +1,57 @@
+{
+  "revision": 4,
+  "travel": {
+    "assumptions": "2014/2024 Basic Rules fast hourly rate; uncomplicated terrain; movement time only; no stops or no-sleep immunity assumed",
+    "baseMilesPerHour": 4,
+    "multiplier": 2,
+    "proposedMilesPerHour": 8,
+    "kilometresPerMile": 1.609344,
+    "hoursFor500Km": 38.83569951483337,
+    "combatSpeedChanged": false
+  },
+  "tattoo": {
+    "chargesPerLongRest": 1,
+    "choicesAvailable": 3,
+    "choicesAppliedAtOnce": 1,
+    "maxActivePerCreator": 1,
+    "maxActivePerRecipient": 1,
+    "preparationMinutes": 10,
+    "newTattooHours": 1,
+    "protectionAtLevels": [
+      {
+        "level": 1,
+        "pb": 2,
+        "mean": 5.5
+      },
+      {
+        "level": 5,
+        "pb": 3,
+        "mean": 6.5
+      },
+      {
+        "level": 11,
+        "pb": 4,
+        "mean": 7.5
+      },
+      {
+        "level": 17,
+        "pb": 6,
+        "mean": 9.5
+      }
+    ],
+    "protectionNote": "Mean reduction before capping to damage received; use consumes recipient reaction",
+    "skillCheck": {
+      "modifier": 5,
+      "dc": 15,
+      "baseSuccess": 0.55,
+      "successWithD6": 0.725,
+      "decision": "After d20 before outcome; flat DC and no other modifiers"
+    },
+    "dash": {
+      "speciesSpeedFeet": 40,
+      "movementWithoutOtherDash": 80,
+      "otherClassSources": "No additional bonus action; can still use a separate action Dash normally"
+    }
+  },
+  "playtest": false
+}

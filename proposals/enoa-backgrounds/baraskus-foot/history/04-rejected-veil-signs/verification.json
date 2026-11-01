@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-01",
+  "revision": 4,
+  "status": "DRAFT_FOR_DISCUSSION_NOT_PUBLISHED",
+  "validator": {
+    "mode": "Approved flag in memory only; stored remains Draft",
+    "issues": []
+  },
+  "productionUnchanged": true,
+  "authorConfirmedPillars": [
+    "500 km and continue running",
+    "Veil-ink tattoo craft",
+    "Social respect and sacred prohibition"
+  ],
+  "mechanicalNumbersApproved": false,
+  "materialPriceStatus": "NOT_ESTABLISHED_FOR_NEW_SIGNS",
+  "equipmentTotalCp": 5000,
+  "tattooResource": "One awakening and one chosen effect, per creator long rest",
+  "socialStatusScope": "Both editions; 2014 Background Feature proposal",
+  "playtest": false
+}
