@@ -1,0 +1,12 @@
+diff --git a/dist/connectors/postgresql.mjs b/dist/connectors/postgresql.mjs
+--- a/dist/connectors/postgresql.mjs
++++ b/dist/connectors/postgresql.mjs
+@@ -16,7 +16,7 @@
+ 	}
+ 	const query = async (sql, params) => {
+ 		const client = await getClient();
+-		return client.query(normalizeParams(sql), params);
++		return client.query(params?.length ? normalizeParams(sql) : sql, params);
+ 	};
+ 	return {
+ 		name: "postgresql",

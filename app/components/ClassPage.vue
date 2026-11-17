@@ -267,7 +267,7 @@ const SOURCE_FULL_NAMES = {
   PHB: 'Player’s Handbook',
   'PHB 2024': 'Player’s Handbook 2024',
   TCE: 'Tasha’s Cauldron of Everything',
-  TJB: 'The Threads of JorasBashu',
+  TJB: 'The Threads of JorashBashu',
   TLDC: 'The Threads of Lost Dice Club',
   TS: 'The Threads of Shkad',
   TU: 'The Threads of Unseen',
@@ -900,6 +900,7 @@ function isExternalSource(source) {
 }
 
 const featureSources = computed(() => [...new Set([
+  ...props.vm.classBaseSources,
   ...(props.vm.classAllFeatures || props.vm.classFeatures).map(f => f.src),
   ...props.vm.classArchetypes.map(a => a.source),
   ...classSpellList.value.map(spell => spell.source)
@@ -1011,6 +1012,11 @@ const visibleClassFeatures = computed(() => {
     return true
   })
 })
+const commonRelics = computed(() => {
+  if (props.vm.className !== 'Дрифтер' || props.vm.classBaseSource !== 'TJB') return null
+  return visibleClassFeatures.value.find(feature => feature.name === 'Общие реликвии')
+})
+const remainingClassFeatures = computed(() => visibleClassFeatures.value.filter(feature => feature !== commonRelics.value))
 const classDescription = computed(() => props.vm.classDescription || {
   title: props.vm.className,
   source: 'Описание класса',
@@ -1191,6 +1197,7 @@ function toggleSubclass(id) {
 function chooseFeatureSource(source) {
   props.state.classFilterTouched = true
   props.state.classFeatureSource = source
+  if (props.vm.classBaseSources.includes(source)) props.state.baseSource = source
   if (source !== 'all' && props.state.classFeatureSubclass !== 'all' && props.state.classFeatureSubclass !== 'base') {
     const archetype = props.vm.classArchetypes.find(arch => arch.id === props.state.classFeatureSubclass)
     if (!archetype || archetype.source !== source) props.state.classFeatureSubclass = 'base'
@@ -1475,6 +1482,20 @@ await loadSpellData(spellEdition.value)
       </div>
 
       <section class="cls-build-panel">
+          <div v-if="state.classMode === 'base' && vm.classBaseSources.length" class="cls-author-thread has-variants">
+            <button
+              v-for="source in vm.classBaseSources"
+              :key="source"
+              type="button"
+              class="cls-author-tab"
+              :class="{ active: vm.classBaseSource === source }"
+              :aria-pressed="vm.classBaseSource === source"
+              @click="state.baseSource = source; state.classFeatureSource = 'all'"
+            >
+              <span class="cls-author-code">{{ source }}</span>
+              <strong class="cls-author-name">{{ SOURCE_FULL_NAMES[source] }}</strong>
+            </button>
+          </div>
           <div v-if="state.classMode === 'base'" class="cls-build-top cls-thread-node">
             <div class="cls-build-main">
               <h2>{{ activeBuildTitle }}</h2>
@@ -1632,8 +1653,18 @@ await loadSpellData(spellEdition.value)
             <span class="cls-feature-count">{{ visibleClassFeatures.length }}</span>
           </div>
           <div class="cls-features-list">
+              <section v-if="commonRelics" :id="`class-feature-${commonRelics.id}`" class="cls-card cls-thread-node" aria-labelledby="drifter-common-relics-title">
+                <h3 id="drifter-common-relics-title" class="cls-feature-name">{{ commonRelics.name }}</h3>
+                <p>{{ commonRelics.text }}</p>
+                <div class="cls-arch-items roomy">
+                  <details v-for="item in commonRelics.items" :key="item.name" class="cls-arch-item">
+                    <summary>{{ item.name }}</summary>
+                    <div class="cls-arch-item-text"><RuleRichText :text="item.text" /></div>
+                  </details>
+                </div>
+              </section>
               <div v-if="!visibleClassFeatures.length" class="cls-stub">По выбранным фильтрам умения не найдены.</div>
-              <details v-for="(f, i) in visibleClassFeatures" :id="`class-feature-${f.id}`" :key="f.id || i" class="cls-card cls-feature-card cls-thread-node" :class="{ 'is-archetype-feature': f.isArchetype }" :open="i < 2 && !f.itemsCollapsed">
+              <details v-for="(f, i) in remainingClassFeatures" :id="`class-feature-${f.id}`" :key="f.id || i" class="cls-card cls-feature-card cls-thread-node" :class="{ 'is-archetype-feature': f.isArchetype }" :open="i < 2 && !f.itemsCollapsed">
                 <summary class="cls-feature-summary">
                   <span class="cls-feature-summary-main">
                     <span class="cls-feature-name">{{ f.name }}</span>

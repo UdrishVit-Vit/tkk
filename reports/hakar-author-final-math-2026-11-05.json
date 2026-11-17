@@ -1,0 +1,379 @@
+{
+  "sourceSha256": "c9b818352c51e421e3302e898cf19602f3fec9d9f90d12b3e91198e565797738",
+  "scope": "Exact finite-state enumeration and conditional arithmetic; no live player test",
+  "checks": [
+    "No fatality in first 3 ordinary excess uses from clean state",
+    "Fourth excess: 4 matching dice has probability 1/64",
+    "Thirteenth excess use is necessarily fatal without recovery",
+    "One rank-3 complication: 25% next ordinary excess is fatal",
+    "Jump 3: repeat on second cast is fatal at 25%",
+    "Jump 4: first attempt necessarily fatal",
+    "Probability conserved"
+  ],
+  "assumptions": {
+    "hp": "Constitution +2 and fixed average HP; no defensive bonuses",
+    "newResult": "starts at level 1",
+    "rank4": "any >=4 kills before casting",
+    "combiningExcessAndGap": "not defined by author text; NOT modelled",
+    "higherConcentrationRanks": "Disadvantage retained for this separate conditional calculation"
+  },
+  "ordinaryExcess": [
+    {
+      "n": 0,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0,
+      "survival": 1
+    },
+    {
+      "n": 1,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0,
+      "survival": 1
+    },
+    {
+      "n": 2,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0,
+      "survival": 1
+    },
+    {
+      "n": 3,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0,
+      "survival": 1
+    },
+    {
+      "n": 4,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.015625,
+      "survival": 0.984375
+    },
+    {
+      "n": 5,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.0625,
+      "survival": 0.9375
+    },
+    {
+      "n": 6,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.150390625,
+      "survival": 0.849609375
+    },
+    {
+      "n": 7,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.2822265625,
+      "survival": 0.7177734375
+    },
+    {
+      "n": 8,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.4488525390625,
+      "survival": 0.5511474609375
+    },
+    {
+      "n": 9,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.6282958984375,
+      "survival": 0.3717041015625
+    },
+    {
+      "n": 10,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.791717529296875,
+      "survival": 0.208282470703125
+    },
+    {
+      "n": 11,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.9118804931640625,
+      "survival": 0.0881195068359375
+    },
+    {
+      "n": 12,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.9779701232910156,
+      "survival": 0.022029876708984375
+    },
+    {
+      "n": 13,
+      "jump": 1,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 1,
+      "survival": 0
+    }
+  ],
+  "expectedExcessUsesUntilFatal": 8.730541229248047,
+  "higherMagic": [
+    {
+      "n": 2,
+      "jump": 2,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.25,
+      "survival": 0.75
+    },
+    {
+      "n": 2,
+      "jump": 3,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 0.25,
+      "survival": 0.75
+    },
+    {
+      "n": 1,
+      "jump": 4,
+      "start": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "death": 1,
+      "survival": 0
+    }
+  ],
+  "penalties": [
+    {
+      "level": 3,
+      "pb": 2,
+      "int": 3,
+      "hp": 20,
+      "prepared": 6,
+      "dc": 13,
+      "burns": [
+        4.5,
+        7,
+        9.5
+      ],
+      "blockedSpellsMean": [
+        2,
+        4.5,
+        7
+      ],
+      "unevenPenaltyMean": [
+        2,
+        4.5,
+        7
+      ],
+      "ownDcMean": [
+        11,
+        8.5,
+        6
+      ]
+    },
+    {
+      "level": 5,
+      "pb": 3,
+      "int": 4,
+      "hp": 32,
+      "prepared": 9,
+      "dc": 15,
+      "burns": [
+        5.5,
+        8,
+        10.5
+      ],
+      "blockedSpellsMean": [
+        3,
+        5.5,
+        8
+      ],
+      "unevenPenaltyMean": [
+        3,
+        5.5,
+        8
+      ],
+      "ownDcMean": [
+        12,
+        9.5,
+        7
+      ]
+    },
+    {
+      "level": 14,
+      "pb": 5,
+      "int": 5,
+      "hp": 86,
+      "prepared": 18,
+      "dc": 18,
+      "burns": [
+        7.5,
+        10,
+        12.5
+      ],
+      "blockedSpellsMean": [
+        5,
+        7.5,
+        10
+      ],
+      "unevenPenaltyMean": [
+        5,
+        7.5,
+        10
+      ],
+      "ownDcMean": [
+        13,
+        10.5,
+        8
+      ]
+    },
+    {
+      "level": 17,
+      "pb": 6,
+      "int": 5,
+      "hp": 104,
+      "prepared": 22,
+      "dc": 19,
+      "burns": [
+        8.5,
+        11,
+        13.5
+      ],
+      "blockedSpellsMean": [
+        6,
+        8.5,
+        11
+      ],
+      "unevenPenaltyMean": [
+        6,
+        8.5,
+        11
+      ],
+      "ownDcMean": [
+        13,
+        10.5,
+        8
+      ]
+    }
+  ],
+  "concentration": {
+    "conBonus": 2,
+    "damageSaveBase": 10,
+    "normal": 0.65,
+    "rank1": 0.42250000000000004,
+    "rank2": 0.27875000000000005,
+    "rank3": 0.16625000000000004
+  },
+  "enemy14": {
+    "saveBonus": 5,
+    "dcBefore": 18,
+    "successBefore": 0.4,
+    "successWithUneven1": 0.65,
+    "successWithUneven3": 0.8968749999999999
+  },
+  "slotValues": [
+    {
+      "level": 3,
+      "nativeSlotLevels": 8,
+      "freeCopyLevelsAtMax": 4
+    },
+    {
+      "level": 5,
+      "nativeSlotLevels": 16,
+      "freeCopyLevelsAtMax": 9
+    },
+    {
+      "level": 14,
+      "nativeSlotLevels": 54,
+      "freeCopyLevelsAtMax": 35
+    }
+  ],
+  "oneStepRecovery": {
+    "excessDrawsToRemoveAtLeast": 1,
+    "note": "Every surviving ordinary excess draw adds one level; each long rest removes only one selected level. Four different first-rank complications require four rests if no new levels accrue."
+  }
+}

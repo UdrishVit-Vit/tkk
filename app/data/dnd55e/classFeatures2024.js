@@ -1,4 +1,3 @@
-import { CLASSDATA } from '../classdata.js'
 import { CLASS_FEATURE_SOURCE_NAMES, CLASS_FEATURE_SOURCE_URLS, normalizeFeatureSource } from '../classFeatureSources.js'
 import { DND55E_CLASSES } from './catalogues.js'
 import { DND55E_CLASS_DETAILS } from './classdata2024.js'
@@ -50,14 +49,12 @@ function normalizeBaseFeature(feature) {
 
 const records = []
 
-for (const { title: className } of DND55E_CLASSES.filter(item => item.hitDie)) {
-  const details = DND55E_CLASS_DETAILS[className] || {}
-
-  for (const [order, raw] of (details.features || []).entries()) {
+function addBaseFeatures(className, features, variant = '') {
+  for (const [order, raw] of (features || []).entries()) {
     const feature = normalizeBaseFeature(raw)
     const source = normalizeFeatureSource(feature.source)
     records.push({
-      id: featureId(className, feature.levelText, feature.name),
+      id: featureId(className, variant, feature.levelText, feature.name),
       className,
       subclassId: '',
       subclassName: 'Базовый класс',
@@ -76,8 +73,17 @@ for (const { title: className } of DND55E_CLASSES.filter(item => item.hitDie)) {
       order
     })
   }
+}
 
-  const archetypes = mergeArchetypes2024(details.archetypes, CLASSDATA[className]?.archetypes)
+for (const { title: className } of DND55E_CLASSES.filter(item => item.hitDie)) {
+  const details = DND55E_CLASS_DETAILS[className] || {}
+
+  addBaseFeatures(className, details.features)
+  for (const [variant, data] of Object.entries(details.baseVariants || {})) {
+    addBaseFeatures(className, data.features, variant)
+  }
+
+  const archetypes = mergeArchetypes2024(details.archetypes)
 
   for (const archetype of archetypes) {
     const source = normalizeFeatureSource(archetype.source)

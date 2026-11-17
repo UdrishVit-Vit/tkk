@@ -3,7 +3,7 @@ export const CLASS_FEATURE_SOURCE_NAMES = {
   PHB: "Player's Handbook (2014)",
   'PHB 2024': "Player's Handbook (2024)",
   TCE: "Tasha's Cauldron of Everything",
-  TJB: 'The Threads of JorasBashu',
+  TJB: 'The Threads of JorashBashu',
   TLDC: 'The Threads of Lost Dice Club',
   TS: 'The Threads of Shkad',
   TU: 'The Threads of Unseen',

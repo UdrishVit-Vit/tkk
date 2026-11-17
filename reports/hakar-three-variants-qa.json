@@ -1,0 +1,34 @@
+[
+  {
+    "variant": "I",
+    "pages": 6,
+    "verified_fragments": 92,
+    "bytes": 3204366,
+    "price_page": 4
+  },
+  {
+    "variant": "II",
+    "pages": 6,
+    "verified_fragments": 93,
+    "bytes": 3206508,
+    "price_page": 4
+  },
+  {
+    "variant": "III",
+    "pages": 6,
+    "verified_fragments": 88,
+    "bytes": 3204959,
+    "price_page": 4
+  },
+  {
+    "math": {
+      "B_wrath_from_strain_3_after_3_slot_casts": 0.42129629629629617,
+      "B_wrath_from_strain_3_after_6_slot_casts": 0.6651020233196159,
+      "burn_average_at_wizard_5_strain_1": 10.0,
+      "B_redirect_average_at_wizard_14": 37.5,
+      "B_redirect_average_at_wizard_17": 45.0,
+      "con_save_plus_2_dc10": 0.65,
+      "con_save_plus_2_dc10_with_preemptive_d4": 0.775
+    }
+  }
+]

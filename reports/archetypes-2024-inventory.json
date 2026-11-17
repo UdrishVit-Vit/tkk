@@ -1,0 +1,1069 @@
+{
+  "scope": "Structure, catalogue coverage and spell accessibility; not a balance approval",
+  "subclasses": 82,
+  "spellReferences": 345,
+  "errors": [],
+  "inventory": [
+    {
+      "className": "Варвар",
+      "id": "path-ksifim",
+      "name": "Ксифим",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 4,
+      "nested": 6
+    },
+    {
+      "className": "Варвар",
+      "id": "path-veil",
+      "name": "Путь Вуали",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 4,
+      "nested": 3
+    },
+    {
+      "className": "Варвар",
+      "id": "path-hatred-and-fear",
+      "name": "Путь Ненависти и Страха",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 4,
+      "nested": 3
+    },
+    {
+      "className": "Варвар",
+      "id": "path-raging-veil",
+      "name": "Путь бушующей вуали",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 4,
+      "nested": 7
+    },
+    {
+      "className": "Варвар",
+      "id": "path-chidkur",
+      "name": "Путь Чидкура",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 0
+    },
+    {
+      "className": "Варвар",
+      "id": "path-mastodon",
+      "name": "Путь Мастодонта",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 4,
+      "nested": 4
+    },
+    {
+      "className": "Бард",
+      "id": "college-word-bearers",
+      "name": "Коллегия Несущих Слово",
+      "levels": [
+        3,
+        6,
+        14
+      ],
+      "features": 4,
+      "nested": 6
+    },
+    {
+      "className": "Бард",
+      "id": "college-traditions",
+      "name": "Коллегия Традиций",
+      "levels": [
+        3,
+        6,
+        14
+      ],
+      "features": 4,
+      "nested": 3
+    },
+    {
+      "className": "Бард",
+      "id": "college-celestial-music",
+      "name": "Коллегия небесной музыки",
+      "levels": [
+        3,
+        6,
+        14
+      ],
+      "features": 3,
+      "nested": 24
+    },
+    {
+      "className": "Бард",
+      "id": "college-festival",
+      "name": "Коллегия Празднества",
+      "levels": [
+        3,
+        6,
+        14
+      ],
+      "features": 4,
+      "nested": 5
+    },
+    {
+      "className": "Бард",
+      "id": "college-fakirs",
+      "name": "Коллегия Факиров",
+      "levels": [
+        3,
+        6,
+        14
+      ],
+      "features": 4,
+      "nested": 10
+    },
+    {
+      "className": "Бард",
+      "id": "college-teamancy",
+      "name": "Коллегия Чаемантии",
+      "levels": [
+        3,
+        6,
+        14
+      ],
+      "features": 4,
+      "nested": 16
+    },
+    {
+      "className": "Воин",
+      "id": "wasteland-rider",
+      "name": "Всадник Пустошей",
+      "levels": [
+        3,
+        7,
+        10,
+        15,
+        18
+      ],
+      "features": 6,
+      "nested": 3
+    },
+    {
+      "className": "Воин",
+      "id": "veil-blade",
+      "name": "Клинок Вуали",
+      "levels": [
+        3,
+        7,
+        10,
+        15,
+        18
+      ],
+      "features": 7,
+      "nested": 10
+    },
+    {
+      "className": "Воин",
+      "id": "spirit-blade",
+      "name": "Клинок Духов",
+      "levels": [
+        3,
+        7,
+        10,
+        15,
+        18
+      ],
+      "features": 6,
+      "nested": 0
+    },
+    {
+      "className": "Воин",
+      "id": "ash-knight",
+      "name": "Пепельный рыцарь",
+      "levels": [
+        3,
+        7,
+        10,
+        15,
+        18
+      ],
+      "features": 5,
+      "nested": 0
+    },
+    {
+      "className": "Воин",
+      "id": "steel-dance",
+      "name": "Танец Стали",
+      "levels": [
+        3,
+        7,
+        10,
+        15,
+        18
+      ],
+      "features": 6,
+      "nested": 6
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-school-of-the-void",
+      "name": "Школа Пустоты",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 7
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-school-of-basalt",
+      "name": "Школа Базальта",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 6,
+      "nested": 0
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-school-of-wyrms",
+      "name": "Школа Вирмов",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 8
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-school-of-distant-halls",
+      "name": "Школа Дальних Чертогов",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 4
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-hakar-ta",
+      "name": "Хакар",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 4,
+      "nested": 0
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-boo",
+      "name": "Боо",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 6
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-hakar-tmc",
+      "name": "Хакар",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 4,
+      "nested": 2
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-windrunners",
+      "name": "Школа Бегущих по ветру",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 7,
+      "nested": 8
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-school-of-fangs",
+      "name": "Школа Клыков",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 7,
+      "nested": 9
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-school-of-bones",
+      "name": "Школа Костей",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 6,
+      "nested": 11
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-school-of-mirage",
+      "name": "Школа Миража",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 2
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-burning-sands",
+      "name": "Школа Пылающих Песков",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 6,
+      "nested": 0
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-school-of-dreams",
+      "name": "Школа Снов",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 3
+    },
+    {
+      "className": "Волшебник",
+      "id": "wizard-thousand-faces",
+      "name": "Школа Тысячеликих",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 8,
+      "nested": 0
+    },
+    {
+      "className": "Дрифтер",
+      "id": "family-reverent",
+      "name": "Семья Чтущих",
+      "levels": [
+        3,
+        6,
+        10,
+        18
+      ],
+      "features": 5,
+      "nested": 0
+    },
+    {
+      "className": "Дрифтер",
+      "id": "family-renounced",
+      "name": "Семья Отрекшихся",
+      "levels": [
+        3,
+        6,
+        10,
+        18
+      ],
+      "features": 6,
+      "nested": 20
+    },
+    {
+      "className": "Дрифтер",
+      "id": "family-awakened",
+      "name": "Семья Прозревших",
+      "levels": [
+        3,
+        6,
+        10,
+        18
+      ],
+      "features": 6,
+      "nested": 14
+    },
+    {
+      "className": "Друид",
+      "id": "circle-of-veil",
+      "name": "Круг Вуали",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 8,
+      "nested": 14
+    },
+    {
+      "className": "Друид",
+      "id": "circle-of-stars",
+      "name": "Круг Звёзд",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 9,
+      "nested": 16
+    },
+    {
+      "className": "Друид",
+      "id": "circle-of-monsters",
+      "name": "Круг Чудовищ",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 0
+    },
+    {
+      "className": "Жрец",
+      "id": "domain-toothless",
+      "name": "Домен Бесклыкого",
+      "levels": [
+        3,
+        6,
+        17
+      ],
+      "features": 5,
+      "nested": 6
+    },
+    {
+      "className": "Жрец",
+      "id": "domain-veil",
+      "name": "Домен Вуали",
+      "levels": [
+        3,
+        6,
+        17
+      ],
+      "features": 6,
+      "nested": 0
+    },
+    {
+      "className": "Жрец",
+      "id": "domain-word",
+      "name": "Домен Слова",
+      "levels": [
+        3,
+        6,
+        17
+      ],
+      "features": 6,
+      "nested": 0
+    },
+    {
+      "className": "Жрец",
+      "id": "domain-tea",
+      "name": "Домен Чая",
+      "levels": [
+        3,
+        6,
+        17
+      ],
+      "features": 6,
+      "nested": 4
+    },
+    {
+      "className": "Изобретатель",
+      "id": "flesh-sculptor",
+      "name": "Ваятель Плоти",
+      "levels": [
+        3,
+        5,
+        9,
+        15
+      ],
+      "features": 8,
+      "nested": 16
+    },
+    {
+      "className": "Изобретатель",
+      "id": "salbara-child-tjb",
+      "name": "Дитя Сальбары",
+      "levels": [
+        3,
+        5,
+        9,
+        15
+      ],
+      "features": 7,
+      "nested": 4
+    },
+    {
+      "className": "Изобретатель",
+      "id": "salbara-child-tu",
+      "name": "Дитя Сальбары",
+      "levels": [
+        3,
+        5,
+        9,
+        15
+      ],
+      "features": 6,
+      "nested": 14
+    },
+    {
+      "className": "Колдун",
+      "id": "lady-veil",
+      "name": "Госпожа Завеса",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 6,
+      "nested": 11
+    },
+    {
+      "className": "Колдун",
+      "id": "ancient-spirit",
+      "name": "Древний Дух",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 8,
+      "nested": 13
+    },
+    {
+      "className": "Колдун",
+      "id": "imprisoned-patron",
+      "name": "Заточенный покровитель",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 0
+    },
+    {
+      "className": "Колдун",
+      "id": "akrepa-chosen",
+      "name": "Избранник Акрепы",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 8,
+      "nested": 16
+    },
+    {
+      "className": "Колдун",
+      "id": "uktee-blade",
+      "name": "Клинок Укт’ээ",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 9,
+      "nested": 7
+    },
+    {
+      "className": "Колдун",
+      "id": "anzu-patron",
+      "name": "Потусторонний покровитель Анзу",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 6,
+      "nested": 0
+    },
+    {
+      "className": "Монах",
+      "id": "way-of-snake",
+      "name": "Путь Змеи",
+      "levels": [
+        3,
+        6,
+        11,
+        17
+      ],
+      "features": 7,
+      "nested": 18
+    },
+    {
+      "className": "Монах",
+      "id": "devouring-hand",
+      "name": "Путь Пожирающей Длани",
+      "levels": [
+        3,
+        6,
+        11,
+        17
+      ],
+      "features": 5,
+      "nested": 11
+    },
+    {
+      "className": "Монах",
+      "id": "bone-dance",
+      "name": "Путь танца на костях",
+      "levels": [
+        3,
+        6,
+        11,
+        17
+      ],
+      "features": 4,
+      "nested": 4
+    },
+    {
+      "className": "Монах",
+      "id": "jungle-dance",
+      "name": "Путь Танца Джунглей",
+      "levels": [
+        3,
+        6,
+        11,
+        17
+      ],
+      "features": 8,
+      "nested": 0
+    },
+    {
+      "className": "Плут",
+      "id": "virtuoso-merchant",
+      "name": "Виртуозный торгаш",
+      "levels": [
+        3,
+        9,
+        13,
+        17
+      ],
+      "features": 5,
+      "nested": 16
+    },
+    {
+      "className": "Плут",
+      "id": "salbar-seeker",
+      "name": "Искатель Сальбара",
+      "levels": [
+        3,
+        9,
+        13,
+        17
+      ],
+      "features": 5,
+      "nested": 4
+    },
+    {
+      "className": "Плут",
+      "id": "sand-snake",
+      "name": "Песчаная Змея",
+      "levels": [
+        3,
+        9,
+        13,
+        17
+      ],
+      "features": 5,
+      "nested": 10
+    },
+    {
+      "className": "Плут",
+      "id": "thread-cutter",
+      "name": "Рвущий нити",
+      "levels": [
+        3,
+        9,
+        13,
+        17
+      ],
+      "features": 5,
+      "nested": 3
+    },
+    {
+      "className": "Плут",
+      "id": "spirit-wanderer",
+      "name": "Странник Духов",
+      "levels": [
+        3,
+        9,
+        13,
+        17
+      ],
+      "features": 6,
+      "nested": 0
+    },
+    {
+      "className": "Плут",
+      "id": "veil-shadow",
+      "name": "Тень Вуали",
+      "levels": [
+        3,
+        9,
+        13,
+        17
+      ],
+      "features": 5,
+      "nested": 0
+    },
+    {
+      "className": "Паладин",
+      "id": "oath-toothless",
+      "name": "Клятва Бесклыкого",
+      "levels": [
+        3,
+        7,
+        15,
+        20
+      ],
+      "features": 5,
+      "nested": 5
+    },
+    {
+      "className": "Паладин",
+      "id": "oath-battle",
+      "name": "Клятва Битвы",
+      "levels": [
+        3,
+        7,
+        15,
+        20
+      ],
+      "features": 5,
+      "nested": 2
+    },
+    {
+      "className": "Паладин",
+      "id": "oath-veil",
+      "name": "Клятва Вуали",
+      "levels": [
+        3,
+        7,
+        15,
+        20
+      ],
+      "features": 7,
+      "nested": 7
+    },
+    {
+      "className": "Паладин",
+      "id": "oath-name-reaper",
+      "name": "Клятва Жнеца Имён",
+      "levels": [
+        3,
+        7,
+        15,
+        20
+      ],
+      "features": 6,
+      "nested": 9
+    },
+    {
+      "className": "Паладин",
+      "id": "oath-nomad",
+      "name": "Клятва Кочевника",
+      "levels": [
+        3,
+        7,
+        15,
+        20
+      ],
+      "features": 5,
+      "nested": 0
+    },
+    {
+      "className": "Паладин",
+      "id": "oath-ending",
+      "name": "Клятва Окончания",
+      "levels": [
+        3,
+        7,
+        15,
+        20
+      ],
+      "features": 5,
+      "nested": 5
+    },
+    {
+      "className": "Паладин",
+      "id": "oath-devourer",
+      "name": "Клятва Пожирателя",
+      "levels": [
+        3,
+        7,
+        15,
+        20
+      ],
+      "features": 7,
+      "nested": 10
+    },
+    {
+      "className": "Паладин",
+      "id": "oath-secrets",
+      "name": "Клятва Секретов",
+      "levels": [
+        3,
+        7,
+        15,
+        20
+      ],
+      "features": 5,
+      "nested": 16
+    },
+    {
+      "className": "Паладин",
+      "id": "oath-word",
+      "name": "Клятва Слова",
+      "levels": [
+        3,
+        7,
+        15,
+        20
+      ],
+      "features": 6,
+      "nested": 7
+    },
+    {
+      "className": "Следопыт",
+      "id": "spirit-trapper",
+      "name": "Ловец Духов",
+      "levels": [
+        3,
+        7,
+        11,
+        15
+      ],
+      "features": 5,
+      "nested": 0
+    },
+    {
+      "className": "Следопыт",
+      "id": "sand-ghost",
+      "name": "Призрак Песков",
+      "levels": [
+        3,
+        7,
+        11,
+        15
+      ],
+      "features": 6,
+      "nested": 4
+    },
+    {
+      "className": "Чародей",
+      "id": "great-hunger",
+      "name": "Великий Глад",
+      "levels": [
+        3,
+        6,
+        14,
+        18
+      ],
+      "features": 4,
+      "nested": 6
+    },
+    {
+      "className": "Чародей",
+      "id": "child-of-hunger",
+      "name": "Дитя Глада",
+      "levels": [
+        3,
+        6,
+        14,
+        18
+      ],
+      "features": 6,
+      "nested": 17
+    },
+    {
+      "className": "Чародей",
+      "id": "azrak-spark",
+      "name": "Искра Азрака",
+      "levels": [
+        3,
+        6,
+        14,
+        18
+      ],
+      "features": 5,
+      "nested": 0
+    },
+    {
+      "className": "Чародей",
+      "id": "royal-blood",
+      "name": "Кровь королей",
+      "levels": [
+        3,
+        6,
+        14,
+        18
+      ],
+      "features": 5,
+      "nested": 10
+    },
+    {
+      "className": "Чародей",
+      "id": "tusus-descendant",
+      "name": "Потомок Тусуса",
+      "levels": [
+        3,
+        6,
+        14,
+        18
+      ],
+      "features": 5,
+      "nested": 0
+    },
+    {
+      "className": "Чародей",
+      "id": "veil-born",
+      "name": "Рождённый Вуалью",
+      "levels": [
+        3,
+        6,
+        14,
+        18
+      ],
+      "features": 7,
+      "nested": 0
+    },
+    {
+      "className": "Чародей",
+      "id": "spark-weaver",
+      "name": "Ткач Искры",
+      "levels": [
+        3,
+        6,
+        14,
+        18
+      ],
+      "features": 4,
+      "nested": 0
+    },
+    {
+      "className": "Шаман",
+      "id": "mudra-shamas",
+      "name": "Мудра Шамаса",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 3
+    },
+    {
+      "className": "Шаман",
+      "id": "mudra-manu",
+      "name": "Мудра Ману",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 3
+    },
+    {
+      "className": "Шаман",
+      "id": "mudra-void",
+      "name": "Мудра Пустоты",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 5,
+      "nested": 3
+    },
+    {
+      "className": "Шаман",
+      "id": "mudra-madness",
+      "name": "Мудра Безумия",
+      "levels": [
+        3,
+        6,
+        10,
+        14
+      ],
+      "features": 6,
+      "nested": 9
+    }
+  ]
+}

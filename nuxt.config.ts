@@ -1,5 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  content: process.env.TKK_POSTGRES === '1'
+    ? { database: { type: 'postgresql', url: 'postgresql:///tkk?host=/var/run/postgresql' } }
+    : {},
   hooks: {
     'build:manifest'(manifest) {
       // Keep current-page preloads; do not download unused async JS/CSS speculatively.

@@ -1,0 +1,152 @@
+{
+  "pages": 16,
+  "cards_verified": 35,
+  "each_card_complete_on_one_page": true,
+  "source_unchanged": true,
+  "changed_parts": [
+    "word/document.xml"
+  ],
+  "drawings_preserved": 144,
+  "card_pages": [
+    {
+      "id": 1,
+      "page": 4
+    },
+    {
+      "id": 2,
+      "page": 4
+    },
+    {
+      "id": 3,
+      "page": 5
+    },
+    {
+      "id": 4,
+      "page": 5
+    },
+    {
+      "id": 5,
+      "page": 5
+    },
+    {
+      "id": 6,
+      "page": 6
+    },
+    {
+      "id": 7,
+      "page": 6
+    },
+    {
+      "id": 8,
+      "page": 6
+    },
+    {
+      "id": 9,
+      "page": 7
+    },
+    {
+      "id": 10,
+      "page": 7
+    },
+    {
+      "id": 11,
+      "page": 7
+    },
+    {
+      "id": 12,
+      "page": 8
+    },
+    {
+      "id": 13,
+      "page": 8
+    },
+    {
+      "id": 14,
+      "page": 8
+    },
+    {
+      "id": 15,
+      "page": 9
+    },
+    {
+      "id": 16,
+      "page": 9
+    },
+    {
+      "id": 17,
+      "page": 9
+    },
+    {
+      "id": 18,
+      "page": 10
+    },
+    {
+      "id": 19,
+      "page": 10
+    },
+    {
+      "id": 20,
+      "page": 11
+    },
+    {
+      "id": 21,
+      "page": 11
+    },
+    {
+      "id": 22,
+      "page": 11
+    },
+    {
+      "id": 23,
+      "page": 12
+    },
+    {
+      "id": 24,
+      "page": 12
+    },
+    {
+      "id": 25,
+      "page": 12
+    },
+    {
+      "id": 26,
+      "page": 13
+    },
+    {
+      "id": 27,
+      "page": 13
+    },
+    {
+      "id": 28,
+      "page": 14
+    },
+    {
+      "id": 29,
+      "page": 14
+    },
+    {
+      "id": 30,
+      "page": 14
+    },
+    {
+      "id": 31,
+      "page": 15
+    },
+    {
+      "id": 32,
+      "page": 15
+    },
+    {
+      "id": 33,
+      "page": 15
+    },
+    {
+      "id": 34,
+      "page": 16
+    },
+    {
+      "id": 35,
+      "page": 16
+    }
+  ]
+}

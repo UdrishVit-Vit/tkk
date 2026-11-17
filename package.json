@@ -3,6 +3,8 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "archetypes:check": "node scripts/check-archetypes-2024.mjs",
+    "archetypes:report": "node scripts/check-archetypes-2024.mjs --report",
     "backgrounds:check": "node scripts/check-backgrounds-2024.mjs",
     "backgrounds:check:strict": "node scripts/check-backgrounds-2024.mjs --strict",
     "backgrounds:test": "node scripts/test-backgrounds-2024.mjs",
@@ -10,7 +12,7 @@
     "backgrounds:origin-review": "node scripts/build-enoa-origin-revision3.mjs",
     "backgrounds:origin-check": "node scripts/check-enoa-origin-revision3.mjs",
     "backgrounds:report": "node scripts/report-backgrounds-2024.mjs && node scripts/report-enoa-origins.mjs && node scripts/enoa-origin-math.mjs",
-    "prebuild": "node scripts/check-backgrounds-2024.mjs && node scripts/check-enoa-origins.mjs",
+    "prebuild": "node scripts/check-archetypes-2024.mjs && node scripts/check-backgrounds-2024.mjs && node scripts/check-enoa-origins.mjs",
     "audit:rulesets": "node scripts/audit-dnd-ruleset-boundaries.mjs",
     "lore:check": "node scripts/validate-lore.mjs",
     "images:webp": "node scripts/images-to-webp.mjs",
@@ -32,6 +34,7 @@
     "@pinia/nuxt": "^0.11.3",
     "better-sqlite3": "^12.11.1",
     "nuxt": "^4.4.8",
+    "pg": "^8.23.1",
     "pinia": "^3.0.4",
     "vue": "^3.5.38",
     "vue-router": "^5.1.0"

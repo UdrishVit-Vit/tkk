@@ -21,7 +21,7 @@ const sparkFadeId = `spark-fade-${useId().replace(/[^a-z0-9_-]/gi, '')}`
 const state = reactive({
   view: 'home', active: null, group: null, section: null, cls: null, overlay: null,
   theme: selectedTheme.value, authed: false, bookmarks: [], query: '', cardQuery: '', classToolMessage: '', infOpen: false, invOpen: false,
-  classMode: 'base', activeArchetype: null, archetypeSource: 'all', classCardTab: 'skills', classHitsOpen: true, classProfOpen: true,
+  classMode: 'base', baseSource: '', activeArchetype: null, archetypeSource: 'all', classCardTab: 'skills', classHitsOpen: true, classProfOpen: true,
   classEquipOpen: true, classTableOpen: false, classFilterOpen: false, classFilterTouched: false, classFeatureSource: 'all',
   classFeatureLevel: 'all', classFeatureSubclass: 'base', subclassesOpen: false, openSubclass: null
 })
@@ -178,6 +178,7 @@ watch(() => [props.initialSystem, props.initialSection, props.initialClass], ([s
   } else if (section === 'Классы') {
     state.cls = null
   }
+  state.baseSource = ''
   state.classMode = 'base'
   state.activeArchetype = null
   state.classCardTab = 'skills'
@@ -342,6 +343,7 @@ function openClass(name) {
   state.cls = nextClass
   state.infOpen = false
   state.invOpen = false
+  state.baseSource = ''
   state.classMode = 'base'
   state.activeArchetype = null
   state.archetypeSource = 'all'
@@ -834,13 +836,12 @@ const vm = computed(() => {
     ? DND55E_CLASSES.find(item => item.title === S.cls)
     : null
   const details2024 = class2024 ? (classDetails2024.value?.[class2024.title] || {}) : null
-  // Архетипы классов 2024: собственные (перенесённые вручную, как у Шамана) плюс
-  // авторские архетипы из раздела 2014 — они общие для обеих редакций.
-  const archetypes2024 = () => mergeArchetypes2024(
-    details2024?.archetypes,
-    class2024 && classDataMap.value?.[class2024.title]?.archetypes
-  )
-  const cd = class2024
+  // Подклассы 2024 публикуются только после отдельной адаптации.
+  const archetypes2024 = () => mergeArchetypes2024(details2024?.archetypes)
+  const originalClass = S.cls && classDataMap.value?.[S.cls]
+  const editionClass = S.active === '2024' ? details2024 : originalClass
+  const baseVariant = editionClass?.baseVariants?.[S.baseSource]
+  const base = class2024
     ? {
         en: class2024.originalName,
         hd: Number(String(class2024.hitDie).replace(/\D/g, '')) || 8,
@@ -865,7 +866,8 @@ const vm = computed(() => {
           sections: details2024.sections || []
         }
       }
-    : ((S.cls && classDataMap.value?.[S.cls]) || {})
+    : (originalClass || {})
+  const cd = baseVariant ? { ...base, ...baseVariant } : base
   const has = !!cd.table
   const classIdx = POOL.classes.indexOf(S.cls)
   const featureLevel = value => {
@@ -909,7 +911,7 @@ const vm = computed(() => {
     const feature = Array.isArray(f)
       ? { name: f[0], src: f[1], lvl: f[2], text: f[3], spellTable: f[4] || [] }
       : { ...f, lvl: f.lvl || f.level, src: f.src || f.source, spellTable: f.spellTable || [] }
-    const id = classFeatureId(S.cls, feature.lvl, feature.name)
+    const id = classFeatureId(S.cls, baseVariant ? S.baseSource : '', feature.lvl, feature.name)
     return {
       ...feature,
       id,
@@ -1101,6 +1103,8 @@ const vm = computed(() => {
     classesPath: S.active === '2024' ? '/dnd55e/classes' : '/dnd5e/classes',
     systemEditionLabel: sysObj ? `${sysObj.name} ${sysObj.tag}` : 'D&D 5e 2014',
     is2024: S.active === '2024',
+    classBaseSources: editionClass?.baseVariants ? [editionClass.baseSource, ...Object.keys(editionClass.baseVariants)] : [],
+    classBaseSource: baseVariant ? S.baseSource : editionClass?.baseSource,
     classDescription: cd.description || null,
     classEmblemUrl: classImg(S.cls) || emblem(classIdx<0?0:classIdx),
     classHasRules: has,

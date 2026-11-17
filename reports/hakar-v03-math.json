@@ -1,0 +1,388 @@
+{
+  "scope": "Exact probabilities, resource boundary checks and damage expectations; not a combat engine or human playtest",
+  "checks": [
+    "3rd-level wizard can pay for circle 5",
+    "3rd-level wizard cannot pay for circle 9",
+    "5th-level wizard can pay for circle 9: design blocker",
+    "No artificial lowering of native circle when slots depleted",
+    "Arcana expertise changes circle-3 success to 75% at level 3",
+    "No auto-fail on natural one of a skill check",
+    "One isolated risk check cannot invoke terminal Wrath from heat zero",
+    "Fourth consecutive failed baseline check has exact probability",
+    "At heat 3 one baseline check has 20% terminal risk",
+    "Probability is conserved"
+  ],
+  "arcana": [
+    {
+      "level": 3,
+      "circle": 3,
+      "payable": true,
+      "proficient": 0.65,
+      "expertise": 0.75,
+      "expertiseWithAdvantage": 0.9375
+    },
+    {
+      "level": 3,
+      "circle": 5,
+      "payable": true,
+      "proficient": 0.55,
+      "expertise": 0.65,
+      "expertiseWithAdvantage": 0.8775000000000001
+    },
+    {
+      "level": 3,
+      "circle": 7,
+      "payable": true,
+      "proficient": 0.45,
+      "expertise": 0.55,
+      "expertiseWithAdvantage": 0.7975000000000001
+    },
+    {
+      "level": 3,
+      "circle": 9,
+      "payable": false,
+      "proficient": 0.35,
+      "expertise": 0.45,
+      "expertiseWithAdvantage": 0.6975
+    },
+    {
+      "level": 4,
+      "circle": 3,
+      "payable": true,
+      "proficient": 0.7,
+      "expertise": 0.8,
+      "expertiseWithAdvantage": 0.96
+    },
+    {
+      "level": 4,
+      "circle": 5,
+      "payable": true,
+      "proficient": 0.6,
+      "expertise": 0.7,
+      "expertiseWithAdvantage": 0.9099999999999999
+    },
+    {
+      "level": 4,
+      "circle": 7,
+      "payable": true,
+      "proficient": 0.5,
+      "expertise": 0.6,
+      "expertiseWithAdvantage": 0.84
+    },
+    {
+      "level": 4,
+      "circle": 9,
+      "payable": true,
+      "proficient": 0.4,
+      "expertise": 0.5,
+      "expertiseWithAdvantage": 0.75
+    },
+    {
+      "level": 5,
+      "circle": 3,
+      "payable": true,
+      "proficient": 0.75,
+      "expertise": 0.9,
+      "expertiseWithAdvantage": 0.99
+    },
+    {
+      "level": 5,
+      "circle": 5,
+      "payable": true,
+      "proficient": 0.65,
+      "expertise": 0.8,
+      "expertiseWithAdvantage": 0.96
+    },
+    {
+      "level": 5,
+      "circle": 7,
+      "payable": true,
+      "proficient": 0.55,
+      "expertise": 0.7,
+      "expertiseWithAdvantage": 0.9099999999999999
+    },
+    {
+      "level": 5,
+      "circle": 9,
+      "payable": true,
+      "proficient": 0.45,
+      "expertise": 0.6,
+      "expertiseWithAdvantage": 0.84
+    },
+    {
+      "level": 6,
+      "circle": 3,
+      "payable": true,
+      "proficient": 0.75,
+      "expertise": 0.9,
+      "expertiseWithAdvantage": 0.99
+    },
+    {
+      "level": 6,
+      "circle": 5,
+      "payable": true,
+      "proficient": 0.65,
+      "expertise": 0.8,
+      "expertiseWithAdvantage": 0.96
+    },
+    {
+      "level": 6,
+      "circle": 7,
+      "payable": true,
+      "proficient": 0.55,
+      "expertise": 0.7,
+      "expertiseWithAdvantage": 0.9099999999999999
+    },
+    {
+      "level": 6,
+      "circle": 9,
+      "payable": true,
+      "proficient": 0.45,
+      "expertise": 0.6,
+      "expertiseWithAdvantage": 0.84
+    },
+    {
+      "level": 10,
+      "circle": 3,
+      "payable": true,
+      "proficient": 0.85,
+      "expertise": 1,
+      "expertiseWithAdvantage": 1
+    },
+    {
+      "level": 10,
+      "circle": 5,
+      "payable": true,
+      "proficient": 0.75,
+      "expertise": 0.95,
+      "expertiseWithAdvantage": 0.9974999999999999
+    },
+    {
+      "level": 10,
+      "circle": 7,
+      "payable": true,
+      "proficient": 0.65,
+      "expertise": 0.85,
+      "expertiseWithAdvantage": 0.9775
+    },
+    {
+      "level": 10,
+      "circle": 9,
+      "payable": true,
+      "proficient": 0.55,
+      "expertise": 0.75,
+      "expertiseWithAdvantage": 0.9375
+    },
+    {
+      "level": 11,
+      "circle": 3,
+      "payable": true,
+      "proficient": 0.85,
+      "expertise": 1,
+      "expertiseWithAdvantage": 1
+    },
+    {
+      "level": 11,
+      "circle": 5,
+      "payable": true,
+      "proficient": 0.75,
+      "expertise": 0.95,
+      "expertiseWithAdvantage": 0.9974999999999999
+    },
+    {
+      "level": 11,
+      "circle": 7,
+      "payable": true,
+      "proficient": 0.65,
+      "expertise": 0.85,
+      "expertiseWithAdvantage": 0.9775
+    },
+    {
+      "level": 11,
+      "circle": 9,
+      "payable": true,
+      "proficient": 0.55,
+      "expertise": 0.75,
+      "expertiseWithAdvantage": 0.9375
+    },
+    {
+      "level": 14,
+      "circle": 3,
+      "payable": true,
+      "proficient": 0.9,
+      "expertise": 1,
+      "expertiseWithAdvantage": 1
+    },
+    {
+      "level": 14,
+      "circle": 5,
+      "payable": true,
+      "proficient": 0.8,
+      "expertise": 1,
+      "expertiseWithAdvantage": 1
+    },
+    {
+      "level": 14,
+      "circle": 7,
+      "payable": true,
+      "proficient": 0.7,
+      "expertise": 0.95,
+      "expertiseWithAdvantage": 0.9974999999999999
+    },
+    {
+      "level": 14,
+      "circle": 9,
+      "payable": true,
+      "proficient": 0.6,
+      "expertise": 0.85,
+      "expertiseWithAdvantage": 0.9775
+    }
+  ],
+  "risks": [
+    {
+      "name": "8 ordinary casts, heat 0",
+      "bases": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "start": 0,
+      "alive": 0.9930684053124997,
+      "wrath": 0.006931594687500001,
+      "states": [
+        0.6634204312890623,
+        0.23295322128906248,
+        0.07497653632812501,
+        0.021718216406250004,
+        0.006931594687500001
+      ]
+    },
+    {
+      "name": "4 native catches and casts, heat 0",
+      "bases": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "start": 0,
+      "alive": 0.9930684053124997,
+      "wrath": 0.006931594687500001,
+      "states": [
+        0.6634204312890623,
+        0.23295322128906248,
+        0.07497653632812501,
+        0.021718216406250004,
+        0.006931594687500001
+      ]
+    },
+    {
+      "name": "circle 5 at level 3: catch + cast",
+      "bases": [
+        4,
+        4
+      ],
+      "start": 0,
+      "alive": 1.0000000000000002,
+      "wrath": 0,
+      "states": [
+        0.6400000000000001,
+        0.31000000000000005,
+        0.05,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "circle 9 at level 5: catch + cast",
+      "bases": [
+        7,
+        7
+      ],
+      "start": 0,
+      "alive": 1,
+      "wrath": 0,
+      "states": [
+        0.42250000000000004,
+        0.4375,
+        0.13999999999999999,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "4 high catches only (gap 6), heat 0",
+      "bases": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "start": 0,
+      "alive": 0.9685000000000001,
+      "wrath": 0.0315,
+      "states": [
+        0.17850625000000006,
+        0.34234375000000006,
+        0.30275,
+        0.1449,
+        0.0315
+      ]
+    },
+    {
+      "name": "one native catch and cast, heat 3",
+      "bases": [
+        1,
+        1
+      ],
+      "start": 3,
+      "alive": 0.6400000000000001,
+      "wrath": 0.36000000000000004,
+      "states": [
+        0,
+        0,
+        0,
+        0.6400000000000001,
+        0.36000000000000004
+      ]
+    },
+    {
+      "name": "one circle 9 catch and cast (gap 6), heat 3",
+      "bases": [
+        7,
+        7
+      ],
+      "start": 3,
+      "alive": 0.25,
+      "wrath": 0.75,
+      "states": [
+        0,
+        0,
+        0,
+        0.25,
+        0.75
+      ]
+    }
+  ],
+  "concentration": {
+    "conBonus": 2,
+    "dc": 10,
+    "tenChecksSurvival": 0.013462743344628911,
+    "hundredChecksSurvival": 1.9558505399828616e-19,
+    "damageFourSomaticCastsMean": 10,
+    "fireballFourFailedSavesMean": 112,
+    "fireballExpectedAreaDamageWithSkillFailure": {
+      "proficient": 72.8,
+      "expertise": 84
+    }
+  }
+}

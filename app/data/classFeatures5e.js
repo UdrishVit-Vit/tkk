@@ -37,28 +37,37 @@ function sourceName(source) {
 
 const records = []
 
-for (const [className, data] of Object.entries(CLASSDATA)) {
-  for (const [order, feature] of (data.features || []).entries()) {
-    const id = featureId(className, feature[2], feature[0])
+function addBaseFeatures(className, features, variantSource = '') {
+  for (const [order, feature] of (features || []).entries()) {
+    const [name, source, levelText, text, rows] = Array.isArray(feature)
+      ? feature
+      : [feature.name, feature.src || feature.source, feature.lvl || feature.level, feature.text, feature.spellTable]
     records.push({
-      id,
+      id: featureId(className, variantSource, levelText, name),
       className,
       subclassId: '',
       subclassName: 'Базовый класс',
       type: 'class',
       typeLabel: 'Умение класса',
-      name: feature[0],
-      source: feature[1],
-      sourceName: sourceName(feature[1]),
-      sourceUrl: CLASS_FEATURE_SOURCE_URLS[feature[1]] || '',
-      levelText: feature[2],
-      level: featureLevel(feature[2]),
-      text: feature[3],
-      items: [],
-      spellTable: spellTable(feature[4] || []),
+      name,
+      source,
+      sourceName: sourceName(source),
+      sourceUrl: CLASS_FEATURE_SOURCE_URLS[source] || '',
+      levelText,
+      level: featureLevel(levelText),
+      text,
+      items: itemList(feature.items),
+      spellTable: spellTable(rows || []),
       spells: [],
       order
     })
+  }
+}
+
+for (const [className, data] of Object.entries(CLASSDATA)) {
+  addBaseFeatures(className, data.features)
+  for (const [source, variant] of Object.entries(data.baseVariants || {})) {
+    addBaseFeatures(className, variant.features, source)
   }
 
   for (const archetype of (data.archetypes || [])) {
