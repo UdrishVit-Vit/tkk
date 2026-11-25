@@ -196,7 +196,7 @@ useSeoMeta({
     :filters="filters"
     :is-active="isActive"
     :active-filter-count="activeCount"
-    :columns="3"
+    :columns="2"
     :thread-web="true"
     :card-actions="['link', 'bookmark', 'print', 'expand', 'close']"
     bookmark-store="tkk-dnd55e-spells-bookmarks"
@@ -220,19 +220,13 @@ useSeoMeta({
           >
         </span>
         <span class="spell-list-copy">
-          <span class="spell-list-name">
-            {{ item.raw.title }}
-            <small>{{ item.raw.originalName }}</small>
-          </span>
+          <span class="spell-list-name">{{ item.raw.title }}</span>
+          <small v-if="item.raw.originalName" class="spell-list-original" lang="en">{{ item.raw.originalName }}</small>
           <span class="spell-list-meta">
             {{ item.raw.level === 0 ? 'Заговор' : `${item.raw.level}-й уровень` }} · {{ DND55E_SPELL_SCHOOLS[item.raw.school].title }}
             <template v-if="item.raw.concentration"> · Концентрация</template>
             <template v-if="item.raw.ritual"> · Ритуал</template>
-          </span>
-        </span>
-        <span class="spell-components" aria-label="Компоненты заклинания">
-          <span v-for="component in ['В', 'С', 'М']" :key="component" :class="{ muted: !item.raw.components.includes(component) }">
-            {{ item.raw.components.includes(component) ? component : '·' }}
+            <span v-if="item.raw.components.length" class="spell-components"> · Компоненты: {{ item.raw.components.join(', ') }}</span>
           </span>
         </span>
       </span>
@@ -298,16 +292,12 @@ useSeoMeta({
 </template>
 
 <style scoped>
-.spell-list-card{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:9px;min-width:0;width:100%}
+.spell-list-card{display:grid;grid-template-columns:42px minmax(0,1fr);align-items:center;gap:9px;min-width:0;width:100%}
 .spell-list-icon{display:grid;width:38px;height:38px;place-items:center;border-right:1px solid rgba(var(--theme-text-rgb),.1);padding-right:7px}
 .spell-list-icon img{width:31px;height:31px;object-fit:contain;filter:sepia(.25) saturate(.75) brightness(1.08)}
-.spell-list-copy{display:flex;min-width:0;flex-direction:column;gap:3px}
-.spell-list-name{overflow:hidden;color:rgba(var(--theme-heading-rgb),.92);font-weight:650;text-overflow:ellipsis;white-space:nowrap}
-.spell-list-name small{margin-left:4px;color:rgba(var(--theme-text-rgb),.43);font-size:9px;font-weight:450}
-.spell-list-meta{overflow:hidden;color:rgba(var(--theme-text-rgb),.48);font-size:10px;text-overflow:ellipsis;white-space:nowrap}
-.spell-components{display:flex;gap:3px;color:rgba(var(--theme-accent-strong-rgb),.72);font-size:10px;font-weight:700}
-.spell-components span{display:grid;width:17px;height:17px;place-items:center;border:1px solid rgba(var(--theme-accent-rgb),.19);border-radius:50%}
-.spell-components span.muted{border-color:transparent;color:rgba(var(--theme-text-rgb),.22)}
+.spell-list-copy{display:flex;min-width:0;flex-direction:column;gap:3px;white-space:normal;overflow-wrap:anywhere}
+.spell-list-name{color:rgba(var(--theme-heading-rgb),.96);font-weight:650;line-height:1.28}
+.spell-list-original,.spell-list-meta{color:rgba(var(--theme-text-rgb),.7);font-size:12px;line-height:1.35}
 .spell-heading{display:grid;grid-template-columns:78px minmax(0,1fr);align-items:center;gap:18px;margin:2px 0 20px}
 .spell-heading-icon{display:grid;width:68px;height:68px;place-items:center;border:1px solid rgba(var(--theme-accent-rgb),.23);background:radial-gradient(circle,rgba(var(--theme-accent-rgb),.1),transparent 70%)}
 .spell-heading-icon img{width:55px;height:55px;object-fit:contain;filter:sepia(.2) saturate(.8) brightness(1.08)}
@@ -326,7 +316,6 @@ useSeoMeta({
 .spell-classes span{border:1px solid rgba(var(--theme-accent-rgb),.18);border-radius:999px;background:rgba(var(--theme-accent-rgb),.045);padding:4px 9px;color:rgba(var(--theme-text-rgb),.68);font-size:11px}
 @media (max-width:700px){
   .spell-list-card{grid-template-columns:36px minmax(0,1fr)}
-  .spell-components{display:none}
   .spell-heading{grid-template-columns:56px minmax(0,1fr);gap:13px}
   .spell-heading-icon{width:49px;height:49px}
   .spell-heading-icon img{width:40px;height:40px}
