@@ -125,7 +125,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="lore-history" :style="{ background: theme.bg }">
+  <main class="lore-history ds-lore" :style="{ background: theme.bg }">
     <aside class="lore-rail" aria-label="Карта пантеона">
       <p>Роды богов</p>
       <nav>
@@ -157,6 +157,7 @@ onBeforeUnmount(() => {
 
         <section ref="introSection" class="history-intro timeline-row" aria-labelledby="pantheon-title">
           <div class="history-intro__copy">
+            <UiBreadcrumb :items="[{ to: '/lore', label: 'Lore' }]" current="Пантеон" />
             <p>{{ PANTHEON_THREAD.eyebrow }}</p>
             <h1 id="pantheon-title">{{ PANTHEON_THREAD.title }}</h1>
             <aside>
@@ -237,4 +238,10 @@ onBeforeUnmount(() => {
 @media(max-width:1000px){.lore-rail{display:none}.lore-viewport{left:0}.lore-history__texture{left:68px}.history-canvas{max-width:780px;padding-inline:24px}.timeline-row{grid-template-columns:0 64px minmax(0,1fr)}.history-thread{left:56px}.history-intro__copy,.history-era__title{grid-column:3;text-align:left}.history-intro aside{margin-left:0;margin-right:auto;padding-right:0;padding-left:18px;border-right:0;border-left:1px solid rgba(var(--theme-accent-rgb),.32)}.history-intro__sigil,.history-node--era,.history-entry__node{grid-column:2;grid-row:1}.history-era__title p{margin-left:0;margin-right:auto}.history-entry--left .history-entry__card,.history-entry--right .history-entry__card{grid-column:3;text-align:left}.history-entry__node::before,.history-entry--left .history-entry__node::before,.history-entry--right .history-entry__node::before{left:50%;right:auto;transform:none}.history-entry--left small{right:12px;left:auto}.history-end i{grid-column:2}.history-end span{left:56px;transform:translateX(-50%)}}
 @media(max-width:720px){.lore-history{left:0}.lore-viewport{top:0}.history-canvas{--thread-gutter:32px;padding:58px 12px 68px}.timeline-row{grid-template-columns:0 var(--thread-gutter) minmax(0,1fr)}.history-thread{left:calc(12px + var(--thread-gutter) / 2);opacity:.55}.history-intro{min-height:260px}.history-intro h1{font-size:46px}.history-intro aside{padding-left:10px}.history-intro aside p{font-size:16px}.history-intro__sigil{width:52px;height:52px}.history-intro__sigil::after{inset:1px}.history-intro__sigil img{width:48px;height:48px}.history-era{padding:30px 0}.history-era__heading{min-height:150px}.history-era__title h2{font-size:36px}.history-era__title p{font-size:16px}.history-node--era{width:34px;height:34px}.history-entry{min-height:122px}.history-entry__card{min-height:90px;padding:22px 18px 18px}.history-entry__card strong{font-size:19px}.history-entry__card p{font-size:15px}.history-end span{left:calc(12px + var(--thread-gutter) / 2)}}
 @media(prefers-reduced-motion:reduce){.history-thread>i,.history-thread>b,.history-node--era,.history-intro__sigil img{animation:none}.history-intro__sigil,.history-era,.history-entry,.history-entry__card{transition:none}}
+
+.history-intro__copy .ds-crumb{margin-bottom:12px}
+.history-intro__copy>p,.history-intro aside span{font:650 var(--ds-label)/1.3 var(--ds-sans);letter-spacing:.09em;color:var(--ds-muted-text)}
+.history-intro__copy>p{margin-bottom:8px}
+@media(min-width:1001px){.history-intro__copy .ds-crumb :deep(ol){justify-content:flex-end}}
+@media(max-width:720px){.history-thread{opacity:var(--ds-thread-opacity)}}
 </style>

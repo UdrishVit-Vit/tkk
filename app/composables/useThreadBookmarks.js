@@ -2,6 +2,8 @@
 // состояние общее на всё приложение, ключ хранилища задаёт вызывающая страница.
 // Обобщение useRuleBookmarks5e.js — переиспользуется панелью иконок в ThreadRefPage.
 
+export const DND55E_SPELL_BOOKMARK_STORE = 'tkk-dnd55e-spells-bookmarks'
+
 export function useThreadBookmarks(storeKey) {
   const key = storeKey || 'tkk-thread-bookmarks'
   const stateId = `thread-bookmarks:${key}`

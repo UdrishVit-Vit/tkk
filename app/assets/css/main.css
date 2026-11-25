@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+@import "./design-system.css";
 
 * { box-sizing: border-box; }
 html {

@@ -1,7 +1,23 @@
 <script setup>
+import { DND55E_SPELL_BOOKMARK_STORE, useThreadBookmarks } from '~/composables/useThreadBookmarks.js'
 const props = defineProps(['vm', 'state'])
 const emit = defineEmits(['close', 'stop'])
 const { themes } = useKnotTheme()
+const { bookmarks, load: loadSpellBookmarks } = useThreadBookmarks(DND55E_SPELL_BOOKMARK_STORE)
+const searchInput = ref(null)
+const spellLinks = computed(() => bookmarks.value.flatMap((item) => {
+  const spell = new URLSearchParams(item.query).get('spell')
+  return spell ? [{ key: item.key, title: item.title, to: { path: '/dnd55e/spells', query: { spell } } }] : []
+}))
+
+watch(() => props.state.overlay, (overlay) => {
+  if (overlay === 'bookmarks') loadSpellBookmarks()
+  if (overlay === 'search') searchInput.value?.focus()
+}, { flush: 'post' })
+onMounted(() => {
+  if (props.state.overlay === 'bookmarks') loadSpellBookmarks()
+  if (props.state.overlay === 'search') searchInput.value?.focus()
+})
 
 function stop(e) { e?.stopPropagation?.() }
 </script>
@@ -12,33 +28,38 @@ function stop(e) { e?.stopPropagation?.() }
   <div v-if="state.overlay === 'search'" class="search-backdrop" @click="emit('close')">
     <div class="search-modal" @click="stop">
       <div class="search-head">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:rgba(200,210,240,.6)"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <UiActionIcon name="search" />
         <input
+          ref="searchInput"
           :value="state.query"
-          placeholder="искать нить, узел, фракцию…"
-          class="search-input"
-          autofocus
+          type="search"
+          aria-label="Поиск по Узлу Узлов"
+          placeholder="Искать нить, узел, фракцию…"
+          class="search-input ds-control"
           @input="state.query = $event.target.value"
         >
         <span class="search-esc">esc</span>
       </div>
       <div class="search-results">
-        <div v-for="(r, i) in vm.results" :key="i" class="search-row" @click="r.onClick()">
+        <button v-for="(r, i) in vm.results" :key="i" type="button" class="search-row ds-control" @click="r.onClick()">
           <svg viewBox="-50 -50 100 100" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.8" style="color:rgba(200,210,240,.5);flex:none"><ellipse rx="36" ry="15"/><ellipse rx="36" ry="15" transform="rotate(90)"/></svg>
           <span class="search-label">{{ r.label }}</span>
           <span class="search-sys">{{ r.sys }}</span>
-        </div>
-        <div v-if="vm.noResults" class="search-empty">нить не найдена</div>
+        </button>
+        <div v-if="vm.noResults" class="search-empty ds-empty" role="status">Ничего не найдено</div>
       </div>
     </div>
   </div>
 
   <div v-if="state.overlay === 'bookmarks'" class="pop" style="top:130px" @click="stop">
     <div class="pop-title">Сохранённые нити</div>
-    <div v-if="vm.hasBookmarks" class="pop-list">
+    <div v-if="vm.hasBookmarks || spellLinks.length" class="pop-list">
       <div v-for="(b, i) in vm.bookmarks" :key="i" class="pop-row"><span style="color:rgba(200,210,240,.5)">◦</span>{{ b }}</div>
+      <NuxtLink v-for="item in spellLinks" :key="item.key" :to="item.to" class="pop-row ds-control" @click="emit('close')">
+        <UiActionIcon name="bookmark" /> {{ item.title }}
+      </NuxtLink>
     </div>
-    <div v-if="vm.noBookmarks" class="pop-empty">пока нет сохранённых нитей</div>
+    <div v-else class="pop-empty ds-empty">Пока нет сохранённых нитей</div>
   </div>
 
   <div v-if="state.overlay === 'social'" class="pop" style="top:176px" @click="stop">
@@ -139,4 +160,6 @@ function stop(e) { e?.stopPropagation?.() }
   .search-sys{font-size:7px;letter-spacing:.12em}
   .pop{position:fixed;top:auto!important;right:12px;bottom:calc(88px + env(safe-area-inset-bottom))!important;left:12px;z-index:110;width:auto!important;max-height:calc(100dvh - 116px);overflow-y:auto;border-radius:18px;padding:16px;background:rgba(var(--theme-surface-rgb),.97)}
 }
+  .search-row{width:100%;text-align:left}
+  .search-empty.ds-empty,.pop-empty.ds-empty{color:var(--ds-muted-text);font:500 .875rem/1.5 var(--ds-sans)}
 </style>

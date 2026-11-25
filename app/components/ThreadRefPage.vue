@@ -21,6 +21,7 @@ const props = defineProps({
   queryKey: { type: String, default: 'open' },
   nodePrefix: { type: String, default: 'node' },
   columns: { type: Number, default: 1 }, // >1 — сетка карточек в N колонок
+  designPilot: { type: Boolean, default: false },
   threadWeb: { type: Boolean, default: false }, // золотое «плетение» нитей между узлами
   openRouteDecorations: { type: Boolean, default: true }, // подсвеченный маршрут, коннектор и искра открытой карточки
   cardCorners: { type: Boolean, default: true }, // золотые уголки на раскрытой карточке
@@ -43,6 +44,7 @@ const router = useRouter()
 const search = defineModel('search', { type: String, default: '' })
 const open = defineModel('open', { default: null })
 const showFilter = defineModel('showFilter', { type: Boolean, default: false })
+const filterPanelId = useId()
 const renderedOpen = ref(open.value)
 let openSwitchTimer = null
 let openSwitchToken = 0
@@ -569,7 +571,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="screens-page">
+  <div class="screens-page" :class="{ 'ds-reference': designPilot }">
     <div ref="railEl" class="screens-shell">
       <NuxtLink :to="systemPath" class="screens-emblem" :title="`Вернуться к ${systemLabel}`">
         <span class="screens-emblem-badge">
@@ -580,7 +582,8 @@ onBeforeUnmount(() => {
       <span ref="sparkEl" class="thread-spark" :class="{ suppressed: !!renderedOpen }" aria-hidden="true" />
 
       <header class="screens-header">
-        <nav class="screens-crumb" aria-label="Навигация">
+        <UiBreadcrumb v-if="designPilot" :items="[{ to: '/', label: 'Системы' }, { to: systemPath, label: systemLabel }]" :current="crumbCurrent" />
+        <nav v-else class="screens-crumb" aria-label="Навигация">
           <NuxtLink to="/">Системы</NuxtLink>
           <span>/</span>
           <NuxtLink :to="systemPath">{{ systemLabel }}</NuxtLink>
@@ -599,26 +602,30 @@ onBeforeUnmount(() => {
             v-model="search"
             type="search"
             class="screens-search"
+            :class="{ 'ds-control': designPilot }"
             :placeholder="searchPlaceholder"
-            aria-label="Поиск"
+            :aria-label="designPilot ? searchPlaceholder : 'Поиск'"
           >
           <button
             type="button"
             class="screens-filter-btn"
-            :class="{ active: activeFilterCount || showFilter }"
+            :class="{ active: activeFilterCount || showFilter, 'ds-control ds-button': designPilot }"
             :aria-expanded="showFilter"
-            title="Фильтр"
+            :aria-controls="showFilter && filters.length ? filterPanelId : undefined"
+            :title="designPilot ? undefined : 'Фильтр'"
             @click="showFilter = !showFilter"
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <UiActionIcon v-if="designPilot" name="filter" />
+            <svg v-else viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <span v-if="designPilot">Фильтры</span>
             <span v-if="activeFilterCount" class="screens-filter-count">{{ activeFilterCount }}</span>
           </button>
           <slot name="controls" />
-          <span class="screens-count">{{ visible }} / {{ total }}</span>
+          <span class="screens-count" :role="designPilot ? 'status' : undefined" :aria-label="designPilot ? `Найдено: ${visible} из ${total}` : undefined">{{ visible }} / {{ total }}</span>
         </div>
 
         <Transition name="weave">
-          <div v-if="showFilter && filters.length" class="screens-filter-panel">
+          <div v-if="showFilter && filters.length" :id="filterPanelId" class="screens-filter-panel" :role="designPilot ? 'region' : undefined" :aria-label="designPilot ? 'Фильтры' : undefined">
             <div v-for="fg in filters" :key="fg.key" class="screens-filter-group">
               <span class="screens-filter-label">{{ fg.label }}<span v-if="fg.note" class="screens-filter-note">{{ fg.note }}</span></span>
               <div class="screens-filter-chips">
@@ -627,7 +634,8 @@ onBeforeUnmount(() => {
                   :key="opt.value"
                   type="button"
                   class="screens-filter-chip"
-                  :class="{ active: isActive(fg.key, opt.value) }"
+                  :class="{ active: isActive(fg.key, opt.value), 'ds-control ds-button': designPilot }"
+                  :aria-pressed="designPilot ? isActive(fg.key, opt.value) : undefined"
                   :title="opt.title || ''"
                   @click="emit('toggle-filter', fg.key, opt.value)"
                 >
@@ -636,7 +644,7 @@ onBeforeUnmount(() => {
               </div>
             </div>
 
-            <button v-if="activeFilterCount" type="button" class="screens-filter-clear" @click="emit('reset-filters')">
+            <button v-if="activeFilterCount" type="button" class="screens-filter-clear" :class="{ 'ds-control ds-button': designPilot }" @click="emit('reset-filters')">
               Сбросить всё
             </button>
           </div>
@@ -833,7 +841,7 @@ onBeforeUnmount(() => {
             </div>
           </section>
 
-          <div v-if="!groups.length" class="screens-empty">
+          <div v-if="!groups.length" class="screens-empty" :class="{ 'ds-empty': designPilot }">
             {{ emptyText }}
           </div>
         </div>
@@ -2011,6 +2019,27 @@ onBeforeUnmount(() => {
     padding-right:0;
   }
 }
+/* The spell catalog opts into the quieter reference treatment. */
+.ds-reference .ds-crumb{margin-bottom:14px}
+.ds-reference .screens-header h1{font-family:var(--ds-serif);font-size:clamp(2rem,4vw,3.5rem);letter-spacing:0;text-transform:none}
+.ds-reference .screens-kicker{color:var(--ds-muted-text);font:650 var(--ds-label)/1.35 var(--ds-sans);letter-spacing:.09em}
+.ds-reference .screens-thread-line,.ds-reference .thread-web{opacity:var(--ds-thread-opacity)}
+.ds-reference .screens-controls{gap:8px;margin-top:18px;flex-wrap:wrap}
+.ds-reference .screens-search{min-width:0;min-height:var(--ds-control-size);padding:8px 10px;border:1px solid var(--ds-control-border);border-radius:var(--ds-control-radius);font-family:var(--ds-sans)}
+.ds-reference .screens-search::placeholder,.ds-reference .screens-count{color:var(--ds-muted-text)}
+.ds-reference .screens-filter-btn,.ds-reference .screens-filter-clear{display:inline-flex;width:auto;height:auto;white-space:nowrap;font:600 var(--ds-label)/1.25 var(--ds-sans);letter-spacing:0;text-transform:none}
+.ds-reference .screens-filter-count{position:static;display:inline-block;min-width:17px;height:auto;padding:2px 4px;border-radius:6px;font-size:11px;line-height:1.2}
+.ds-reference .screens-filter-panel{gap:14px;padding:10px;border:1px solid var(--ds-control-border);border-radius:var(--ds-control-radius);background:rgba(var(--theme-surface-rgb),.75)}
+.ds-reference .screens-filter-label{flex-wrap:wrap;color:var(--ds-ink);font:650 var(--ds-label)/1.3 var(--ds-sans);letter-spacing:0;text-transform:none}
+.ds-reference .screens-filter-note{color:var(--ds-muted-text);font:500 var(--ds-label)/1.35 var(--ds-sans);letter-spacing:0}
+.ds-reference .screens-filter-chip{font:600 var(--ds-label)/1.25 var(--ds-sans);letter-spacing:0;text-transform:none}
+.ds-reference .screens-empty{color:var(--ds-muted-text);font:500 .875rem/1.5 var(--ds-sans)}
+@media (max-width:760px){
+  .ds-reference .screens-filter-panel{max-height:min(45dvh,340px);overflow:auto;scrollbar-width:thin}
+  .ds-reference .screens-search{flex:1 1 120px}
+  .ds-reference .screens-count{flex-basis:100%}
+}
+@media (prefers-reduced-motion:reduce){.ds-reference .weave-enter-active,.ds-reference .weave-leave-active{transition:none}}
 </style>
 
 <!-- Печать: на страницу выводится только раскрытая карточка, чёрным по белому -->

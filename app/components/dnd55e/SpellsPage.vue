@@ -1,4 +1,5 @@
 <script setup>
+import { DND55E_SPELL_BOOKMARK_STORE } from '~/composables/useThreadBookmarks.js'
 import {
   DND55E_SPELLS,
   DND55E_SPELL_CLASSES,
@@ -197,9 +198,10 @@ useSeoMeta({
     :is-active="isActive"
     :active-filter-count="activeCount"
     :columns="2"
+    design-pilot
     :thread-web="true"
     :card-actions="['link', 'bookmark', 'print', 'expand', 'close']"
-    bookmark-store="tkk-dnd55e-spells-bookmarks"
+    :bookmark-store="DND55E_SPELL_BOOKMARK_STORE"
     empty-text="Ничего не найдено. Попробуйте другой запрос или сбросьте фильтры."
     v-model:search="search"
     v-model:open="open"

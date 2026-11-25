@@ -1,4 +1,10 @@
 <script setup>
+defineProps({ designPilot: { type: Boolean, default: false } })
+const pilotActions = [
+  { panel: 'search', icon: 'search', label: 'Поиск' },
+  { panel: 'bookmarks', icon: 'bookmark', label: 'Закладки' },
+  { panel: 'systems', icon: 'systems', label: 'Системы' },
+]
 const route = useRoute()
 const isDnd55e = computed(() => route.path === '/dnd55e' || route.path.startsWith('/dnd55e/'))
 const rulesPath = computed(() => isDnd55e.value ? '/dnd55e/glossary' : '/dnd5e/screens')
@@ -13,42 +19,52 @@ function active(path) {
 
 <template>
   <aside class="site-sidebar" aria-label="Основная навигация">
-    <NuxtLink to="/" class="site-sidebar-btn site-sidebar-main" title="Главный узел" aria-label="Главный узел">
+    <NuxtLink v-if="designPilot" to="/" class="site-sidebar-btn site-sidebar-main ds-control" title="Главная" aria-label="Главная">
+      <UiActionIcon name="home" />
+    </NuxtLink>
+    <NuxtLink v-else to="/" class="site-sidebar-btn site-sidebar-main" title="Главный узел" aria-label="Главный узел">
       <img src="/assets/knot-main.png" width="30" height="30" alt="">
     </NuxtLink>
 
-    <NuxtLink
-      :to="rulesPath"
-      class="site-sidebar-btn"
-      :class="{ active: active(rulesPath) }"
-      :title="rulesTitle"
-      :aria-label="rulesTitle"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-    </NuxtLink>
+    <template v-if="designPilot">
+      <NuxtLink v-for="action in pilotActions" :key="action.panel" :to="{ path: '/dnd55e', query: { panel: action.panel } }" class="site-sidebar-btn ds-control" :title="action.label" :aria-label="action.label">
+        <UiActionIcon :name="action.icon" />
+      </NuxtLink>
+      <ThemeSwitcher compact />
+    </template>
+    <template v-else>
+      <NuxtLink
+        :to="rulesPath"
+        class="site-sidebar-btn"
+        :class="{ active: active(rulesPath) }"
+        :title="rulesTitle"
+        :aria-label="rulesTitle"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      </NuxtLink>
 
-    <ThemeSwitcher compact />
+      <ThemeSwitcher compact />
 
-    <NuxtLink
-      to="/dnd5e"
-      class="site-sidebar-btn"
-      :class="{ active: active('/dnd5e') }"
-      title="Карта D&D 5e"
-      aria-label="Карта D&D 5e"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>
-    </NuxtLink>
+      <NuxtLink
+        to="/dnd5e"
+        class="site-sidebar-btn"
+        :class="{ active: active('/dnd5e') }"
+        title="Карта D&D 5e"
+        aria-label="Карта D&D 5e"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>
+      </NuxtLink>
 
-    <NuxtLink
-      to="/dnd55e"
-      class="site-sidebar-btn"
-      :class="{ active: active('/dnd55e') }"
-      title="Карта D&D 5.5e"
-      aria-label="Карта D&D 5.5e"
-    >
-      <img src="/assets/knot-2024.png" width="24" height="24" alt="">
-    </NuxtLink>
-
+      <NuxtLink
+        to="/dnd55e"
+        class="site-sidebar-btn"
+        :class="{ active: active('/dnd55e') }"
+        title="Карта D&D 5.5e"
+        aria-label="Карта D&D 5.5e"
+      >
+        <img src="/assets/knot-2024.png" width="24" height="24" alt="">
+      </NuxtLink>
+    </template>
   </aside>
 </template>
 

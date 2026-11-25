@@ -27,6 +27,28 @@ const state = reactive({
 })
 
 const mobileMoreOpen = ref(false)
+const mobileNavCurrent = computed(() => mobileMoreOpen.value ? 'more' : state.overlay || (state.active ? '' : 'home'))
+const mobilePanels = ['search', 'bookmarks', 'systems', 'more']
+
+watch(() => route.query.panel, (panel, previous) => {
+  if (mobilePanels.includes(panel)) {
+    mobileMoreOpen.value = panel === 'more'
+    state.overlay = panel === 'more' ? null : panel
+  } else if (mobilePanels.includes(previous)) {
+    mobileMoreOpen.value = false
+    state.overlay = null
+  }
+}, { immediate: true })
+
+function selectMobileNav(action) {
+  if (action === 'home') return mobileHome()
+  if (action === 'more') {
+    state.overlay = null
+    mobileMoreOpen.value = !mobileMoreOpen.value
+    return
+  }
+  openMobileOverlay(action)
+}
 
 function openMobileOverlay(name) {
   mobileMoreOpen.value = false
@@ -1184,21 +1206,21 @@ if (initialClass) await loadClassData()
 </script>
 
 <template>
-  <div class="tkk" :class="[`theme-${state.theme}`, { 'is-lore-map': vm.isLoreMap }]" :style="{ background: vm.th.bg }">
+  <div class="tkk" :class="[`theme-${state.theme}`, { 'is-lore-map': vm.isLoreMap, 'ds-atlas': !vm.isSystem || state.active === '2024' }]" :style="{ background: vm.th.bg }">
     <canvas ref="canvasEl" class="tkk-canvas" />
     <div v-if="vm.isLoreMap" class="tkk-lore-carpet-bg" aria-hidden="true" />
 
     <main v-if="!vm.showClassPage && !vm.showCards && !vm.showLoreHistory && !vm.showLoreGlossary && !vm.showLorePantheon && !vm.showLoreGeography && !vm.showLoreShards && !vm.showLoreFactions && !vm.showLoreTales && !vm.showLoreUzly && !vm.showLoreCalendar && !vm.showLoreGuilds" class="tkk-mobile" aria-label="Мобильная навигация">
       <header class="tkk-mobile-head">
-        <button class="tkk-mobile-back" :class="{ placeholder: !vm.isSystem }" type="button" :aria-label="vm.isSystem ? 'Назад к системам' : undefined" :tabindex="vm.isSystem ? 0 : -1" @click="vm.isSystem && goUp()">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
+        <button class="tkk-mobile-back ds-control ds-button" :class="{ placeholder: !vm.isSystem }" type="button" :aria-label="vm.isSystem ? 'Назад к системам' : undefined" :tabindex="vm.isSystem ? 0 : -1" @click="vm.isSystem && goUp()">
+          <UiActionIcon name="back" />
         </button>
         <div class="tkk-mobile-brand">
           <span>Threads of the Knot of Knots</span>
           <b>TKK<em>.club</em></b>
         </div>
-        <button class="tkk-mobile-search" type="button" aria-label="Открыть поиск" @click="openMobileOverlay('search')">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg>
+        <button class="tkk-mobile-search ds-control ds-button" type="button" aria-label="Открыть поиск" :aria-expanded="state.overlay === 'search'" @click="openMobileOverlay('search')">
+          <UiActionIcon name="search" />
         </button>
       </header>
 
@@ -1208,10 +1230,10 @@ if (initialClass) await loadClassData()
           <h1>Выберите нить</h1>
         </div>
         <div class="tkk-mobile-system-list">
-          <button v-for="system in SYSTEMS" :key="system.id" type="button" class="tkk-mobile-system" @click="selectSystem(system.id)">
+          <button v-for="system in SYSTEMS" :key="system.id" type="button" class="tkk-mobile-system ds-control" @click="selectSystem(system.id)">
             <span class="tkk-mobile-system-knot"><img :src="IMG[system.id]" alt=""></span>
-            <span class="tkk-mobile-system-copy"><b>{{ system.name }}</b><small>{{ system.tag }} · открыть систему</small></span>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+            <span class="tkk-mobile-system-copy"><b>{{ system.name }}</b><small v-if="system.id !== 'lore'">{{ system.tag }}</small></span>
+            <UiActionIcon name="next" />
           </button>
         </div>
       </section>
@@ -1223,9 +1245,9 @@ if (initialClass) await loadClassData()
             <img :src="IMG[state.active]" alt="">
           </button>
           <div>
-            <span class="tkk-mobile-kicker">Активная система</span>
+            <span class="tkk-mobile-kicker">{{ state.active === '2024' ? 'Редакция 2024' : 'Активная система' }}</span>
             <h1>{{ vm.activeName }}</h1>
-            <p>{{ vm.sysObj?.tag }} · {{ mobileGroups.reduce((sum, group) => sum + group.sections.length, 0) }} разделов</p>
+            <p v-if="state.active !== '2024'">{{ vm.sysObj?.tag }} · {{ mobileGroups.reduce((sum, group) => sum + group.sections.length, 0) }} разделов</p>
           </div>
         </section>
 
@@ -1252,16 +1274,35 @@ if (initialClass) await loadClassData()
           <div class="tkk-mobile-groups">
             <section v-for="(group, groupIndex) in mobileGroups" :key="group.name" class="tkk-mobile-group">
               <header><span>0{{ groupIndex + 1 }}</span><h3>{{ group.name }}</h3></header>
-              <button v-for="section in group.sections" :key="section" type="button" @click="openSection(section)">
+              <button v-for="section in group.sections" :key="section" type="button" class="ds-control" @click="openSection(section)">
                 <span class="tkk-mobile-section-knot"><img v-if="nodeImg(section, state.active)" :src="nodeImg(section, state.active)" alt=""></span>
                 <b>{{ section }}</b>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+                <UiActionIcon name="next" />
               </button>
             </section>
           </div>
         </section>
       </template>
     </main>
+
+    <div v-if="route.path === '/' || route.path === '/dnd55e'" class="tkk-desktop-guide">
+      <UiBreadcrumb v-if="vm.isSystem" :items="[{ to: '/', label: 'Системы' }]" current="D&D 2024" />
+      <h1>{{ vm.isSystem ? 'D&D 2024' : 'Выберите нить' }}</h1>
+      <details>
+        <summary class="ds-control ds-button">{{ vm.isSystem ? 'Список разделов' : 'Список направлений' }}</summary>
+        <div class="tkk-desktop-guide-list">
+          <template v-if="vm.isSystem">
+            <section v-for="group in mobileGroups" :key="group.name">
+              <h2>{{ group.name }}</h2>
+              <button v-for="section in group.sections" :key="section" type="button" class="ds-control" @click="openSection(section)">{{ section }}</button>
+            </section>
+          </template>
+          <button v-else v-for="system in SYSTEMS" :key="system.id" type="button" class="ds-control" @click="selectSystem(system.id)">
+            {{ system.id === 'lore' ? system.name : `${system.name} · ${system.tag}` }}
+          </button>
+        </div>
+      </details>
+    </div>
 
     <svg v-if="!vm.isLoreMap" class="tkk-rings" :style="{ color: vm.th.ring }">
       <g :transform="`translate(${center.x},${center.y})`">
@@ -1342,7 +1383,7 @@ if (initialClass) await loadClassData()
       <div class="tkk-wordmark-title">TKK<span style="opacity:.5">.club</span></div>
     </div>
 
-    <div v-if="vm.isSystem" class="tkk-crumb">
+    <div v-if="vm.isSystem && route.path !== '/dnd55e'" class="tkk-crumb">
       <span class="tkk-crumb-link" @click="recenter">Системы</span>
       <span class="tkk-crumb-sep">/</span>
       <span class="tkk-crumb-link tkk-crumb-strong" @click="crumbSystem">{{ vm.activeName }}</span>
@@ -1370,47 +1411,31 @@ if (initialClass) await loadClassData()
     </div>
 
     <div class="tkk-sidebar">
-      <div class="tkk-sidebar-btn tkk-sidebar-main" title="Главный узел" @click="recenter">
-        <img src="/assets/knot-main.png" width="30" height="30" style="display:block;object-fit:contain">
-      </div>
-      <div class="tkk-sidebar-btn" title="Поиск" @click="toggleOverlay('search')">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-      </div>
-      <div class="tkk-sidebar-btn" title="Закладки" @click="toggleOverlay('bookmarks')">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4.2-6 4.2z"/></svg>
-      </div>
+      <button type="button" class="tkk-sidebar-btn tkk-sidebar-main ds-control" title="Главная" aria-label="Главная" @click="mobileHome">
+        <UiActionIcon name="home" />
+      </button>
+      <button type="button" class="tkk-sidebar-btn ds-control" title="Поиск" aria-label="Поиск" :aria-expanded="state.overlay === 'search'" @click="toggleOverlay('search')">
+        <UiActionIcon name="search" />
+      </button>
+      <button type="button" class="tkk-sidebar-btn ds-control" title="Закладки" aria-label="Закладки" :aria-expanded="state.overlay === 'bookmarks'" @click="toggleOverlay('bookmarks')">
+        <UiActionIcon name="bookmark" />
+      </button>
       <div class="tkk-sidebar-btn" title="Сообщество" @click="toggleOverlay('social')">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><line x1="8.1" y1="10.9" x2="15.9" y2="7.1"/><line x1="8.1" y1="13.1" x2="15.9" y2="16.9"/></svg>
       </div>
       <div class="tkk-sidebar-btn" title="Тема" @click="toggleOverlay('theme')">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.7A8.2 8.2 0 1 1 11.3 3a6.4 6.4 0 0 0 9.7 9.7z"/></svg>
       </div>
-      <div class="tkk-sidebar-btn" title="Сменить систему" @click="toggleOverlay('systems')">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>
-      </div>
+      <button type="button" class="tkk-sidebar-btn ds-control" title="Системы" aria-label="Системы" :aria-expanded="state.overlay === 'systems'" @click="toggleOverlay('systems')">
+        <UiActionIcon name="systems" />
+      </button>
       <div style="flex:1" />
       <div class="tkk-sidebar-btn" title="Авторизация" @click="toggleOverlay('auth')">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
       </div>
     </div>
 
-    <nav class="tkk-mobile-nav" aria-label="Основная навигация">
-      <button type="button" :class="{ active: !vm.isSystem && !state.overlay && !mobileMoreOpen }" @click="mobileHome">
-        <img src="/assets/knot-main.png" alt=""><span>Главная</span>
-      </button>
-      <button type="button" :class="{ active: state.overlay === 'search' }" @click="openMobileOverlay('search')">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg><span>Поиск</span>
-      </button>
-      <button type="button" :class="{ active: state.overlay === 'bookmarks' }" @click="openMobileOverlay('bookmarks')">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h12v17l-6-4.2-6 4.2z"/></svg><span>Закладки</span>
-      </button>
-      <button type="button" :class="{ active: state.overlay === 'systems' }" @click="openMobileOverlay('systems')">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg><span>Системы</span>
-      </button>
-      <button type="button" :class="{ active: mobileMoreOpen }" @click="state.overlay = null; mobileMoreOpen = !mobileMoreOpen">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span>Ещё</span>
-      </button>
-    </nav>
+    <UiMobileNav :current="mobileNavCurrent" @select="selectMobileNav" />
 
     <div v-if="mobileMoreOpen" class="tkk-mobile-more-backdrop" @click="mobileMoreOpen = false">
       <section class="tkk-mobile-more" aria-label="Дополнительные действия" @click.stop>
@@ -1528,7 +1553,7 @@ if (initialClass) await loadClassData()
 .tkk-sidebar-btn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:rgba(var(--theme-text-rgb),.55);cursor:pointer;border-radius:11px;transition:all .25s}
 .tkk-sidebar-btn:hover{color:rgba(var(--theme-heading-rgb),.95);background:rgba(var(--theme-contrast-rgb),.05)}
 .tkk-sidebar-main{margin-bottom:6px;color:rgba(var(--theme-heading-rgb),.85)}
-.tkk-mobile,.tkk-mobile-nav,.tkk-mobile-more-backdrop{display:none}
+.tkk-mobile,.tkk-mobile-more-backdrop{display:none}
 
 @media (max-width:760px){
   .tkk{overflow:hidden}
@@ -1589,11 +1614,7 @@ if (initialClass) await loadClassData()
   .tkk-mobile-class-grid img{width:76px;height:76px;object-fit:contain}
   .tkk-mobile-class-grid b{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:rgba(var(--theme-heading-rgb),.92)}
   .tkk-mobile-class-grid small{margin-top:3px;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.36)}
-  .tkk-mobile-nav{position:fixed;right:10px;bottom:max(10px,env(safe-area-inset-bottom));left:10px;z-index:120;display:grid;grid-template-columns:repeat(5,1fr);height:66px;padding:5px;border:1px solid rgba(var(--theme-contrast-rgb),.1);border-radius:20px;background:rgba(var(--theme-surface-rgb),.9);box-shadow:0 14px 42px rgba(0,0,0,.42),inset 0 1px rgba(var(--theme-contrast-rgb),.06);backdrop-filter:blur(22px)}
-  .tkk-mobile-nav button{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;border-radius:15px;background:transparent;color:rgba(var(--theme-text-rgb),.43)}
-  .tkk-mobile-nav button.active{color:rgba(var(--theme-heading-rgb),.95);background:rgba(var(--theme-accent-rgb),.095)}
-  .tkk-mobile-nav svg,.tkk-mobile-nav img{width:21px;height:21px;object-fit:contain;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-  .tkk-mobile-nav span{overflow:hidden;max-width:100%;font-family:'Hanken Grotesk',sans-serif;font-size:7.5px;letter-spacing:.03em;text-overflow:ellipsis;white-space:nowrap}
+
   .tkk-mobile-more-backdrop{position:fixed;inset:0;z-index:130;display:flex;align-items:flex-end;padding:12px 12px calc(86px + env(safe-area-inset-bottom));background:rgba(0,0,0,.46);backdrop-filter:blur(5px)}
   .tkk-mobile-more{width:100%;padding:8px;border:1px solid rgba(var(--theme-contrast-rgb),.1);border-radius:21px;background:rgba(var(--theme-surface-rgb),.97);box-shadow:0 20px 60px rgba(0,0,0,.5);animation:popIn .2s ease both}
   .tkk-mobile-more header{display:flex;align-items:center;justify-content:space-between;padding:4px 8px 8px 12px;font-family:'Cormorant Garamond',serif;font-size:22px;color:rgba(var(--theme-heading-rgb),.95)}
@@ -1604,4 +1625,22 @@ if (initialClass) await loadClassData()
   .tkk-mobile-more small{font-size:9px;color:rgba(var(--theme-text-rgb),.4)}
 }
 @media (prefers-reduced-motion:reduce){.tkk.theme-madness::before{animation:none}}
+
+.tkk-desktop-guide{position:absolute;z-index:34;top:24px;right:26px;display:grid;justify-items:end;gap:6px;max-width:calc(100% - 120px)}
+.tkk-desktop-guide h1{margin:0;color:var(--ds-ink);font:600 28px/1.15 var(--ds-serif)}
+.tkk-desktop-guide summary{display:flex;list-style:none}
+.tkk-desktop-guide summary::-webkit-details-marker{display:none}
+.tkk-desktop-guide details{position:relative;justify-self:end}
+.tkk-desktop-guide details[open] summary{border-color:var(--theme-accent);background:var(--theme-surface)}
+.tkk-desktop-guide-list{position:absolute;top:calc(100% + 8px);right:0;display:grid;gap:10px;width:240px;max-height:calc(100dvh - 160px);overflow:auto;padding:12px;border:1px solid var(--ds-control-border);border-radius:var(--ds-control-radius);background:var(--theme-surface);box-shadow:0 12px 32px #0006}
+.tkk-desktop-guide-list h2{margin:0 0 3px;padding:4px 8px;color:var(--ds-muted-text);font:700 var(--ds-label)/1.4 var(--ds-sans)}
+.tkk-desktop-guide-list button{display:block;width:100%;min-height:32px;border-radius:6px;padding:5px 8px;color:var(--ds-ink);font:500 .875rem/1.3 var(--ds-sans);text-align:left;cursor:pointer}
+.tkk-desktop-guide-list button:hover{background:var(--ds-selected-fill)}
+.tkk.ds-atlas .tkk-rings{opacity:var(--ds-thread-opacity)}
+@media (max-width:760px){
+  .tkk-desktop-guide{display:none}
+  .tkk-mobile .tkk-mobile-search,.tkk-mobile .tkk-mobile-back{width:44px;height:44px;border-radius:var(--ds-control-radius);padding:0;border-color:var(--ds-control-border)}
+  .tkk-mobile .tkk-mobile-system-copy small,.tkk-mobile .tkk-mobile-kicker{font:650 var(--ds-label)/1.25 var(--ds-sans);letter-spacing:.07em;color:var(--ds-muted-text)}
+  .tkk-mobile .tkk-mobile-group h3{font:650 var(--ds-label)/1.25 var(--ds-sans);letter-spacing:.1em;color:var(--ds-muted-text)}
+}
 </style>
