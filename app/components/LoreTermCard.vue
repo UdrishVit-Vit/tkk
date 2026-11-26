@@ -108,9 +108,9 @@ function shortSummary(text) {
     <ul v-else class="term-card-choice">
       <li v-for="term in terms" :key="term.id">
         <button type="button" @click="emit('open', term.id)">
-          <span>{{ typeTitle(term) }}</span>
           <b>{{ term.term }}</b>
-          <em>{{ shortSummary(term.definition).slice(0, 90) }}</em>
+          <span>{{ typeTitle(term) }}</span>
+          <span class="term-card-summary">{{ shortSummary(term.definition) }}</span>
         </button>
       </li>
     </ul>
@@ -124,7 +124,7 @@ function shortSummary(text) {
 .term-card header button{border:0;background:none;padding:0 0 0 6px;color:rgba(var(--theme-text-rgb),.34);font-size:12px;line-height:1;cursor:pointer}
 .term-card header button:hover{color:var(--gold-bright)}
 .term-card b{display:block;margin:9px 0 7px;font:600 22px/1.15 'Cormorant Garamond',serif;color:rgba(var(--theme-heading-rgb),.92)}
-.term-card p{margin:0;color:rgba(var(--theme-text-rgb),.72);font:400 16px/1.5 'Cormorant Garamond',serif}
+.term-card p,.term-card-choice .term-card-summary{margin:0;color:var(--ds-muted-text);font:400 1rem/1.45 var(--ds-serif);letter-spacing:normal;text-transform:none;overflow-wrap:anywhere}
 .term-card-more{display:inline-flex;align-items:center;gap:7px;margin-top:12px;border:1px solid rgba(var(--theme-accent-rgb),.24);background:none;padding:7px 11px;color:rgba(var(--theme-accent-strong-rgb),.78);font:600 10px/1 'Hanken Grotesk',sans-serif;letter-spacing:.13em;text-transform:uppercase;cursor:pointer;transition:border-color .18s,color .18s}
 .term-card-more:hover{border-color:var(--gold-bright);color:var(--gold-bright)}
 .term-card-more i{font-style:normal}
@@ -133,7 +133,7 @@ function shortSummary(text) {
 .term-card-choice button:hover{border-color:var(--gold-bright)}
 .term-card-choice span{display:block;font:600 10px/1.2 'Hanken Grotesk',sans-serif;letter-spacing:.15em;text-transform:uppercase;color:rgba(var(--theme-accent-rgb),.6)}
 .term-card-choice b{margin:5px 0 4px;font-size:19px}
-.term-card-choice em{display:block;color:rgba(var(--theme-text-rgb),.55);font:italic 14px/1.4 'Cormorant Garamond',serif}
+.term-card-choice .term-card-summary{display:-webkit-box;margin-top:4px;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2}
 @media(prefers-reduced-motion:no-preference){
   .term-card{animation:termCardIn .16s ease-out}
   @keyframes termCardIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}

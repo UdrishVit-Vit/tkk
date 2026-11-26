@@ -2,6 +2,7 @@
 const props = defineProps({
   current: { type: String, default: '' },
   panelsInHub: { type: Boolean, default: false },
+  inlineSearch: { type: Boolean, default: false },
   hubPath: { type: String, default: '/' },
 })
 const emit = defineEmits(['select'])
@@ -22,7 +23,7 @@ function destination(id) {
   <nav class="ds-mobile-nav" aria-label="Основная навигация">
     <template v-for="action in actions" :key="action.id">
       <NuxtLink
-        v-if="panelsInHub"
+        v-if="panelsInHub && !(inlineSearch && action.id === 'search')"
         :to="destination(action.id)"
         class="ds-control ds-mobile-nav__item"
         :aria-current="current === action.id ? 'location' : undefined"
@@ -34,7 +35,8 @@ function destination(id) {
         type="button"
         class="ds-control ds-mobile-nav__item"
         :aria-current="action.id === 'home' && current === 'home' ? 'page' : undefined"
-        :aria-expanded="action.id === 'home' ? undefined : current === action.id"
+        :aria-haspopup="inlineSearch && action.id === 'search' ? 'dialog' : undefined"
+        :aria-expanded="action.id === 'home' || inlineSearch ? undefined : current === action.id"
         @click="emit('select', action.id)"
       >
         <UiActionIcon :name="action.icon" /><span>{{ action.label }}</span>

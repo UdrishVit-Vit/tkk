@@ -15,13 +15,15 @@ const props = defineProps({
   showGroupTitles: { type: Boolean, default: true },
   total: { type: Number, default: 0 },
   visible: { type: Number, default: 0 },
-  filters: { type: Array, default: () => [] }, // [{ key, label, note?, options:[{ value, label, title? }] }]
+  filters: { type: Array, default: () => [] }, // [{ key, label, note?, options:[{ value, label, title?, ariaLabel? }] }]
+  primaryFilterKeys: { type: Array, default: null }, // Opt into progressive disclosure.
   isActive: { type: Function, default: () => false },
   activeFilterCount: { type: Number, default: 0 },
   queryKey: { type: String, default: 'open' },
   nodePrefix: { type: String, default: 'node' },
   columns: { type: Number, default: 1 }, // >1 — сетка карточек в N колонок
   designPilot: { type: Boolean, default: false },
+  compactRail: { type: Boolean, default: false },
   threadWeb: { type: Boolean, default: false }, // золотое «плетение» нитей между узлами
   openRouteDecorations: { type: Boolean, default: true }, // подсвеченный маршрут, коннектор и искра открытой карточки
   cardCorners: { type: Boolean, default: true }, // золотые уголки на раскрытой карточке
@@ -45,6 +47,19 @@ const search = defineModel('search', { type: String, default: '' })
 const open = defineModel('open', { default: null })
 const showFilter = defineModel('showFilter', { type: Boolean, default: false })
 const filterPanelId = useId()
+const filterSections = computed(() => {
+  if (!props.primaryFilterKeys) return [{ key: 'all', groups: props.filters }]
+  return [
+    { key: 'primary', groups: props.filters.filter(group => props.primaryFilterKeys.includes(group.key)) },
+    { key: 'additional', groups: props.filters.filter(group => !props.primaryFilterKeys.includes(group.key)), disclosure: true }
+  ].filter(section => section.groups.length)
+})
+const additionalFilterCount = computed(() => (
+  filterSections.value.find(section => section.disclosure)?.groups.reduce(
+    (count, group) => count + group.options.filter(option => props.isActive(group.key, option.value)).length,
+    0
+  ) || 0
+))
 const renderedOpen = ref(open.value)
 let openSwitchTimer = null
 let openSwitchToken = 0
@@ -283,7 +298,8 @@ function computeWeb() {
 
   const railRect = rail.getBoundingClientRect()
   const shellRect = shell.getBoundingClientRect()
-  const axis = parseFloat(getComputedStyle(shell).getPropertyValue('--axis')) || 38
+  const shellStyle = getComputedStyle(shell)
+  const axis = parseFloat(shellStyle.getPropertyValue('--axis')) || 38
   const srcX = shellRect.left + axis - railRect.left
 
   webW.value = rail.clientWidth
@@ -295,7 +311,8 @@ function computeWeb() {
   const routes = {} // маршрут искры к каждому заклинанию (ромб → шина → спайн → узел)
   const routeLengths = {}
   const routeBase = {} // «ствол+шина+вход в спайн» на случай переопределения к карточке
-  const STUB = 16 // отступ спайна влево от колонки
+  const compactStub = parseFloat(shellStyle.getPropertyValue('--compact-web-stub'))
+  const STUB = compactStub || 16 // отступ спайна влево от колонки
   const CH = 6    // размер 45°-фаски у отвода
 
   for (const sec of rail.querySelectorAll('.thread-group')) {
@@ -347,7 +364,8 @@ function computeWeb() {
     const busEndX = Math.max(...spineX)
 
     // Ствол: ромб → 33°-диагональ → горизонтальная шина уровня
-    const kinkX = Dx + (busY - Dy) / TAN33
+    const diagonalX = Dx + (busY - Dy) / TAN33
+    const kinkX = compactStub ? Math.min(diagonalX, busEndX) : diagonalX
     paths.push({ cls: 'trunk', d: `M${Dx.toFixed(1)} ${Dy.toFixed(1)} L${kinkX.toFixed(1)} ${busY.toFixed(1)} L${busEndX.toFixed(1)} ${busY.toFixed(1)}` })
     junctions.push({ x: Dx, y: Dy })
 
@@ -571,7 +589,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="screens-page" :class="{ 'ds-reference': designPilot }">
+  <div class="screens-page" :class="{ 'ds-reference': designPilot, 'thread-ref-compact': compactRail, 'thread-ref-progressive': primaryFilterKeys }">
     <div ref="railEl" class="screens-shell">
       <NuxtLink :to="systemPath" class="screens-emblem" :title="`Вернуться к ${systemLabel}`">
         <span class="screens-emblem-badge">
@@ -622,29 +640,50 @@ onBeforeUnmount(() => {
           </button>
           <slot name="controls" />
           <span class="screens-count" :role="designPilot ? 'status' : undefined" :aria-label="designPilot ? `Найдено: ${visible} из ${total}` : undefined">{{ visible }} / {{ total }}</span>
+          <button
+            v-if="primaryFilterKeys"
+            type="button"
+            class="screens-filter-clear"
+            :class="{ 'ds-control ds-button': designPilot }"
+            :aria-disabled="!activeFilterCount"
+            @click="activeFilterCount && emit('reset-filters')"
+          >
+            Сбросить фильтры
+          </button>
         </div>
 
         <Transition name="weave">
           <div v-if="showFilter && filters.length" :id="filterPanelId" class="screens-filter-panel" :role="designPilot ? 'region' : undefined" :aria-label="designPilot ? 'Фильтры' : undefined">
-            <div v-for="fg in filters" :key="fg.key" class="screens-filter-group">
-              <span class="screens-filter-label">{{ fg.label }}<span v-if="fg.note" class="screens-filter-note">{{ fg.note }}</span></span>
-              <div class="screens-filter-chips">
-                <button
-                  v-for="opt in fg.options"
-                  :key="opt.value"
-                  type="button"
-                  class="screens-filter-chip"
-                  :class="{ active: isActive(fg.key, opt.value), 'ds-control ds-button': designPilot }"
-                  :aria-pressed="designPilot ? isActive(fg.key, opt.value) : undefined"
-                  :title="opt.title || ''"
-                  @click="emit('toggle-filter', fg.key, opt.value)"
-                >
-                  {{ opt.label }}
-                </button>
+            <component
+              v-for="section in filterSections"
+              :is="section.disclosure ? 'details' : 'div'"
+              :key="section.key"
+              :class="section.disclosure ? 'screens-filter-additional' : 'screens-filter-primary'"
+            >
+              <summary v-if="section.disclosure" class="screens-filter-more" :class="{ 'ds-control': designPilot }">
+                Дополнительные фильтры<span v-if="additionalFilterCount"> · {{ additionalFilterCount }} выбрано</span>
+              </summary>
+              <div v-for="fg in section.groups" :key="fg.key" class="screens-filter-group">
+                <span class="screens-filter-label">{{ fg.label }}<span v-if="fg.note" class="screens-filter-note">{{ fg.note }}</span></span>
+                <div class="screens-filter-chips">
+                  <button
+                    v-for="opt in fg.options"
+                    :key="opt.value"
+                    type="button"
+                    class="screens-filter-chip"
+                    :class="{ active: isActive(fg.key, opt.value), 'ds-control ds-button': designPilot }"
+                    :aria-pressed="designPilot ? isActive(fg.key, opt.value) : undefined"
+                    :aria-label="opt.ariaLabel"
+                    :title="opt.title || ''"
+                    @click="emit('toggle-filter', fg.key, opt.value)"
+                  >
+                    {{ opt.label }}
+                  </button>
+                </div>
               </div>
-            </div>
+            </component>
 
-            <button v-if="activeFilterCount" type="button" class="screens-filter-clear" :class="{ 'ds-control ds-button': designPilot }" @click="emit('reset-filters')">
+            <button v-if="!primaryFilterKeys && activeFilterCount" type="button" class="screens-filter-clear" :class="{ 'ds-control ds-button': designPilot }" @click="emit('reset-filters')">
               Сбросить всё
             </button>
           </div>
@@ -1121,6 +1160,19 @@ onBeforeUnmount(() => {
   flex-direction:column;
   gap:8px;
 }
+
+.screens-filter-primary{display:contents}
+.screens-filter-additional{border-top:1px solid var(--t-line)}
+.screens-filter-more{
+  padding:13px 0;
+  color:var(--t-text);
+  font:650 .875rem/1.35 var(--ds-sans,system-ui);
+  cursor:pointer;
+}
+.screens-filter-more::marker{color:var(--t-gold-soft)}
+.screens-filter-more span{color:var(--t-muted);font-weight:500}
+.screens-filter-additional .screens-filter-group + .screens-filter-group{margin-top:14px}
+.thread-ref-progressive .screens-filter-clear[aria-disabled='true']{opacity:.55;cursor:default}
 
 .screens-filter-label{
   display:flex;
@@ -2038,6 +2090,29 @@ onBeforeUnmount(() => {
   .ds-reference .screens-filter-panel{max-height:min(45dvh,340px);overflow:auto;scrollbar-width:thin}
   .ds-reference .screens-search{flex:1 1 120px}
   .ds-reference .screens-count{flex-basis:100%}
+  .ds-reference.thread-ref-progressive .screens-filter-panel{max-height:none;overflow:visible}
+  .ds-reference.thread-ref-progressive .screens-controls{display:grid;grid-template-columns:minmax(0,1fr) auto}
+  .ds-reference.thread-ref-progressive .screens-count{grid-column:1}
+  .ds-reference.thread-ref-progressive .screens-filter-clear{justify-self:end}
+  .ds-reference.thread-ref-progressive .screens-filter-chip{padding-inline:8px}
+}
+@media (max-width:600px){
+  .thread-ref-compact .screens-shell{
+    --indent:24px;
+    --axis:6px;
+    --compact-web-stub:8px;
+    width:calc(100% - 24px);
+  }
+  .thread-ref-compact .screens-header h1,.thread-ref-compact .screens-kicker{padding-right:48px}
+  .thread-ref-compact .screens-emblem{left:auto;right:0;top:62px;transform:none}
+  .thread-ref-compact .screens-emblem-badge{width:44px;height:44px}
+  .thread-ref-compact .screens-emblem-badge::before{width:24px;height:24px}
+  .thread-ref-compact .screens-emblem-badge::after{width:29px;height:29px}
+  .thread-ref-compact .screens-emblem-badge img{width:30px;height:30px}
+  .thread-ref-compact .thread-group-title{flex-wrap:wrap;gap:2px 10px}
+  .thread-ref-compact .thread-group-title::before{left:calc(var(--axis) - var(--indent) - 4px);top:13px;width:8px;height:8px}
+  .thread-ref-compact .thread-item{flex-wrap:nowrap;gap:6px}
+  .thread-ref-compact .rule-body{padding-inline:14px}
 }
 @media (prefers-reduced-motion:reduce){.ds-reference .weave-enter-active,.ds-reference .weave-leave-active{transition:none}}
 </style>

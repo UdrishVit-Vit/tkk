@@ -3,6 +3,7 @@ import { DND55E_CLASSES } from '~/data/dnd55e/catalogues.js'
 import { mergeArchetypes2024 } from '~/data/dnd55e/classArchetypes2024.js'
 import { SYSTEMS, POOL, IMG, THEMES, nodeImg, classImg, layoutPoints, entriesFor } from '~/data/hub.js'
 import { useKnotCanvas } from '~/composables/useKnotCanvas.js'
+import { SECTION_ROUTES_BY_SYSTEM } from '~/data/sectionRoutes.js'
 
 const props = defineProps({
   initialSystem: { type: String, default: '' },
@@ -291,64 +292,6 @@ function crumbSystem() {
 // sharing one /races list, the same way Pathfinder will get its own branch.
 const SYSTEM_HOME = { '5e': '/dnd5e', '2024': '/dnd55e', pf: '/pf2e', lore: '/lore' }
 function systemHome(id) { return SYSTEM_HOME[id] || '/dnd5e' }
-const SECTION_ROUTES_BY_SYSTEM = {
-  '5e': {
-    'Расы и происхождения': '/dnd5e/races',
-    'Черты': '/dnd5e/feats',
-    'Особенности классов': '/dnd5e/class-features',
-    'Предыстории': '/dnd5e/backgrounds',
-    'Заклинания': '/dnd5e/spells',
-    'Оружие': '/dnd5e/weapons',
-    'Доспехи': '/dnd5e/armor',
-    'Снаряжение': '/dnd5e/equipment',
-    'Драгоценности': '/dnd5e/jewelry',
-    'Магические предметы': '/dnd5e/magic-items',
-    'Бестиарий': '/dnd5e/bestiary',
-    'Знамения': '/dnd5e/omens',
-    'Гнев Ильбеша': '/dnd5e/wrath',
-    'Чай': '/dnd5e/tea',
-    'Бусины': '/dnd5e/beads',
-    'Ширма (справочник)': '/dnd5e/screens'
-  },
-  '2024': {
-    'Классы': '/dnd55e/classes',
-    'Виды': '/dnd55e/species',
-    'Черты': '/dnd55e/feats',
-    'Особенности классов': '/dnd55e/class-features',
-    'Предыстории': '/dnd55e/backgrounds',
-    'Заклинания': '/dnd55e/spells',
-    'Снаряжение': '/dnd55e/equipment',
-    'Магические предметы': '/dnd55e/magic-items',
-    'Знамения': '/dnd55e/omens',
-    'Гнев Ильбеша': '/dnd55e/wrath',
-    'Чай': '/dnd55e/tea',
-    'Бусины': '/dnd55e/beads',
-    'Бестиарий': '/dnd55e/bestiary',
-    'Глоссарий': '/dnd55e/glossary'
-  },
-  pf: {
-    'Наследия': '/pf2e/ancestries',
-    'Классы': '/pf2e/classes',
-    'Снаряжение': '/pf2e/equipment',
-    'Магические предметы': '/pf2e/magic-items',
-    'Бусины': '/pf2e/beads',
-    'Заклинания': '/pf2e/spells',
-    'Бестиарий': '/pf2e/bestiary',
-    'Глоссарий': '/pf2e/glossary'
-  },
-  lore: {
-    'Календарь': '/lore/calendar',
-    'Пантеон': '/lore/pantheon',
-    'География': '/lore/geography',
-    'Осколки': '/lore/shards',
-    'Фракции': '/lore/factions',
-    'Гильдии': '/lore/guilds',
-    'Сказания': '/lore/tales',
-    'Узлы': '/lore/uzly',
-    'Глоссарий': '/lore/glossary',
-    'Нить Башни Мафраш': '/lore/history'
-  },
-}
 function openSection(name) {
   const sectionRoute = SECTION_ROUTES_BY_SYSTEM[state.active]?.[name]
   if (sectionRoute) { navigateTo(sectionRoute); return }
@@ -1245,9 +1188,10 @@ if (initialClass) await loadClassData()
             <img :src="IMG[state.active]" alt="">
           </button>
           <div>
-            <span class="tkk-mobile-kicker">{{ state.active === '2024' ? 'Редакция 2024' : 'Активная система' }}</span>
+            <span v-if="!vm.isLoreMap" class="tkk-mobile-kicker">{{ state.active === '2024' ? 'Редакция 2024' : 'Активная система' }}</span>
             <h1>{{ vm.activeName }}</h1>
-            <p v-if="state.active !== '2024'">{{ vm.sysObj?.tag }} · {{ mobileGroups.reduce((sum, group) => sum + group.sections.length, 0) }} разделов</p>
+            <p v-if="vm.isLoreMap">Мир Эноа</p>
+            <p v-else-if="state.active !== '2024'">{{ vm.sysObj?.tag }} · {{ mobileGroups.reduce((sum, group) => sum + group.sections.length, 0) }} разделов</p>
           </div>
         </section>
 
@@ -1266,14 +1210,14 @@ if (initialClass) await loadClassData()
           </div>
         </section>
 
-        <section v-else class="tkk-mobile-catalogue">
-          <div class="tkk-mobile-section-title">
+        <section v-else class="tkk-mobile-catalogue" :aria-label="vm.isLoreMap ? 'Разделы Lore' : undefined">
+          <div v-if="!vm.isLoreMap" class="tkk-mobile-section-title">
             <h2>Путеводитель</h2>
             <span>{{ mobileGroups.length }} группы</span>
           </div>
           <div class="tkk-mobile-groups">
             <section v-for="(group, groupIndex) in mobileGroups" :key="group.name" class="tkk-mobile-group">
-              <header><span>0{{ groupIndex + 1 }}</span><h3>{{ group.name }}</h3></header>
+              <header v-if="!vm.isLoreMap"><span>0{{ groupIndex + 1 }}</span><h3>{{ group.name }}</h3></header>
               <button v-for="section in group.sections" :key="section" type="button" class="ds-control" @click="openSection(section)">
                 <span class="tkk-mobile-section-knot"><img v-if="nodeImg(section, state.active)" :src="nodeImg(section, state.active)" alt=""></span>
                 <b>{{ section }}</b>

@@ -294,7 +294,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="screens-page">
+  <div class="screens-page ds-reference">
     <div ref="railEl" class="screens-shell">
       <NuxtLink to="/dnd5e" class="screens-emblem" title="Вернуться к D&D 5e">
         <span class="screens-emblem-badge">
@@ -305,15 +305,8 @@ useSeoMeta({
       <span ref="sparkEl" class="thread-spark" aria-hidden="true" />
 
     <header class="screens-header">
-      <nav class="screens-crumb" aria-label="Навигация">
-        <NuxtLink to="/">Системы</NuxtLink>
-        <span>/</span>
-        <NuxtLink to="/dnd5e">D&D 5e</NuxtLink>
-        <span>/</span>
-        <span>Ширма</span>
-      </nav>
-
-      <p class="screens-kicker">D&D 5e 2014</p>
+      <UiBreadcrumb :items="[{ to: '/', label: 'Системы' }, { to: '/dnd5e', label: 'D&D 2014' }]" current="Ширма правил" />
+      <p class="screens-kicker">D&D 5e · редакция 2014</p>
       <h1>Ширма правил</h1>
       <p class="screens-lead">
         Все правила игры — части одной нити. Потяните за узел — нить сплетётся
@@ -324,22 +317,22 @@ useSeoMeta({
         <input
           v-model="search"
           type="search"
-          class="screens-search"
+          class="screens-search ds-control"
           placeholder="Найти правило, термин или раздел"
           aria-label="Поиск по ширме"
         >
         <button
           type="button"
-          class="screens-filter-btn"
+          class="screens-filter-btn ds-control ds-button"
           :class="{ active: activeFilters.length || activeSources.length || showFilter }"
           :aria-expanded="showFilter"
           title="Фильтр и источники"
           @click="showFilter = !showFilter"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <UiActionIcon name="filter" /><span>Фильтры</span>
           <span v-if="activeFilters.length + activeSources.length" class="screens-filter-count">{{ activeFilters.length + activeSources.length }}</span>
         </button>
-        <span class="screens-count">{{ totalVisible }} / {{ totalScreens }}</span>
+        <span class="screens-count" role="status" :aria-label="`Найдено: ${totalVisible} из ${totalScreens}`">{{ totalVisible }} / {{ totalScreens }}</span>
       </div>
 
       <Transition name="weave">
@@ -351,8 +344,9 @@ useSeoMeta({
                 v-for="group in groups"
                 :key="group.id"
                 type="button"
-                class="screens-filter-chip"
+                class="screens-filter-chip ds-control ds-button"
                 :class="{ active: activeFilters.includes(group.id) }"
+                :aria-pressed="activeFilters.includes(group.id)"
                 @click="toggleFilter(group.id)"
               >
                 {{ group.title }}
@@ -370,8 +364,9 @@ useSeoMeta({
                 v-for="src in SOURCE_OPTIONS"
                 :key="src.code"
                 type="button"
-                class="screens-filter-chip"
+                class="screens-filter-chip ds-control ds-button"
                 :class="{ active: activeSources.includes(src.code) }"
+                :aria-pressed="activeSources.includes(src.code)"
                 :title="src.label"
                 @click="toggleSource(src.code)"
               >
@@ -383,7 +378,7 @@ useSeoMeta({
           <button
             v-if="activeFilters.length || activeSources.length"
             type="button"
-            class="screens-filter-clear"
+            class="screens-filter-clear ds-control ds-button"
             @click="resetFilters"
           >
             Сбросить всё
@@ -590,7 +585,7 @@ useSeoMeta({
         </div>
       </section>
 
-      <div v-if="!filteredGroups.length" class="screens-empty">
+      <div v-if="!filteredGroups.length" class="screens-empty ds-empty">
         Ничего не найдено. Попробуйте другой термин.
       </div>
       </div>
@@ -1742,4 +1737,18 @@ useSeoMeta({
     row-gap:2px;
   }
 }
+
+.ds-reference .ds-crumb{margin-bottom:14px}
+.ds-reference .screens-header h1{font-family:var(--ds-serif);font-size:clamp(2rem,4vw,3.5rem);letter-spacing:0;text-transform:none}
+.ds-reference .screens-kicker{color:var(--ds-muted-text);font:650 var(--ds-label)/1.35 var(--ds-sans);letter-spacing:.09em}
+.ds-reference .screens-thread-line{opacity:var(--ds-thread-opacity)}
+.ds-reference .screens-controls{gap:8px;margin-top:18px;flex-wrap:wrap}
+.ds-reference .screens-search{min-height:var(--ds-control-size);padding:8px 10px;border:1px solid var(--ds-control-border);border-radius:var(--ds-control-radius);font-family:var(--ds-sans)}
+.ds-reference .screens-search::placeholder,.ds-reference .screens-count{color:var(--ds-muted-text)}
+.ds-reference .screens-filter-btn,.ds-reference .screens-filter-clear{display:inline-flex;width:auto;height:auto;white-space:nowrap;font:600 var(--ds-label)/1.25 var(--ds-sans);letter-spacing:0;text-transform:none}
+.ds-reference .screens-filter-count{position:static;min-width:17px;height:auto;padding:2px 4px;border-radius:6px;font-size:11px;line-height:1.2}
+.ds-reference .screens-filter-chip{font:600 var(--ds-label)/1.25 var(--ds-sans);letter-spacing:0;text-transform:none}
+.ds-reference .screens-filter-label,.ds-reference .screens-filter-loading{font-size:var(--ds-label);color:var(--ds-muted-text)}
+.ds-reference .screens-empty{font:500 .875rem/1.5 var(--ds-sans);color:var(--ds-muted-text)}
+@media(max-width:760px){.ds-reference .screens-search{flex:1 1 120px}.ds-reference .screens-count{flex-basis:100%}}
 </style>

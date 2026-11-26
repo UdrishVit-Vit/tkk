@@ -1,5 +1,6 @@
 <script setup>
 import { PANTHEON_THREAD, PANTHEON_CONTENT } from '~/data/lorePantheon.js'
+import LoreReaderNav from './LoreReaderNav.vue'
 
 const props = defineProps({
   section: { type: Object, required: true },
@@ -154,26 +155,25 @@ onBeforeUnmount(() => {
 <template>
   <main class="era-page ds-lore">
     <div class="era-page__texture" aria-hidden="true" />
-    <div class="era-path">
-      <NuxtLink to="/lore/pantheon" class="ds-control ds-button"><UiActionIcon name="back" /> К Пантеону</NuxtLink>
-      <UiBreadcrumb :items="[{ to: '/lore', label: 'Lore' }, { to: '/lore/pantheon', label: 'Пантеон' }]" :current="section.title" />
-    </div>
-    <section class="era-heading">
-      <div class="era-heading__knot" aria-hidden="true">
-        <span>{{ String(index + 1).padStart(2, '0') }}</span>
-      </div>
-      <h1>{{ section.title }}</h1>
-    </section>
-
-    <label v-if="chapters.length" class="era-mobile-chapters">
-      <span>Глава</span>
-      <select class="ds-control" :value="activeSlug" @change="selectChapter($event.target.value)">
-        <option v-if="hasIntro" value="">Вступление</option>
-        <option v-for="(chapter, chapterIndex) in chapters" :key="chapter.slug" :value="chapter.slug">
-          {{ index + 1 }}.{{ chapterIndex + 1 }} · {{ chapter.title }}
-        </option>
-      </select>
-    </label>
+    <LoreReaderNav
+      back-to="/lore/pantheon"
+      back-label="К Пантеону"
+      :chapters="chapters"
+      :chapter-prefix="index + 1"
+      :has-intro="hasIntro"
+      :active-slug="activeSlug"
+      @update:active-slug="selectChapter"
+    >
+      <template #breadcrumbs>
+        <UiBreadcrumb :items="[{ to: '/lore', label: 'Lore' }, { to: '/lore/pantheon', label: 'Пантеон' }]" :current="section.title" />
+      </template>
+      <section class="era-heading">
+        <div class="era-heading__knot" aria-hidden="true">
+          <span>{{ String(index + 1).padStart(2, '0') }}</span>
+        </div>
+        <h1>{{ section.title }}</h1>
+      </section>
+    </LoreReaderNav>
 
     <nav v-if="chapters.length" class="era-thread" aria-label="Божества и сущности рода">
       <div class="era-thread__line" aria-hidden="true"><i /><i /><i /></div>
@@ -279,8 +279,6 @@ onBeforeUnmount(() => {
 @media(max-width:680px){.era-page{padding-bottom:48px}.era-heading{min-height:126px;padding:24px 20px;gap:25px;text-align:left}.era-heading::before,.era-heading::after{display:none}.era-heading__knot{width:48px;height:48px}.era-heading h1{font-size:42px}.era-thread{padding:20px 15px;gap:15px 11px}.era-thread button{width:calc(50% - 6px);min-height:88px;padding:18px 12px}.era-thread button>strong{font-size:16px}.era-stage{width:100%;margin-top:28px;padding:0 16px 17px;grid-template-columns:1fr 1fr;border-bottom:1px solid rgba(var(--theme-accent-rgb),.13)}.era-reader{grid-column:1/-1;grid-row:1;min-height:330px;padding:38px 22px 23px;border-inline:0;border-bottom:1px solid rgba(var(--theme-accent-rgb),.13)}.era-reader__body{padding-top:30px}.era-reader__body>p{font-size:19px;line-height:1.62}.era-reader blockquote{margin:26px -2px;padding:27px 14px}.era-reader blockquote p{font-size:17px}.era-direction,.era-direction-placeholder{position:relative;top:auto;grid-row:2;min-height:116px;padding:23px 9px 12px}.era-direction--previous{grid-column:1}.era-direction--next{grid-column:2}.era-direction small{margin:9px 0 6px}.era-direction strong{font-size:16px}.era-direction__arrow{height:18px}.era-direction__arrow b{width:19px;height:19px;font-size:18px}.era-stage__swipe{display:block;grid-column:1/-1;grid-row:3;margin:10px 0 0;text-align:center;font:500 6px/1 'Hanken Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--theme-text-rgb),.27)}.era-stage__swipe span{padding:0 8px;color:rgba(var(--theme-accent-rgb),.55)}}
 @media(prefers-reduced-motion:reduce){.era-reader,.era-thread button,.era-heading__knot,.era-heading__knot::before,.era-heading__knot::after,.page-forward-enter-active,.page-forward-leave-active,.page-backward-enter-active,.page-backward-leave-active{transition:none!important}}
 
-.era-path{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;width:min(1040px,calc(100% - 32px));margin:0 auto;padding-top:14px}
-.era-path .ds-button{background:transparent}
 .era-heading .era-heading__knot{cursor:default;pointer-events:none}
 .era-heading h1,.era-reader h2{font-family:var(--ds-serif)}
 .era-reader__body>p{font-family:var(--ds-serif)}
@@ -288,13 +286,9 @@ onBeforeUnmount(() => {
 .era-thread button{border-color:var(--ds-control-border)}
 .era-thread button>span,.era-reader__scene>header>span,.era-direction small,.era-reader__progress{font:600 var(--ds-label)/1.2 var(--ds-sans);color:var(--ds-muted-text)}
 .era-reader .era-reader__empty{font:500 .875rem/1.5 var(--ds-sans);color:var(--ds-muted-text)!important}
-.era-mobile-chapters{display:none}
 @media(max-width:760px){
-  .era-path{width:auto;margin:0 16px;gap:6px 12px;padding-top:10px}
   .era-heading{min-height:96px;padding:14px 16px;gap:16px;justify-content:flex-start}
   .era-thread{display:none}
-  .era-mobile-chapters{display:grid;gap:5px;margin:12px 16px 0;color:var(--ds-muted-text);font:600 var(--ds-label)/1.25 var(--ds-sans)}
-  .era-mobile-chapters select{width:100%;min-height:var(--ds-control-size);padding:8px 10px;border:1px solid var(--ds-control-border);border-radius:var(--ds-control-radius);background:var(--theme-surface);color:var(--ds-ink);font:500 1rem/1.3 var(--ds-sans)}
   .era-stage{margin-top:14px}
   .era-reader__scene>header{padding-bottom:16px}
   .era-reader__body{padding-top:20px}

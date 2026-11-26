@@ -82,15 +82,9 @@ const filters = computed(() => [
     label: 'Уровень',
     options: [
       { value: '0', label: 'Заговоры' },
-      { value: '1', label: '1-й уровень' },
-      { value: '2', label: '2-й уровень' },
-      { value: '3', label: '3-й уровень' },
-      { value: '4', label: '4-й уровень' },
-      { value: '5', label: '5-й уровень' },
-      { value: '6', label: '6-й уровень' },
-      { value: '7', label: '7-й уровень' },
-      { value: '8', label: '8-й уровень' },
-      { value: '9', label: '9-й уровень' }
+      ...LEVEL_GROUPS.slice(1).map(({ level }) => ({
+        value: String(level), label: String(level), ariaLabel: `${level}-й уровень`
+      }))
     ]
   },
   {
@@ -140,10 +134,7 @@ const filters = computed(() => [
   }
 ])
 
-const activeCount = computed(() => (
-  active.level.length + active.school.length + active.class.length + active.concentration.length
-  + active.ritual.length + active.component.length
-))
+const activeCount = computed(() => Object.values(active).reduce((count, values) => count + values.length, 0))
 
 function isActive(key, value) {
   return active[key]?.includes(value)
@@ -195,10 +186,12 @@ useSeoMeta({
     :total="DND55E_SPELLS.length"
     :visible="visibleSpells.length"
     :filters="filters"
+    :primary-filter-keys="['level', 'class']"
     :is-active="isActive"
     :active-filter-count="activeCount"
     :columns="2"
     design-pilot
+    compact-rail
     :thread-web="true"
     :card-actions="['link', 'bookmark', 'print', 'expand', 'close']"
     :bookmark-store="DND55E_SPELL_BOOKMARK_STORE"
@@ -323,5 +316,11 @@ useSeoMeta({
   .spell-heading-icon img{width:40px;height:40px}
   .spell-title{font-size:25px}
   .spell-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:600px){
+  .spell-list-card{grid-template-columns:30px minmax(0,1fr);gap:7px}
+  .spell-list-icon{width:30px;height:34px;padding-right:4px}
+  .spell-list-icon img{width:25px;height:25px}
+  .spell-heading,.spell-stats,.spell-rules,.spell-classes{overflow-wrap:anywhere}
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup>
-defineProps({ designPilot: { type: Boolean, default: false } })
+defineProps({ designPilot: { type: Boolean, default: false }, hubPath: { type: String, default: '/dnd55e' } })
+const emit = defineEmits(['search'])
 const pilotActions = [
-  { panel: 'search', icon: 'search', label: 'Поиск' },
   { panel: 'bookmarks', icon: 'bookmark', label: 'Закладки' },
   { panel: 'systems', icon: 'systems', label: 'Системы' },
 ]
@@ -27,7 +27,8 @@ function active(path) {
     </NuxtLink>
 
     <template v-if="designPilot">
-      <NuxtLink v-for="action in pilotActions" :key="action.panel" :to="{ path: '/dnd55e', query: { panel: action.panel } }" class="site-sidebar-btn ds-control" :title="action.label" :aria-label="action.label">
+      <button type="button" class="site-sidebar-btn ds-control" title="Поиск" aria-label="Поиск" aria-haspopup="dialog" @click="emit('search')"><UiActionIcon name="search" /></button>
+      <NuxtLink v-for="action in pilotActions" :key="action.panel" :to="{ path: hubPath, query: { panel: action.panel } }" class="site-sidebar-btn ds-control" :title="action.label" :aria-label="action.label">
         <UiActionIcon :name="action.icon" />
       </NuxtLink>
       <ThemeSwitcher compact />

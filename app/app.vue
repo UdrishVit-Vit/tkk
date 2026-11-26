@@ -11,7 +11,11 @@ const embeddedThemeRoute = computed(() => (
   || /^\/dnd55e\/species(?:\/|$)/.test(route.path)
 ))
 const showSiteSidebar = computed(() => !hubRoute.value && !embeddedThemeRoute.value)
-const pilotReference = computed(() => route.path.replace(/\/$/, '') === '/dnd55e/spells')
+const referenceSystem = computed(() => ({ '/dnd55e/spells': '2024', '/dnd5e/screens': '5e' })[route.path.replace(/\/$/, '')])
+const pilotReference = computed(() => Boolean(referenceSystem.value))
+const referenceHub = computed(() => referenceSystem.value === '5e' ? '/dnd5e' : '/dnd55e')
+const referenceSearch = ref(null)
+function openReferenceSearch() { referenceSearch.value?.show() }
 
 useHead(() => ({
   htmlAttrs: { 'data-theme': theme.value, style: 'color-scheme:dark' },
@@ -26,8 +30,9 @@ useHead(() => ({
     <div class="site-page-frame" :class="{ 'with-sidebar': showSiteSidebar, 'pilot-reference-frame': pilotReference }">
       <NuxtPage />
     </div>
-    <SiteSidebar v-if="showSiteSidebar" :design-pilot="pilotReference" :class="{ 'site-sidebar-desktop-only': pilotReference }" :key="`site-sidebar:${route.path}`" />
-    <UiMobileNav v-if="pilotReference" panels-in-hub hub-path="/dnd55e" />
+    <SiteSidebar v-if="showSiteSidebar" :design-pilot="pilotReference" :hub-path="referenceHub" :class="{ 'site-sidebar-desktop-only': pilotReference }" :key="`site-sidebar:${route.path}`" @search="openReferenceSearch" />
+    <UiMobileNav v-if="pilotReference" panels-in-hub inline-search :hub-path="referenceHub" @select="openReferenceSearch" />
+    <UiReferenceSearch v-if="pilotReference" ref="referenceSearch" :system="referenceSystem" />
   </UApp>
 </template>
 

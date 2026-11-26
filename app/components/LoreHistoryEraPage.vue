@@ -1,6 +1,7 @@
 <script setup>
 import { HISTORY_THREAD } from '~/data/loreHistory.js'
 import historyContent from '~/data/loreHistoryContent.generated.json'
+import LoreReaderNav from './LoreReaderNav.vue'
 
 const props = defineProps({
   section: { type: Object, required: true },
@@ -155,18 +156,27 @@ onBeforeUnmount(() => {
 <template>
   <main class="era-page">
     <div class="era-page__texture" aria-hidden="true" />
-    <section class="era-heading">
-      <NuxtLink
-        to="/lore/history"
-        class="era-heading__knot"
-        :class="{ 'has-emblem': section.emblem, 'is-rebirth': section.slug === 'epoha-pererozhdeniya', 'is-light': section.slug === 'epoha-sveta', 'is-human': section.slug === 'epoha-lyudey', 'is-restore': section.slug === 'epoha-vosstanovleniya', 'is-winds': section.slug === 'vremya-vetrov' }"
-        aria-label="Вернуться к общей нити истории"
-      >
-        <img v-if="section.emblem" :src="section.emblem" width="256" height="256" alt="" decoding="async">
-        <span v-else>{{ String(index).padStart(2, '0') }}</span>
-      </NuxtLink>
-      <h1>{{ section.title }}</h1>
-    </section>
+    <LoreReaderNav
+      back-to="/lore/history"
+      back-label="К хронике"
+      :chapters="chapters"
+      :chapter-prefix="index"
+      :has-intro="hasIntro"
+      :active-slug="activeSlug"
+      @update:active-slug="selectChapter"
+    >
+      <section class="era-heading">
+        <div
+          class="era-heading__knot"
+          :class="{ 'has-emblem': section.emblem, 'is-rebirth': section.slug === 'epoha-pererozhdeniya', 'is-light': section.slug === 'epoha-sveta', 'is-human': section.slug === 'epoha-lyudey', 'is-restore': section.slug === 'epoha-vosstanovleniya', 'is-winds': section.slug === 'vremya-vetrov' }"
+          aria-hidden="true"
+        >
+          <img v-if="section.emblem" :src="section.emblem" width="256" height="256" alt="" decoding="async">
+          <span v-else>{{ String(index).padStart(2, '0') }}</span>
+        </div>
+        <h1>{{ section.title }}</h1>
+      </section>
+    </LoreReaderNav>
 
     <nav v-if="chapters.length" class="era-thread" aria-label="Подразделы эпохи">
       <div class="era-thread__line" aria-hidden="true"><i /><i /><i /></div>
@@ -175,6 +185,7 @@ onBeforeUnmount(() => {
         :key="chapter.slug"
         type="button"
         :class="{ 'is-active': activeSlug === chapter.slug }"
+        :aria-current="activeSlug === chapter.slug ? 'location' : undefined"
         @click="selectChapter(chapter.slug)"
       >
         <span>{{ index }}.{{ chapterIndex + 1 }}</span>
@@ -273,5 +284,13 @@ onBeforeUnmount(() => {
 @media(max-width:680px){.era-heading__knot.has-emblem.is-human{width:68px;height:68px}.era-heading__knot.has-emblem.is-human img{width:66px;height:66px}}
 @media(max-width:680px){.era-heading__knot.has-emblem.is-restore{width:70px;height:70px}.era-heading__knot.has-emblem.is-restore img{width:68px;height:68px}}
 @media(max-width:680px){.era-heading__knot.has-emblem.is-winds{width:66px;height:66px}.era-heading__knot.has-emblem.is-winds img{width:64px;height:64px}}
+.era-heading .era-heading__knot{cursor:default;pointer-events:none}
+@media(max-width:760px){
+  .era-heading{min-height:96px;padding:14px 16px;gap:16px;justify-content:flex-start}
+  .era-thread{display:none}
+  .era-stage{margin-top:14px}
+  .era-reader__scene>header{padding-bottom:16px}
+  .era-reader__body{padding-top:20px}
+}
 @media(prefers-reduced-motion:reduce){.era-reader,.era-thread button,.era-heading__knot,.era-heading__knot::before,.era-heading__knot::after,.page-forward-enter-active,.page-forward-leave-active,.page-backward-enter-active,.page-backward-leave-active{transition:none!important}}
 </style>

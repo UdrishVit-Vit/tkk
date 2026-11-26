@@ -4,18 +4,24 @@ const props = defineProps(['vm', 'state'])
 const emit = defineEmits(['close', 'stop'])
 const { themes } = useKnotTheme()
 const { bookmarks, load: loadSpellBookmarks } = useThreadBookmarks(DND55E_SPELL_BOOKMARK_STORE)
+const { bookmarks: rules2014, load: loadRules2014 } = useRuleBookmarks5e()
 const searchInput = ref(null)
+const ruleLinks = computed(() => rules2014.value.filter(item => typeof item.path === 'string' && item.path.startsWith('/dnd5e/')))
+function loadReferenceBookmarks() {
+  loadSpellBookmarks()
+  loadRules2014()
+}
 const spellLinks = computed(() => bookmarks.value.flatMap((item) => {
   const spell = new URLSearchParams(item.query).get('spell')
   return spell ? [{ key: item.key, title: item.title, to: { path: '/dnd55e/spells', query: { spell } } }] : []
 }))
 
 watch(() => props.state.overlay, (overlay) => {
-  if (overlay === 'bookmarks') loadSpellBookmarks()
+  if (overlay === 'bookmarks') loadReferenceBookmarks()
   if (overlay === 'search') searchInput.value?.focus()
 }, { flush: 'post' })
 onMounted(() => {
-  if (props.state.overlay === 'bookmarks') loadSpellBookmarks()
+  if (props.state.overlay === 'bookmarks') loadReferenceBookmarks()
   if (props.state.overlay === 'search') searchInput.value?.focus()
 })
 
@@ -53,10 +59,13 @@ function stop(e) { e?.stopPropagation?.() }
 
   <div v-if="state.overlay === 'bookmarks'" class="pop" style="top:130px" @click="stop">
     <div class="pop-title">Сохранённые нити</div>
-    <div v-if="vm.hasBookmarks || spellLinks.length" class="pop-list">
+    <div v-if="vm.hasBookmarks || spellLinks.length || ruleLinks.length" class="pop-list">
       <div v-for="(b, i) in vm.bookmarks" :key="i" class="pop-row"><span style="color:rgba(200,210,240,.5)">◦</span>{{ b }}</div>
       <NuxtLink v-for="item in spellLinks" :key="item.key" :to="item.to" class="pop-row ds-control" @click="emit('close')">
-        <UiActionIcon name="bookmark" /> {{ item.title }}
+        <UiActionIcon name="bookmark" /> <span>{{ item.title }} <small>· D&D 2024</small></span>
+      </NuxtLink>
+      <NuxtLink v-for="item in ruleLinks" :key="item.path" :to="item.path" class="pop-row ds-control" @click="emit('close')">
+        <UiActionIcon name="bookmark" /> <span>{{ item.title }} <small>· D&D 2014</small></span>
       </NuxtLink>
     </div>
     <div v-else class="pop-empty ds-empty">Пока нет сохранённых нитей</div>
