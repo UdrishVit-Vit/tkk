@@ -145,6 +145,12 @@ export const LORE_GLOSSARY_ARCHIVE = [
     related: ['ulungury', 'nochnaya-kolesnitsa', 'kolossy'], history: 'epoha-sveta',
   },
   {
+    id: 'shamas', term: 'Шамас', type: 'deity', category: 'foundations',
+    definition: 'Золотой солнечный диск Эноа, солнце силы, гордости и тепла. На рассвете Шамас рассеивает тьму и посылает против неё восемь первых лучей — Всадников Рассвета. После Лета Трёх Солнц, когда Даскар сбил Улу и Азрака, Шамас остался на небе.',
+    related: ['ula', 'azrak', 'leto-treh-solnts'], history: 'epoha-sveta',
+    sourceRoute: { path: '/lore/pantheon/luny-i-solntsa', query: { chapter: 'tri-luny-i-tri-solntsa' } },
+  },
+  {
     id: 'ula', term: 'Ула', category: 'foundations', aliases: ['Красное солнце', 'Мстительное солнце'],
     definition: 'Красное мстительное солнце Эноа, выжигавшее земли досуха. Даскар сбил Улу с неба, а её осколки сокрыли от мира, чтобы она больше никогда не увидела синего неба.',
     related: ['shamas', 'azrak', 'leto-treh-solnts'], history: 'epoha-sveta',

@@ -13,6 +13,7 @@ import {
 } from '~/data/loreGlossary.js'
 import { ogniChapterLink } from '~/data/loreOgniGlossary/index.js'
 import { LORE_DOSSIERS } from '~/data/loreDossiers.js'
+import { glossaryTermPath, glossaryThreadLinks } from '~/data/loreGlossaryThreads.js'
 
 defineProps({ theme: { type: Object, default: () => ({}) } })
 defineEmits(['up'])
@@ -180,7 +181,7 @@ const termsBeforeLetter = computed(() => {
     .filter(term => activeCategory.value === 'all' || term.category === activeCategory.value)
     .filter(term => activeSource.value === 'all' || sourceIdsFor(term).includes(activeSource.value))
     .filter(term => !historyOnly.value || Boolean(term.history))
-    .filter(term => !relatedOnly.value || Boolean(term.related?.length))
+    .filter(term => !relatedOnly.value || Boolean(term.related?.length || term.links?.length || glossaryThreadLinks(term.ogni).length))
     .filter((term) => {
       if (!needle) return true
       const source = sourceFor(term)
@@ -224,13 +225,13 @@ const activeId = ref(termFromRoute())
 detailVisible.value = Boolean(activeId.value)
 mobileDetailOpen.value = Boolean(activeId.value)
 const glossaryById = computed(() => new Map(glossary.value.map(term => [term.id, term])))
+const selectedUnavailable = computed(() => Boolean(activeId.value && !glossaryById.value.has(activeId.value)))
 const selected = computed(() => (
-  glossaryById.value.get(activeId.value)
-  || filteredTerms.value[0]
-  || null
+  activeId.value ? glossaryById.value.get(activeId.value) ?? null : filteredTerms.value[0] ?? null
 ))
 const selectedSource = computed(() => sourceFor(selected.value))
-const selectedSources = computed(() => sourcesFor(selected.value))
+const selectedSources = computed(() => sourcesFor(selected.value).filter(source => source.id !== 'ogni'))
+const campaignThreads = computed(() => glossaryThreadLinks(selected.value?.ogni))
 const selectedAttribution = computed(() => selected.value?.attributedTo || selectedSource.value?.attributedTo)
 const relatedTerms = computed(() => {
   const visible = glossaryById.value
@@ -380,26 +381,6 @@ const showLead = computed(() => {
     .some(word => !role.includes(word))
 })
 
-// Тридцать два номера подряд ничего не сообщают. Диапазон сообщает.
-const chapterSpan = computed(() => {
-  const ogni = selected.value?.ogni
-  const current = ogni?.chapters || []
-  const previous = ogni?.seasons?.filter(item => item.season < ogni.season && item.chapters.length).at(-1)
-  const chapters = current.length ? current : previous?.chapters || []
-  if (!chapters.length) return null
-  const season = current.length ? ogni.season : previous.season
-  const first = chapters[0]
-  const last = chapters[chapters.length - 1]
-  if (chapters.length === 1) return { label: `сезон ${season} · глава ${first}`, season, chapter: first }
-  if (chapters.length <= 4) return { label: `сезон ${season} · главы ${chapters.join(', ')}`, season, chapter: first }
-  const solid = last - first + 1 === chapters.length
-  return {
-    label: solid ? `сезон ${season} · главы ${first}—${last}` : `сезон ${season} · ${chapters.length} глав, с ${first} по ${last}`,
-    season,
-    chapter: first,
-  }
-})
-
 // Связь ведёт к статье свода «Огни»: у слитых статей её id — это id архива,
 // поэтому ищем и по нему, и по исходному ключу кампании.
 const selectedRelations = computed(() => {
@@ -457,8 +438,8 @@ function syncQuery(push = false) {
   // получает свой URL.
   delete next.term
 
-  const openId = detailVisible.value ? selected.value?.id : ''
-  const path = openId ? `${GLOSSARY_PATH}/${openId}` : GLOSSARY_PATH
+  // Previewing a filtered result must not navigate to its article and remount the search field.
+  const path = glossaryTermPath(detailVisible.value ? activeId.value : '')
   if (path === route.path && JSON.stringify(next) === JSON.stringify(route.query)) return
   // Переход к другой статье — это навигация, кнопка «назад» должна её отменять.
   // Смена фильтра — уточнение того же экрана, история им не засоряется.
@@ -778,13 +759,12 @@ function handleKeydown(event) {
 }
 
 watch([query, activeSource, activeLetter, sortDirection, historyOnly, relatedOnly, seasonNumber, chapterCut], () => {
-  if (!filteredTerms.value.some(term => term.id === activeId.value)) activeId.value = ''
   syncQuery()
 })
 
 // Адрес — источник правды о выбранной статье: кнопки «назад» и «вперёд»
 // в браузере должны листать глоссарий, а не только менять строку адреса.
-watch(() => [route.params.slug, route.query.term], () => {
+watch([() => route.params.slug, () => route.query.term], () => {
   const fromRoute = termFromRoute()
   if (!fromRoute || fromRoute === activeId.value) return
   activeId.value = fromRoute
@@ -994,7 +974,7 @@ onBeforeUnmount(() => {
               <div class="filter-section-title filter-options-title"><span><i>05</i> Дополнительные условия</span><small>Необязательно</small></div>
               <div class="filter-switches">
                 <button :class="{ active: historyOnly }" type="button" :aria-pressed="historyOnly" @click="historyOnly = !historyOnly"><i><span /></i><span><b>Нить истории</b><small>Только упомянутые в летописи</small></span></button>
-                <button :class="{ active: relatedOnly }" type="button" :aria-pressed="relatedOnly" @click="relatedOnly = !relatedOnly"><i><span /></i><span><b>Связанные понятия</b><small>Только записи со связями</small></span></button>
+                <button :class="{ active: relatedOnly }" type="button" :aria-pressed="relatedOnly" @click="relatedOnly = !relatedOnly"><i><span /></i><span><b>Связанные нити</b><small>Только записи со связями</small></span></button>
               </div>
             </div>
 
@@ -1080,8 +1060,8 @@ onBeforeUnmount(() => {
           <p v-else-if="!portraitFacets.length" class="definition"><span :class="dropcapMode === 'drop' ? 'definition-dropcap' : 'definition-versal'">{{ selected.definition.slice(0, 1) }}</span><LoreRichText :text="selected.definition.slice(1)" :skip-id="selected.id" @preview="showTermCard" /></p>
 
 
-          <section v-if="relatedTerms.length" class="related-block" aria-labelledby="glossary-related-title">
-            <h3 id="glossary-related-title">Связанные понятия</h3>
+          <section v-if="relatedTerms.length || campaignThreads.length" class="related-block" aria-labelledby="glossary-related-title">
+            <h3 id="glossary-related-title">Связанные нити</h3>
             <ul>
               <li v-for="relation in relatedTerms" :key="relation.key">
                 <NuxtLink
@@ -1098,7 +1078,23 @@ onBeforeUnmount(() => {
                   <span class="relation-arrow" aria-hidden="true">→</span>
                 </NuxtLink>
               </li>
+              <li v-for="chapter in campaignThreads.slice(0, 4)" :key="`ogni:${chapter.key}`">
+                <NuxtLink :to="chapter.to" class="relation-link ds-control" no-prefetch>
+                  <i aria-hidden="true" /><span><span class="relation-label">Упоминание в кампании</span><strong>{{ chapter.title }}</strong></span>
+                  <span class="relation-arrow" aria-hidden="true">→</span>
+                </NuxtLink>
+              </li>
             </ul>
+            <details v-if="campaignThreads.length > 4" class="more-threads">
+              <summary class="ds-control">Другие главы «Огней» ({{ campaignThreads.length - 4 }})</summary>
+              <ul>
+                <li v-for="chapter in campaignThreads.slice(4)" :key="chapter.key">
+                  <NuxtLink :to="chapter.to" class="relation-link ds-control" no-prefetch>
+                    <i aria-hidden="true" /><strong>{{ chapter.title }}</strong><span class="relation-arrow" aria-hidden="true">→</span>
+                  </NuxtLink>
+                </li>
+              </ul>
+            </details>
           </section>
 
           <section v-if="selectedDossier" class="dossier-block">
@@ -1122,15 +1118,7 @@ onBeforeUnmount(() => {
           </section>
 
           <section v-if="selected.ogni" class="ogni-block">
-            <header>
-              <span>Свод «Огни» · сезон {{ selected.ogni.season }}</span>
-              <NuxtLink
-                v-if="chapterSpan"
-                class="ogni-span"
-                :to="chapterLink(chapterSpan.season, chapterSpan.chapter)"
-                :title="chapterTitle(chapterSpan.season, chapterSpan.chapter)"
-              >{{ chapterSpan.label }}</NuxtLink>
-            </header>
+            <header><span>Свод «Огни» · сезон {{ selected.ogni.season }}</span></header>
 
             <section v-for="facet in portraitFacets" :key="facet.id" class="ogni-portrait">
               <h3>{{ facet.label }}</h3>
@@ -1182,13 +1170,20 @@ onBeforeUnmount(() => {
             </p>
           </section>
 
-          <dl class="provenance">
-            <div v-for="source in selectedSources" :key="source.id">
-              <dt>{{ source.id === 'ogni' ? 'Свидетельство кампании' : 'Источник Нити' }}</dt>
-              <dd><b><span>{{ source.mark }}</span></b>{{ source.title }}</dd>
-              <p>{{ source.id === 'ogni' ? source.attributedTo : selectedAttribution }}</p>
-            </div>
-          </dl>
+          <section v-if="selectedSources.length" class="related-block thread-sources" aria-labelledby="glossary-source-title">
+            <h3 id="glossary-source-title">{{ selectedSources.length === 1 ? 'Источник нити' : 'Источники нити' }}</h3>
+            <ul>
+              <li v-for="source in selectedSources" :key="source.id">
+                <NuxtLink v-if="selected.sourceRoute" :to="selected.sourceRoute" class="relation-link ds-control">
+                  <i aria-hidden="true" /><span><span class="relation-label">{{ selectedAttribution }}</span><strong>{{ source.title }}</strong></span>
+                  <span class="relation-arrow" aria-hidden="true">→</span>
+                </NuxtLink>
+                <div v-else class="relation-link thread-source-static">
+                  <i aria-hidden="true" /><span><span class="relation-label">{{ selectedAttribution }}</span><strong>{{ source.title }}</strong></span>
+                </div>
+              </li>
+            </ul>
+          </section>
 
           <NuxtLink v-if="selected.history" class="history-link" :to="`/lore/history/${selected.history}`">
             <span>В Нити Башни Мафраш</span>
@@ -1196,6 +1191,11 @@ onBeforeUnmount(() => {
             <i>↗</i>
           </NuxtLink>
         </template>
+        <div v-else-if="detailVisible && selectedUnavailable" class="detail-empty" role="status">
+          <i aria-hidden="true" />
+          <b>Запись пока недоступна</b>
+          <p>Она скрыта выбранным прогрессом чтения. Измените сезон или главу в фильтрах, чтобы открыть её.</p>
+        </div>
         <div v-else class="detail-empty">
           <i />
           <span>Запись архива закрыта</span>
@@ -1584,7 +1584,10 @@ onBeforeUnmount(() => {
   text-decoration: none;
   overflow-wrap: anywhere;
 }
-.relation-link:hover { border-color: var(--ds-focus); }
+a.relation-link:hover { border-color: var(--ds-focus); }
+.thread-source-static { grid-template-columns: 8px minmax(0, 1fr); }
+.more-threads { margin-top: 10px; }
+.more-threads summary { width: fit-content; padding: 8px 0; color: var(--ds-muted-text); cursor: pointer; }
 .relation-link i { width: 7px; height: 7px; border: 1px solid var(--theme-accent); transform: rotate(45deg); }
 .relation-link strong { display: block; font: 600 1.2rem/1.2 var(--ds-serif); }
 .relation-label { display: block; color: var(--ds-muted-text); font: var(--lore-meta); }
